@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom styles for card consultation interface */
+.card-container {
+  @apply relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200;
+}
+
+.card-face {
+  @apply w-full h-full absolute top-0 left-0 backface-hidden transition-transform duration-500;
+}
+
+.card-face.front {
+  @apply transform rotateY-0;
+}
+
+.card-face.back {
+  @apply transform rotateY-180;
+}
+
+.card-flipped .card-face.front {
+  @apply transform rotateY-180;
+}
+
+.card-flipped .card-face.back {
+  @apply transform rotateY-0;
+}
+
+.dragging {
+  @apply z-50 opacity-80 scale-105 cursor-grabbing;
+}
+
+.drop-zone {
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-4 transition-colors duration-200;
+}
+
+.drop-zone.active {
+  @apply border-blue-400 bg-blue-50;
+}
+
+.consultation-area {
+  @apply min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4;
+}
+
+.floating-panel {
+  @apply fixed bg-white rounded-lg shadow-lg border p-4 z-40;
+}

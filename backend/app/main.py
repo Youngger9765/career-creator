@@ -4,6 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.rooms import router as rooms_router
 from app.api.auth import router as auth_router
+from app.api.visitors import router as visitors_router
+from app.api.card_events import router as card_events_router
+from app.api.websocket import router as websocket_router
+
+# Import models to ensure they are registered with SQLModel
+from app.models.user import User
+from app.models.room import Room
+from app.models.visitor import Visitor
+from app.models.card_event import CardEvent
 
 app = FastAPI(
     title="Career Creator API",
@@ -26,6 +35,9 @@ app.add_middleware(
 # Include routers
 app.include_router(auth_router)
 app.include_router(rooms_router)
+app.include_router(visitors_router)
+app.include_router(card_events_router)
+app.include_router(websocket_router)
 
 @app.get("/")
 async def root():

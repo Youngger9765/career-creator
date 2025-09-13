@@ -12,6 +12,7 @@ from app.main import app
 from app.core.database import get_session
 from app.models.user import User, UserCreate
 from app.models.room import Room, RoomCreate
+from tests.helpers import create_auth_headers
 
 
 # Test database setup
@@ -72,7 +73,7 @@ class TestCreateRoom:
         response = client.post(
             f"/api/rooms",
             json=room_data,
-            headers={"user-id": str(test_user.id)}  # Mock authentication
+            headers=create_auth_headers(test_user)  # JWT authentication
         )
         
         assert response.status_code == 201
@@ -96,7 +97,7 @@ class TestCreateRoom:
         response = client.post(
             f"/api/rooms",
             json=room_data,
-            headers={"user-id": str(test_user.id)}
+            headers=create_auth_headers(test_user)
         )
         
         assert response.status_code == 201
@@ -113,7 +114,7 @@ class TestCreateRoom:
         response = client.post(
             f"/api/rooms",
             json=room_data,
-            headers={"user-id": str(test_user.id)}
+            headers=create_auth_headers(test_user)
         )
         
         assert response.status_code == 422  # Validation error
@@ -139,7 +140,7 @@ class TestGetRoom:
             id=uuid4(),
             name="Test Room",
             description="Test Description",
-            counselor_id=test_user.id,
+            counselor_id=str(test_user.id),  # Convert UUID to string
             share_code="ABC123",
             is_active=True
         )
@@ -165,7 +166,7 @@ class TestGetRoom:
         room = Room(
             id=uuid4(),
             name="Shared Room",
-            counselor_id=test_user.id,
+            counselor_id=str(test_user.id),  # Convert UUID to string
             share_code="XYZ789",
             is_active=True
         )

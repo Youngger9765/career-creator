@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.rooms import router as rooms_router
+from app.api.auth import router as auth_router
 
 app = FastAPI(
     title="Career Creator API",
@@ -23,6 +24,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth_router)
 app.include_router(rooms_router)
 
 @app.get("/")

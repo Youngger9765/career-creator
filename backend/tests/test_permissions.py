@@ -12,6 +12,7 @@ from app.main import app
 from app.core.database import get_session
 from app.core.roles import UserRole, Permission, has_permission, get_user_permissions
 from app.models.user import User
+from tests.helpers import create_auth_headers
 
 
 @pytest.fixture(name="session")
@@ -183,7 +184,7 @@ class TestAPIPermissionEnforcement:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         assert response.status_code == 201
         
@@ -191,7 +192,7 @@ class TestAPIPermissionEnforcement:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(admin.id)}
+            headers=create_auth_headers(admin)
         )
         assert response.status_code == 201
         
@@ -199,7 +200,7 @@ class TestAPIPermissionEnforcement:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(client_user.id)}
+            headers=create_auth_headers(client_user)
         )
         assert response.status_code == 403
         assert "Only counselors can create rooms" in response.json()["detail"]
@@ -208,7 +209,7 @@ class TestAPIPermissionEnforcement:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(observer.id)}
+            headers=create_auth_headers(observer)
         )
         assert response.status_code == 403
     
@@ -225,7 +226,7 @@ class TestAPIPermissionEnforcement:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         assert response.status_code == 201
         room_id = response.json()["id"]
@@ -236,7 +237,7 @@ class TestAPIPermissionEnforcement:
         response = client.put(
             f"/api/rooms/{room_id}",
             json=update_data,
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         assert response.status_code == 200
         
@@ -244,7 +245,7 @@ class TestAPIPermissionEnforcement:
         response = client.put(
             f"/api/rooms/{room_id}",
             json=update_data,
-            headers={"user-id": str(admin.id)}
+            headers=create_auth_headers(admin)
         )
         assert response.status_code == 200
         
@@ -252,7 +253,7 @@ class TestAPIPermissionEnforcement:
         response = client.put(
             f"/api/rooms/{room_id}",
             json=update_data,
-            headers={"user-id": str(another_counselor.id)}
+            headers=create_auth_headers(another_counselor)
         )
         assert response.status_code == 403
         
@@ -260,7 +261,7 @@ class TestAPIPermissionEnforcement:
         response = client.put(
             f"/api/rooms/{room_id}",
             json=update_data,
-            headers={"user-id": str(client_user.id)}
+            headers=create_auth_headers(client_user)
         )
         assert response.status_code == 403
 
@@ -311,7 +312,7 @@ class TestRoleEvolution:
         response = client.post(
             "/api/rooms",
             json={"name": "Test Room"},
-            headers={"user-id": str(user.id)}
+            headers=create_auth_headers(user)
         )
         assert response.status_code == 403
         
@@ -325,6 +326,6 @@ class TestRoleEvolution:
         response = client.post(
             "/api/rooms",
             json={"name": "Test Room"},
-            headers={"user-id": str(user.id)}
+            headers=create_auth_headers(user)
         )
         assert response.status_code == 201

@@ -43,7 +43,7 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     """Schema for user response (no sensitive data)"""
-    id: UUID
+    id: str  # Support both UUID and demo account string IDs
     roles: List[str]
     is_active: bool
-    created_at: datetime
+    created_at: str  # ISO string format for demo accounts

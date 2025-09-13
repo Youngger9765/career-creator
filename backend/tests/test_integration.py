@@ -12,6 +12,7 @@ from app.main import app
 from app.core.database import get_session
 from app.models.user import User
 from app.models.room import Room
+from tests.helpers import create_auth_headers
 
 
 @pytest.fixture(name="session")
@@ -112,7 +113,7 @@ class TestRoomWorkflow:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         
         assert response.status_code == 201
@@ -125,7 +126,7 @@ class TestRoomWorkflow:
         # Counselor can access own room
         response = client.get(
             f"/api/rooms/{room_id}",
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         assert response.status_code == 200
         assert response.json()["id"] == room_id
@@ -148,7 +149,7 @@ class TestRoomWorkflow:
         response = client.put(
             f"/api/rooms/{room_id}",
             json=update_data,
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         assert response.status_code == 200
         assert response.json()["name"] == "Updated Room Name"
@@ -157,14 +158,14 @@ class TestRoomWorkflow:
         response = client.put(
             f"/api/rooms/{room_id}",
             json=update_data,
-            headers={"user-id": str(client_user.id)}
+            headers=create_auth_headers(client_user)
         )
         assert response.status_code == 403
         
         # 5. Counselor can list their rooms
         response = client.get(
             "/api/rooms",
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         assert response.status_code == 200
         rooms = response.json()
@@ -174,7 +175,7 @@ class TestRoomWorkflow:
         # 6. Client user lists rooms (should be empty - they don't own any)
         response = client.get(
             "/api/rooms",
-            headers={"user-id": str(client_user.id)}
+            headers=create_auth_headers(client_user)
         )
         assert response.status_code == 200
         assert len(response.json()) == 0
@@ -199,7 +200,7 @@ class TestPermissionMatrix:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(counselor.id)}
+            headers=create_auth_headers(counselor)
         )
         assert response.status_code == 201
         
@@ -207,7 +208,7 @@ class TestPermissionMatrix:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(client_user.id)}
+            headers=create_auth_headers(client_user)
         )
         assert response.status_code == 403
         
@@ -215,7 +216,7 @@ class TestPermissionMatrix:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(observer.id)}
+            headers=create_auth_headers(observer)
         )
         assert response.status_code == 403
     
@@ -240,7 +241,7 @@ class TestPermissionMatrix:
         response = client.post(
             "/api/rooms",
             json=room_data,
-            headers={"user-id": str(multi_role_user.id)}
+            headers=create_auth_headers(multi_role_user)
         )
         assert response.status_code == 201
 
@@ -250,14 +251,24 @@ class TestErrorHandling:
     
     def test_invalid_user_id_across_endpoints(self, client: TestClient):
         """Test invalid user ID handling across different endpoints"""
+        from app.core.auth import create_access_token
         
         invalid_user_id = str(uuid4())  # Non-existent user
+        
+        # Create a token with invalid user ID
+        token_data = {
+            "sub": invalid_user_id,
+            "email": "invalid@test.com",
+            "roles": ["counselor"]
+        }
+        token = create_access_token(token_data)
+        headers = {"Authorization": f"Bearer {token}"}
         
         # Test create room with invalid user
         response = client.post(
             "/api/rooms",
             json={"name": "Test Room"},
-            headers={"user-id": invalid_user_id}
+            headers=headers
         )
         assert response.status_code == 404
         assert "User not found" in response.json()["detail"]
@@ -265,7 +276,7 @@ class TestErrorHandling:
         # Test list rooms with invalid user
         response = client.get(
             "/api/rooms",
-            headers={"user-id": invalid_user_id}
+            headers=headers
         )
         assert response.status_code == 404
         assert "User not found" in response.json()["detail"]
@@ -273,14 +284,14 @@ class TestErrorHandling:
     def test_malformed_uuid_handling(self, client: TestClient):
         """Test malformed UUID handling"""
         
-        # Invalid UUID format
+        # Invalid token format
         response = client.post(
             "/api/rooms",
             json={"name": "Test Room"},
-            headers={"user-id": "invalid-uuid"}
+            headers={"Authorization": "Bearer invalid-token"}
         )
         assert response.status_code == 401
-        assert "Invalid user ID" in response.json()["detail"]
+        assert "Could not validate credentials" in response.json()["detail"]
         
         # Test room access with invalid UUID
         response = client.get("/api/rooms/invalid-uuid")

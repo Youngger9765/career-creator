@@ -34,45 +34,142 @@ body {
 
 /* Custom styles for card consultation interface */
 .card-container {
-  @apply relative bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200;
+  @apply relative bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer;
+  transform-style: preserve-3d;
+  border: 2px solid transparent;
+}
+
+.card-container:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+}
+
+.card-container.selected {
+  @apply ring-2 ring-blue-500 ring-offset-2;
+  transform: translateY(-4px) scale(1.02);
 }
 
 .card-face {
-  @apply w-full h-full absolute top-0 left-0 backface-hidden transition-transform duration-500;
+  @apply w-full h-full absolute top-0 left-0 transition-all duration-500;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .card-face.front {
-  @apply transform rotateY-0;
+  transform: rotateY(0deg);
 }
 
 .card-face.back {
-  @apply transform rotateY-180;
+  transform: rotateY(180deg);
 }
 
 .card-flipped .card-face.front {
-  @apply transform rotateY-180;
+  transform: rotateY(180deg);
 }
 
 .card-flipped .card-face.back {
-  @apply transform rotateY-0;
+  transform: rotateY(0deg);
+}
+
+.card-flip-button {
+  @apply absolute top-2 right-2 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-blue-600 transition-all duration-200 opacity-70 hover:opacity-100;
+  z-index: 10;
 }
 
 .dragging {
-  @apply z-50 opacity-80 scale-105 cursor-grabbing;
+  @apply z-50 opacity-90 scale-110 cursor-grabbing;
+  transform: rotate(5deg) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .drop-zone {
-  @apply border-2 border-dashed border-gray-300 rounded-lg p-4 transition-colors duration-200;
+  @apply border-2 border-dashed border-gray-300 rounded-lg p-4 transition-all duration-300;
+  position: relative;
+  overflow: hidden;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
 }
 
 .drop-zone.active {
-  @apply border-blue-400 bg-blue-50;
+  @apply border-blue-400 bg-blue-50 shadow-lg scale-105;
+  animation: pulse-border 1s infinite;
+}
+
+.drop-zone.active::before {
+  left: 100%;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: #60a5fa;
+  }
+  50% {
+    border-color: #3b82f6;
+  }
 }
 
 .consultation-area {
-  @apply min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4;
+  @apply min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4;
+  background-attachment: fixed;
 }
 
 .floating-panel {
-  @apply fixed bg-white rounded-lg shadow-lg border p-4 z-40;
+  @apply fixed bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50 p-4 z-40;
+}
+
+.card-deck {
+  @apply relative;
+}
+
+.card-deck-stack {
+  position: relative;
+}
+
+.card-deck-card {
+  position: absolute;
+  transition: all 0.3s ease;
+}
+
+.card-deck-card:nth-child(1) {
+  transform: translateY(-2px) rotate(-1deg);
+  z-index: 3;
+}
+
+.card-deck-card:nth-child(2) {
+  transform: translateY(-1px) rotate(0.5deg);
+  z-index: 2;
+}
+
+.card-deck-card:nth-child(3) {
+  transform: translateY(0px) rotate(-0.5deg);
+  z-index: 1;
+}
+
+.deal-button {
+  @apply bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg;
+}
+
+.card-counter {
+  @apply bg-white/90 backdrop-blur-sm rounded-lg shadow-md p-3 border border-gray-200/50;
+}
+
+.history-panel {
+  @apply bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200/50;
+}
+
+.history-item {
+  @apply p-2 rounded-lg transition-all duration-200 hover:bg-gray-100;
+}
+
+.clear-button {
+  @apply bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg;
 }

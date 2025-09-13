@@ -39,11 +39,11 @@ apiClient.interceptors.response.use(
     // Handle 401 Unauthorized
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       // Clear token and redirect to login
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
-      
+
       // Only redirect if not already on login page
       if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
         window.location.href = '/login';

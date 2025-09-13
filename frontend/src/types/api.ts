@@ -70,14 +70,14 @@ export interface VisitorCreate {
 
 // Card Event types
 export enum CardEventType {
-  CARD_DEALT = "card_dealt",
-  CARD_FLIPPED = "card_flipped",
-  CARD_SELECTED = "card_selected",
-  CARD_MOVED = "card_moved",
-  CARD_ARRANGED = "card_arranged",
-  CARD_DISCUSSED = "card_discussed",
-  NOTES_ADDED = "notes_added",
-  INSIGHT_RECORDED = "insight_recorded"
+  CARD_DEALT = 'card_dealt',
+  CARD_FLIPPED = 'card_flipped',
+  CARD_SELECTED = 'card_selected',
+  CARD_MOVED = 'card_moved',
+  CARD_ARRANGED = 'card_arranged',
+  CARD_DISCUSSED = 'card_discussed',
+  NOTES_ADDED = 'notes_added',
+  INSIGHT_RECORDED = 'insight_recorded',
 }
 
 export interface CardEvent extends BaseEntity {
@@ -87,7 +87,7 @@ export interface CardEvent extends BaseEntity {
   event_data?: Record<string, any>;
   notes?: string;
   performer_id?: string;
-  performer_type: "user" | "visitor";
+  performer_type: 'user' | 'visitor';
   performer_name?: string;
   sequence_number: number;
 }
@@ -99,7 +99,7 @@ export interface CardEventCreate {
   event_data?: Record<string, any>;
   notes?: string;
   performer_id?: string;
-  performer_type?: "user" | "visitor";
+  performer_type?: 'user' | 'visitor';
   performer_name?: string;
 }
 
@@ -110,19 +110,19 @@ export interface WebSocketMessage {
 }
 
 export interface CardEventMessage extends WebSocketMessage {
-  type: "card_event";
+  type: 'card_event';
   data: CardEventCreate;
 }
 
 export interface ChatMessage extends WebSocketMessage {
-  type: "chat_message";
+  type: 'chat_message';
   data: {
     message: string;
   };
 }
 
 export interface UserActionMessage extends WebSocketMessage {
-  type: "user_action";
+  type: 'user_action';
   data: {
     action: string;
     position?: { x: number; y: number };

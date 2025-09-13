@@ -3,16 +3,16 @@
  * API 客戶端
  */
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { 
-  DemoAccount, 
-  LoginRequest, 
-  LoginResponse, 
-  Room, 
+import {
+  DemoAccount,
+  LoginRequest,
+  LoginResponse,
+  Room,
   RoomCreate,
   Visitor,
   VisitorCreate,
   CardEvent,
-  CardEventCreate
+  CardEventCreate,
 } from '@/types/api';
 
 class ApiClient {
@@ -138,7 +138,7 @@ class ApiClient {
 
   async updateVisitorHeartbeat(visitorId: string): Promise<Visitor> {
     const response = await this.client.put(`/api/visitors/${visitorId}/heartbeat`, {
-      last_seen: new Date().toISOString()
+      last_seen: new Date().toISOString(),
     });
     return response.data;
   }
@@ -154,7 +154,7 @@ class ApiClient {
   }
 
   async getRoomEvents(
-    roomId: string, 
+    roomId: string,
     filters?: {
       event_type?: string;
       performer_id?: string;
@@ -172,7 +172,7 @@ class ApiClient {
         }
       });
     }
-    
+
     const response = await this.client.get(`/api/card-events/room/${roomId}?${params}`);
     return response.data;
   }

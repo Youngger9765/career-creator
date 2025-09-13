@@ -12,13 +12,13 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => void;
   getCurrentUser: () => Promise<void>;
   clearError: () => void;
-  
+
   // Demo accounts
   demoAccounts: DemoAccount[];
   loadDemoAccounts: () => Promise<void>;
@@ -35,22 +35,22 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (credentials: LoginRequest) => {
         set({ isLoading: true, error: null });
-        
+
         try {
           const response = await apiClient.login(credentials);
-          set({ 
+          set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
-            error: null
+            error: null,
           });
         } catch (error: any) {
           const errorMessage = error.response?.data?.detail || 'Login failed';
-          set({ 
+          set({
             error: errorMessage,
             isLoading: false,
             isAuthenticated: false,
-            user: null
+            user: null,
           });
           throw error;
         }
@@ -58,10 +58,10 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         apiClient.logout();
-        set({ 
+        set({
           user: null,
           isAuthenticated: false,
-          error: null
+          error: null,
         });
       },
 
@@ -71,23 +71,23 @@ export const useAuthStore = create<AuthState>()(
         }
 
         set({ isLoading: true });
-        
+
         try {
           const user = await apiClient.getCurrentUser();
-          set({ 
+          set({
             user,
             isAuthenticated: true,
             isLoading: false,
-            error: null
+            error: null,
           });
         } catch (error: any) {
           // Token might be invalid
           apiClient.logout();
-          set({ 
+          set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: null
+            error: null,
           });
         }
       },
@@ -107,9 +107,9 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         user: state.user,
-        isAuthenticated: state.isAuthenticated
+        isAuthenticated: state.isAuthenticated,
       }),
     }
   )

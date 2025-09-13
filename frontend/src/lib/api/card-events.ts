@@ -74,7 +74,7 @@ class CardEventsAPI {
   ): Promise<CardEvent[]> {
     try {
       const response = await apiClient.get<CardEvent[]>(`/api/card-events/room/${roomId}`, {
-        params
+        params,
       });
       return response.data;
     } catch (error) {
@@ -87,10 +87,9 @@ class CardEventsAPI {
    */
   async getLatestRoomEvents(roomId: string, limit: number = 50): Promise<CardEvent[]> {
     try {
-      const response = await apiClient.get<CardEvent[]>(
-        `/api/card-events/room/${roomId}/latest`,
-        { params: { limit } }
-      );
+      const response = await apiClient.get<CardEvent[]>(`/api/card-events/room/${roomId}/latest`, {
+        params: { limit },
+      });
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -137,11 +136,15 @@ class CardEventsAPI {
   /**
    * Helper: Create card flip event
    */
-  async flipCard(roomId: string, cardId: string, performerInfo?: {
-    id?: string;
-    name?: string;
-    type?: string;
-  }): Promise<CardEvent> {
+  async flipCard(
+    roomId: string,
+    cardId: string,
+    performerInfo?: {
+      id?: string;
+      name?: string;
+      type?: string;
+    }
+  ): Promise<CardEvent> {
     return this.createEvent({
       room_id: roomId,
       event_type: CardEventType.CARD_FLIPPED,
@@ -157,8 +160,8 @@ class CardEventsAPI {
    * Helper: Create card move event
    */
   async moveCard(
-    roomId: string, 
-    cardId: string, 
+    roomId: string,
+    cardId: string,
     position: { x: number; y: number; zone?: string },
     performerInfo?: {
       id?: string;

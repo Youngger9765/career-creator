@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { DndContext, DragEndEvent, DragStartEvent, DragOverEvent, useDndMonitor, useDroppable } from '@dnd-kit/core';
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverEvent,
+  useDndMonitor,
+  useDroppable,
+} from '@dnd-kit/core';
 import { Card } from './Card';
 import { CardDeck } from './CardDeck';
 import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
@@ -31,7 +38,7 @@ const DROP_ZONES: DropZone[] = [
     color: 'border-green-300 bg-green-50',
     position: { x: 100, y: 100 },
     width: 200,
-    height: 150
+    height: 150,
   },
   {
     id: 'maybe',
@@ -40,7 +47,7 @@ const DROP_ZONES: DropZone[] = [
     color: 'border-yellow-300 bg-yellow-50',
     position: { x: 350, y: 100 },
     width: 200,
-    height: 150
+    height: 150,
   },
   {
     id: 'not-interested',
@@ -49,7 +56,7 @@ const DROP_ZONES: DropZone[] = [
     color: 'border-red-300 bg-red-50',
     position: { x: 600, y: 100 },
     width: 200,
-    height: 150
+    height: 150,
   },
   {
     id: 'discussion',
@@ -58,8 +65,8 @@ const DROP_ZONES: DropZone[] = [
     color: 'border-blue-300 bg-blue-50',
     position: { x: 250, y: 300 },
     width: 300,
-    height: 200
-  }
+    height: 200,
+  },
 ];
 
 function DropZoneComponent({ zone, isActive }: { zone: DropZone; isActive: boolean }) {
@@ -77,7 +84,7 @@ function DropZoneComponent({ zone, isActive }: { zone: DropZone; isActive: boole
         left: zone.position.x,
         top: zone.position.y,
         width: zone.width,
-        height: zone.height
+        height: zone.height,
       }}
     >
       <div className="text-center">
@@ -88,40 +95,49 @@ function DropZoneComponent({ zone, isActive }: { zone: DropZone; isActive: boole
   );
 }
 
-export function ConsultationArea({ roomId, onCardEvent, isReadOnly = false }: ConsultationAreaProps) {
+export function ConsultationArea({
+  roomId,
+  onCardEvent,
+  isReadOnly = false,
+}: ConsultationAreaProps) {
   const [cards, setCards] = useState<GameCard[]>([]);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [activeDropZone, setActiveDropZone] = useState<string | null>(null);
 
-  const handleDealCard = useCallback((cardData: CardData) => {
-    const newCard: GameCard = {
-      id: `game-${cardData.id}-${Date.now()}`,
-      data: cardData,
-      position: { 
-        x: 400 + Math.random() * 100 - 50, 
-        y: 300 + Math.random() * 100 - 50 
-      },
-      isFaceUp: false,
-      isSelected: false,
-      rotation: Math.random() * 10 - 5, // Random rotation between -5 and 5 degrees
-      scale: 1,
-      zIndex: cards.length + 1
-    };
+  const handleDealCard = useCallback(
+    (cardData: CardData) => {
+      const newCard: GameCard = {
+        id: `game-${cardData.id}-${Date.now()}`,
+        data: cardData,
+        position: {
+          x: 400 + Math.random() * 100 - 50,
+          y: 300 + Math.random() * 100 - 50,
+        },
+        isFaceUp: false,
+        isSelected: false,
+        rotation: Math.random() * 10 - 5, // Random rotation between -5 and 5 degrees
+        scale: 1,
+        zIndex: cards.length + 1,
+      };
 
-    setCards(prev => [...prev, newCard]);
-  }, [cards.length]);
+      setCards((prev) => [...prev, newCard]);
+    },
+    [cards.length]
+  );
 
   const handleCardFlip = useCallback((cardId: string, faceUp: boolean) => {
-    setCards(prev => prev.map(card => 
-      card.id === cardId ? { ...card, isFaceUp: faceUp } : card
-    ));
+    setCards((prev) =>
+      prev.map((card) => (card.id === cardId ? { ...card, isFaceUp: faceUp } : card))
+    );
   }, []);
 
   const handleCardSelect = useCallback((cardId: string) => {
-    setCards(prev => prev.map(card => ({
-      ...card,
-      isSelected: card.id === cardId ? !card.isSelected : false
-    })));
+    setCards((prev) =>
+      prev.map((card) => ({
+        ...card,
+        isSelected: card.id === cardId ? !card.isSelected : false,
+      }))
+    );
   }, []);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -130,75 +146,79 @@ export function ConsultationArea({ roomId, onCardEvent, isReadOnly = false }: Co
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
     const { over } = event;
-    setActiveDropZone(over?.id as string || null);
+    setActiveDropZone((over?.id as string) || null);
   }, []);
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over, delta } = event;
-    const cardId = active.id as string;
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over, delta } = event;
+      const cardId = active.id as string;
 
-    setActiveCard(null);
-    setActiveDropZone(null);
+      setActiveCard(null);
+      setActiveDropZone(null);
 
-    if (over) {
-      // Dropped on a drop zone
-      const dropZone = DROP_ZONES.find(zone => zone.id === over.id);
-      if (dropZone) {
-        const newPosition = {
-          x: dropZone.position.x + dropZone.width / 2 - 64, // Center the card
-          y: dropZone.position.y + dropZone.height / 2 - 88
-        };
-
-        setCards(prev => prev.map(card => 
-          card.id === cardId 
-            ? { ...card, position: newPosition, isSelected: false }
-            : card
-        ));
-
-        onCardEvent?.(cardId, CardEventType.CARD_ARRANGED, {
-          drop_zone: over.id,
-          position: newPosition
-        });
-      }
-    } else {
-      // Free drag
-      setCards(prev => prev.map(card => {
-        if (card.id === cardId) {
+      if (over) {
+        // Dropped on a drop zone
+        const dropZone = DROP_ZONES.find((zone) => zone.id === over.id);
+        if (dropZone) {
           const newPosition = {
-            x: card.position.x + delta.x,
-            y: card.position.y + delta.y
+            x: dropZone.position.x + dropZone.width / 2 - 64, // Center the card
+            y: dropZone.position.y + dropZone.height / 2 - 88,
           };
-          
-          onCardEvent?.(cardId, CardEventType.CARD_MOVED, {
-            from_position: card.position,
-            to_position: newPosition
+
+          setCards((prev) =>
+            prev.map((card) =>
+              card.id === cardId ? { ...card, position: newPosition, isSelected: false } : card
+            )
+          );
+
+          onCardEvent?.(cardId, CardEventType.CARD_ARRANGED, {
+            drop_zone: over.id,
+            position: newPosition,
           });
-
-          return { ...card, position: newPosition, isSelected: false };
         }
-        return card;
-      }));
-    }
-  }, [onCardEvent]);
+      } else {
+        // Free drag
+        setCards((prev) =>
+          prev.map((card) => {
+            if (card.id === cardId) {
+              const newPosition = {
+                x: card.position.x + delta.x,
+                y: card.position.y + delta.y,
+              };
 
-  const handleCardEvent = useCallback((cardId: string, eventType: CardEventType, data?: any) => {
-    onCardEvent?.(cardId, eventType, data);
-  }, [onCardEvent]);
+              onCardEvent?.(cardId, CardEventType.CARD_MOVED, {
+                from_position: card.position,
+                to_position: newPosition,
+              });
+
+              return { ...card, position: newPosition, isSelected: false };
+            }
+            return card;
+          })
+        );
+      }
+    },
+    [onCardEvent]
+  );
+
+  const handleCardEvent = useCallback(
+    (cardId: string, eventType: CardEventType, data?: any) => {
+      onCardEvent?.(cardId, eventType, data);
+    },
+    [onCardEvent]
+  );
 
   return (
     <div className="consultation-area relative w-full h-screen overflow-hidden">
-      <DndContext 
+      <DndContext
         onDragStart={handleDragStart}
-        onDragOver={handleDragOver} 
+        onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
         {/* Drop Zones */}
-        {DROP_ZONES.map(zone => (
-          <DropZoneComponent 
-            key={zone.id} 
-            zone={zone} 
-            isActive={activeDropZone === zone.id}
-          />
+        {DROP_ZONES.map((zone) => (
+          <DropZoneComponent key={zone.id} zone={zone} isActive={activeDropZone === zone.id} />
         ))}
 
         {/* Card Deck */}
@@ -211,14 +231,14 @@ export function ConsultationArea({ roomId, onCardEvent, isReadOnly = false }: Co
         </div>
 
         {/* Game Cards */}
-        {cards.map(card => (
+        {cards.map((card) => (
           <div
             key={card.id}
             className="absolute"
-            style={{ 
-              left: card.position.x, 
+            style={{
+              left: card.position.x,
               top: card.position.y,
-              zIndex: card.zIndex + (card.isSelected ? 100 : 0)
+              zIndex: card.zIndex + (card.isSelected ? 100 : 0),
             }}
           >
             <Card
@@ -253,17 +273,14 @@ export function ConsultationArea({ roomId, onCardEvent, isReadOnly = false }: Co
             桌上卡片: <span className="font-bold text-gray-800">{cards.length}</span>
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            翻面: {cards.filter(c => c.isFaceUp).length} 張
+            翻面: {cards.filter((c) => c.isFaceUp).length} 張
           </div>
         </div>
 
         {/* Clear button */}
         {cards.length > 0 && (
           <div className="absolute bottom-4 right-4 z-20">
-            <button
-              onClick={() => setCards([])}
-              className="clear-button text-sm"
-            >
+            <button onClick={() => setCards([])} className="clear-button text-sm">
               清空桌面
             </button>
           </div>

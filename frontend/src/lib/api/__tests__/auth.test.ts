@@ -39,7 +39,7 @@ describe('Auth API', () => {
 
       // This test will fail initially (RED phase)
       const result = await authAPI.login(credentials);
-      
+
       expect(result).toEqual(mockResponse);
       expect(localStorage.setItem).toHaveBeenCalledWith('access_token', 'mock-token');
       expect(localStorage.setItem).toHaveBeenCalledWith('user', JSON.stringify(mockResponse.user));
@@ -47,7 +47,7 @@ describe('Auth API', () => {
 
     it('should handle login error with invalid credentials', async () => {
       const credentials = { email: 'wrong@example.com', password: 'wrong' };
-      
+
       // This test will fail initially (RED phase)
       await expect(authAPI.login(credentials)).rejects.toThrow('Invalid credentials');
     });
@@ -56,7 +56,7 @@ describe('Auth API', () => {
   describe('isAuthenticated', () => {
     it('should return true when token exists', () => {
       localStorageMock.getItem.mockReturnValue('mock-token');
-      
+
       // This test will fail initially (RED phase)
       expect(authAPI.isAuthenticated()).toBe(true);
       expect(localStorage.getItem).toHaveBeenCalledWith('access_token');
@@ -64,7 +64,7 @@ describe('Auth API', () => {
 
     it('should return false when token does not exist', () => {
       localStorageMock.getItem.mockReturnValue(null);
-      
+
       // This test will fail initially (RED phase)
       expect(authAPI.isAuthenticated()).toBe(false);
     });
@@ -75,10 +75,10 @@ describe('Auth API', () => {
       // Mock window.location
       delete (window as any).location;
       window.location = { href: '' } as any;
-      
+
       // This test will fail initially (RED phase)
       authAPI.logout();
-      
+
       expect(localStorage.removeItem).toHaveBeenCalledWith('access_token');
       expect(localStorage.removeItem).toHaveBeenCalledWith('user');
       expect(window.location.href).toBe('/login');
@@ -95,7 +95,7 @@ describe('Auth API', () => {
         is_active: true,
       };
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockUser));
-      
+
       // This test will fail initially (RED phase)
       const user = authAPI.getStoredUser();
       expect(user).toEqual(mockUser);
@@ -103,7 +103,7 @@ describe('Auth API', () => {
 
     it('should return null when user does not exist', () => {
       localStorageMock.getItem.mockReturnValue(null);
-      
+
       // This test will fail initially (RED phase)
       const user = authAPI.getStoredUser();
       expect(user).toBeNull();
@@ -111,7 +111,7 @@ describe('Auth API', () => {
 
     it('should return null when stored data is invalid JSON', () => {
       localStorageMock.getItem.mockReturnValue('invalid-json');
-      
+
       // This test will fail initially (RED phase)
       const user = authAPI.getStoredUser();
       expect(user).toBeNull();

@@ -27,13 +27,16 @@ class VisitorsAPI {
   async joinRoom(data: JoinRoomData): Promise<Visitor> {
     try {
       const response = await apiClient.post<Visitor>('/api/visitors/join', data);
-      
+
       // Store visitor session
-      sessionStorage.setItem('visitor_session', JSON.stringify({
-        session_id: data.session_id,
-        visitor: response.data
-      }));
-      
+      sessionStorage.setItem(
+        'visitor_session',
+        JSON.stringify({
+          session_id: data.session_id,
+          visitor: response.data,
+        })
+      );
+
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -103,7 +106,7 @@ class VisitorsAPI {
   getStoredSession(): { session_id: string; visitor: Visitor } | null {
     const sessionStr = sessionStorage.getItem('visitor_session');
     if (!sessionStr) return null;
-    
+
     try {
       return JSON.parse(sessionStr);
     } catch {

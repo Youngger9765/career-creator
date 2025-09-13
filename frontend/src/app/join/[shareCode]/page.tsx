@@ -51,14 +51,13 @@ export default function JoinByShareCodePage() {
         shareCode: room.share_code,
         name: visitorName.trim(),
         joinedAt: new Date().toISOString(),
-        sessionId: `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        sessionId: `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       };
 
       localStorage.setItem('visitor_session', JSON.stringify(visitorSession));
 
       // Redirect to room
       router.push(`/room/${room.id}?visitor=true&name=${encodeURIComponent(visitorName)}`);
-
     } catch (error) {
       console.error('Failed to join as visitor:', error);
       setError('加入房間失敗，請重試');
@@ -87,8 +86,18 @@ export default function JoinByShareCodePage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <div className="mb-6">
-            <svg className="mx-auto h-16 w-16 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="mx-auto h-16 w-16 text-red-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-gray-900 mb-2">無法加入房間</h2>
@@ -143,11 +152,11 @@ export default function JoinByShareCodePage() {
               </div>
               <div className="flex justify-between">
                 <span>狀態：</span>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  room.is_active
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    room.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}
+                >
                   {room.is_active ? '開放中' : '已關閉'}
                 </span>
               </div>
@@ -193,9 +202,7 @@ export default function JoinByShareCodePage() {
               </button>
 
               {!room.is_active && (
-                <div className="text-center text-sm text-red-600">
-                  此房間已關閉，無法加入
-                </div>
+                <div className="text-center text-sm text-red-600">此房間已關閉，無法加入</div>
               )}
             </div>
           </form>

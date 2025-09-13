@@ -21,7 +21,7 @@ class WebSocketClient {
   }
 
   async connect(
-    roomId: string, 
+    roomId: string,
     userInfo: {
       user_id?: string;
       user_name?: string;
@@ -92,7 +92,9 @@ class WebSocketClient {
     }
   ) {
     this.reconnectAttempts++;
-    console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
+    console.log(
+      `Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`
+    );
 
     setTimeout(() => {
       this.connect(roomId, userInfo).catch((error) => {
@@ -135,7 +137,7 @@ class WebSocketClient {
   private emit(event: string, data: any) {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
-      handlers.forEach(handler => handler(data));
+      handlers.forEach((handler) => handler(data));
     }
   }
 
@@ -180,28 +182,28 @@ class WebSocketClient {
   sendCardEvent(eventData: CardEventMessage['data']) {
     this.send({
       type: 'card_event',
-      data: eventData
+      data: eventData,
     });
   }
 
   sendChatMessage(message: string) {
     this.send({
       type: 'chat_message',
-      data: { message }
+      data: { message },
     });
   }
 
   sendUserAction(actionData: UserActionMessage['data']) {
     this.send({
       type: 'user_action',
-      data: actionData
+      data: actionData,
     });
   }
 
   sendHeartbeat() {
     this.send({
       type: 'heartbeat',
-      data: { timestamp: new Date().toISOString() }
+      data: { timestamp: new Date().toISOString() },
     });
   }
 }

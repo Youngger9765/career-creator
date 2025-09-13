@@ -14,13 +14,13 @@ describe('Auth API - Simple', () => {
   describe('login', () => {
     it('should successfully login and store token', async () => {
       const credentials = { email: 'test@example.com', password: 'password123' };
-      
+
       const result = await authAPI.login(credentials);
-      
+
       // Check returned data
       expect(result.access_token).toBe('mock-token');
       expect(result.user.email).toBe('test@example.com');
-      
+
       // Check localStorage
       expect(localStorage.getItem('access_token')).toBe('mock-token');
       expect(localStorage.getItem('user')).toBeTruthy();
@@ -28,7 +28,7 @@ describe('Auth API - Simple', () => {
 
     it('should handle login error with invalid credentials', async () => {
       const credentials = { email: 'wrong@example.com', password: 'wrong' };
-      
+
       await expect(authAPI.login(credentials)).rejects.toThrow('Invalid credentials');
     });
   });
@@ -54,7 +54,7 @@ describe('Auth API - Simple', () => {
         is_active: true,
       };
       localStorage.setItem('user', JSON.stringify(mockUser));
-      
+
       const user = authAPI.getStoredUser();
       expect(user).toEqual(mockUser);
     });

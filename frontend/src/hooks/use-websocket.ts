@@ -20,15 +20,15 @@ export function useWebSocket({ roomId, userInfo, autoConnect = true }: UseWebSoc
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  
+
   const eventHandlersRef = useRef<Map<string, Function[]>>(new Map());
 
   const connect = async () => {
     if (isConnecting || isConnected) return;
-    
+
     setIsConnecting(true);
     setError(null);
-    
+
     try {
       await wsClient.connect(roomId, userInfo);
       setIsConnected(true);
@@ -47,7 +47,7 @@ export function useWebSocket({ roomId, userInfo, autoConnect = true }: UseWebSoc
   const sendCardEvent = (eventData: Omit<CardEventCreate, 'room_id'>) => {
     wsClient.sendCardEvent({
       ...eventData,
-      room_id: roomId
+      room_id: roomId,
     });
   };
 
@@ -58,7 +58,7 @@ export function useWebSocket({ roomId, userInfo, autoConnect = true }: UseWebSoc
   const sendUserAction = (action: string, data?: Record<string, any>) => {
     wsClient.sendUserAction({
       action,
-      ...data
+      ...data,
     });
   };
 
@@ -68,7 +68,7 @@ export function useWebSocket({ roomId, userInfo, autoConnect = true }: UseWebSoc
     }
     eventHandlersRef.current.get(event)!.push(handler);
     wsClient.on(event, handler as any);
-    
+
     // Return cleanup function
     return () => {
       const handlers = eventHandlersRef.current.get(event);
@@ -102,14 +102,14 @@ export function useWebSocket({ roomId, userInfo, autoConnect = true }: UseWebSoc
       wsClient.off('connected', handleConnected);
       wsClient.off('disconnected', handleDisconnected);
       wsClient.off('error', handleError);
-      
+
       // Clean up all custom event handlers
       eventHandlersRef.current.forEach((handlers, event) => {
-        handlers.forEach(handler => {
+        handlers.forEach((handler) => {
           wsClient.off(event, handler as any);
         });
       });
-      
+
       // Disconnect if still connected
       if (wsClient.isConnected()) {
         wsClient.disconnect();
@@ -126,6 +126,6 @@ export function useWebSocket({ roomId, userInfo, autoConnect = true }: UseWebSoc
     sendCardEvent,
     sendChatMessage,
     sendUserAction,
-    on
+    on,
   };
 }

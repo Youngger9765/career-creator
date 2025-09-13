@@ -12,11 +12,11 @@ interface CardDeckProps {
   maxVisible?: number;
 }
 
-export function CardDeck({ 
-  cards = DEFAULT_CAREER_CARDS, 
-  onDealCard, 
+export function CardDeck({
+  cards = DEFAULT_CAREER_CARDS,
+  onDealCard,
   onCardEvent,
-  maxVisible = 3 
+  maxVisible = 3,
 }: CardDeckProps) {
   const [shuffledCards, setShuffledCards] = useState(cards);
   const [dealtCards, setDealtCards] = useState<Set<string>>(new Set());
@@ -32,7 +32,7 @@ export function CardDeck({
   };
 
   const dealRandomCard = () => {
-    const availableCards = shuffledCards.filter(card => !dealtCards.has(card.id));
+    const availableCards = shuffledCards.filter((card) => !dealtCards.has(card.id));
     if (availableCards.length === 0) {
       // All cards dealt, shuffle and reset
       shuffle();
@@ -40,16 +40,16 @@ export function CardDeck({
     }
 
     const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
-    setDealtCards(prev => {
+    setDealtCards((prev) => {
       const newSet = new Set(prev);
       newSet.add(randomCard.id);
       return newSet;
     });
-    
+
     onDealCard?.(randomCard);
     onCardEvent?.(randomCard.id, CardEventType.CARD_DEALT, {
       position: { x: 400, y: 300 }, // Default center position
-      from_deck: true
+      from_deck: true,
     });
   };
 
@@ -68,7 +68,7 @@ export function CardDeck({
               width: '8rem',
               height: '11rem',
               transform: `translate(${index * 2}px, ${index * -2}px)`,
-              zIndex: maxVisible - index
+              zIndex: maxVisible - index,
             }}
           >
             <div className="w-full h-full rounded-lg flex items-center justify-center">
@@ -91,8 +91,18 @@ export function CardDeck({
             title="發牌"
           >
             <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white bg-opacity-90 rounded-full p-2">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
             </div>
           </button>
@@ -101,10 +111,8 @@ export function CardDeck({
 
       {/* Deck Info */}
       <div className="mt-4 text-center">
-        <div className="text-sm text-gray-600 mb-2">
-          剩餘: {remainingCount} 張
-        </div>
-        
+        <div className="text-sm text-gray-600 mb-2">剩餘: {remainingCount} 張</div>
+
         <div className="space-y-2">
           <button
             onClick={dealRandomCard}
@@ -113,7 +121,7 @@ export function CardDeck({
           >
             {remainingCount === 0 ? '已發完' : '發牌'}
           </button>
-          
+
           <button
             onClick={shuffle}
             className="w-full px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"

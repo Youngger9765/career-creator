@@ -10,14 +10,14 @@ export default function JoinRoomPage() {
   const router = useRouter();
   const { joinRoomByShareCode, isLoading, error } = useRoomStore();
   const { isAuthenticated, user } = useAuthStore();
-  
+
   const [shareCode, setShareCode] = useState('');
   const [visitorName, setVisitorName] = useState('');
   const [joinAsVisitor, setJoinAsVisitor] = useState(!isAuthenticated);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!shareCode.trim()) {
       return;
     }
@@ -31,7 +31,7 @@ export default function JoinRoomPage() {
 
       // Join as authenticated user
       await joinRoomByShareCode(shareCode.trim().toUpperCase());
-      
+
       // Get the room ID and redirect
       const currentRoom = useRoomStore.getState().currentRoom;
       if (currentRoom) {
@@ -72,7 +72,7 @@ export default function JoinRoomPage() {
           {/* Join Mode Selection */}
           <div className="space-y-3">
             <div className="text-sm font-medium text-gray-700">加入方式:</div>
-            
+
             {isAuthenticated ? (
               <div className="space-y-2">
                 <label className="flex items-center">
@@ -85,10 +85,12 @@ export default function JoinRoomPage() {
                   />
                   <div>
                     <div className="font-medium">以用戶身份加入</div>
-                    <div className="text-sm text-gray-600">使用 {user?.name} ({user?.roles.join(', ')})</div>
+                    <div className="text-sm text-gray-600">
+                      使用 {user?.name} ({user?.roles.join(', ')})
+                    </div>
                   </div>
                 </label>
-                
+
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -105,9 +107,7 @@ export default function JoinRoomPage() {
               </div>
             ) : (
               <div className="p-3 bg-blue-50 rounded-lg">
-                <div className="text-sm text-blue-800">
-                  將以訪客身份加入房間
-                </div>
+                <div className="text-sm text-blue-800">將以訪客身份加入房間</div>
               </div>
             )}
           </div>
@@ -152,10 +152,13 @@ export default function JoinRoomPage() {
           <Link href="/" className="block text-blue-600 hover:text-blue-700 text-sm">
             ← 返回首頁
           </Link>
-          
+
           {!isAuthenticated && (
             <div className="text-sm text-gray-600">
-              有帳號嗎？<Link href="/" className="text-blue-600 hover:text-blue-700">立即登入</Link>
+              有帳號嗎？
+              <Link href="/" className="text-blue-600 hover:text-blue-700">
+                立即登入
+              </Link>
             </div>
           )}
         </div>

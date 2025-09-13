@@ -10,10 +10,10 @@ export default function CreateRoomPage() {
   const router = useRouter();
   const { createRoom, isLoading, error } = useRoomStore();
   const { isAuthenticated, user } = useAuthStore();
-  
+
   const [formData, setFormData] = useState({
     name: '',
-    description: ''
+    description: '',
   });
 
   if (!isAuthenticated) {
@@ -22,7 +22,10 @@ export default function CreateRoomPage() {
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">請先登入</h1>
           <p className="text-gray-600 mb-6">需要登入才能創建諮詢房間</p>
-          <Link href="/" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
             前往登入頁面
           </Link>
         </div>
@@ -36,7 +39,10 @@ export default function CreateRoomPage() {
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">權限不足</h1>
           <p className="text-gray-600 mb-6">只有諮詢師才能創建房間</p>
-          <Link href="/" className="inline-block px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+          <Link
+            href="/"
+            className="inline-block px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+          >
             返回首頁
           </Link>
         </div>
@@ -46,7 +52,7 @@ export default function CreateRoomPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       return;
     }
@@ -54,9 +60,9 @@ export default function CreateRoomPage() {
     try {
       const room = await createRoom({
         name: formData.name.trim(),
-        description: formData.description.trim() || undefined
+        description: formData.description.trim() || undefined,
       });
-      
+
       // Redirect to the new room
       router.push(`/room/${room.id}`);
     } catch (error) {
@@ -65,9 +71,9 @@ export default function CreateRoomPage() {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -121,9 +127,15 @@ export default function CreateRoomPage() {
           <div className="p-4 bg-blue-50 rounded-lg">
             <h3 className="font-medium text-blue-800 mb-2">諮詢師資訊</h3>
             <div className="space-y-1 text-sm text-blue-700">
-              <div><strong>姓名:</strong> {user.name}</div>
-              <div><strong>角色:</strong> {user.roles.join(', ')}</div>
-              <div><strong>信箱:</strong> {user.email}</div>
+              <div>
+                <strong>姓名:</strong> {user.name}
+              </div>
+              <div>
+                <strong>角色:</strong> {user.roles.join(', ')}
+              </div>
+              <div>
+                <strong>信箱:</strong> {user.email}
+              </div>
             </div>
           </div>
 

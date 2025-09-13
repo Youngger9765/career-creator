@@ -13,7 +13,7 @@ export default function RoomPage() {
   const params = useParams();
   const router = useRouter();
   const roomId = params.id as string;
-  
+
   const { user, isAuthenticated } = useAuthStore();
   const { currentRoom, isLoading, error, joinRoom } = useRoomStore();
   const [isJoining, setIsJoining] = useState(false);
@@ -23,25 +23,21 @@ export default function RoomPage() {
     isConnected,
     sendCardEvent,
     connect: connectWebSocket,
-    on: onWebSocketEvent
+    on: onWebSocketEvent,
   } = useWebSocket({
     roomId,
     userInfo: {
       user_id: user?.id,
       user_name: user?.name,
-      user_type: 'user'
+      user_type: 'user',
     },
-    autoConnect: false // We'll connect after joining the room
+    autoConnect: false, // We'll connect after joining the room
   });
 
   // Card events management
-  const {
-    events,
-    handleRealtimeEvent,
-    loadEvents
-  } = useCardEvents({
+  const { events, handleRealtimeEvent, loadEvents } = useCardEvents({
     roomId,
-    realtime: true
+    realtime: true,
   });
 
   // Join room on mount
@@ -92,7 +88,7 @@ export default function RoomPage() {
       event_data: data,
       performer_id: user?.id,
       performer_name: user?.name,
-      performer_type: 'user'
+      performer_type: 'user',
     });
   };
 
@@ -156,15 +152,17 @@ export default function RoomPage() {
       <div className="absolute top-0 left-0 right-0 z-30 bg-white shadow-sm border-b">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => router.push('/')}
-              className="text-gray-600 hover:text-gray-800"
-            >
+            <button onClick={() => router.push('/')} className="text-gray-600 hover:text-gray-800">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
-            
+
             <div>
               <h1 className="text-xl font-bold text-gray-800">{currentRoom.name}</h1>
               {currentRoom.description && (
@@ -175,18 +173,21 @@ export default function RoomPage() {
 
           <div className="flex items-center space-x-4">
             {/* Connection Status */}
-            <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
-              isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-            }`}>
-              <div className={`w-2 h-2 rounded-full ${
-                isConnected ? 'bg-green-500' : 'bg-red-500'
-              }`}></div>
+            <div
+              className={`flex items-center space-x-2 px-3 py-1 rounded-full text-sm ${
+                isConnected ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}
+            >
+              <div
+                className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+              ></div>
               <span>{isConnected ? '已連線' : '未連線'}</span>
             </div>
 
             {/* Share Code */}
             <div className="text-sm text-gray-600">
-              分享碼: <span className="font-mono font-bold text-blue-600">{currentRoom.share_code}</span>
+              分享碼:{' '}
+              <span className="font-mono font-bold text-blue-600">{currentRoom.share_code}</span>
             </div>
 
             {/* User Info */}
@@ -216,13 +217,23 @@ export default function RoomPage() {
             <p className="text-sm text-gray-500">尚無操作記錄</p>
           ) : (
             <div className="space-y-2">
-              {events.slice(-5).reverse().map((event) => (
-                <div key={event.id} className="history-item text-xs text-gray-600 bg-gray-50 rounded">
-                  <div className="font-medium">{event.performer_name || '未知用戶'}</div>
-                  <div>{event.event_type} {event.card_id && `- ${event.card_id}`}</div>
-                  <div className="text-gray-500">{new Date(event.created_at).toLocaleTimeString()}</div>
-                </div>
-              ))}
+              {events
+                .slice(-5)
+                .reverse()
+                .map((event) => (
+                  <div
+                    key={event.id}
+                    className="history-item text-xs text-gray-600 bg-gray-50 rounded"
+                  >
+                    <div className="font-medium">{event.performer_name || '未知用戶'}</div>
+                    <div>
+                      {event.event_type} {event.card_id && `- ${event.card_id}`}
+                    </div>
+                    <div className="text-gray-500">
+                      {new Date(event.created_at).toLocaleTimeString()}
+                    </div>
+                  </div>
+                ))}
             </div>
           )}
         </div>

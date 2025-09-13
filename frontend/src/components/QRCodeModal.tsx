@@ -48,12 +48,14 @@ export default function QRCodeModal({ room, isOpen, onClose }: QRCodeModalProps)
             <h2 className="text-xl font-semibold text-gray-900">分享房間</h2>
             <p className="text-sm text-gray-600 mt-1">{room.name}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -77,9 +79,7 @@ export default function QRCodeModal({ room, isOpen, onClose }: QRCodeModalProps)
                 <p className="text-red-600 text-sm">QR Code 載入失敗</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mt-3">
-              掃描 QR Code 快速加入房間
-            </p>
+            <p className="text-sm text-gray-600 mt-3">掃描 QR Code 快速加入房間</p>
           </div>
 
           {/* Room Info */}
@@ -96,11 +96,11 @@ export default function QRCodeModal({ room, isOpen, onClose }: QRCodeModalProps)
               </div>
               <div className="flex justify-between">
                 <span className="text-blue-700">狀態：</span>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  room.is_active
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    room.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}
+                >
                   {room.is_active ? '開放中' : '已關閉'}
                 </span>
               </div>
@@ -109,9 +109,7 @@ export default function QRCodeModal({ room, isOpen, onClose }: QRCodeModalProps)
 
           {/* Share Link */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              分享連結
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">分享連結</label>
             <div className="flex">
               <input
                 type="text"

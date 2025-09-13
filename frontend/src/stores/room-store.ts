@@ -47,7 +47,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       const { userRooms } = get();
       set({
         userRooms: [...userRooms, room],
-        isLoading: false
+        isLoading: false,
       });
 
       return room;
@@ -65,9 +65,8 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       const room = await roomsAPI.getRoom(roomId);
       set({
         currentRoom: room,
-        isLoading: false
+        isLoading: false,
       });
-
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to join room';
       set({ error: errorMessage, isLoading: false });
@@ -82,9 +81,8 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       const room = await roomsAPI.getRoomByShareCode(shareCode);
       set({
         currentRoom: room,
-        isLoading: false
+        isLoading: false,
       });
-
     } catch (error: any) {
       const errorMessage = error.message || 'Room not found';
       set({ error: errorMessage, isLoading: false });
@@ -94,7 +92,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
 
   leaveRoom: () => {
     set({
-      currentRoom: null
+      currentRoom: null,
     });
   },
 
@@ -105,7 +103,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
       const rooms = await roomsAPI.getMyRooms();
       set({
         userRooms: rooms,
-        isLoading: false
+        isLoading: false,
       });
     } catch (error: any) {
       const errorMessage = error.message || 'Failed to load rooms';
@@ -119,7 +117,7 @@ export const useRoomStore = create<RoomState>((set, get) => ({
 
   clearCurrentRoom: () => {
     set({
-      currentRoom: null
+      currentRoom: null,
     });
   },
 }));

@@ -43,11 +43,11 @@ class AuthAPI {
     try {
       const response = await apiClient.post<AuthResponse>('/api/auth/login', credentials);
       const { access_token, user } = response.data;
-      
+
       // Store token and user info
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
-      
+
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -61,11 +61,11 @@ class AuthAPI {
     try {
       const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
       const { access_token, user } = response.data;
-      
+
       // Store token and user info
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
-      
+
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -118,7 +118,7 @@ class AuthAPI {
   getStoredUser(): User | null {
     const userStr = localStorage.getItem('user');
     if (!userStr) return null;
-    
+
     try {
       return JSON.parse(userStr);
     } catch {

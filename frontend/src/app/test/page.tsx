@@ -9,21 +9,21 @@ export default function TestPage() {
   useEffect(() => {
     // Test health endpoint
     fetch('/api/health')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setApiStatus(`✅ API Connected: ${data.status} (${data.environment})`);
       })
-      .catch(err => {
+      .catch((err) => {
         setApiStatus(`❌ API Error: ${err.message}`);
       });
 
     // Test demo accounts endpoint
     fetch('/api/auth/demo-accounts')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setDemoAccounts(data);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Demo accounts error:', err);
       });
   }, []);
@@ -31,9 +31,7 @@ export default function TestPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          🧪 API Integration Test
-        </h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">🧪 API Integration Test</h1>
 
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Backend Connection</h2>

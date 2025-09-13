@@ -68,7 +68,9 @@ export default function RoomsPage() {
   };
 
   if (!user) {
-    return <div className="min-h-screen bg-gray-100 flex items-center justify-center">載入中...</div>;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">載入中...</div>
+    );
   }
 
   return (
@@ -119,8 +121,18 @@ export default function RoomsPage() {
         ) : rooms.length === 0 ? (
           <div className="text-center py-12">
             <div className="mb-6">
-              <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <svg
+                className="mx-auto h-16 w-16 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">還沒有創建任何房間</h3>
@@ -135,7 +147,10 @@ export default function RoomsPage() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {rooms.map((room) => (
-              <div key={room.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div
+                key={room.id}
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              >
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -144,11 +159,11 @@ export default function RoomsPage() {
                         <p className="text-sm text-gray-600 line-clamp-2">{room.description}</p>
                       )}
                     </div>
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      room.is_active
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        room.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
                       {room.is_active ? '活躍' : '已關閉'}
                     </span>
                   </div>

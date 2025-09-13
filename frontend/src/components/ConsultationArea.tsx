@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -13,11 +13,17 @@ import { Card } from './Card';
 import { CardDeck } from './CardDeck';
 import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
 import { CardEventType } from '@/types/api';
+import { useCardSync } from '@/hooks/use-card-sync';
 
 interface ConsultationAreaProps {
   roomId: string;
   onCardEvent?: (cardId: string, eventType: CardEventType, data?: any) => void;
   isReadOnly?: boolean;
+  performerInfo?: {
+    id?: string;
+    name?: string;
+    type?: string;
+  };
 }
 
 interface DropZone {
@@ -99,10 +105,35 @@ export function ConsultationArea({
   roomId,
   onCardEvent,
   isReadOnly = false,
+  performerInfo,
 }: ConsultationAreaProps) {
   const [cards, setCards] = useState<GameCard[]>([]);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [activeDropZone, setActiveDropZone] = useState<string | null>(null);
+
+  // Initialize card synchronization
+  const {
+    syncedCards,
+    isActive: isSyncActive,
+    isWebSocketConnected,
+    error: syncError,
+    syncCardEvent,
+    updateLocalCard,
+    applyToGameCards,
+    clearError: clearSyncError,
+  } = useCardSync({
+    roomId,
+    enabled: !isReadOnly,
+    useWebSocket: true,
+    performerInfo,
+  });
+
+  // Apply synchronized state to local cards
+  useEffect(() => {
+    if (syncedCards.length === 0) return;
+
+    setCards((prevCards) => applyToGameCards(prevCards));
+  }, [syncedCards, applyToGameCards]);
 
   const handleDealCard = useCallback(
     (cardData: CardData) => {
@@ -121,15 +152,34 @@ export function ConsultationArea({
       };
 
       setCards((prev) => [...prev, newCard]);
+
+      // Sync card dealt event
+      if (!isReadOnly) {
+        syncCardEvent(newCard.id, CardEventType.CARD_DEALT, {
+          position: newCard.position,
+          card_data: cardData,
+          from_deck: true,
+        }).catch(console.error);
+      }
     },
-    [cards.length]
+    [cards.length, isReadOnly, syncCardEvent]
   );
 
-  const handleCardFlip = useCallback((cardId: string, faceUp: boolean) => {
-    setCards((prev) =>
-      prev.map((card) => (card.id === cardId ? { ...card, isFaceUp: faceUp } : card))
-    );
-  }, []);
+  const handleCardFlip = useCallback(
+    (cardId: string, faceUp: boolean) => {
+      setCards((prev) =>
+        prev.map((card) => (card.id === cardId ? { ...card, isFaceUp: faceUp } : card))
+      );
+
+      // Sync card flip event
+      if (!isReadOnly) {
+        syncCardEvent(cardId, CardEventType.CARD_FLIPPED, {
+          face_up: faceUp,
+        }).catch(console.error);
+      }
+    },
+    [isReadOnly, syncCardEvent]
+  );
 
   const handleCardSelect = useCallback((cardId: string) => {
     setCards((prev) =>
@@ -172,6 +222,14 @@ export function ConsultationArea({
             )
           );
 
+          // Sync card arranged event
+          if (!isReadOnly) {
+            syncCardEvent(cardId, CardEventType.CARD_ARRANGED, {
+              drop_zone: over.id,
+              position: newPosition,
+            }).catch(console.error);
+          }
+
           onCardEvent?.(cardId, CardEventType.CARD_ARRANGED, {
             drop_zone: over.id,
             position: newPosition,
@@ -186,6 +244,14 @@ export function ConsultationArea({
                 x: card.position.x + delta.x,
                 y: card.position.y + delta.y,
               };
+
+              // Sync card move event
+              if (!isReadOnly) {
+                syncCardEvent(cardId, CardEventType.CARD_MOVED, {
+                  from_position: card.position,
+                  to_position: newPosition,
+                }).catch(console.error);
+              }
 
               onCardEvent?.(cardId, CardEventType.CARD_MOVED, {
                 from_position: card.position,
@@ -255,16 +321,56 @@ export function ConsultationArea({
           </div>
         ))}
 
-        {/* Instructions */}
+        {/* Instructions and Sync Status */}
         <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-20">
-          <h3 className="font-bold text-gray-800 mb-2">操作說明</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-bold text-gray-800">操作說明</h3>
+            {!isReadOnly && (
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-1">
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      isSyncActive ? 'bg-green-500' : 'bg-red-500'
+                    }`}
+                    title={isSyncActive ? '同步中' : '離線'}
+                  ></div>
+                  <span className="text-xs text-gray-500">{isSyncActive ? '同步' : '離線'}</span>
+                </div>
+                {isWebSocketConnected && (
+                  <div className="flex items-center space-x-1">
+                    <svg className="w-3 h-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z" />
+                    </svg>
+                    <span className="text-xs text-green-600">即時</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="text-sm text-gray-600 space-y-1">
             <div>• 點擊發牌按鈕獲取卡片</div>
             <div>• 點擊卡片右上角翻面</div>
             <div>• 拖拽卡片到分類區域</div>
             <div>• 點擊卡片選中/取消選中</div>
             <div>• 在討論區放置正在討論的卡片</div>
+            {!isReadOnly && <div className="text-xs text-blue-600 mt-2">• 所有操作將即時同步</div>}
           </div>
+
+          {syncError && (
+            <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-600">
+              <div className="flex items-center justify-between">
+                <span>同步錯誤: {syncError.message}</span>
+                <button
+                  onClick={clearSyncError}
+                  className="text-red-400 hover:text-red-600"
+                  title="清除錯誤"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Card Counter */}

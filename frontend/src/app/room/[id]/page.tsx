@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ConsultationArea } from '@/components/ConsultationArea';
 import { useRoomStore } from '@/stores/room-store';
 import { useAuthStore } from '@/stores/auth-store';
@@ -12,7 +12,12 @@ import { CardEventType } from '@/types/api';
 export default function RoomPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const roomId = params.id as string;
+
+  // Check if this is a visitor session
+  const isVisitor = searchParams.get('visitor') === 'true';
+  const visitorName = searchParams.get('name') || '';
 
   const { user, isAuthenticated } = useAuthStore();
   const { currentRoom, isLoading, error, joinRoom } = useRoomStore();
@@ -42,7 +47,7 @@ export default function RoomPage() {
 
   // Join room on mount
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && !isVisitor) {
       router.push('/');
       return;
     }
@@ -92,7 +97,7 @@ export default function RoomPage() {
     });
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isVisitor) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -192,7 +197,7 @@ export default function RoomPage() {
 
             {/* User Info */}
             <div className="text-sm text-gray-600">
-              {user?.name} ({user?.roles.join(', ')})
+              {isVisitor ? `${visitorName} (訪客)` : `${user?.name} (${user?.roles.join(', ')})`}
             </div>
           </div>
         </div>
@@ -204,6 +209,15 @@ export default function RoomPage() {
           roomId={roomId}
           onCardEvent={handleCardEvent}
           isReadOnly={!user?.roles.includes('counselor') && !user?.roles.includes('admin')}
+          performerInfo={{
+            id: isVisitor ? undefined : user?.id,
+            name: isVisitor ? visitorName : user?.name,
+            type: isVisitor
+              ? 'visitor'
+              : user?.roles.includes('counselor')
+                ? 'counselor'
+                : 'client',
+          }}
         />
       </div>
 

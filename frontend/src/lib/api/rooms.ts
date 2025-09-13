@@ -44,7 +44,7 @@ class RoomsAPI {
    */
   async getMyRooms(): Promise<Room[]> {
     try {
-      const response = await apiClient.get<Room[]>('/api/rooms/my-rooms');
+      const response = await apiClient.get<Room[]>('/api/rooms/');
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -68,7 +68,7 @@ class RoomsAPI {
    */
   async getRoomByShareCode(shareCode: string): Promise<Room> {
     try {
-      const response = await apiClient.get<Room>(`/api/rooms/share/${shareCode}`);
+      const response = await apiClient.get<Room>(`/api/rooms/by-code/${shareCode}`);
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -80,7 +80,7 @@ class RoomsAPI {
    */
   async updateRoom(roomId: string, data: Partial<CreateRoomData>): Promise<Room> {
     try {
-      const response = await apiClient.patch<Room>(`/api/rooms/${roomId}`, data);
+      const response = await apiClient.put<Room>(`/api/rooms/${roomId}`, data);
       return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -114,8 +114,8 @@ class RoomsAPI {
    * Generate share link for room
    */
   generateShareLink(shareCode: string): string {
-    const baseUrl = typeof window !== 'undefined' 
-      ? window.location.origin 
+    const baseUrl = typeof window !== 'undefined'
+      ? window.location.origin
       : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     return `${baseUrl}/join/${shareCode}`;
   }

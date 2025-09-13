@@ -38,29 +38,29 @@ export default function HomePage() {
             <p className="text-gray-600 mb-6">
               Ready to start your career consultation session?
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-blue-50 rounded-lg p-6">
                 <h2 className="text-xl font-semibold text-blue-800 mb-4">
                   {user.roles.includes('counselor') ? 'Counselor Actions' : 'Your Options'}
                 </h2>
-                
+
                 {user.roles.includes('counselor') && (
                   <div className="space-y-3">
                     <Link href="/rooms/create" className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center">
                       Create New Room
                     </Link>
-                    <Link href="/dashboard" className="block w-full bg-blue-100 text-blue-600 py-2 px-4 rounded-md hover:bg-blue-200 transition-colors text-center">
+                    <Link href="/rooms" className="block w-full bg-blue-100 text-blue-600 py-2 px-4 rounded-md hover:bg-blue-200 transition-colors text-center">
                       View My Rooms
                     </Link>
                   </div>
                 )}
-                
+
                 <Link href="/join" className="block w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors text-center mt-3">
                   Join Room by Code
                 </Link>
               </div>
-              
+
               <div className="bg-indigo-50 rounded-lg p-6">
                 <h2 className="text-xl font-semibold text-indigo-800 mb-4">
                   Quick Access
@@ -72,7 +72,7 @@ export default function HomePage() {
                   <div className="text-sm text-gray-600">
                     <strong>Email:</strong> {user.email}
                   </div>
-                  <button 
+                  <button
                     onClick={() => useAuthStore.getState().logout()}
                     className="block w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-center mt-4"
                   >
@@ -99,7 +99,7 @@ export default function HomePage() {
           <h2 className="text-lg font-semibold text-gray-700 text-center mb-4">
             Quick Demo Login
           </h2>
-          
+
           {demoAccounts.map((account) => (
             <button
               key={account.id}
@@ -114,7 +114,7 @@ export default function HomePage() {
               </div>
             </button>
           ))}
-          
+
           {isLoading && (
             <div className="text-center text-gray-600">
               Logging in...

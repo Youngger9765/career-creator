@@ -20,6 +20,9 @@ out/
 build/
 dist/
 
+# TypeScript
+*.tsbuildinfo
+
 # Testing
 coverage/
 .coverage

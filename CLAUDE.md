@@ -15,11 +15,25 @@ Building an online card consultation system for career counselors and their visi
   - `chore:` for maintenance tasks
 
 ## Code Standards
+
+### Frontend
 - **Framework**: Next.js 14 with TypeScript
-- **Styling**: Tailwind CSS
-- **Database**: PostgreSQL with Prisma
+- **Styling**: Tailwind CSS + shadcn/ui
 - **State Management**: Zustand
 - **Drag and Drop**: @dnd-kit
+- **API Client**: Axios + React Query
+
+### Backend
+- **Framework**: FastAPI with Python 3.11+
+- **ORM**: SQLAlchemy
+- **Validation**: Pydantic
+- **Testing**: pytest
+- **Async**: asyncio
+
+### Database & Infrastructure
+- **Database**: PostgreSQL (Supabase)
+- **Deployment**: GCP Cloud Run
+- **Storage**: GCP Cloud Storage
 
 ## Development Guidelines
 1. **Mobile First**: Always prioritize mobile experience
@@ -28,15 +42,69 @@ Building an online card consultation system for career counselors and their visi
 4. **Testing**: Write tests for critical functionality
 5. **Documentation**: Comment complex logic
 
-## File Structure
+## TDD with AI Development (Kent Beck's Principles)
+
+### Canon TDD Process
+Following Kent Beck's canonical TDD workflow:
+
+1. **List Expected Behaviors**: Before coding, list all expected variants in the new behavior
+   - Basic case
+   - Edge cases (timeouts, missing data, etc.)
+   - Existing behavior that shouldn't break
+
+2. **Red-Green-Refactor Cycle**:
+   - **Red**: Write one failing test
+   - **Green**: Make it pass (even with ugly code)
+   - **Refactor**: Clean up when test is green
+
+3. **One Test at a Time**: Focus on a single test, make it pass, then move to the next
+
+### TDD as AI "Superpower"
+According to Kent Beck, TDD is a "superpower" when working with AI agents:
+
+1. **Tests as Prompts**: Writing tests first essentially "prompts" the AI with exact requirements
+2. **Guard Rails**: Tests prevent AI from introducing regressions
+3. **Small Context Window**: Keep tests focused to maintain high code quality
+4. **Immediate Feedback**: Tests catch when AI strays off course
+
+### Common Mistakes to Avoid
+- Don't write tests without assertions just for coverage
+- Don't convert all test items to concrete tests at once
+- Don't mix refactoring with making tests pass
+- Watch for AI trying to delete/disable tests to "pass"
+
+### AI-Assisted TDD Workflow
+1. Write a failing test that describes the desired behavior
+2. Use AI to generate code that passes the test
+3. Feed test results back to AI for iterations
+4. Refactor with confidence knowing tests protect you
+5. Repeat for next behavior
+
+### Key Benefits
+- **Better Context**: Tests provide crucial context to AI assistants
+- **Higher Quality**: Edge cases in tests lead to more robust generated code
+- **Faster Iteration**: Clear requirements reduce back-and-forth
+- **Confidence**: Tests catch AI-introduced bugs immediately
+
+## File Structure (Monorepo)
 ```
-/src
-  /app          # Next.js app router pages
-  /components   # Reusable components
-  /lib          # Utilities and helpers
-  /hooks        # Custom React hooks
-  /types        # TypeScript type definitions
-  /styles       # Global styles
+/frontend
+  /src
+    /app          # Next.js app router pages
+    /components   # Reusable components
+    /lib          # Utilities and helpers
+    /hooks        # Custom React hooks
+    /types        # TypeScript type definitions
+    /styles       # Global styles
+
+/backend
+  /app
+    /api          # API endpoints
+    /models       # SQLAlchemy models
+    /schemas      # Pydantic schemas
+    /services     # Business logic
+    /core         # Core configs
+  /tests          # pytest tests
 ```
 
 ## Key Decisions
@@ -46,16 +114,34 @@ Building an online card consultation system for career counselors and their visi
 - Start with single card deck (職能盤點卡)
 
 ## Testing Commands
+
+### Frontend
 ```bash
-npm run dev      # Development server
+cd frontend
+npm run dev      # Development server (port 3000)
 npm run build    # Production build
 npm run lint     # Lint check
 npm run test     # Run tests
 ```
 
+### Backend
+```bash
+cd backend
+uvicorn app.main:app --reload  # Dev server (port 8000)
+pytest                          # Run all tests
+pytest -v                       # Verbose output
+pytest --cov                    # With coverage
+```
+
+### Full Stack
+```bash
+docker-compose up               # Run both frontend and backend
+```
+
 ## Deployment
-- Platform: Vercel
+- Platform: GCP Cloud Run
 - Database: Supabase PostgreSQL
+- Storage: GCP Cloud Storage
 - Environment: Production branch = main
 
 ---

@@ -25,8 +25,8 @@ Building an online card consultation system for career counselors and their visi
 
 ### Backend
 - **Framework**: FastAPI with Python 3.11+
-- **ORM**: SQLAlchemy
-- **Validation**: Pydantic
+- **ORM**: SQLModel (unified SQLAlchemy + Pydantic)
+- **Database Migrations**: Alembic
 - **Testing**: pytest
 - **Async**: asyncio
 
@@ -99,12 +99,12 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 
 /backend
   /app
-    /api          # API endpoints
-    /models       # SQLAlchemy models
-    /schemas      # Pydantic schemas
-    /services     # Business logic
-    /core         # Core configs
-  /tests          # pytest tests
+    /api          # API endpoints (FastAPI routers)
+    /models       # SQLModel models (unified ORM + schemas)
+    /core         # Core configs, database, roles
+    /services     # Business logic (future)
+  /tests          # pytest tests (TDD approach)
+  /alembic        # Database migrations
 ```
 
 ## Key Decisions
@@ -131,6 +131,7 @@ uvicorn app.main:app --reload  # Dev server (port 8000)
 pytest                          # Run all tests
 pytest -v                       # Verbose output
 pytest --cov                    # With coverage
+alembic upgrade head             # Run migrations
 ```
 
 ### Full Stack

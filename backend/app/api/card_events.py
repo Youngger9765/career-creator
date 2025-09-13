@@ -88,14 +88,11 @@ def get_room_events(
     if performer_id:
         query = query.where(CardEvent.performer_id == performer_id)
     
-    if from_sequence is not None:
-        query = query.where(CardEvent.sequence_number >= from_sequence)
+    # Note: from_sequence and to_sequence are deprecated
+    # TODO: Remove these parameters in future version
     
-    if to_sequence is not None:
-        query = query.where(CardEvent.sequence_number <= to_sequence)
-    
-    # Order by sequence number and apply pagination
-    query = query.order_by(CardEvent.sequence_number).offset(offset).limit(limit)
+    # Order by created_at and id for consistent ordering
+    query = query.order_by(CardEvent.created_at, CardEvent.id).offset(offset).limit(limit)
     
     events = session.exec(query).all()
     return events
@@ -118,7 +115,7 @@ def get_latest_room_events(
     query = (
         select(CardEvent)
         .where(CardEvent.room_id == room_id)
-        .order_by(desc(CardEvent.sequence_number))
+        .order_by(desc(CardEvent.created_at), desc(CardEvent.id))
         .limit(limit)
     )
     

@@ -5,9 +5,10 @@ An online card consultation system for career counselors and their visitors.
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 20+
 - Python 3.11+
-- Docker & Docker Compose
+- Node.js 18.17.0+
+- PostgreSQL 15
+- Docker & Docker Compose (optional)
 
 ### Development Setup
 
@@ -17,13 +18,13 @@ git clone https://github.com/Youngger9765/career-creator.git
 cd career-creator
 ```
 
-2. Install dependencies:
-
-**Frontend:**
+2. **Install pre-commit hooks:**
 ```bash
-cd frontend
-npm install
+pip install pre-commit
+pre-commit install
 ```
+
+3. Install dependencies:
 
 **Backend:**
 ```bash
@@ -31,25 +32,34 @@ cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
+alembic upgrade head  # Run database migrations
 ```
 
-3. Run with Docker Compose:
+**Frontend:**
+```bash
+cd frontend
+npm install
+```
+
+4. Run development servers:
+
+**With Docker Compose:**
 ```bash
 docker-compose up
 ```
 
-Or run separately:
+**Or run separately:**
 
-**Frontend (http://localhost:3000):**
-```bash
-cd frontend
-npm run dev
-```
-
-**Backend (http://localhost:8000):**
+Backend (http://localhost:8000):
 ```bash
 cd backend
 uvicorn app.main:app --reload
+```
+
+Frontend (http://localhost:3000):
+```bash
+cd frontend
+npm run dev
 ```
 
 ## 🧪 Testing
@@ -59,23 +69,57 @@ uvicorn app.main:app --reload
 cd backend
 pytest
 pytest -v  # verbose
-pytest --cov  # with coverage
+pytest --cov=app --cov-report=term-missing  # with coverage report
 ```
 
 ### Frontend Tests
 ```bash
 cd frontend
-npm run test
+npm test
+```
+
+## 🔧 Code Quality
+
+This project uses pre-commit hooks to ensure code quality. They run automatically on `git commit`.
+
+### Tools included:
+- **Python**: Black, Flake8, mypy, isort, Bandit
+- **TypeScript/JavaScript**: ESLint, TypeScript compiler, Prettier
+- **Security**: Gitleaks (secret detection)
+- **Other**: SQL formatter, Markdown linter, Dockerfile linter
+
+### Run manually:
+```bash
+pre-commit run --all-files
+```
+
+### Update hooks:
+```bash
+pre-commit autoupdate
 ```
 
 ## 📁 Project Structure
 
 ```
 career-creator/
-├── frontend/          # Next.js frontend
-├── backend/           # FastAPI backend
-├── docker-compose.yml # Development environment
-└── docs/             # Documentation
+├── frontend/              # Next.js frontend
+│   ├── src/
+│   │   ├── app/          # App router pages
+│   │   ├── components/   # React components
+│   │   └── types/        # TypeScript types
+│   └── package.json
+│
+├── backend/              # FastAPI backend
+│   ├── app/
+│   │   ├── api/          # API endpoints
+│   │   ├── models/       # SQLModel models
+│   │   └── core/         # Core configs
+│   ├── tests/            # pytest tests
+│   └── requirements.txt
+│
+├── .pre-commit-config.yaml  # Pre-commit hooks config
+├── docker-compose.yml       # Development environment
+└── docs/                    # Documentation
 ```
 
 ## 📚 Documentation
@@ -86,9 +130,11 @@ career-creator/
 
 ## 🛠 Tech Stack
 
-- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
-- **Backend**: FastAPI, Python 3.11, SQLAlchemy
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: FastAPI, Python 3.11, SQLModel (SQLAlchemy + Pydantic)
 - **Database**: PostgreSQL (Supabase)
+- **Testing**: pytest (backend), Jest (frontend)
+- **Code Quality**: pre-commit, Black, ESLint, Prettier
 - **Deployment**: GCP Cloud Run
 
 ## 📝 License

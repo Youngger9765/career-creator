@@ -248,19 +248,10 @@ async def handle_card_event_message(
             notes=data.get("notes"),
             performer_id=user_info.get("user_id"),
             performer_type=user_info.get("user_type", "user"),
-            performer_name=user_info.get("user_name"),
-            sequence_number=0  # Will be set by API logic
+            performer_name=user_info.get("user_name")
         )
         
-        # Get next sequence number
-        from sqlmodel import select, desc
-        last_event = session.exec(
-            select(CardEvent)
-            .where(CardEvent.room_id == UUID(room_id))
-            .order_by(desc(CardEvent.sequence_number))
-        ).first()
-        
-        card_event.sequence_number = (last_event.sequence_number + 1) if last_event else 1
+        # No longer calculating sequence number - using created_at for ordering
         
         session.add(card_event)
         session.commit()
@@ -278,8 +269,7 @@ async def handle_card_event_message(
                 "performer_id": card_event.performer_id,
                 "performer_name": card_event.performer_name,
                 "performer_type": card_event.performer_type,
-                "created_at": card_event.created_at.isoformat(),
-                "sequence_number": card_event.sequence_number
+                "created_at": card_event.created_at.isoformat()
             }
         })
         

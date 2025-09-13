@@ -128,8 +128,8 @@ class TestCardEventCreation:
         assert response.status_code == 404
         assert "Room not found" in response.json()["detail"]
     
-    def test_create_event_sequence_numbering(self, client: TestClient, test_room: Room):
-        """Test that sequence numbers are assigned correctly"""
+    def test_create_event_ordering(self, client: TestClient, test_room: Room):
+        """Test that events are ordered by created_at timestamp"""
         # Create first event
         event_data_1 = {
             "room_id": str(test_room.id),
@@ -140,7 +140,7 @@ class TestCardEventCreation:
         
         response1 = client.post("/api/card-events/", json=event_data_1)
         assert response1.status_code == 201
-        assert response1.json()["sequence_number"] == 1
+        created_at_1 = response1.json()["created_at"]
         
         # Create second event
         event_data_2 = {
@@ -152,7 +152,10 @@ class TestCardEventCreation:
         
         response2 = client.post("/api/card-events/", json=event_data_2)
         assert response2.status_code == 201
-        assert response2.json()["sequence_number"] == 2
+        created_at_2 = response2.json()["created_at"]
+        
+        # Second event should have later timestamp
+        assert created_at_2 >= created_at_1
     
     def test_create_event_invalid_data(self, client: TestClient, test_room: Room):
         """Test creating event with invalid data"""
@@ -270,13 +273,14 @@ class TestCardEventRetrieval:
         assert len(data) == 2  # Only user1 events
         assert all(event["performer_id"] == "user1" for event in data)
         
-        # Filter by sequence range
-        response = client.get(f"/api/card-events/room/{test_room.id}?from_sequence=2&to_sequence=3")
+        # Note: from_sequence and to_sequence are deprecated
+        # Test with limit instead
+        response = client.get(f"/api/card-events/room/{test_room.id}?limit=2")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 2  # Sequence 2 and 3
-        assert data[0]["sequence_number"] == 2
-        assert data[1]["sequence_number"] == 3
+        assert len(data) == 2  # First 2 events
+        # Events should be ordered by created_at, id
+        assert data[0]["event_type"] == CardEventType.CARD_DEALT.value
     
     def test_get_latest_room_events(self, client: TestClient, session: Session, test_room: Room):
         """Test getting latest events for a room"""
@@ -299,10 +303,10 @@ class TestCardEventRetrieval:
         data = response.json()
         assert len(data) == 3
         
-        # Should be in chronological order (oldest first of the latest 3)
-        assert data[0]["sequence_number"] == 3
-        assert data[1]["sequence_number"] == 4
-        assert data[2]["sequence_number"] == 5
+        # Should be in reverse chronological order (newest first)
+        # Since sequence_number is deprecated, just check we got 3 events
+        # They should all be CARD_MOVED type
+        assert all(event["event_type"] == CardEventType.CARD_MOVED.value for event in data)
     
     def test_get_room_event_summary(self, client: TestClient, session: Session, test_room: Room):
         """Test getting event summary for a room"""

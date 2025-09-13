@@ -1,0 +1,146 @@
+# Pre-commit hooks for code quality
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+      - id: check-case-conflict
+
+  # Python - Black formatter
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        files: ^backend/
+        language_version: python3.11
+
+  # Python - isort (import sorting)
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^backend/
+        args: ["--profile", "black"]
+
+  # Python - Flake8 linter
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        files: ^backend/
+        args:
+          - --max-line-length=88  # Match Black's line length
+          - --extend-ignore=E203,W503  # Compatible with Black
+          - --exclude=backend/alembic/versions/*
+
+  # Python - Type checking with mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.9.0
+    hooks:
+      - id: mypy
+        files: ^backend/
+        args: [--ignore-missing-imports, --no-strict-optional]
+        additional_dependencies:
+          - types-python-dateutil
+          - types-requests
+          - sqlmodel
+          - pydantic
+
+  # Frontend - ESLint
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx)$
+        pass_filenames: false
+
+  # Frontend - TypeScript Compiler
+  - repo: local
+    hooks:
+      - id: tsc
+        name: TypeScript Compiler
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false
+
+  # Frontend - Prettier formatter
+  - repo: local
+    hooks:
+      - id: prettier
+        name: Prettier
+        entry: bash -c 'cd frontend && npx prettier --check "src/**/*.{js,jsx,ts,tsx,css,md,json}"'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx|css|md|json)$
+        pass_filenames: false
+
+  # SQL formatter (for migrations)
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.0.2
+    hooks:
+      - id: sqlfluff-lint
+        files: ^backend/alembic/versions/.*\.py$
+        args: [--dialect, postgres]
+
+  # Security checks
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.7
+    hooks:
+      - id: bandit
+        files: ^backend/
+        args: [-r, backend/, --skip, B101]  # Skip assert_used test
+
+  # Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        exclude: ^frontend/node_modules/
+
+  # Dockerfile linting
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        files: Dockerfile$
+
+  # Check for secrets
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+
+# Configuration for specific tools
+exclude: |
+  (?x)^(
+    frontend/node_modules/|
+    frontend/.next/|
+    frontend/out/|
+    backend/__pycache__/|
+    backend/.pytest_cache/|
+    backend/venv/|
+    backend/env/|
+    .*\.min\.js|
+    .*\.min\.css
+  )
+
+default_language_version:
+  python: python3.11
+  node: 18.17.0

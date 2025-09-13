@@ -40,7 +40,7 @@ class CardEvent(CardEventBase, table=True):
     performer_type: str = Field(default="user")  # "user" or "visitor"
     performer_name: Optional[str] = None  # Display name for UI
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    sequence_number: int = Field(default=0)  # For ordering events in session
+    sequence_number: Optional[int] = Field(default=None)  # Deprecated, kept for backwards compatibility
 
 
 class CardEventCreate(CardEventBase):
@@ -48,7 +48,7 @@ class CardEventCreate(CardEventBase):
     performer_id: Optional[str] = None
     performer_type: str = "user"
     performer_name: Optional[str] = None
-    sequence_number: Optional[int] = 0
+    sequence_number: Optional[int] = None  # Deprecated field
 
 
 class CardEventResponse(CardEventBase):
@@ -66,7 +66,7 @@ class CardEventQuery(SQLModel):
     room_id: Optional[UUID] = None
     event_type: Optional[CardEventType] = None
     performer_id: Optional[str] = None
-    from_sequence: Optional[int] = None
-    to_sequence: Optional[int] = None
+    from_datetime: Optional[datetime] = None
+    to_datetime: Optional[datetime] = None
     limit: Optional[int] = Field(default=100, le=1000)
     offset: Optional[int] = Field(default=0, ge=0)

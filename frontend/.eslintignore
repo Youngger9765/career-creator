@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Next.js
+.next/
+out/
+build/
+
+# Production
+dist/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Config files
+next.config.js
+tailwind.config.js
+postcss.config.js

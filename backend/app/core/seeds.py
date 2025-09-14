@@ -1,0 +1,354 @@
+"""
+Database Seeding System
+資料庫種子資料系統
+"""
+
+from sqlmodel import Session, select
+from app.core.database import engine
+from app.models.game_rule import Card, CardDeck, GameRuleTemplate
+from app.models.user import User
+from app.core.auth import get_password_hash, DEMO_ACCOUNTS
+
+
+def seed_demo_users():
+    """創建demo用戶"""
+    with Session(engine) as session:
+        for demo_data in DEMO_ACCOUNTS:
+            # Check if user already exists
+            existing = session.exec(
+                select(User).where(User.email == demo_data["email"])
+            ).first()
+            
+            if not existing:
+                user = User(
+                    email=demo_data["email"],
+                    name=demo_data["name"],
+                    hashed_password=get_password_hash(demo_data["password"]),
+                    roles=demo_data["roles"],
+                    is_active=True
+                )
+                session.add(user)
+        
+        session.commit()
+        print("✅ Demo users seeded")
+
+
+def seed_career_cards():
+    """創建職業卡片資料"""
+    
+    # First create or get a basic game rule template
+    with Session(engine) as session:
+        # Create a basic game rule if it doesn't exist
+        game_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_career")
+        ).first()
+        
+        if not game_rule:
+            game_rule = GameRuleTemplate(
+                name="基本職業探索規則",
+                slug="basic_career",
+                description="基本的職業卡片探索遊戲規則",
+                version="1.0",
+                layout_config={"grid": {"rows": 4, "cols": 8}},
+                constraint_config={"max_selections": 10},
+                validation_rules={"min_selections": 3},
+                is_active=True
+            )
+            session.add(game_rule)
+            session.commit()
+            session.refresh(game_rule)
+        
+        # Now create a career deck
+        career_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "職業探索卡組")
+        ).first()
+        
+        if not career_deck:
+            career_deck = CardDeck(
+                name="職業探索卡組",
+                description="包含各種職業選項的卡組，適合職涯探索",
+                version="1.0",
+                is_official=True,
+                is_default=True,
+                game_rule_id=game_rule.id
+            )
+            session.add(career_deck)
+            session.commit()
+            session.refresh(career_deck)
+    
+    career_cards_data = [
+        # 科技類
+        {"card_key": "tech_001", "title": "軟體工程師", "description": "設計和開發軟體應用程式，解決技術問題", "category": "technology"},
+        {"card_key": "tech_002", "title": "資料科學家", "description": "分析大數據找出商業洞察和預測模型", "category": "technology"},
+        {"card_key": "tech_003", "title": "產品經理", "description": "規劃產品策略，協調團隊實現產品目標", "category": "technology"},
+        {"card_key": "tech_004", "title": "UI/UX設計師", "description": "設計使用者介面和體驗，提升產品易用性", "category": "technology"},
+        {"card_key": "tech_005", "title": "網路安全工程師", "description": "保護企業資訊安全，防範網路攻擊", "category": "technology"},
+        
+        # 商業類
+        {"card_key": "biz_001", "title": "行銷經理", "description": "制定行銷策略，推廣產品和品牌", "category": "business"},
+        {"card_key": "biz_002", "title": "業務代表", "description": "開發客戶關係，達成銷售目標", "category": "business"},
+        {"card_key": "biz_003", "title": "財務分析師", "description": "分析財務數據，提供投資建議", "category": "business"},
+        {"card_key": "biz_004", "title": "人力資源專員", "description": "招募人才，管理員工關係和福利", "category": "business"},
+        {"card_key": "biz_005", "title": "專案經理", "description": "規劃和執行專案，確保按時按預算完成", "category": "business"},
+        
+        # 創意類
+        {"card_key": "creative_001", "title": "平面設計師", "description": "創作視覺設計，傳達品牌訊息", "category": "creative"},
+        {"card_key": "creative_002", "title": "內容創作者", "description": "撰寫文章、製作影片等數位內容", "category": "creative"},
+        {"card_key": "creative_003", "title": "攝影師", "description": "拍攝照片，記錄美好瞬間和商業需求", "category": "creative"},
+        {"card_key": "creative_004", "title": "影片剪輯師", "description": "編輯影片內容，創造吸引人的視覺故事", "category": "creative"},
+        {"card_key": "creative_005", "title": "廣告創意", "description": "發想創意概念，製作廣告內容", "category": "creative"},
+        
+        # 教育類
+        {"card_key": "edu_001", "title": "小學教師", "description": "教導兒童基礎知識，培養學習興趣", "category": "education"},
+        {"card_key": "edu_002", "title": "企業講師", "description": "設計培訓課程，提升員工能力", "category": "education"},
+        {"card_key": "edu_003", "title": "線上課程創作者", "description": "製作數位學習內容，線上教學", "category": "education"},
+        {"card_key": "edu_004", "title": "職涯顧問", "description": "提供職業規劃建議，協助轉職發展", "category": "education"},
+        {"card_key": "edu_005", "title": "學習設計師", "description": "設計學習體驗，優化教學效果", "category": "education"},
+        
+        # 醫療健康類
+        {"card_key": "health_001", "title": "護理師", "description": "照護病患健康，協助醫療程序", "category": "healthcare"},
+        {"card_key": "health_002", "title": "物理治療師", "description": "幫助患者恢復身體功能和活動能力", "category": "healthcare"},
+        {"card_key": "health_003", "title": "營養師", "description": "設計營養計畫，促進健康飲食", "category": "healthcare"},
+        {"card_key": "health_004", "title": "心理諮商師", "description": "提供心理支持，協助解決情緒問題", "category": "healthcare"},
+        {"card_key": "health_005", "title": "牙醫助理", "description": "協助牙醫診療，維護口腔健康", "category": "healthcare"},
+        
+        # 服務類
+        {"card_key": "service_001", "title": "客服專員", "description": "處理客戶問題，提供優質服務體驗", "category": "service"},
+        {"card_key": "service_002", "title": "旅遊顧問", "description": "規劃旅遊行程，提供旅行建議", "category": "service"},
+        {"card_key": "service_003", "title": "美容師", "description": "提供美容服務，幫助客戶提升外觀", "category": "service"},
+        {"card_key": "service_004", "title": "餐廳經理", "description": "管理餐廳營運，確保服務品質", "category": "service"},
+        {"card_key": "service_005", "title": "活動企劃", "description": "策劃各類活動，創造難忘體驗", "category": "service"},
+        
+        # 手工藝類
+        {"card_key": "craft_001", "title": "木工師傅", "description": "製作木製家具和裝飾品", "category": "craft"},
+        {"card_key": "craft_002", "title": "陶藝家", "description": "創作陶瓷藝品，表達創意想法", "category": "craft"},
+        {"card_key": "craft_003", "title": "裁縫師", "description": "設計和製作服裝，修補衣物", "category": "craft"},
+        {"card_key": "craft_004", "title": "烘焙師", "description": "製作麵包糕點，帶來美味享受", "category": "craft"},
+        {"card_key": "craft_005", "title": "花藝師", "description": "設計花束裝飾，美化生活空間", "category": "craft"},
+    ]
+    
+    with Session(engine) as session:
+        # Create cards
+        for card_data in career_cards_data:
+            existing = session.exec(
+                select(Card).where(Card.card_key == card_data["card_key"], Card.deck_id == career_deck.id)
+            ).first()
+            
+            if not existing:
+                card = Card(
+                    deck_id=career_deck.id,
+                    card_key=card_data["card_key"],
+                    title=card_data["title"],
+                    description=card_data["description"],
+                    category=card_data["category"],
+                    card_metadata={"tags": [card_data["category"]], "difficulty": "beginner"}
+                )
+                session.add(card)
+        
+        session.commit()
+        print(f"✅ {len(career_cards_data)} career cards seeded")
+
+
+def seed_value_cards():
+    """創建價值觀卡片資料"""
+    
+    # First create or get a basic game rule template for values
+    with Session(engine) as session:
+        # Create a basic game rule if it doesn't exist
+        game_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_values")
+        ).first()
+        
+        if not game_rule:
+            game_rule = GameRuleTemplate(
+                name="價值觀探索規則",
+                slug="basic_values",
+                description="價值觀卡片探索遊戲規則",
+                version="1.0",
+                layout_config={"grid": {"rows": 3, "cols": 5}},
+                constraint_config={"max_selections": 5},
+                validation_rules={"min_selections": 3},
+                is_active=True
+            )
+            session.add(game_rule)
+            session.commit()
+            session.refresh(game_rule)
+        
+        # Now create a values deck
+        values_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "價值觀卡組")
+        ).first()
+        
+        if not values_deck:
+            values_deck = CardDeck(
+                name="價值觀卡組",
+                description="探索個人價值觀的卡組",
+                version="1.0",
+                is_official=True,
+                is_default=True,
+                game_rule_id=game_rule.id
+            )
+            session.add(values_deck)
+            session.commit()
+            session.refresh(values_deck)
+    
+    value_cards_data = [
+        {"card_key": "value_001", "title": "成就感", "description": "在工作中獲得成功和認可的滿足感", "category": "personal_fulfillment"},
+        {"card_key": "value_002", "title": "創意發揮", "description": "有機會展現創意和想像力", "category": "creative_expression"},
+        {"card_key": "value_003", "title": "工作穩定", "description": "擁有穩定的職業和收入保障", "category": "security"},
+        {"card_key": "value_004", "title": "彈性時間", "description": "能夠彈性安排工作時間和地點", "category": "flexibility"},
+        {"card_key": "value_005", "title": "團隊合作", "description": "與他人協作完成共同目標", "category": "collaboration"},
+        {"card_key": "value_006", "title": "領導他人", "description": "引導和激勵團隊成員", "category": "leadership"},
+        {"card_key": "value_007", "title": "持續學習", "description": "不斷獲得新知識和技能", "category": "growth"},
+        {"card_key": "value_008", "title": "社會影響", "description": "工作能對社會產生正面影響", "category": "social_impact"},
+        {"card_key": "value_009", "title": "高收入", "description": "獲得豐厚的經濟回報", "category": "financial_reward"},
+        {"card_key": "value_010", "title": "工作生活平衡", "description": "工作與個人生活的良好平衡", "category": "life_balance"},
+        {"card_key": "value_011", "title": "挑戰性", "description": "面對具有挑戰性的工作任務", "category": "challenge"},
+        {"card_key": "value_012", "title": "獨立自主", "description": "能夠獨立決策和執行工作", "category": "autonomy"},
+        {"card_key": "value_013", "title": "人際關係", "description": "建立良好的職場人際網絡", "category": "relationships"},
+        {"card_key": "value_014", "title": "專業聲望", "description": "在專業領域獲得尊重和認可", "category": "prestige"},
+        {"card_key": "value_015", "title": "服務他人", "description": "通過工作幫助和服務他人", "category": "service"},
+    ]
+    
+    with Session(engine) as session:
+        # Get the values deck
+        values_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "價值觀卡組")
+        ).first()
+        
+        if not values_deck:
+            print("⚠️ Values deck not found, skipping value cards")
+            return
+            
+        for card_data in value_cards_data:
+            existing = session.exec(
+                select(Card).where(Card.card_key == card_data["card_key"], Card.deck_id == values_deck.id)
+            ).first()
+            
+            if not existing:
+                card = Card(
+                    deck_id=values_deck.id,
+                    card_key=card_data["card_key"],
+                    title=card_data["title"],
+                    description=card_data["description"],
+                    category=card_data["category"],
+                    card_metadata={"importance_level": "high"}
+                )
+                session.add(card)
+        
+        session.commit()
+        print(f"✅ {len(value_cards_data)} value cards seeded")
+
+
+def seed_skill_cards():
+    """創建技能卡片資料"""
+    
+    # First create or get a basic game rule template for skills
+    with Session(engine) as session:
+        # Create a basic game rule if it doesn't exist
+        game_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_skills")
+        ).first()
+        
+        if not game_rule:
+            game_rule = GameRuleTemplate(
+                name="技能盤點規則",
+                slug="basic_skills",
+                description="技能卡片盤點遊戲規則",
+                version="1.0",
+                layout_config={"grid": {"rows": 3, "cols": 5}},
+                constraint_config={"max_selections": 8},
+                validation_rules={"min_selections": 5},
+                is_active=True
+            )
+            session.add(game_rule)
+            session.commit()
+            session.refresh(game_rule)
+        
+        # Now create a skills deck
+        skills_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "技能盤點卡組")
+        ).first()
+        
+        if not skills_deck:
+            skills_deck = CardDeck(
+                name="技能盤點卡組",
+                description="評估個人技能的卡組",
+                version="1.0",
+                is_official=True,
+                is_default=True,
+                game_rule_id=game_rule.id
+            )
+            session.add(skills_deck)
+            session.commit()
+            session.refresh(skills_deck)
+    
+    skill_cards_data = [
+        {"card_key": "skill_001", "title": "程式設計", "description": "編寫和維護程式代碼的能力", "category": "technical"},
+        {"card_key": "skill_002", "title": "數據分析", "description": "收集、處理和分析數據的能力", "category": "analytical"},
+        {"card_key": "skill_003", "title": "溝通表達", "description": "清晰有效地傳達想法和信息", "category": "communication"},
+        {"card_key": "skill_004", "title": "領導管理", "description": "領導團隊和管理專案的能力", "category": "leadership"},
+        {"card_key": "skill_005", "title": "創意思維", "description": "產生新想法和創新解決方案", "category": "creative"},
+        {"card_key": "skill_006", "title": "問題解決", "description": "識別和解決複雜問題的能力", "category": "analytical"},
+        {"card_key": "skill_007", "title": "團隊協作", "description": "與他人有效合作達成目標", "category": "interpersonal"},
+        {"card_key": "skill_008", "title": "時間管理", "description": "有效安排和利用時間的能力", "category": "organizational"},
+        {"card_key": "skill_009", "title": "學習適應", "description": "快速學習新事物並適應變化", "category": "adaptability"},
+        {"card_key": "skill_010", "title": "銷售技巧", "description": "推廣產品和服務的能力", "category": "business"},
+        {"card_key": "skill_011", "title": "設計美感", "description": "創造美觀和功能性設計", "category": "creative"},
+        {"card_key": "skill_012", "title": "外語能力", "description": "掌握一種或多種外國語言", "category": "communication"},
+        {"card_key": "skill_013", "title": "批判思考", "description": "客觀分析和評估信息的能力", "category": "analytical"},
+        {"card_key": "skill_014", "title": "情緒管理", "description": "理解和管理自己及他人情緒", "category": "emotional_intelligence"},
+        {"card_key": "skill_015", "title": "技術維修", "description": "修理和維護技術設備的能力", "category": "technical"},
+    ]
+    
+    with Session(engine) as session:
+        # Get the skills deck
+        skills_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "技能盤點卡組")
+        ).first()
+        
+        if not skills_deck:
+            print("⚠️ Skills deck not found, skipping skill cards")
+            return
+            
+        for card_data in skill_cards_data:
+            existing = session.exec(
+                select(Card).where(Card.card_key == card_data["card_key"], Card.deck_id == skills_deck.id)
+            ).first()
+            
+            if not existing:
+                card = Card(
+                    deck_id=skills_deck.id,
+                    card_key=card_data["card_key"],
+                    title=card_data["title"],
+                    description=card_data["description"],
+                    category=card_data["category"],
+                    card_metadata={"skill_level": "intermediate"}
+                )
+                session.add(card)
+        
+        session.commit()
+        print(f"✅ {len(skill_cards_data)} skill cards seeded")
+
+
+
+
+def run_all_seeds():
+    """執行所有種子資料"""
+    print("🌱 Starting database seeding...")
+    
+    try:
+        seed_demo_users()
+        seed_career_cards()
+        seed_value_cards() 
+        seed_skill_cards()
+        
+        print("🎉 All seeds completed successfully!")
+        
+    except Exception as e:
+        print(f"❌ Seeding failed: {e}")
+        raise
+
+
+if __name__ == "__main__":
+    run_all_seeds()

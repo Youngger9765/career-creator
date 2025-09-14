@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ConsultationArea } from '@/components/ConsultationArea';
 import QRCodeModal from '@/components/QRCodeModal';
+import { GameSessionPanel } from '@/components/GameSessionPanel';
 import { useRoomStore } from '@/stores/room-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useWebSocket } from '@/hooks/use-websocket';
@@ -374,6 +375,11 @@ export default function RoomPage() {
           }}
           onClearAreaReady={(clearFn: () => void) => setClearAreaCallback(() => clearFn)}
         />
+      </div>
+
+      {/* Game Session Panel (floating top-right) */}
+      <div className="fixed top-24 right-4 w-96 z-30">
+        <GameSessionPanel roomId={roomId} isCounselor={isCounselor} />
       </div>
 
       {/* Events Panel (floating) */}

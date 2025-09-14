@@ -264,42 +264,164 @@ Based on iGaming industry best practices, we implement a flexible game rules eng
 └─────────────────────────────────────┘
 ```
 
-#### Engine Layer (引擎層)
+#### Engine Layer (引擎層) - 核心邏輯
 
-- **Core Logic**: State management, action execution, rule validation
-- **Rule Agnostic**: Handles common logic across all game types
-- **Concurrent Safe**: Supports multi-user operations
+**職責：**
+- **狀態管理**: 遊戲狀態的存儲、更新、查詢
+- **動作執行**: 處理所有遊戲動作的執行邏輯
+- **規則驗證**: 驗證動作是否符合當前規則
+- **事件發布**: 觸發狀態變更事件
 
+**核心組件：**
 ```typescript
+// 遊戲引擎核心
 interface GameEngine {
+  // 狀態管理
+  getState(roomId: string): GameState;
+  updateState(roomId: string, newState: GameState): void;
+
+  // 動作處理
   executeAction(action: GameAction): ActionResult;
   validateAction(action: GameAction, state: GameState): boolean;
-  getState(roomId: string): GameState;
+
+  // 事件系統
   publishEvent(event: GameEvent): void;
+  subscribeToEvents(callback: EventCallback): void;
+}
+
+// 遊戲狀態定義
+interface GameState {
+  roomId: string;
+  ruleId: string;
+  cards: Map<string, CardState>;      // 所有牌卡狀態
+  zones: Map<string, ZoneState>;      // 所有區域狀態
+  players: Map<string, PlayerState>;  // 玩家狀態
+  metadata: GameMetadata;             // 額外資訊
+  version: number;                    // 版本控制
+}
+
+// 動作定義
+interface GameAction {
+  type: ActionType;                   // FLIP, MOVE, ARRANGE, ANNOTATE
+  playerId: string;
+  cardId?: string;
+  targetZone?: string;
+  position?: Position;
+  data?: any;
 }
 ```
 
-#### Configuration Layer (配置層)
+**實現特點：**
+- **規則無關**: 不關心具體規則，只處理通用邏輯
+- **狀態不可變**: 每次更新產生新狀態
+- **事務安全**: 支持原子操作和回滾
+- **並發安全**: 支持多用戶同時操作
 
-- **Rule Definition**: Game rules and constraints
-- **Content Management**: Card decks and layouts
-- **UI Configuration**: Interface layouts
+#### Configuration Layer (配置層) - 規則與內容
 
+**職責：**
+- **規則定義**: 定義各種遊戲規則和限制
+- **內容管理**: 管理牌卡內容和布局
+- **驗證邏輯**: 實現具體的規則驗證
+- **UI配置**: 定義用戶界面布局
+
+**核心組件：**
 ```typescript
+// 規則配置接口
 interface GameRuleConfig {
   id: string;
-  layout: LayoutConfig;        // 布局配置
-  constraints: ConstraintConfig; // 規則約束
-  validators: GameValidator[];   // 驗證器
-  uiConfig: UIConfig;           // UI配置
+  name: string;
+  version: string;
+
+  // 布局配置
+  layout: LayoutConfig;
+
+  // 規則配置
+  constraints: ConstraintConfig;
+
+  // 驗證器
+  validators: GameValidator[];
+
+  // UI配置
+  uiConfig: UIConfig;
+}
+
+// 布局配置
+interface LayoutConfig {
+  deckArea: {
+    position: Position;
+    style: 'stack' | 'grid' | 'categorized';
+    cardCount?: number;
+  };
+
+  dropZones: DropZoneConfig[];
+}
+
+// 遊戲驗證器
+interface GameValidator {
+  id: string;
+  validate(action: GameAction, state: GameState, config: GameRuleConfig): ValidationResult;
+}
+
+// 牌組定義
+interface CardDeck {
+  id: string;
+  ruleId: string;              // 屬於哪個規則
+  name: string;
+  version: string;
+  isOfficial: boolean;
+  cards: Card[];
 }
 ```
 
-#### Application Layer (應用層)
+#### Application Layer (應用層) - 業務流程
 
-- **Business Logic**: Room management, user interactions
-- **Security**: Permission control, session management
-- **API Endpoints**: RESTful interfaces
+**職責：**
+- **用戶交互**: 處理用戶請求和響應
+- **會話管理**: 管理房間和用戶會話
+- **權限控制**: 處理用戶權限和安全
+- **業務流程**: 協調底層服務完成業務邏輯
+
+**核心組件：**
+```typescript
+// 房間服務
+interface RoomService {
+  createRoom(request: CreateRoomRequest): Promise<Room>;
+  joinRoom(roomId: string, visitor: VisitorInfo): Promise<JoinResult>;
+  leaveRoom(roomId: string, userId: string): Promise<void>;
+  closeRoom(roomId: string, counselorId: string): Promise<void>;
+  getRoomStatus(roomId: string): Promise<RoomStatus>;
+}
+
+// 遊戲服務
+interface GameService {
+  initializeGame(roomId: string, ruleId: string, deckId: string): Promise<GameState>;
+  executePlayerAction(roomId: string, action: PlayerAction): Promise<ActionResult>;
+  getGameState(roomId: string): Promise<GameState>;
+  getGameHistory(roomId: string): Promise<GameEvent[]>;
+  saveGameSnapshot(roomId: string): Promise<void>;
+}
+
+// 用戶交互API
+class GameController {
+  // 房間管理
+  async createRoom(req: Request): Promise<Response> {
+    // 1. 驗證用戶權限
+    // 2. 調用房間服務創建房間
+    // 3. 初始化遊戲狀態
+    // 4. 返回房間信息
+  }
+
+  // 遊戲操作
+  async executeAction(req: Request): Promise<Response> {
+    // 1. 解析用戶動作
+    // 2. 獲取房間規則配置
+    // 3. 調用引擎執行動作
+    // 4. 廣播狀態變更
+    // 5. 返回操作結果
+  }
+}
+```
 
 ### Three Game Types Support
 

@@ -189,7 +189,9 @@ class CardEventFactory:
     ) -> CardEvent:
         """創建排列事件"""
         kwargs.setdefault("event_type", "card_arranged")
-        kwargs.setdefault("event_data", {"drop_zone": zone, "position": {"x": 400, "y": 150}})
+        kwargs.setdefault(
+            "event_data", {"drop_zone": zone, "position": {"x": 400, "y": 150}}
+        )
         return CardEventFactory.create(session, room, **kwargs)
 
     @staticmethod

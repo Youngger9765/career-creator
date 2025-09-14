@@ -4,7 +4,7 @@
  */
 import { useState, useCallback } from 'react';
 import { CardEvent, CardEventCreate, CardEventType } from '@/types/api';
-import apiClient from '@/lib/api-client';
+import { cardEventsAPI } from '@/lib/api/card-events';
 import { useWebSocket } from './use-websocket';
 
 interface UseCardEventsOptions {
@@ -22,8 +22,8 @@ export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions)
     setError(null);
 
     try {
-      const latestEvents = await apiClient.getLatestRoomEvents(roomId);
-      setEvents(latestEvents);
+      const latestEvents = await cardEventsAPI.getLatestRoomEvents(roomId);
+      setEvents(latestEvents as any);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to load events');
     } finally {
@@ -34,7 +34,7 @@ export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions)
   const createEvent = useCallback(
     async (eventData: Omit<CardEventCreate, 'room_id'>) => {
       try {
-        const event = await apiClient.createCardEvent({
+        const event = await cardEventsAPI.createEvent({
           ...eventData,
           room_id: roomId,
         });

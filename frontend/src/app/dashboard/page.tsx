@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { authAPI } from '@/lib/api/auth-simple';
-import { roomsAPI, Room } from '@/lib/api/rooms';
-import { cardEventsAPI, CardEvent } from '@/lib/api/card-events';
+import { authAPI } from '@/lib/api/auth';
+import { roomsAPI } from '@/lib/api/rooms';
+import { cardEventsAPI } from '@/lib/api/card-events';
+import { Room, CardEvent } from '@/types/api';
 import { Calendar, Users, Clock, TrendingUp, Activity, Archive } from 'lucide-react';
 
 interface DashboardStats {
@@ -30,25 +31,32 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const checkAuth = () => {
-      if (!authAPI.isAuthenticated()) {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
         router.push('/login');
         return false;
       }
 
-      const userData = authAPI.getStoredUser();
-      if (!userData) {
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
         router.push('/login');
         return false;
       }
 
-      // Check if user is counselor
-      if (!userData.roles?.includes('counselor') && !userData.roles?.includes('admin')) {
-        router.push('/');
+      try {
+        const userData = JSON.parse(userStr);
+        // Check if user is counselor
+        if (!userData.roles?.includes('counselor') && !userData.roles?.includes('admin')) {
+          router.push('/');
+          return false;
+        }
+        setUser(userData);
+        return true;
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+        router.push('/login');
         return false;
       }
-
-      setUser(userData);
-      return true;
     };
 
     const loadDashboardData = async () => {
@@ -129,10 +137,14 @@ export default function DashboardPage() {
   }
 
   const activeRooms = rooms.filter(
-    (room) => room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
+    (room) =>
+      room.is_active &&
+      (!(room as any).expires_at || new Date((room as any).expires_at) > new Date())
   );
   const historyRooms = rooms.filter(
-    (room) => !room.is_active || (room.expires_at && new Date(room.expires_at) < new Date())
+    (room) =>
+      !room.is_active ||
+      ((room as any).expires_at && new Date((room as any).expires_at) < new Date())
   );
 
   return (
@@ -366,7 +378,8 @@ export default function DashboardPage() {
                         <h4 className="font-semibold text-gray-900">{room.name}</h4>
                         <p className="text-sm text-gray-600 mt-1">
                           創建於 {formatDate(room.created_at)}
-                          {room.expires_at && ` • 過期於 ${formatDate(room.expires_at)}`}
+                          {(room as any).expires_at &&
+                            ` • 過期於 ${formatDate((room as any).expires_at)}`}
                         </p>
                       </div>
                       <span

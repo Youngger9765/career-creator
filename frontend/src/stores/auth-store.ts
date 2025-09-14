@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { UserResponse, DemoAccount, LoginRequest } from '@/types/api';
-import apiClient from '@/lib/api-client';
+import { authAPI } from '@/lib/api/auth';
 
 interface AuthState {
   user: UserResponse | null;
@@ -37,9 +37,13 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
 
         try {
-          const response = await apiClient.login(credentials);
+          const response = await authAPI.login(credentials);
           set({
-            user: response.user,
+            user: {
+              ...response.user,
+              name: response.user.full_name,
+              created_at: new Date().toISOString(),
+            } as any,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -57,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        apiClient.logout();
+        authAPI.logout();
         set({
           user: null,
           isAuthenticated: false,
@@ -66,23 +70,27 @@ export const useAuthStore = create<AuthState>()(
       },
 
       getCurrentUser: async () => {
-        if (!apiClient.getToken()) {
+        if (!localStorage.getItem('access_token')) {
           return;
         }
 
         set({ isLoading: true });
 
         try {
-          const user = await apiClient.getCurrentUser();
+          const user = await authAPI.getCurrentUser();
           set({
-            user,
+            user: {
+              ...user,
+              name: user.full_name,
+              created_at: new Date().toISOString(),
+            } as any,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
         } catch (error: any) {
           // Token might be invalid
-          apiClient.logout();
+          authAPI.logout();
           set({
             user: null,
             isAuthenticated: false,
@@ -98,8 +106,8 @@ export const useAuthStore = create<AuthState>()(
 
       loadDemoAccounts: async () => {
         try {
-          const accounts = await apiClient.getDemoAccounts();
-          set({ demoAccounts: accounts });
+          const accounts = await authAPI.getDemoAccounts();
+          set({ demoAccounts: accounts as any });
         } catch (error) {
           console.error('Failed to load demo accounts:', error);
         }

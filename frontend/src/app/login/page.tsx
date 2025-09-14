@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { authAPI } from '@/lib/api/auth-simple';
+import { authAPI } from '@/lib/api/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,14 +15,24 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      await authAPI.login({ email, password });
+      const response = await authAPI.login({ email, password });
+      console.log('Login successful:', response);
+
+      // authAPI already stores token and user in localStorage
       // Redirect to dashboard after successful login
-      window.location.href = '/rooms';
+      window.location.href = '/dashboard';
     } catch (err) {
+      console.error('Login error:', err);
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
       setLoading(false);
     }
+  };
+
+  const fillTestAccount = () => {
+    console.log('Filling test account...');
+    setEmail('test@example.com');
+    setPassword('password123');
   };
 
   return (
@@ -90,14 +100,23 @@ export default function LoginPage() {
 
         {/* Demo accounts for testing */}
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <h3 className="text-sm font-medium text-yellow-800">測試帳號</h3>
-          <p className="mt-1 text-sm text-yellow-700">
-            測試用途：
-            <br />
-            帳號：test@example.com
-            <br />
-            密碼：password123
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="text-sm font-medium text-yellow-800">開發測試帳號</h3>
+              <p className="mt-1 text-sm text-yellow-700">
+                帳號：test@example.com
+                <br />
+                密碼：password123
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={fillTestAccount}
+              className="ml-4 px-3 py-1 text-xs bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
+            >
+              快速填入
+            </button>
+          </div>
         </div>
 
         <div className="text-center">

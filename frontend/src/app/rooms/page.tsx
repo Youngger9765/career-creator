@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { authAPI } from '@/lib/api/auth-simple';
+import { authAPI } from '@/lib/api/auth';
 import { roomsAPI, Room } from '@/lib/api/rooms';
 import QRCodeModal from '@/components/QRCodeModal';
 

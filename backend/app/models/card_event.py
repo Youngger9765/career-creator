@@ -66,7 +66,7 @@ class CardEventResponse(CardEventBase):
     performer_type: str
     performer_name: Optional[str]
     created_at: datetime
-    sequence_number: int
+    sequence_number: Optional[int] = None
 
 
 class CardEventQuery(SQLModel):

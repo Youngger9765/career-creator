@@ -145,7 +145,15 @@ export function ConsultationArea({
   useEffect(() => {
     if (syncedCards.length === 0) return;
 
-    setCards((prevCards) => applyToGameCards(prevCards));
+    setCards((prevCards) => {
+      // Only update if there are actual changes
+      const updatedCards = applyToGameCards(prevCards);
+      // Check if cards actually changed to prevent unnecessary re-renders
+      if (JSON.stringify(prevCards) === JSON.stringify(updatedCards)) {
+        return prevCards;
+      }
+      return updatedCards;
+    });
   }, [syncedCards, applyToGameCards]);
 
   const handleDealCard = useCallback(

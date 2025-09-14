@@ -19,6 +19,115 @@ from app.models.user import User
 router = APIRouter()
 
 
+@router.get("/")
+async def list_game_rules():
+    """
+    獲取所有可用的遊戲規則
+
+    返回系統內建的三種遊戲規則類型及其配置
+    這個端點不需要認證，因為遊戲規則是公開資訊
+    """
+    from app.game.config import GameRuleConfig
+
+    skill_config = GameRuleConfig.get_skill_assessment_config()
+    value_config = GameRuleConfig.get_value_navigation_config()
+    career_config = GameRuleConfig.get_career_personality_config()
+
+    rules = [
+        {
+            "id": "skill_assessment",
+            "slug": "skill_assessment",
+            "name": "職能盤點卡",
+            "description": "評估個人專業技能優勢與待改善領域",
+            "version": "1.0",
+            "layout_config": skill_config.layout.to_dict(),
+            "constraint_config": skill_config.constraints.to_dict(),
+            "is_active": True,
+        },
+        {
+            "id": "value_navigation",
+            "slug": "value_navigation",
+            "name": "價值導航卡",
+            "description": "探索個人價值觀與人生重要性排序",
+            "version": "1.0",
+            "layout_config": value_config.layout.to_dict(),
+            "constraint_config": value_config.constraints.to_dict(),
+            "is_active": True,
+        },
+        {
+            "id": "career_personality",
+            "slug": "career_personality",
+            "name": "職游旅人卡",
+            "description": "發現職業興趣偏好與性格特質",
+            "version": "1.0",
+            "layout_config": career_config.layout.to_dict(),
+            "constraint_config": career_config.constraints.to_dict(),
+            "is_active": True,
+        },
+    ]
+
+    return rules
+
+
+@router.get("/{rule_id}")
+async def get_game_rule(rule_id: str):
+    """
+    獲取特定遊戲規則的詳細配置
+
+    根據規則ID返回對應的遊戲規則配置
+    """
+    from app.game.config import GameRuleConfig
+
+    if rule_id == "skill_assessment":
+        config = GameRuleConfig.get_skill_assessment_config()
+        return {
+            "id": "skill_assessment",
+            "slug": "skill_assessment",
+            "name": "職能盤點卡",
+            "description": "評估個人專業技能優勢與待改善領域",
+            "version": "1.0",
+            "layout_config": config.layout.to_dict(),
+            "constraint_config": config.constraints.to_dict(),
+            "is_active": True,
+        }
+    elif rule_id == "value_navigation":
+        config = GameRuleConfig.get_value_navigation_config()
+        return {
+            "id": "value_navigation",
+            "slug": "value_navigation",
+            "name": "價值導航卡",
+            "description": "探索個人價值觀與人生重要性排序",
+            "version": "1.0",
+            "layout_config": config.layout.to_dict(),
+            "constraint_config": config.constraints.to_dict(),
+            "is_active": True,
+        }
+    elif rule_id == "career_personality":
+        config = GameRuleConfig.get_career_personality_config()
+        return {
+            "id": "career_personality",
+            "slug": "career_personality",
+            "name": "職游旅人卡",
+            "description": "發現職業興趣偏好與性格特質",
+            "version": "1.0",
+            "layout_config": config.layout.to_dict(),
+            "constraint_config": config.constraints.to_dict(),
+            "is_active": True,
+        }
+    else:
+        raise HTTPException(status_code=404, detail="Game rule not found")
+
+
+@router.get("/by-slug/{slug}")
+async def get_game_rule_by_slug(slug: str):
+    """
+    根據slug獲取遊戲規則
+
+    slug即規則的標識符，與ID相同
+    """
+    return await get_game_rule(slug)
+
+
 @router.get("/templates", response_model=List[GameRuleTemplate])
 async def list_game_rule_templates(
     session: Session = Depends(get_session),

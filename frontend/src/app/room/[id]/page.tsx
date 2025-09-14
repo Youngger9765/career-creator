@@ -66,6 +66,10 @@ export default function RoomPage() {
       return;
     }
 
+    if (isJoining) {
+      return; // Prevent multiple join attempts
+    }
+
     const joinRoomAsync = async () => {
       setIsJoining(true);
       try {
@@ -89,7 +93,9 @@ export default function RoomPage() {
     };
 
     joinRoomAsync();
-  }, [roomId, isAuthenticated, isVisitor, joinRoom, router, connectWebSocket, user, visitorName]);
+    // Remove joinRoom and connectWebSocket from dependencies to prevent infinite loop
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId, isAuthenticated, isVisitor]);
 
   // Set up WebSocket event listeners
   useEffect(() => {

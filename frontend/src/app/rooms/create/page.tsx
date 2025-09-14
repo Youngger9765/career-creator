@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRoomStore } from '@/stores/room-store';
 import { useAuthStore } from '@/stores/auth-store';
@@ -10,12 +10,50 @@ export default function CreateRoomPage() {
   const router = useRouter();
   const { createRoom, isLoading, error } = useRoomStore();
   const { isAuthenticated, user } = useAuthStore();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    // Check localStorage for auth token
+    const token = localStorage.getItem('access_token');
+    const userStr = localStorage.getItem('user');
+
+    if (!token || !userStr) {
+      setCheckingAuth(false);
+      return;
+    }
+
+    try {
+      const userData = JSON.parse(userStr);
+      // If we have valid token but store not updated, update it
+      if (!isAuthenticated && token) {
+        useAuthStore.setState({
+          user: userData,
+          isAuthenticated: true,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to parse user data:', error);
+    }
+
+    setCheckingAuth(false);
+  }, [isAuthenticated]);
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     expirationDays: 7, // Default 7 days
   });
+
+  if (checkingAuth) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">檢查認證狀態...</p>
+        </div>
+      </main>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

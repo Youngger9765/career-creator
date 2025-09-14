@@ -47,10 +47,16 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
   // Load active session and available rules on mount
   useEffect(() => {
     loadActiveSession(roomId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId]); // Only reload when roomId changes
+
+  // Load available rules once when counselor
+  useEffect(() => {
     if (isCounselor) {
       loadAvailableRules();
     }
-  }, [roomId, isCounselor]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only load once on mount
 
   const handleCreateSession = async () => {
     if (!selectedRuleId) {

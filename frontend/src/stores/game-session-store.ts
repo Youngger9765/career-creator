@@ -11,14 +11,14 @@ interface GameSessionState {
   // Current game session
   currentSession: GameSession | null;
   currentRule: GameRule | null;
-  
+
   // Available game rules
   availableRules: GameRule[];
-  
+
   // UI state
   isLoading: boolean;
   error: string | null;
-  
+
   // Actions
   loadAvailableRules: () => Promise<void>;
   createSession: (roomId: string, gameRuleId: string) => Promise<GameSession>;
@@ -44,9 +44,9 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
       const rules = await gameRulesAPI.list();
       set({ availableRules: rules, isLoading: false });
     } catch (error: any) {
-      set({ 
+      set({
         error: error.response?.data?.detail || 'Failed to load game rules',
-        isLoading: false 
+        isLoading: false,
       });
     }
   },
@@ -55,21 +55,21 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const session = await gameSessionsAPI.create({ room_id: roomId, game_rule_id: gameRuleId });
-      
+
       // Load the game rule for this session
       const rule = await gameRulesAPI.get(gameRuleId);
-      
-      set({ 
-        currentSession: session, 
+
+      set({
+        currentSession: session,
         currentRule: rule,
-        isLoading: false 
+        isLoading: false,
       });
-      
+
       return session;
     } catch (error: any) {
-      set({ 
+      set({
         error: error.response?.data?.detail || 'Failed to create game session',
-        isLoading: false 
+        isLoading: false,
       });
       throw error;
     }
@@ -79,19 +79,19 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const session = await gameSessionsAPI.get(sessionId);
-      
+
       // Load the game rule for this session
       const rule = await gameRulesAPI.get(session.game_rule_id);
-      
-      set({ 
-        currentSession: session, 
+
+      set({
+        currentSession: session,
         currentRule: rule,
-        isLoading: false 
+        isLoading: false,
       });
     } catch (error: any) {
-      set({ 
+      set({
         error: error.response?.data?.detail || 'Failed to load game session',
-        isLoading: false 
+        isLoading: false,
       });
     }
   },
@@ -100,35 +100,35 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const session = await gameSessionsAPI.getActiveForRoom(roomId);
-      
+
       if (session) {
         // Load the game rule for this session
         const rule = await gameRulesAPI.get(session.game_rule_id);
-        
-        set({ 
-          currentSession: session, 
+
+        set({
+          currentSession: session,
           currentRule: rule,
-          isLoading: false 
+          isLoading: false,
         });
       } else {
-        set({ 
-          currentSession: null, 
+        set({
+          currentSession: null,
           currentRule: null,
-          isLoading: false 
+          isLoading: false,
         });
       }
     } catch (error: any) {
       // If no active session, this is not an error
       if (error.response?.status === 404) {
-        set({ 
-          currentSession: null, 
+        set({
+          currentSession: null,
           currentRule: null,
-          isLoading: false 
+          isLoading: false,
         });
       } else {
-        set({ 
+        set({
           error: error.response?.data?.detail || 'Failed to load active session',
-          isLoading: false 
+          isLoading: false,
         });
       }
     }
@@ -144,14 +144,14 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const updatedSession = await gameSessionsAPI.start(currentSession.id);
-      set({ 
-        currentSession: updatedSession, 
-        isLoading: false 
+      set({
+        currentSession: updatedSession,
+        isLoading: false,
       });
     } catch (error: any) {
-      set({ 
+      set({
         error: error.response?.data?.detail || 'Failed to start session',
-        isLoading: false 
+        isLoading: false,
       });
     }
   },
@@ -166,14 +166,14 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const updatedSession = await gameSessionsAPI.complete(currentSession.id);
-      set({ 
-        currentSession: updatedSession, 
-        isLoading: false 
+      set({
+        currentSession: updatedSession,
+        isLoading: false,
       });
     } catch (error: any) {
-      set({ 
+      set({
         error: error.response?.data?.detail || 'Failed to complete session',
-        isLoading: false 
+        isLoading: false,
       });
     }
   },
@@ -188,32 +188,33 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
     set({ error: null });
     try {
       const result = await gameSessionsAPI.executeAction(currentSession.id, action);
-      
+
       if (result.success && result.game_state) {
         // Update the current session with new game state
-        set({ 
+        set({
           currentSession: {
             ...currentSession,
-            game_state: result.game_state
-          }
+            game_state: result.game_state,
+          },
         });
       } else if (!result.success) {
         set({ error: result.error_message || 'Action failed' });
       }
     } catch (error: any) {
-      set({ 
-        error: error.response?.data?.detail || 'Failed to execute action'
+      set({
+        error: error.response?.data?.detail || 'Failed to execute action',
       });
     }
   },
 
   clearError: () => set({ error: null }),
 
-  reset: () => set({
-    currentSession: null,
-    currentRule: null,
-    availableRules: [],
-    isLoading: false,
-    error: null,
-  }),
+  reset: () =>
+    set({
+      currentSession: null,
+      currentRule: null,
+      availableRules: [],
+      isLoading: false,
+      error: null,
+    }),
 }));

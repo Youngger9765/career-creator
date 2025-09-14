@@ -72,7 +72,15 @@ const DROP_ZONES: DropZone[] = [
   },
 ];
 
-function DropZoneComponent({ zone, isActive, cardCount }: { zone: DropZone; isActive: boolean; cardCount: number }) {
+function DropZoneComponent({
+  zone,
+  isActive,
+  cardCount,
+}: {
+  zone: DropZone;
+  isActive: boolean;
+  cardCount: number;
+}) {
   const { setNodeRef } = useDroppable({ id: zone.id });
 
   return (
@@ -94,9 +102,7 @@ function DropZoneComponent({ zone, isActive, cardCount }: { zone: DropZone; isAc
         <h3 className="font-bold text-gray-700 mb-1">
           {zone.name}
           {(zone.id === 'advantage' || zone.id === 'disadvantage') && (
-            <span className="ml-2 text-sm font-normal text-gray-600">
-              ({cardCount}/5)
-            </span>
+            <span className="ml-2 text-sm font-normal text-gray-600">({cardCount}/5)</span>
           )}
         </h3>
         <p className="text-xs text-gray-600">{zone.description}</p>
@@ -282,17 +288,20 @@ export function ConsultationArea({
     [onCardEvent]
   );
 
-  const handleAddNote = useCallback((cardId: string) => {
-    const card = cards.find(c => c.id === cardId);
-    if (card) {
-      setNoteModalCard(card.data);
-    }
-  }, [cards]);
+  const handleAddNote = useCallback(
+    (cardId: string) => {
+      const card = cards.find((c) => c.id === cardId);
+      if (card) {
+        setNoteModalCard(card.data);
+      }
+    },
+    [cards]
+  );
 
   const handleNoteSaved = useCallback((cardId: string, notes: string) => {
-    setCardNotes(prev => ({
+    setCardNotes((prev) => ({
       ...prev,
-      [cardId]: [...(prev[cardId] || []), notes]
+      [cardId]: [...(prev[cardId] || []), notes],
     }));
     setNoteModalCard(null);
   }, []);
@@ -309,22 +318,29 @@ export function ConsultationArea({
   }, [onClearAreaReady]);
 
   // Count cards in each zone
-  const getZoneCardCount = useCallback((zoneId: string) => {
-    const zone = DROP_ZONES.find(z => z.id === zoneId);
-    if (!zone) return 0;
+  const getZoneCardCount = useCallback(
+    (zoneId: string) => {
+      const zone = DROP_ZONES.find((z) => z.id === zoneId);
+      if (!zone) return 0;
 
-    return cards.filter(card => {
-      const cardCenterX = card.position.x + 64;
-      const cardCenterY = card.position.y + 88;
-      const zoneLeft = zone.position.x;
-      const zoneRight = zone.position.x + zone.width;
-      const zoneTop = zone.position.y;
-      const zoneBottom = zone.position.y + zone.height;
+      return cards.filter((card) => {
+        const cardCenterX = card.position.x + 64;
+        const cardCenterY = card.position.y + 88;
+        const zoneLeft = zone.position.x;
+        const zoneRight = zone.position.x + zone.width;
+        const zoneTop = zone.position.y;
+        const zoneBottom = zone.position.y + zone.height;
 
-      return cardCenterX >= zoneLeft && cardCenterX <= zoneRight &&
-             cardCenterY >= zoneTop && cardCenterY <= zoneBottom;
-    }).length;
-  }, [cards]);
+        return (
+          cardCenterX >= zoneLeft &&
+          cardCenterX <= zoneRight &&
+          cardCenterY >= zoneTop &&
+          cardCenterY <= zoneBottom
+        );
+      }).length;
+    },
+    [cards]
+  );
 
   return (
     <div className="consultation-area relative w-full h-screen overflow-hidden">
@@ -450,23 +466,25 @@ export function ConsultationArea({
           <div className="flex items-center space-x-4 text-sm">
             <div className="flex items-center space-x-2">
               <span className="text-gray-600">優勢：</span>
-              <span className={`font-bold ${getZoneCardCount('advantage') === 5 ? 'text-green-600' : 'text-gray-800'}`}>
+              <span
+                className={`font-bold ${getZoneCardCount('advantage') === 5 ? 'text-green-600' : 'text-gray-800'}`}
+              >
                 {getZoneCardCount('advantage')}/5
               </span>
             </div>
             <div className="w-px h-4 bg-gray-300"></div>
             <div className="flex items-center space-x-2">
               <span className="text-gray-600">劣勢：</span>
-              <span className={`font-bold ${getZoneCardCount('disadvantage') === 5 ? 'text-red-600' : 'text-gray-800'}`}>
+              <span
+                className={`font-bold ${getZoneCardCount('disadvantage') === 5 ? 'text-red-600' : 'text-gray-800'}`}
+              >
                 {getZoneCardCount('disadvantage')}/5
               </span>
             </div>
             <div className="w-px h-4 bg-gray-300"></div>
             <div className="flex items-center space-x-2">
               <span className="text-gray-600">總計：</span>
-              <span className="font-bold text-blue-600">
-                {cards.length} 張牌
-              </span>
+              <span className="font-bold text-blue-600">{cards.length} 張牌</span>
             </div>
           </div>
         </div>

@@ -41,20 +41,18 @@ const statusConfig = {
   },
 };
 
-export function GameStatusBadge({ 
-  status, 
+export function GameStatusBadge({
+  status,
   size = 'default',
-  showIcon = true 
+  showIcon = true,
 }: GameStatusBadgeProps) {
   const config = statusConfig[status];
   const Icon = config.icon;
 
   return (
-    <Badge 
+    <Badge
       variant={config.variant}
-      className={`${config.className} ${
-        size === 'lg' ? 'text-base px-4 py-2' : ''
-      }`}
+      className={`${config.className} ${size === 'lg' ? 'text-base px-4 py-2' : ''}`}
     >
       {showIcon && <Icon className={`${size === 'lg' ? 'w-5 h-5' : 'w-4 h-4'} mr-1`} />}
       {config.label}

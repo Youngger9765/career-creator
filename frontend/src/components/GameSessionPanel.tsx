@@ -7,7 +7,14 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useGameSessionStore } from '@/stores/game-session-store';
 import { GameRuleSelector } from './GameRuleSelector';
 import { GameStatusBadge } from './GameStatusBadge';
@@ -22,7 +29,7 @@ interface GameSessionPanelProps {
 export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps) {
   const [showRuleSelector, setShowRuleSelector] = useState(false);
   const [selectedRuleId, setSelectedRuleId] = useState<string>('');
-  
+
   const {
     currentSession,
     currentRule,
@@ -84,14 +91,10 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          
+
           <Dialog open={showRuleSelector} onOpenChange={setShowRuleSelector}>
             <DialogTrigger asChild>
-              <Button 
-                className="w-full" 
-                size="lg"
-                disabled={isLoading}
-              >
+              <Button className="w-full" size="lg" disabled={isLoading}>
                 {isLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -103,11 +106,9 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
             <DialogContent className="max-w-4xl">
               <DialogHeader>
                 <DialogTitle>選擇遊戲規則</DialogTitle>
-                <DialogDescription>
-                  選擇適合的卡牌類型開始諮商會話
-                </DialogDescription>
+                <DialogDescription>選擇適合的卡牌類型開始諮商會話</DialogDescription>
               </DialogHeader>
-              
+
               <div className="mt-6">
                 <GameRuleSelector
                   rules={availableRules}
@@ -116,7 +117,7 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
                   disabled={isLoading}
                 />
               </div>
-              
+
               <div className="mt-6 flex justify-end gap-3">
                 <Button
                   variant="outline"
@@ -125,13 +126,8 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
                 >
                   取消
                 </Button>
-                <Button
-                  onClick={handleCreateSession}
-                  disabled={!selectedRuleId || isLoading}
-                >
-                  {isLoading ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : null}
+                <Button onClick={handleCreateSession} disabled={!selectedRuleId || isLoading}>
+                  {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   創建會話
                 </Button>
               </div>
@@ -205,11 +201,7 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
           {isCounselor && (
             <div className="space-y-3">
               {currentSession.status === GameStatus.WAITING && (
-                <Button 
-                  className="w-full" 
-                  onClick={handleStartSession}
-                  disabled={isLoading}
-                >
+                <Button className="w-full" onClick={handleStartSession} disabled={isLoading}>
                   {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -218,10 +210,10 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
                   開始遊戲
                 </Button>
               )}
-              
+
               {currentSession.status === GameStatus.IN_PROGRESS && (
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   variant="outline"
                   onClick={handleCompleteSession}
                   disabled={isLoading}
@@ -234,11 +226,9 @@ export function GameSessionPanel({ roomId, isCounselor }: GameSessionPanelProps)
                   結束遊戲
                 </Button>
               )}
-              
+
               {currentSession.status === GameStatus.COMPLETED && (
-                <div className="text-center py-4 text-muted-foreground">
-                  遊戲已結束
-                </div>
+                <div className="text-center py-4 text-muted-foreground">遊戲已結束</div>
               )}
             </div>
           )}

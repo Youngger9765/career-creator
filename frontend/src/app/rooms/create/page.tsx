@@ -130,7 +130,10 @@ export default function CreateRoomPage() {
 
           {/* Expiration Settings */}
           <div>
-            <label htmlFor="expirationDays" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="expirationDays"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               房間有效期限
             </label>
             <select

@@ -62,8 +62,8 @@ export default function DashboardPage() {
         setRooms(myRooms);
 
         // Calculate stats
-        const activeRooms = myRooms.filter(room =>
-          room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
+        const activeRooms = myRooms.filter(
+          (room) => room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
         );
 
         // Load recent events from all rooms
@@ -128,11 +128,11 @@ export default function DashboardPage() {
     );
   }
 
-  const activeRooms = rooms.filter(room =>
-    room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
+  const activeRooms = rooms.filter(
+    (room) => room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
   );
-  const historyRooms = rooms.filter(room =>
-    !room.is_active || (room.expires_at && new Date(room.expires_at) < new Date())
+  const historyRooms = rooms.filter(
+    (room) => !room.is_active || (room.expires_at && new Date(room.expires_at) < new Date())
   );
 
   return (
@@ -261,7 +261,10 @@ export default function DashboardPage() {
                   {stats.recentEvents.length > 0 ? (
                     <div className="space-y-3">
                       {stats.recentEvents.map((event) => (
-                        <div key={event.id} className="flex items-center justify-between py-3 border-b">
+                        <div
+                          key={event.id}
+                          className="flex items-center justify-between py-3 border-b"
+                        >
                           <div className="flex items-center space-x-3">
                             <div className="p-2 bg-blue-50 rounded">
                               <Activity className="w-4 h-4 text-blue-600" />
@@ -270,7 +273,9 @@ export default function DashboardPage() {
                               <p className="text-sm font-medium text-gray-900">
                                 {event.performer_name || '未知用戶'} - {event.event_type}
                               </p>
-                              <p className="text-xs text-gray-500">{formatDate(event.created_at)}</p>
+                              <p className="text-xs text-gray-500">
+                                {formatDate(event.created_at)}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -286,10 +291,15 @@ export default function DashboardPage() {
             {selectedTab === 'active' && (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {activeRooms.map((room) => (
-                  <div key={room.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div
+                    key={room.id}
+                    className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  >
                     <div className="flex items-start justify-between mb-3">
                       <h4 className="font-semibold text-gray-900">{room.name}</h4>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}>
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}
+                      >
                         {getRoomStatus(room).label}
                       </span>
                     </div>
@@ -305,9 +315,7 @@ export default function DashboardPage() {
                           <span>剩餘 {getDaysRemaining(room.expires_at)} 天</span>
                         </div>
                       )}
-                      <div className="font-mono text-blue-600">
-                        分享碼：{room.share_code}
-                      </div>
+                      <div className="font-mono text-blue-600">分享碼：{room.share_code}</div>
                     </div>
 
                     <div className="flex space-x-2">
@@ -361,7 +369,9 @@ export default function DashboardPage() {
                           {room.expires_at && ` • 過期於 ${formatDate(room.expires_at)}`}
                         </p>
                       </div>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}>
+                      <span
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}
+                      >
                         {getRoomStatus(room).label}
                       </span>
                     </div>
@@ -369,9 +379,7 @@ export default function DashboardPage() {
                 ))}
 
                 {historyRooms.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    沒有歷史記錄
-                  </div>
+                  <div className="text-center py-12 text-gray-500">沒有歷史記錄</div>
                 )}
               </div>
             )}

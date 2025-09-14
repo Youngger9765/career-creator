@@ -61,4 +61,4 @@ export const GAME_RULES = {
   CAREER_PERSONALITY: 'career_personality',
 } as const;
 
-export type GameRuleSlug = typeof GAME_RULES[keyof typeof GAME_RULES];
+export type GameRuleSlug = (typeof GAME_RULES)[keyof typeof GAME_RULES];

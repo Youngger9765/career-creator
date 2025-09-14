@@ -44,7 +44,8 @@ function DroppableZone({ zone, cards, isActive }: DroppableZoneProps) {
         <div className="flex items-center gap-2">
           {zone.show_counter && (
             <Badge variant={isNearLimit ? 'destructive' : 'secondary'}>
-              {cards.length}{zone.max_cards ? `/${zone.max_cards}` : ''}
+              {cards.length}
+              {zone.max_cards ? `/${zone.max_cards}` : ''}
             </Badge>
           )}
           {zone.min_cards && cards.length < zone.min_cards && (
@@ -66,9 +67,7 @@ function DroppableZone({ zone, cards, isActive }: DroppableZoneProps) {
 
       {/* Empty State */}
       {cards.length === 0 && (
-        <div className="text-center text-gray-400 text-sm mt-4">
-          拖放卡片到此區域
-        </div>
+        <div className="text-center text-gray-400 text-sm mt-4">拖放卡片到此區域</div>
       )}
     </div>
   );
@@ -84,7 +83,7 @@ export function GameDropZones({ zones, gameState, onCardDrop }: GameDropZonesPro
   // Parse game state to get cards in each zone
   const getCardsInZone = (zoneId: string) => {
     if (!gameState?.zones?.[zoneId]) return [];
-    
+
     return gameState.zones[zoneId].cards || [];
   };
 
@@ -95,11 +94,7 @@ export function GameDropZones({ zones, gameState, onCardDrop }: GameDropZonesPro
       return (
         <div className="grid grid-cols-2 gap-4">
           {zones.map((zone) => (
-            <DroppableZone
-              key={zone.id}
-              zone={zone}
-              cards={getCardsInZone(zone.id)}
-            />
+            <DroppableZone key={zone.id} zone={zone} cards={getCardsInZone(zone.id)} />
           ))}
         </div>
       );
@@ -110,11 +105,7 @@ export function GameDropZones({ zones, gameState, onCardDrop }: GameDropZonesPro
       return (
         <div className="grid grid-cols-3 gap-4">
           {zones.map((zone) => (
-            <DroppableZone
-              key={zone.id}
-              zone={zone}
-              cards={getCardsInZone(zone.id)}
-            />
+            <DroppableZone key={zone.id} zone={zone} cards={getCardsInZone(zone.id)} />
           ))}
         </div>
       );
@@ -125,11 +116,7 @@ export function GameDropZones({ zones, gameState, onCardDrop }: GameDropZonesPro
       return (
         <div className="grid grid-cols-3 gap-4">
           {zones.map((zone) => (
-            <DroppableZone
-              key={zone.id}
-              zone={zone}
-              cards={getCardsInZone(zone.id)}
-            />
+            <DroppableZone key={zone.id} zone={zone} cards={getCardsInZone(zone.id)} />
           ))}
         </div>
       );
@@ -139,11 +126,7 @@ export function GameDropZones({ zones, gameState, onCardDrop }: GameDropZonesPro
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {zones.map((zone) => (
-          <DroppableZone
-            key={zone.id}
-            zone={zone}
-            cards={getCardsInZone(zone.id)}
-          />
+          <DroppableZone key={zone.id} zone={zone} cards={getCardsInZone(zone.id)} />
         ))}
       </div>
     );

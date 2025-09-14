@@ -105,11 +105,14 @@ export default function RoomPage() {
         type: data.user_type === 'visitor' ? 'visitor' : 'counselor',
         joinedAt: new Date().toISOString(),
       };
-      setParticipants(prev => [...prev.filter(p => p.id !== newParticipant.id), newParticipant]);
+      setParticipants((prev) => [
+        ...prev.filter((p) => p.id !== newParticipant.id),
+        newParticipant,
+      ]);
     });
 
     const cleanupLeave = onWebSocketEvent('participant_left', (data: any) => {
-      setParticipants(prev => prev.filter(p => p.id !== data.user_id));
+      setParticipants((prev) => prev.filter((p) => p.id !== data.user_id));
     });
 
     return () => {
@@ -346,7 +349,11 @@ export default function RoomPage() {
                 <div>
                   <div className="font-medium text-gray-800">{participant.name}</div>
                   <div className="text-xs text-gray-500">
-                    {participant.type === 'counselor' ? '諮詢師' : participant.type === 'visitor' ? '訪客' : '客戶'}
+                    {participant.type === 'counselor'
+                      ? '諮詢師'
+                      : participant.type === 'visitor'
+                        ? '訪客'
+                        : '客戶'}
                   </div>
                 </div>
                 <div className="text-xs text-gray-400">
@@ -379,7 +386,7 @@ export default function RoomPage() {
 
       {/* Game Session Panel (floating top-right) */}
       <div className="fixed top-24 right-4 w-96 z-30">
-        <GameSessionPanel roomId={roomId} isCounselor={isCounselor} />
+        <GameSessionPanel roomId={roomId} isCounselor={isCounselor || false} />
       </div>
 
       {/* Events Panel (floating) */}
@@ -416,11 +423,7 @@ export default function RoomPage() {
 
       {/* QR Code Modal */}
       {showQRCode && currentRoom && (
-        <QRCodeModal
-          room={currentRoom}
-          isOpen={showQRCode}
-          onClose={() => setShowQRCode(false)}
-        />
+        <QRCodeModal room={currentRoom} isOpen={showQRCode} onClose={() => setShowQRCode(false)} />
       )}
     </div>
   );

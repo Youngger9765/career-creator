@@ -79,21 +79,23 @@ export function CardNotesModal({
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 mb-1">新增牌卡註記</h2>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
-                card.category === 'technology' ? 'bg-blue-500' :
-                card.category === 'management' ? 'bg-green-500' :
-                card.category === 'creative' ? 'bg-purple-500' :
-                'bg-gray-500'
-              }`}>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-medium text-white ${
+                  card.category === 'technology'
+                    ? 'bg-blue-500'
+                    : card.category === 'management'
+                      ? 'bg-green-500'
+                      : card.category === 'creative'
+                        ? 'bg-purple-500'
+                        : 'bg-gray-500'
+                }`}
+              >
                 {card.category}
               </span>
               <span className="font-medium">{card.title}</span>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -118,9 +120,7 @@ export function CardNotesModal({
 
         {/* Notes Input */}
         <div className="p-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            註記內容
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">註記內容</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -129,9 +129,7 @@ export function CardNotesModal({
             className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             autoFocus
           />
-          <div className="mt-2 text-xs text-gray-500">
-            按下 Ctrl+Enter 快速儲存
-          </div>
+          <div className="mt-2 text-xs text-gray-500">按下 Ctrl+Enter 快速儲存</div>
 
           {error && (
             <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
@@ -143,9 +141,7 @@ export function CardNotesModal({
         {/* Actions */}
         <div className="flex items-center justify-between p-6 bg-gray-50 border-t">
           <div className="text-sm text-gray-500">
-            {performerInfo?.name && (
-              <span>註記者：{performerInfo.name}</span>
-            )}
+            {performerInfo?.name && <span>註記者：{performerInfo.name}</span>}
           </div>
           <div className="flex space-x-3">
             <button

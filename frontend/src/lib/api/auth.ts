@@ -20,7 +20,8 @@ export interface LoginCredentials {
 export interface RegisterData {
   email: string;
   password: string;
-  full_name: string;
+  name: string;
+  roles?: string[];
 }
 
 export interface AuthResponse {
@@ -59,7 +60,12 @@ class AuthAPI {
    */
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await apiClient.post<AuthResponse>('/api/auth/register', data);
+      const response = await apiClient.post<AuthResponse>('/api/auth/register', {
+        email: data.email,
+        password: data.password,
+        full_name: data.name,
+        roles: data.roles || ['counselor'],
+      });
       const { access_token, user } = response.data;
 
       // Store token and user info

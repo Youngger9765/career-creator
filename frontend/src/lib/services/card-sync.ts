@@ -133,8 +133,9 @@ export class CardSyncService {
           card_id: cardId,
           event_data: eventData,
           performer_id: performerInfo?.id,
-          performer_type: performerInfo?.type || 'visitor',
+          performer_type: (performerInfo?.type as 'user' | 'visitor') || 'visitor',
           performer_name: performerInfo?.name,
+          sequence_number: 0,
           created_at: new Date().toISOString(),
         };
         this.applyEventToLocalState(mockEvent);
@@ -328,6 +329,7 @@ export class CardSyncService {
         performer_id: eventData.performer_id,
         performer_type: eventData.performer_type || 'visitor',
         performer_name: eventData.performer_name,
+        sequence_number: eventData.sequence_number || 0,
         created_at: eventData.created_at || new Date().toISOString(),
       };
 

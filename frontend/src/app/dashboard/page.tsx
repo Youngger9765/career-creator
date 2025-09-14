@@ -7,7 +7,7 @@ import { authAPI } from '@/lib/api/auth';
 import { roomsAPI } from '@/lib/api/rooms';
 import { cardEventsAPI } from '@/lib/api/card-events';
 import { Room, CardEvent } from '@/types/api';
-import { Calendar, Users, Clock, TrendingUp, Activity, Archive } from 'lucide-react';
+import { Calendar, Users, Clock, TrendingUp, Activity, Archive, LogOut } from 'lucide-react';
 
 interface DashboardStats {
   totalRooms: number;
@@ -170,6 +170,17 @@ export default function DashboardPage() {
               >
                 房間列表
               </Link>
+              <button
+                onClick={() => {
+                  if (confirm('確定要登出嗎？')) {
+                    authAPI.logout();
+                  }
+                }}
+                className="px-4 py-2 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                登出
+              </button>
             </div>
           </div>
         </div>

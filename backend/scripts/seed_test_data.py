@@ -35,7 +35,7 @@ def create_test_users():
             id=uuid.uuid4(),
             email="test@example.com",
             name="測試諮詢師",
-            hashed_password=get_password_hash("password123"),
+            hashed_password=get_password_hash("CareerCreator2025!Dev@Testing#Safe"),
             roles=["counselor"],
             is_active=True,
             created_at=datetime.utcnow(),
@@ -71,7 +71,7 @@ def create_test_users():
 
         session.commit()
         print("Test users created successfully:")
-        print("- test@example.com / password123 (諮詢師)")
+        print("- test@example.com / CareerCreator2025!Dev@Testing#Safe (諮詢師)")
         print("- counselor@example.com / test1234 (諮詢師)")
         print("- admin@example.com / admin123 (管理員)")
 
@@ -141,7 +141,7 @@ def main():
     print("\nSeed process completed!")
     print("\nYou can now login with:")
     print("Email: test@example.com")
-    print("Password: password123")
+    print("Password: CareerCreator2025!Dev@Testing#Safe")
 
 
 if __name__ == "__main__":

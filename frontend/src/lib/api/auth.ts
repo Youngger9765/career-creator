@@ -106,8 +106,21 @@ class AuthAPI {
    * Logout user
    */
   logout(): void {
+    // Clear localStorage
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
+
+    // Clear sessionStorage (in case anything is stored there)
+    sessionStorage.clear();
+
+    // Clear cookies (if any)
+    document.cookie.split(';').forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+    });
+
+    // Redirect to login page
     window.location.href = '/login';
   }
 

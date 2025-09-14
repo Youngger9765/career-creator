@@ -24,8 +24,9 @@ export interface CardEvent {
   event_data?: Record<string, any>;
   notes?: string;
   performer_id?: string;
-  performer_type: string;
+  performer_type: 'user' | 'visitor';
   performer_name?: string;
+  sequence_number: number;
   created_at: string;
 }
 

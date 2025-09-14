@@ -45,6 +45,8 @@ export interface Room extends BaseEntity {
   counselor_id: string;
   share_code: string;
   is_active: boolean;
+  expires_at?: string;
+  session_count?: number;
 }
 
 export interface RoomCreate {

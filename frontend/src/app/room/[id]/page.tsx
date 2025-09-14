@@ -16,7 +16,7 @@ export default function RoomPage() {
   const [isReady, setIsReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
-  
+
   // 牌卡和玩法選擇狀態
   const [selectedDeck, setSelectedDeck] = useState('職游旅人卡');
   const [selectedGameRule, setSelectedGameRule] = useState('六大性格分析');
@@ -159,7 +159,7 @@ export default function RoomPage() {
             <div className="flex items-center space-x-4">
               <div className="flex flex-col">
                 <label className="text-xs text-gray-500 mb-1">牌卡選擇</label>
-                <select 
+                <select
                   className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedDeck}
                   onChange={(e) => handleDeckChange(e.target.value)}
@@ -169,18 +169,18 @@ export default function RoomPage() {
                   <option value="價值導航卡">價值導航卡</option>
                 </select>
               </div>
-              
+
               <div className="flex flex-col">
                 <label className="text-xs text-gray-500 mb-1">玩法選擇</label>
-                <select 
+                <select
                   className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedGameRule}
                   onChange={(e) => setSelectedGameRule(e.target.value)}
                 >
                   {getAvailableGameRules(selectedDeck).map((rule) => (
                     <option key={rule} value={rule}>
-                      {rule === '六大性格分析' ? '性格分類' : 
-                       rule === '價值觀排序' ? '價值排序' : 
+                      {rule === '六大性格分析' ? '性格分類' :
+                       rule === '價值觀排序' ? '價值排序' :
                        rule === '優劣勢分析' ? '優劣分析' : rule}
                     </option>
                   ))}

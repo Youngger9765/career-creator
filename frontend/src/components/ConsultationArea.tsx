@@ -13,6 +13,7 @@ import { Card } from './Card';
 import { CardDeck } from './CardDeck';
 import { CardNotesModal } from './CardNotesModal';
 import { GameDropZones } from './GameDropZones';
+import { GameToken } from './GameToken';
 import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
 import { CardEventType } from '@/lib/api/card-events';
 import { useCardSync } from '@/hooks/use-card-sync';
@@ -130,10 +131,20 @@ export function ConsultationArea({
   const [activeDropZone, setActiveDropZone] = useState<string | null>(null);
   const [noteModalCard, setNoteModalCard] = useState<CardData | null>(null);
   const [cardNotes, setCardNotes] = useState<Record<string, string[]>>({});
-  
+
   // 牌卡瀏覽狀態
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [selectedAuxCardId, setSelectedAuxCardId] = useState<string | null>(null);
+  
+  // 籌碼狀態
+  const [gameTokens, setGameTokens] = useState<Array<{
+    id: string;
+    type: 'chip' | 'marker';
+    color: string;
+    value?: number;
+    position: { x: number; y: number };
+    zIndex: number;
+  }>>([]);
 
   // Mock 牌卡數據 - 擴展為更多卡片
   const mockCards = {
@@ -144,21 +155,21 @@ export function ConsultationArea({
       { id: 'career-3', title: '網路安全專家', description: '保護資訊系統安全', category: 'technology' },
       { id: 'career-4', title: 'UI/UX設計師', description: '設計使用者介面和體驗', category: 'technology' },
       { id: 'career-5', title: '系統管理員', description: '維護和管理電腦系統', category: 'technology' },
-      
+
       // 醫療類
       { id: 'career-6', title: '醫生', description: '診斷和治療疾病', category: 'healthcare' },
       { id: 'career-7', title: '護理師', description: '提供醫療護理服務', category: 'healthcare' },
       { id: 'career-8', title: '藥師', description: '配製和管理藥物', category: 'healthcare' },
       { id: 'career-9', title: '物理治療師', description: '幫助患者恢復身體功能', category: 'healthcare' },
       { id: 'career-10', title: '心理諮商師', description: '提供心理健康諮詢', category: 'healthcare' },
-      
+
       // 教育類
       { id: 'career-11', title: '小學老師', description: '教育小學生基礎知識', category: 'education' },
       { id: 'career-12', title: '中學老師', description: '教授中學課程', category: 'education' },
       { id: 'career-13', title: '大學教授', description: '進行高等教育和研究', category: 'education' },
       { id: 'career-14', title: '幼兒園老師', description: '照顧和教育幼兒', category: 'education' },
       { id: 'career-15', title: '補習班老師', description: '提供課外輔導', category: 'education' },
-      
+
       // 更多職業...
       { id: 'career-16', title: '律師', description: '提供法律諮詢和服務', category: 'law' },
       { id: 'career-17', title: '會計師', description: '處理財務和稅務事務', category: 'finance' },
@@ -231,6 +242,36 @@ export function ConsultationArea({
     return selectedGameRule === '六大性格分析' && selectedDeck === '職游旅人卡';
   };
 
+  // 新增籌碼到畫布
+  const addTokenToCanvas = useCallback((tokenType: 'chip' | 'marker', color: string, value?: number) => {
+    const newToken = {
+      id: `token-${Date.now()}-${Math.random()}`,
+      type: tokenType,
+      color,
+      value,
+      position: {
+        x: 200 + Math.random() * 200,
+        y: 200 + Math.random() * 200,
+      },
+      zIndex: 1,
+    };
+    setGameTokens(prev => [...prev, newToken]);
+  }, []);
+
+  // 清空桌面的函數
+  const resetGameArea = useCallback(() => {
+    setCards([]);
+    setGameTokens([]);
+    setActiveCard(null);
+    setActiveDropZone(null);
+    setCardNotes({});
+  }, []);
+
+  // 當牌卡或玩法改變時，重置桌面
+  useEffect(() => {
+    resetGameArea();
+  }, [selectedDeck, selectedGameRule, resetGameArea]);
+
   // 初始化選中卡片
   useEffect(() => {
     const cards = getCurrentCards();
@@ -258,14 +299,6 @@ export function ConsultationArea({
     return gameRuleCardMapping[gameRule as keyof typeof gameRuleCardMapping] || [];
   };
 
-  // 當玩法改變時，檢查當前卡片是否還可用
-  const handleGameRuleChange = (newGameRule: string) => {
-    setSelectedGameRule(newGameRule);
-    const availableDecks = getAvailableDecks(newGameRule);
-    if (!availableDecks.includes(selectedDeck)) {
-      setSelectedDeck(availableDecks[0] || '職能盤點卡');
-    }
-  };
 
   // Initialize card synchronization
   const {
@@ -366,13 +399,31 @@ export function ConsultationArea({
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over, delta } = event;
-      const draggedCardId = active.id as string;
+      const draggedId = active.id as string;
 
       setActiveCard(null);
       setActiveDropZone(null);
 
+      // Check if it's a token being dragged
+      if (draggedId.startsWith('token-')) {
+        const draggedToken = gameTokens.find(token => token.id === draggedId);
+        if (!draggedToken) return;
+
+        const newPosition = {
+          x: draggedToken.position.x + delta.x,
+          y: draggedToken.position.y + delta.y,
+        };
+
+        setGameTokens(prev =>
+          prev.map(token =>
+            token.id === draggedId ? { ...token, position: newPosition } : token
+          )
+        );
+        return;
+      }
+
       // Find the game card by its ID
-      const draggedCard = cards.find(card => card.id === draggedCardId);
+      const draggedCard = cards.find(card => card.id === draggedId);
       if (!draggedCard) return;
 
       if (over) {
@@ -430,7 +481,7 @@ export function ConsultationArea({
         });
       }
     },
-    [cards, isReadOnly, syncCardEvent, onCardEvent]
+    [cards, gameTokens, isReadOnly, syncCardEvent, onCardEvent]
   );
 
   const handleCardEvent = useCallback(
@@ -507,22 +558,22 @@ export function ConsultationArea({
             <span className="text-gray-600 text-lg font-bold">?</span>
           </button>
         </div>
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <select 
+            <select
               className="px-3 py-2 bg-teal-100 border border-teal-300 rounded-lg"
               value={selectedGameRule}
-              onChange={(e) => handleGameRuleChange(e.target.value)}
+              disabled
             >
               <option value="優劣勢分析">優劣勢分析 ▼</option>
               <option value="價值觀排序">價值觀排序 ▼</option>
               <option value="六大性格分析">六大性格分析 ▼</option>
             </select>
             <div className="relative">
-              <input 
-                type="text" 
-                placeholder="Search..." 
+              <input
+                type="text"
+                placeholder="Search..."
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
               <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -530,7 +581,7 @@ export function ConsultationArea({
               </svg>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <button className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
               回到牌卡選擇
@@ -541,7 +592,10 @@ export function ConsultationArea({
             <button className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
               取消還原
             </button>
-            <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+            <button 
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              onClick={resetGameArea}
+            >
               清空畫面
             </button>
             <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
@@ -563,7 +617,7 @@ export function ConsultationArea({
             <h3 className="text-lg font-bold text-gray-800 mb-4">
               {selectedDeck} - {selectedGameRule}
             </h3>
-            
+
             {/* 輔助卡區域 (如果需要的話) */}
             {shouldShowAuxiliaryCards() && (
               <div className="mb-6">
@@ -585,7 +639,7 @@ export function ConsultationArea({
                       ))}
                     </div>
                   </div>
-                  
+
                   {/* 右側：選中的解釋卡樣式 - 直立長方形 */}
                   <div className="w-1/2">
                     <div className="w-full h-80 bg-blue-600 rounded-lg shadow-lg flex flex-col items-center justify-center text-white">
@@ -608,7 +662,7 @@ export function ConsultationArea({
               <h4 className="text-md font-medium text-gray-700 mb-3">
                 {selectedDeck} ({getCurrentCards().length}張)
               </h4>
-              
+
               <div className="flex space-x-4 flex-1 min-h-0">
                 {/* 左側：牌卡名稱列表 */}
                 <div className="w-1/2 flex flex-col">
@@ -626,11 +680,11 @@ export function ConsultationArea({
                     ))}
                   </div>
                 </div>
-                
+
                 {/* 右側：選中卡片的樣式 - 直立長方形 */}
                 <div className="w-1/2">
                   <div className={`w-full h-80 rounded-lg shadow-lg flex flex-col items-center justify-center text-white ${
-                    selectedDeck === '職游旅人卡' ? 'bg-teal-600' : 
+                    selectedDeck === '職游旅人卡' ? 'bg-teal-600' :
                     selectedDeck === '職能盤點卡' ? 'bg-blue-600' : 'bg-purple-600'
                   }`}>
                     <div className="text-center px-4">
@@ -649,12 +703,48 @@ export function ConsultationArea({
               </div>
             </div>
 
+            {/* 道具區域 - 只在價值導航卡的價值觀排序玩法中顯示 */}
+            {selectedDeck === '價值導航卡' && selectedGameRule === '價值觀排序' && (
+              <div className="bg-gray-100 p-3 rounded-lg mt-4">
+                <h5 className="text-sm font-medium text-gray-700 mb-2">遊戲道具</h5>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => addTokenToCanvas('chip', 'red', 1)}
+                    className="flex flex-col items-center p-2 bg-white rounded border hover:bg-gray-50 transition-colors"
+                    title="紅色籌碼"
+                  >
+                    <div className="w-8 h-8 bg-red-500 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white text-xs font-bold">1</div>
+                    <span className="text-xs text-gray-600 mt-1">紅籌</span>
+                  </button>
+                  <button
+                    onClick={() => addTokenToCanvas('chip', 'blue', 5)}
+                    className="flex flex-col items-center p-2 bg-white rounded border hover:bg-gray-50 transition-colors"
+                    title="藍色籌碼"
+                  >
+                    <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white text-xs font-bold">5</div>
+                    <span className="text-xs text-gray-600 mt-1">藍籌</span>
+                  </button>
+                  <button
+                    onClick={() => addTokenToCanvas('marker', 'yellow')}
+                    className="flex flex-col items-center p-2 bg-white rounded border hover:bg-gray-50 transition-colors"
+                    title="黃色標記"
+                  >
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-white text-xs font-bold">●</div>
+                    <span className="text-xs text-gray-600 mt-1">標記</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* 操作提示 */}
             <div className="bg-gray-100 p-3 rounded-lg text-xs text-gray-600 mt-4">
               <div className="font-medium mb-1">操作說明：</div>
               <div>• 點擊左側列表選擇要查看的卡片</div>
               <div>• 右側顯示選中卡片的樣式</div>
               <div>• 拖拽卡片到右側分類區域</div>
+              {selectedDeck === '價值導航卡' && selectedGameRule === '價值觀排序' && (
+                <div>• 點擊道具按鈕新增到畫布</div>
+              )}
             </div>
           </div>
 
@@ -662,16 +752,16 @@ export function ConsultationArea({
           <div className="flex-1 p-6 relative">
             {/* Game Board */}
             <div className="w-full h-full border-2 border-gray-300 rounded-lg bg-white relative overflow-hidden">
-              
+
               {/* 根據玩法顯示不同的遊戲區域 */}
               {selectedGameRule === '優劣勢分析' && (
                 <div className="p-6 h-full flex flex-col space-y-6">
                   <h3 className="text-lg font-bold text-gray-800 text-center mb-2">優劣勢分析</h3>
-                  
+
                   {/* Advantage Zone */}
                   <div className="flex-1 space-y-2">
                     <h4 className="text-md font-bold text-green-700 flex items-center justify-center">
-                      優勢 (5 張) 
+                      優勢 (5 張)
                       <span className="ml-2 text-sm text-gray-500">
                         ({getZoneCardCount('advantage')}/5)
                       </span>
@@ -785,6 +875,19 @@ export function ConsultationArea({
                   onCardEvent={handleCardEvent}
                   onAddNote={!isReadOnly ? handleAddNote : undefined}
                   hasNotes={!!cardNotes[card.data.id]?.length}
+                />
+              ))}
+
+              {/* Game Tokens */}
+              {gameTokens.map((token) => (
+                <GameToken
+                  key={token.id}
+                  id={token.id}
+                  type={token.type}
+                  color={token.color}
+                  value={token.value}
+                  position={token.position}
+                  isDragging={activeCard === token.id}
                 />
               ))}
             </div>

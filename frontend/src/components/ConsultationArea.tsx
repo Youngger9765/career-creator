@@ -6,6 +6,7 @@ import {
   DragEndEvent,
   DragStartEvent,
   DragOverEvent,
+  DragOverlay,
   useDndMonitor,
   useDroppable,
 } from '@dnd-kit/core';
@@ -14,6 +15,8 @@ import { CardDeck } from './CardDeck';
 import { CardNotesModal } from './CardNotesModal';
 import { GameDropZones } from './GameDropZones';
 import { GameToken } from './GameToken';
+import { DraggableCardPreview } from './DraggableCardPreview';
+import { DroppableGameArea } from './DroppableGameArea';
 import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
 import { CardEventType } from '@/lib/api/card-events';
 import { useCardSync } from '@/hooks/use-card-sync';
@@ -75,6 +78,56 @@ const DROP_ZONES: DropZone[] = [
   },
 ];
 
+// Three Zone Component for 六大性格分析
+function ThreeZoneDropZone({
+  id,
+  title,
+  emoji,
+  count,
+  maxCount,
+  bgColor,
+  borderColor,
+  textColor,
+  isActive
+}: {
+  id: string;
+  title: string;
+  emoji: string;
+  count: number;
+  maxCount?: number;
+  bgColor: string;
+  borderColor: string;
+  textColor: string;
+  isActive: boolean;
+}) {
+  const { setNodeRef } = useDroppable({ id });
+
+  return (
+    <div className="mb-4" ref={setNodeRef}>
+      <div
+        className={`
+          border-2 border-dashed ${borderColor} rounded-lg ${bgColor} min-h-[240px] ${textColor} relative transition-all duration-200
+          ${isActive ? 'border-solid scale-105 shadow-lg ring-2 ring-opacity-20' : ''}
+        `}
+        style={{ minHeight: '240px', paddingBottom: '50px' }}
+      >
+        {/* Title inside the drop zone */}
+        <div className={`absolute top-2 left-3 font-medium ${textColor} flex items-center text-sm z-10`}>
+          <span className="text-lg mr-1">{emoji}</span>
+          {title} ({count}/{maxCount || '∞'})
+        </div>
+
+        {/* Drop hint in center when empty */}
+        {count === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-gray-400">拖拽卡片到此處</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function DropZoneComponent({
   zone,
   isActive,
@@ -131,11 +184,15 @@ export function ConsultationArea({
   const [activeDropZone, setActiveDropZone] = useState<string | null>(null);
   const [noteModalCard, setNoteModalCard] = useState<CardData | null>(null);
   const [cardNotes, setCardNotes] = useState<Record<string, string[]>>({});
+  const [activeDragItem, setActiveDragItem] = useState<any>(null);
 
   // 牌卡瀏覽狀態
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [selectedAuxCardId, setSelectedAuxCardId] = useState<string | null>(null);
-  
+
+  // 已使用的卡片ID列表（從列表中移除）
+  const [usedCardIds, setUsedCardIds] = useState<Set<string>>(new Set());
+
   // 籌碼狀態
   const [gameTokens, setGameTokens] = useState<Array<{
     id: string;
@@ -150,56 +207,56 @@ export function ConsultationArea({
   const mockCards = {
     '職游旅人卡': [
       // 科技類
-      { id: 'career-1', title: '軟體工程師', description: '負責軟體開發與維護', category: 'technology' },
-      { id: 'career-2', title: '資料科學家', description: '分析大數據並建立模型', category: 'technology' },
-      { id: 'career-3', title: '網路安全專家', description: '保護資訊系統安全', category: 'technology' },
-      { id: 'career-4', title: 'UI/UX設計師', description: '設計使用者介面和體驗', category: 'technology' },
-      { id: 'career-5', title: '系統管理員', description: '維護和管理電腦系統', category: 'technology' },
+      { id: 'career-1', title: '軟體工程師', description: '負責軟體開發與維護', category: 'technology', tags: ['程式', '邏輯'] },
+      { id: 'career-2', title: '資料科學家', description: '分析大數據並建立模型', category: 'technology', tags: ['數據', '分析'] },
+      { id: 'career-3', title: '網路安全專家', description: '保護資訊系統安全', category: 'technology', tags: ['安全', '防護'] },
+      { id: 'career-4', title: 'UI/UX設計師', description: '設計使用者介面和體驗', category: 'technology', tags: ['設計', '美學'] },
+      { id: 'career-5', title: '系統管理員', description: '維護和管理電腦系統', category: 'technology', tags: ['維護', '管理'] },
 
       // 醫療類
-      { id: 'career-6', title: '醫生', description: '診斷和治療疾病', category: 'healthcare' },
-      { id: 'career-7', title: '護理師', description: '提供醫療護理服務', category: 'healthcare' },
-      { id: 'career-8', title: '藥師', description: '配製和管理藥物', category: 'healthcare' },
-      { id: 'career-9', title: '物理治療師', description: '幫助患者恢復身體功能', category: 'healthcare' },
-      { id: 'career-10', title: '心理諮商師', description: '提供心理健康諮詢', category: 'healthcare' },
+      { id: 'career-6', title: '醫生', description: '診斷和治療疾病', category: 'healthcare', tags: ['醫療', '診斷'] },
+      { id: 'career-7', title: '護理師', description: '提供醫療護理服務', category: 'healthcare', tags: ['照護', '服務'] },
+      { id: 'career-8', title: '藥師', description: '配製和管理藥物', category: 'healthcare', tags: ['藥物', '專業'] },
+      { id: 'career-9', title: '物理治療師', description: '幫助患者恢復身體功能', category: 'healthcare', tags: ['復健', '治療'] },
+      { id: 'career-10', title: '心理諮商師', description: '提供心理健康諮詢', category: 'healthcare', tags: ['心理', '諮詢'] },
 
       // 教育類
-      { id: 'career-11', title: '小學老師', description: '教育小學生基礎知識', category: 'education' },
-      { id: 'career-12', title: '中學老師', description: '教授中學課程', category: 'education' },
-      { id: 'career-13', title: '大學教授', description: '進行高等教育和研究', category: 'education' },
-      { id: 'career-14', title: '幼兒園老師', description: '照顧和教育幼兒', category: 'education' },
-      { id: 'career-15', title: '補習班老師', description: '提供課外輔導', category: 'education' },
+      { id: 'career-11', title: '小學老師', description: '教育小學生基礎知識', category: 'education', tags: ['教學', '兒童'] },
+      { id: 'career-12', title: '中學老師', description: '教授中學課程', category: 'education', tags: ['教育', '青少年'] },
+      { id: 'career-13', title: '大學教授', description: '進行高等教育和研究', category: 'education', tags: ['研究', '學術'] },
+      { id: 'career-14', title: '幼兒園老師', description: '照顧和教育幼兒', category: 'education', tags: ['幼教', '照顧'] },
+      { id: 'career-15', title: '補習班老師', description: '提供課外輔導', category: 'education', tags: ['輔導', '教學'] },
 
       // 更多職業...
-      { id: 'career-16', title: '律師', description: '提供法律諮詢和服務', category: 'law' },
-      { id: 'career-17', title: '會計師', description: '處理財務和稅務事務', category: 'finance' },
-      { id: 'career-18', title: '建築師', description: '設計建築物和空間', category: 'design' },
-      { id: 'career-19', title: '廚師', description: '製作美味料理', category: 'service' },
-      { id: 'career-20', title: '記者', description: '報導新聞和事件', category: 'media' },
+      { id: 'career-16', title: '律師', description: '提供法律諮詢和服務', category: 'law', tags: ['法律', '諮詢'] },
+      { id: 'career-17', title: '會計師', description: '處理財務和稅務事務', category: 'finance', tags: ['財務', '稅務'] },
+      { id: 'career-18', title: '建築師', description: '設計建築物和空間', category: 'design', tags: ['建築', '空間'] },
+      { id: 'career-19', title: '廚師', description: '製作美味料理', category: 'service', tags: ['烹飪', '美食'] },
+      { id: 'career-20', title: '記者', description: '報導新聞和事件', category: 'media', tags: ['新聞', '報導'] },
     ],
     '職能盤點卡': [
-      { id: 'skill-1', title: '溝通協調', description: '與他人有效溝通的能力', category: 'communication' },
-      { id: 'skill-2', title: '分析思考', description: '邏輯分析和批判性思考', category: 'analytical' },
-      { id: 'skill-3', title: '領導管理', description: '領導團隊和管理能力', category: 'leadership' },
-      { id: 'skill-4', title: '創新發想', description: '創造性思維和解決問題', category: 'creative' },
-      { id: 'skill-5', title: '時間管理', description: '有效規劃和控制時間', category: 'organizational' },
-      { id: 'skill-6', title: '團隊合作', description: '與他人協作達成目標', category: 'collaboration' },
-      { id: 'skill-7', title: '學習能力', description: '快速學習新知識和技能', category: 'learning' },
-      { id: 'skill-8', title: '抗壓能力', description: '在壓力下保持表現', category: 'resilience' },
-      { id: 'skill-9', title: '適應能力', description: '面對變化的調適能力', category: 'adaptability' },
-      { id: 'skill-10', title: '解決問題', description: '識別和解決各種問題', category: 'problem-solving' },
+      { id: 'skill-1', title: '溝通協調', description: '與他人有效溝通的能力', category: 'communication', tags: ['溝通', '協調'] },
+      { id: 'skill-2', title: '分析思考', description: '邏輯分析和批判性思考', category: 'analytical', tags: ['分析', '邏輯'] },
+      { id: 'skill-3', title: '領導管理', description: '領導團隊和管理能力', category: 'leadership', tags: ['領導', '管理'] },
+      { id: 'skill-4', title: '創新發想', description: '創造性思維和解決問題', category: 'creative', tags: ['創新', '思維'] },
+      { id: 'skill-5', title: '時間管理', description: '有效規劃和控制時間', category: 'organizational', tags: ['時間', '規劃'] },
+      { id: 'skill-6', title: '團隊合作', description: '與他人協作達成目標', category: 'collaboration', tags: ['團隊', '合作'] },
+      { id: 'skill-7', title: '學習能力', description: '快速學習新知識和技能', category: 'learning', tags: ['學習', '成長'] },
+      { id: 'skill-8', title: '抗壓能力', description: '在壓力下保持表現', category: 'resilience', tags: ['抗壓', '韌性'] },
+      { id: 'skill-9', title: '適應能力', description: '面對變化的調適能力', category: 'adaptability', tags: ['適應', '彈性'] },
+      { id: 'skill-10', title: '解決問題', description: '識別和解決各種問題', category: 'problem-solving', tags: ['解決', '問題'] },
     ],
     '價值導航卡': [
-      { id: 'value-1', title: '成就感', description: '追求個人成就和認可', category: 'achievement' },
-      { id: 'value-2', title: '穩定性', description: '尋求安全和穩定', category: 'security' },
-      { id: 'value-3', title: '自主性', description: '獨立自主的工作環境', category: 'autonomy' },
-      { id: 'value-4', title: '社會貢獻', description: '為社會做出貢獻', category: 'service' },
-      { id: 'value-5', title: '創意發揮', description: '能夠展現創意和想像力', category: 'creativity' },
-      { id: 'value-6', title: '工作平衡', description: '工作與生活的平衡', category: 'balance' },
-      { id: 'value-7', title: '學習成長', description: '持續學習和個人發展', category: 'growth' },
-      { id: 'value-8', title: '人際關係', description: '建立良好的人際網絡', category: 'relationships' },
-      { id: 'value-9', title: '經濟報酬', description: '獲得合理的經濟回報', category: 'financial' },
-      { id: 'value-10', title: '地位聲望', description: '獲得社會認可和尊重', category: 'status' },
+      { id: 'value-1', title: '成就感', description: '追求個人成就和認可', category: 'achievement', tags: ['成就', '認可'] },
+      { id: 'value-2', title: '穩定性', description: '尋求安全和穩定', category: 'security', tags: ['穩定', '安全'] },
+      { id: 'value-3', title: '自主性', description: '獨立自主的工作環境', category: 'autonomy', tags: ['自主', '獨立'] },
+      { id: 'value-4', title: '社會貢獻', description: '為社會做出貢獻', category: 'service', tags: ['貢獻', '服務'] },
+      { id: 'value-5', title: '創意發揮', description: '能夠展現創意和想像力', category: 'creativity', tags: ['創意', '想像'] },
+      { id: 'value-6', title: '工作平衡', description: '工作與生活的平衡', category: 'balance', tags: ['平衡', '生活'] },
+      { id: 'value-7', title: '學習成長', description: '持續學習和個人發展', category: 'growth', tags: ['學習', '成長'] },
+      { id: 'value-8', title: '人際關係', description: '建立良好的人際網絡', category: 'relationships', tags: ['人際', '關係'] },
+      { id: 'value-9', title: '經濟報酬', description: '獲得合理的經濟回報', category: 'financial', tags: ['經濟', '報酬'] },
+      { id: 'value-10', title: '地位聲望', description: '獲得社會認可和尊重', category: 'status', tags: ['地位', '聲望'] },
     ]
   };
 
@@ -215,9 +272,10 @@ export function ConsultationArea({
     ]
   };
 
-  // 取得當前牌卡數據
+  // 取得當前牌卡數據（排除已使用的卡片）
   const getCurrentCards = () => {
-    return mockCards[selectedDeck as keyof typeof mockCards] || [];
+    const allCards = mockCards[selectedDeck as keyof typeof mockCards] || [];
+    return allCards.filter(card => !usedCardIds.has(card.id));
   };
 
   // 取得輔助卡數據
@@ -265,6 +323,7 @@ export function ConsultationArea({
     setActiveCard(null);
     setActiveDropZone(null);
     setCardNotes({});
+    setUsedCardIds(new Set()); // 清空已使用卡片列表
   }, []);
 
   // 當牌卡或玩法改變時，重置桌面
@@ -350,6 +409,22 @@ export function ConsultationArea({
 
       setCards((prev) => [...prev, newCard]);
 
+      // 將卡片ID加入已使用列表
+      setUsedCardIds(prev => {
+        const newSet = new Set(prev);
+        newSet.add(cardData.id);
+        return newSet;
+      });
+
+      // 自動選擇下一張可用卡片
+      const allCards = mockCards[selectedDeck as keyof typeof mockCards] || [];
+      const remainingCards = allCards.filter(card => card.id !== cardData.id && !usedCardIds.has(card.id));
+      if (remainingCards.length > 0) {
+        setSelectedCardId(remainingCards[0].id);
+      } else {
+        setSelectedCardId(null);
+      }
+
       // Sync card dealt event
       if (!isReadOnly) {
         syncCardEvent(newCard.id, 'card_dealt' as CardEventType, {
@@ -359,7 +434,7 @@ export function ConsultationArea({
         }).catch(console.error);
       }
     },
-    [cards.length, isReadOnly, syncCardEvent]
+    [cards.length, isReadOnly, syncCardEvent, selectedDeck, usedCardIds]
   );
 
   const handleCardFlip = useCallback(
@@ -388,7 +463,9 @@ export function ConsultationArea({
   }, []);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveCard(event.active.id as string);
+    const activeId = event.active.id as string;
+    setActiveCard(activeId);
+    setActiveDragItem(event.active);
   }, []);
 
   const handleDragOver = useCallback((event: DragOverEvent) => {
@@ -403,6 +480,49 @@ export function ConsultationArea({
 
       setActiveCard(null);
       setActiveDropZone(null);
+      setActiveDragItem(null);
+
+      // Check if it's a card preview being dragged
+      if (draggedId.startsWith('preview-') && active.data.current?.card) {
+        const cardData = active.data.current.card;
+
+        // Only add card if dropped on the game canvas
+        if (over && over.id === 'game-canvas') {
+          // Create new card at the drop position
+          const newCard: GameCard = {
+            id: `game-${cardData.id}-${Date.now()}`,
+            data: cardData,
+            position: {
+              x: Math.max(50, Math.min(800, delta.x + 400)), // Constrain to canvas area
+              y: Math.max(50, Math.min(600, delta.y + 300)),
+            },
+            isFaceUp: false,
+            isSelected: false,
+            rotation: Math.random() * 10 - 5,
+            scale: 1,
+            zIndex: cards.length + 1,
+          };
+
+          setCards((prev) => [...prev, newCard]);
+
+          // Add to used cards list
+          setUsedCardIds(prev => {
+            const newSet = new Set(prev);
+            newSet.add(cardData.id);
+            return newSet;
+          });
+
+          // Auto select next card
+          const allCards = mockCards[selectedDeck as keyof typeof mockCards] || [];
+          const remainingCards = allCards.filter(card => card.id !== cardData.id && !usedCardIds.has(card.id));
+          if (remainingCards.length > 0) {
+            setSelectedCardId(remainingCards[0].id);
+          } else {
+            setSelectedCardId(null);
+          }
+        }
+        return;
+      }
 
       // Check if it's a token being dragged
       if (draggedId.startsWith('token-')) {
@@ -437,19 +557,19 @@ export function ConsultationArea({
 
           setCards((prev) =>
             prev.map((card) =>
-              card.id === draggedCardId ? { ...card, position: newPosition, isSelected: false } : card
+              card.id === draggedId ? { ...card, position: newPosition, isSelected: false } : card
             )
           );
 
           // Sync card arranged event
           if (!isReadOnly) {
-            syncCardEvent(draggedCardId, 'card_arranged' as CardEventType, {
+            syncCardEvent(draggedId, 'card_arranged' as CardEventType, {
               drop_zone: over.id,
               position: newPosition,
             }).catch(console.error);
           }
 
-          onCardEvent?.(draggedCardId, CardEventType.CARD_ARRANGED, {
+          onCardEvent?.(draggedId, CardEventType.CARD_ARRANGED, {
             drop_zone: over.id,
             position: newPosition,
           });
@@ -463,25 +583,25 @@ export function ConsultationArea({
 
         setCards((prev) =>
           prev.map((card) =>
-            card.id === draggedCardId ? { ...card, position: newPosition, isSelected: false } : card
+            card.id === draggedId ? { ...card, position: newPosition, isSelected: false } : card
           )
         );
 
         // Sync card move event
         if (!isReadOnly) {
-          syncCardEvent(draggedCardId, 'card_moved' as CardEventType, {
+          syncCardEvent(draggedId, 'card_moved' as CardEventType, {
             from_position: draggedCard.position,
             to_position: newPosition,
           }).catch(console.error);
         }
 
-        onCardEvent?.(draggedCardId, CardEventType.CARD_MOVED, {
+        onCardEvent?.(draggedId, CardEventType.CARD_MOVED, {
           from_position: draggedCard.position,
           to_position: newPosition,
         });
       }
     },
-    [cards, gameTokens, isReadOnly, syncCardEvent, onCardEvent]
+    [cards, gameTokens, isReadOnly, syncCardEvent, onCardEvent, selectedDeck, usedCardIds, mockCards]
   );
 
   const handleCardEvent = useCallback(
@@ -548,21 +668,16 @@ export function ConsultationArea({
 
   return (
     <div className="consultation-area w-full h-full flex flex-col bg-gray-50">
-      {/* Unified Header - Title, Actions, and Controls */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">
-            {selectedDeck} ({selectedGameRule})
-          </h1>
-          <button className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors">
-            <span className="text-gray-600 text-lg font-bold">?</span>
-          </button>
-        </div>
-
+      {/* Compact Single Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          {/* Left: Title and Controls */}
+          <div className="flex items-center space-x-6">
+            <h1 className="text-xl font-bold text-gray-800">
+              {selectedDeck} ({selectedGameRule})
+            </h1>
             <select
-              className="px-3 py-2 bg-teal-100 border border-teal-300 rounded-lg"
+              className="px-3 py-1.5 bg-teal-100 border border-teal-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               value={selectedGameRule}
               disabled
             >
@@ -574,32 +689,37 @@ export function ConsultationArea({
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="pl-8 pr-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                style={{width: '180px'}}
               />
-              <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg className="absolute left-2.5 top-2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0z" />
               </svg>
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <button className="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors">
+          {/* Right: Action Buttons and Help */}
+          <div className="flex items-center space-x-3">
+            <button className="px-3 py-1.5 bg-teal-500 text-white rounded text-sm hover:bg-teal-600 transition-colors">
               回到牌卡選擇
             </button>
-            <button className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+            <button className="px-3 py-1.5 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 transition-colors">
               還原
             </button>
-            <button className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+            <button className="px-3 py-1.5 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 transition-colors">
               取消還原
             </button>
-            <button 
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            <button
+              className="px-3 py-1.5 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors"
               onClick={resetGameArea}
             >
               清空畫面
             </button>
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            <button className="px-3 py-1.5 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors">
               儲存畫面
+            </button>
+            <button className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors ml-2">
+              <span className="text-gray-600 text-sm font-bold">?</span>
             </button>
           </div>
         </div>
@@ -674,6 +794,8 @@ export function ConsultationArea({
                           selectedCardId === card.id ? 'bg-blue-200 font-medium' : ''
                         }`}
                         onClick={() => setSelectedCardId(card.id)}
+                        onDoubleClick={() => handleDealCard(card)}
+                        title="雙擊新增到畫布"
                       >
                         {card.title}
                       </div>
@@ -681,24 +803,13 @@ export function ConsultationArea({
                   </div>
                 </div>
 
-                {/* 右側：選中卡片的樣式 - 直立長方形 */}
+                {/* 右側：可拖拽的卡片預覽 */}
                 <div className="w-1/2">
-                  <div className={`w-full h-80 rounded-lg shadow-lg flex flex-col items-center justify-center text-white ${
-                    selectedDeck === '職游旅人卡' ? 'bg-teal-600' :
-                    selectedDeck === '職能盤點卡' ? 'bg-blue-600' : 'bg-purple-600'
-                  }`}>
-                    <div className="text-center px-4">
-                      <div className="text-lg font-bold mb-3">
-                        {getSelectedCard()?.title || '卡片標題'}
-                      </div>
-                      <div className="text-sm leading-relaxed mb-4">
-                        {getSelectedCard()?.description || '卡片描述'}
-                      </div>
-                      <div className="text-xs opacity-75">
-                        類型: {getSelectedCard()?.category || '未分類'}
-                      </div>
-                    </div>
-                  </div>
+                  <DraggableCardPreview
+                    card={getSelectedCard()}
+                    selectedDeck={selectedDeck}
+                    onAddToCanvas={handleDealCard}
+                  />
                 </div>
               </div>
             </div>
@@ -741,7 +852,8 @@ export function ConsultationArea({
               <div className="font-medium mb-1">操作說明：</div>
               <div>• 點擊左側列表選擇要查看的卡片</div>
               <div>• 右側顯示選中卡片的樣式</div>
-              <div>• 拖拽卡片到右側分類區域</div>
+              <div>• 雙擊卡片名稱新增到畫布</div>
+              <div>• 拖拽畫布上的卡片到分類區域</div>
               {selectedDeck === '價值導航卡' && selectedGameRule === '價值觀排序' && (
                 <div>• 點擊道具按鈕新增到畫布</div>
               )}
@@ -751,7 +863,10 @@ export function ConsultationArea({
           {/* Right Side - Game Area */}
           <div className="flex-1 p-6 relative">
             {/* Game Board */}
-            <div className="w-full h-full border-2 border-gray-300 rounded-lg bg-white relative overflow-hidden">
+            <DroppableGameArea
+              isActive={!!activeCard && activeCard.startsWith('preview-')}
+              selectedGameRule={selectedGameRule}
+            >
 
               {/* 根據玩法顯示不同的遊戲區域 */}
               {selectedGameRule === '優劣勢分析' && (
@@ -817,44 +932,46 @@ export function ConsultationArea({
               )}
 
               {selectedGameRule === '六大性格分析' && (
-                <div className="p-8 space-y-6">
-                  <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">六大性格分析</h3>
-
+                <div className="p-4 h-full overflow-y-auto">
                   {/* 分類區域 - Row by Row */}
-                  <div className="space-y-6">
+                  <div className="space-y-2">
                     {/* 喜歡區域 */}
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-green-600 flex items-center">
-                        <span className="text-xl mr-2">😍</span>
-                        喜歡 (0/20)
-                      </h4>
-                      <div className="border-2 border-dashed border-green-300 rounded-lg bg-green-50 h-32 flex items-center justify-center text-green-500 relative">
-                        <span>拖拽卡片到此處</span>
-                        {/* 可以放置卡片的橫向空間 */}
-                      </div>
-                    </div>
+                    <ThreeZoneDropZone
+                      id="like"
+                      title="喜歡"
+                      emoji="😍"
+                      count={0}
+                      maxCount={20}
+                      bgColor="bg-green-50"
+                      borderColor="border-green-300"
+                      textColor="text-green-600"
+                      isActive={activeDropZone === 'like'}
+                    />
 
                     {/* 中立區域 */}
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-gray-600 flex items-center">
-                        <span className="text-xl mr-2">😐</span>
-                        中立 (無限)
-                      </h4>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 h-32 flex items-center justify-center text-gray-500 relative">
-                        <span>拖拽卡片到此處</span>
-                      </div>
-                    </div>
+                    <ThreeZoneDropZone
+                      id="neutral"
+                      title="中立"
+                      emoji="😐"
+                      count={0}
+                      bgColor="bg-gray-50"
+                      borderColor="border-gray-300"
+                      textColor="text-gray-600"
+                      isActive={activeDropZone === 'neutral'}
+                    />
 
                     {/* 討厭區域 */}
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-red-600 flex items-center">
-                        <span className="text-xl mr-2">😤</span>
-                        討厭 (0/20)
-                      </h4>
-                      <div className="border-2 border-dashed border-red-300 rounded-lg bg-red-50 h-32 flex items-center justify-center text-red-500 relative">
-                        <span>拖拽卡片到此處</span>
-                      </div>
-                    </div>
+                    <ThreeZoneDropZone
+                      id="dislike"
+                      title="討厭"
+                      emoji="😤"
+                      count={0}
+                      maxCount={20}
+                      bgColor="bg-red-50"
+                      borderColor="border-red-300"
+                      textColor="text-red-500"
+                      isActive={activeDropZone === 'dislike'}
+                    />
                   </div>
                 </div>
               )}
@@ -890,8 +1007,38 @@ export function ConsultationArea({
                   isDragging={activeCard === token.id}
                 />
               ))}
-            </div>
+            </DroppableGameArea>
           </div>
+
+          <DragOverlay style={{ zIndex: 9999999 }}>
+            {activeDragItem && (
+              activeDragItem.data?.current?.card ? (
+                <div className="w-32 h-44 opacity-90">
+                  <Card
+                    card={activeDragItem.data.current.card}
+                    isFaceUp={false}
+                    isSelected={false}
+                    isDragging={true}
+                    position={{ x: 0, y: 0 }}
+                    rotation={5}
+                    scale={1.1}
+                  />
+                </div>
+              ) : (
+                <div className="w-32 h-44 opacity-90">
+                  <Card
+                    card={cards.find(c => c.id === activeDragItem.id)?.data || {} as CardData}
+                    isFaceUp={cards.find(c => c.id === activeDragItem.id)?.isFaceUp || false}
+                    isSelected={false}
+                    isDragging={true}
+                    position={{ x: 0, y: 0 }}
+                    rotation={5}
+                    scale={1.1}
+                  />
+                </div>
+              )
+            )}
+          </DragOverlay>
         </DndContext>
       </div>
 

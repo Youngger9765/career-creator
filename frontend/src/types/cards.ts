@@ -26,6 +26,7 @@ export interface GameCard {
   rotation: number;
   scale: number;
   zIndex: number;
+  zone?: string; // Zone assignment for 六大性格分析 mode
 }
 
 export interface CardSet {

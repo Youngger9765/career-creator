@@ -17,6 +17,7 @@ interface CardProps {
   onSelect?: (cardId: string) => void;
   onCardEvent?: (cardId: string, eventType: CardEventType, data?: any) => void;
   onAddNote?: (cardId: string) => void;
+  onRemove?: (cardId: string) => void;
   hasNotes?: boolean;
 }
 
@@ -32,6 +33,7 @@ export function Card({
   onSelect,
   onCardEvent,
   onAddNote,
+  onRemove,
   hasNotes = false,
 }: CardProps) {
   const [isFlipping, setIsFlipping] = useState(false);
@@ -84,15 +86,19 @@ export function Card({
     position: 'absolute' as const,
     left: position?.x || 0,
     top: position?.y || 0,
-    zIndex: isDndDragging ? 1000 : isSelected ? 100 : 1,
+    zIndex: isDndDragging ? 9999 : isSelected ? 100 : 10,
   };
 
   return (
     <div
       ref={setNodeRef}
-      style={cardStyle}
+      style={{
+        ...cardStyle,
+        position: isDndDragging ? 'fixed' : cardStyle.position,
+        zIndex: isDndDragging ? 999999 : cardStyle.zIndex
+      }}
       className={`
-        relative w-32 h-44 cursor-pointer transition-all duration-300
+        relative w-32 h-44 cursor-pointer ${isDndDragging || isDragging ? '' : 'transition-all duration-300'}
         ${isDndDragging || isDragging ? 'dragging' : ''}
         ${isSelected ? 'selected' : ''}
         ${isFlipping ? 'scale-105' : ''}
@@ -103,9 +109,9 @@ export function Card({
     >
       <div
         className={`
-          card-container w-full h-full rounded-lg shadow-lg transition-all duration-500
+          card-container w-full h-full rounded-lg shadow-lg ${isDndDragging || isDragging ? '' : 'transition-all duration-500'}
           ${isFaceUp || isFlipping ? 'card-flipped' : ''}
-          hover:shadow-xl hover:scale-105
+          ${isDndDragging || isDragging ? '' : 'hover:shadow-xl hover:scale-105'}
         `}
       >
         {/* Card Back */}
@@ -153,7 +159,7 @@ export function Card({
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1 mb-2">
-            {card.tags.slice(0, 2).map((tag, index) => (
+            {card.tags && card.tags.slice(0, 2).map((tag, index) => (
               <span
                 key={index}
                 className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
@@ -161,7 +167,7 @@ export function Card({
                 {tag}
               </span>
             ))}
-            {card.tags.length > 2 && (
+            {card.tags && card.tags.length > 2 && (
               <span className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
                 +{card.tags.length - 2}
               </span>
@@ -184,6 +190,20 @@ export function Card({
               />
             </svg>
           </button>
+
+          {/* Remove button */}
+          {isFaceUp && onRemove && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove(card.id);
+              }}
+              className="absolute top-2 left-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center text-lg font-bold hover:bg-red-600 transition-all duration-200 opacity-80 hover:opacity-100 shadow-md"
+              title="移除卡片"
+            >
+              −
+            </button>
+          )}
 
           {/* Note button */}
           {isFaceUp && onAddNote && (

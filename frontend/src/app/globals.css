@@ -73,8 +73,12 @@ body {
 }
 
 .dragging {
-  @apply z-50 opacity-90 scale-110 cursor-grabbing;
-  transform: rotate(5deg) !important;
+  position: fixed !important;
+  z-index: 999999 !important;
+  opacity: 0.9 !important;
+  transform: scale(1.1) rotate(5deg) !important;
+  cursor: grabbing !important;
+  pointer-events: none !important;
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);

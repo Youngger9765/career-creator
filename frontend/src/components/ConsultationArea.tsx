@@ -314,7 +314,7 @@ export function ConsultationArea({
     setNoteModalCard(null);
   }, []);
 
-  // Register clear area callback
+  // Register clear area callback - only once on mount
   useEffect(() => {
     if (onClearAreaReady) {
       const clearFn = () => {
@@ -323,7 +323,8 @@ export function ConsultationArea({
       };
       onClearAreaReady(clearFn);
     }
-  }, [onClearAreaReady]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - register only once on mount
 
   // Count cards in each zone
   const getZoneCardCount = useCallback(

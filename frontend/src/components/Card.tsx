@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CardData, CARD_CATEGORIES } from '@/types/cards';
-import { CardEventType } from '@/types/api';
+import { CardEventType } from '@/lib/api/card-events';
 
 interface CardProps {
   card: CardData;
@@ -16,6 +16,8 @@ interface CardProps {
   onFlip?: (cardId: string, faceUp: boolean) => void;
   onSelect?: (cardId: string) => void;
   onCardEvent?: (cardId: string, eventType: CardEventType, data?: any) => void;
+  onAddNote?: (cardId: string) => void;
+  hasNotes?: boolean;
 }
 
 export function Card({
@@ -29,6 +31,8 @@ export function Card({
   onFlip,
   onSelect,
   onCardEvent,
+  onAddNote,
+  hasNotes = false,
 }: CardProps) {
   const [isFlipping, setIsFlipping] = useState(false);
 
@@ -65,6 +69,11 @@ export function Card({
   const handleSelect = () => {
     onSelect?.(card.id);
     onCardEvent?.(card.id, CardEventType.CARD_SELECTED);
+  };
+
+  const handleAddNote = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddNote?.(card.id);
   };
 
   const cardStyle = {
@@ -156,7 +165,7 @@ export function Card({
             )}
           </div>
 
-          {/* Flip button on front */}
+          {/* Action buttons on front */}
           <button onClick={handleFlip} className="card-flip-button" title="翻牌">
             <svg
               className="w-4 h-4 text-white"
@@ -172,6 +181,25 @@ export function Card({
               />
             </svg>
           </button>
+
+          {/* Note button */}
+          {isFaceUp && onAddNote && (
+            <button
+              onClick={handleAddNote}
+              className="absolute bottom-2 right-2 w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-yellow-600 transition-all duration-200 opacity-70 hover:opacity-100"
+              title="新增註記"
+            >
+              {hasNotes ? (
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                </svg>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>

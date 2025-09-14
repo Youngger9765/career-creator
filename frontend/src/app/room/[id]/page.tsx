@@ -3,11 +3,20 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ConsultationArea } from '@/components/ConsultationArea';
+import QRCodeModal from '@/components/QRCodeModal';
 import { useRoomStore } from '@/stores/room-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useCardEvents } from '@/hooks/use-card-events';
-import { CardEventType } from '@/types/api';
+import { CardEventType } from '@/lib/api/card-events';
+import { roomsAPI } from '@/lib/api/rooms';
+
+interface Participant {
+  id: string;
+  name: string;
+  type: 'counselor' | 'visitor' | 'client';
+  joinedAt: string;
+}
 
 export default function RoomPage() {
   const params = useParams();
@@ -22,6 +31,10 @@ export default function RoomPage() {
   const { user, isAuthenticated } = useAuthStore();
   const { currentRoom, isLoading, error, joinRoom } = useRoomStore();
   const [isJoining, setIsJoining] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [showParticipants, setShowParticipants] = useState(false);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [clearAreaCallback, setClearAreaCallback] = useState<(() => void) | null>(null);
 
   // WebSocket connection
   const {
@@ -32,9 +45,9 @@ export default function RoomPage() {
   } = useWebSocket({
     roomId,
     userInfo: {
-      user_id: user?.id,
-      user_name: user?.name,
-      user_type: 'user',
+      user_id: user?.id || `visitor_${Date.now()}`,
+      user_name: isVisitor ? visitorName : user?.name,
+      user_type: isVisitor ? 'visitor' : 'user',
     },
     autoConnect: false, // We'll connect after joining the room
   });
@@ -58,6 +71,15 @@ export default function RoomPage() {
         await joinRoom(roomId);
         // Connect WebSocket after successfully joining the room
         await connectWebSocket();
+
+        // Add self to participants
+        const participant: Participant = {
+          id: isVisitor ? `visitor_${Date.now()}` : user?.id || '',
+          name: isVisitor ? visitorName : user?.name || '',
+          type: isVisitor ? 'visitor' : user?.roles.includes('counselor') ? 'counselor' : 'client',
+          joinedAt: new Date().toISOString(),
+        };
+        setParticipants([participant]);
       } catch (error) {
         console.error('Failed to join room:', error);
       } finally {
@@ -66,7 +88,7 @@ export default function RoomPage() {
     };
 
     joinRoomAsync();
-  }, [roomId, isAuthenticated, joinRoom, router, connectWebSocket]);
+  }, [roomId, isAuthenticated, isVisitor, joinRoom, router, connectWebSocket, user, visitorName]);
 
   // Set up WebSocket event listeners
   useEffect(() => {
@@ -74,7 +96,26 @@ export default function RoomPage() {
       handleRealtimeEvent(eventData);
     });
 
-    return cleanup;
+    // Listen for participant join/leave events
+    const cleanupJoin = onWebSocketEvent('participant_joined', (data: any) => {
+      const newParticipant: Participant = {
+        id: data.user_id,
+        name: data.user_name,
+        type: data.user_type === 'visitor' ? 'visitor' : 'counselor',
+        joinedAt: new Date().toISOString(),
+      };
+      setParticipants(prev => [...prev.filter(p => p.id !== newParticipant.id), newParticipant]);
+    });
+
+    const cleanupLeave = onWebSocketEvent('participant_left', (data: any) => {
+      setParticipants(prev => prev.filter(p => p.id !== data.user_id));
+    });
+
+    return () => {
+      cleanup();
+      cleanupJoin();
+      cleanupLeave();
+    };
   }, [onWebSocketEvent, handleRealtimeEvent]);
 
   // Load initial events when room is ready
@@ -91,11 +132,56 @@ export default function RoomPage() {
       event_type: eventType,
       card_id: cardId,
       event_data: data,
-      performer_id: user?.id,
-      performer_name: user?.name,
-      performer_type: 'user',
+      performer_id: isVisitor ? `visitor_${Date.now()}` : user?.id,
+      performer_name: isVisitor ? visitorName : user?.name,
+      performer_type: isVisitor ? 'visitor' : 'user',
     });
   };
+
+  const handleClearArea = () => {
+    if (clearAreaCallback) {
+      if (confirm('確定要清空所有牌卡嗎？此操作無法復原。')) {
+        clearAreaCallback();
+        // Send clear event via WebSocket
+        sendCardEvent({
+          event_type: CardEventType.AREA_CLEARED,
+          card_id: 'all',
+          event_data: { cleared_by: isVisitor ? visitorName : user?.name },
+          performer_id: isVisitor ? `visitor_${Date.now()}` : user?.id,
+          performer_name: isVisitor ? visitorName : user?.name,
+          performer_type: isVisitor ? 'visitor' : 'user',
+        });
+      }
+    }
+  };
+
+  const handleCloseRoom = async () => {
+    if (!currentRoom || !isCounselor) return;
+
+    if (confirm('確定要結束這個房間嗎？房間將會關閉，所有人將無法繼續操作。')) {
+      try {
+        await roomsAPI.closeRoom(currentRoom.id);
+        alert('房間已結束');
+        router.push('/dashboard');
+      } catch (error) {
+        console.error('Failed to close room:', error);
+        alert('結束房間失敗，請重試');
+      }
+    }
+  };
+
+  const copyShareLink = async () => {
+    if (!currentRoom) return;
+    const shareLink = roomsAPI.generateShareLink(currentRoom.share_code);
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      alert('分享連結已複製到剪貼簿！');
+    } catch (err) {
+      alert(`分享連結：${shareLink}`);
+    }
+  };
+
+  const isCounselor = user?.roles.includes('counselor') || user?.roles.includes('admin');
 
   if (!isAuthenticated && !isVisitor) {
     return (
@@ -189,11 +275,49 @@ export default function RoomPage() {
               <span>{isConnected ? '已連線' : '未連線'}</span>
             </div>
 
-            {/* Share Code */}
-            <div className="text-sm text-gray-600">
-              分享碼:{' '}
-              <span className="font-mono font-bold text-blue-600">{currentRoom.share_code}</span>
-            </div>
+            {/* Action Buttons */}
+            {isCounselor && (
+              <>
+                <button
+                  onClick={handleClearArea}
+                  className="px-3 py-1 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700 transition-colors"
+                  title="清空畫面"
+                >
+                  清空
+                </button>
+                <button
+                  onClick={handleCloseRoom}
+                  className="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                  title="結束房間"
+                >
+                  結束房間
+                </button>
+              </>
+            )}
+
+            <button
+              onClick={copyShareLink}
+              className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+              title="複製分享連結"
+            >
+              分享
+            </button>
+
+            <button
+              onClick={() => setShowQRCode(true)}
+              className="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+              title="顯示 QR Code"
+            >
+              QR Code
+            </button>
+
+            <button
+              onClick={() => setShowParticipants(!showParticipants)}
+              className="px-3 py-1 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 transition-colors"
+              title="參與者列表"
+            >
+              參與者 ({participants.length})
+            </button>
 
             {/* User Info */}
             <div className="text-sm text-gray-600">
@@ -203,14 +327,44 @@ export default function RoomPage() {
         </div>
       </div>
 
+      {/* Participants Panel */}
+      {showParticipants && (
+        <div className="absolute top-20 right-6 w-64 bg-white rounded-lg shadow-lg z-40 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-gray-800">參與者列表</h3>
+            <button
+              onClick={() => setShowParticipants(false)}
+              className="text-gray-400 hover:text-gray-600"
+            >
+              ×
+            </button>
+          </div>
+          <div className="space-y-2">
+            {participants.map((participant) => (
+              <div key={participant.id} className="flex items-center justify-between py-2 border-b">
+                <div>
+                  <div className="font-medium text-gray-800">{participant.name}</div>
+                  <div className="text-xs text-gray-500">
+                    {participant.type === 'counselor' ? '諮詢師' : participant.type === 'visitor' ? '訪客' : '客戶'}
+                  </div>
+                </div>
+                <div className="text-xs text-gray-400">
+                  {new Date(participant.joinedAt).toLocaleTimeString()}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Main Consultation Area */}
       <div className="pt-20">
         <ConsultationArea
           roomId={roomId}
           onCardEvent={handleCardEvent}
-          isReadOnly={!user?.roles.includes('counselor') && !user?.roles.includes('admin')}
+          isReadOnly={!isCounselor && !isVisitor}
           performerInfo={{
-            id: isVisitor ? undefined : user?.id,
+            id: isVisitor ? `visitor_${Date.now()}` : user?.id,
             name: isVisitor ? visitorName : user?.name,
             type: isVisitor
               ? 'visitor'
@@ -218,6 +372,7 @@ export default function RoomPage() {
                 ? 'counselor'
                 : 'client',
           }}
+          onClearAreaReady={(clearFn: () => void) => setClearAreaCallback(() => clearFn)}
         />
       </div>
 
@@ -252,6 +407,15 @@ export default function RoomPage() {
           )}
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      {showQRCode && currentRoom && (
+        <QRCodeModal
+          room={currentRoom}
+          isOpen={showQRCode}
+          onClose={() => setShowQRCode(false)}
+        />
+      )}
     </div>
   );
 }

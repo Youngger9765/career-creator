@@ -14,6 +14,7 @@ export default function CreateRoomPage() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    expirationDays: 7, // Default 7 days
   });
 
   if (!isAuthenticated) {
@@ -58,9 +59,13 @@ export default function CreateRoomPage() {
     }
 
     try {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + formData.expirationDays);
+
       const room = await createRoom({
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
+        expires_at: expiresAt.toISOString(),
       });
 
       // Redirect to the new room
@@ -120,6 +125,28 @@ export default function CreateRoomPage() {
             />
             <p className="text-xs text-gray-500 mt-1">
               {formData.description.length}/500 字 (選填)
+            </p>
+          </div>
+
+          {/* Expiration Settings */}
+          <div>
+            <label htmlFor="expirationDays" className="block text-sm font-medium text-gray-700 mb-2">
+              房間有效期限
+            </label>
+            <select
+              id="expirationDays"
+              value={formData.expirationDays}
+              onChange={(e) => handleInputChange('expirationDays', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value={1}>1 天</option>
+              <option value={3}>3 天</option>
+              <option value={7}>7 天（預設）</option>
+              <option value={14}>14 天</option>
+              <option value={30}>30 天</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              房間將在 {formData.expirationDays} 天後自動過期，過期後將無法進入
             </p>
           </div>
 

@@ -78,6 +78,7 @@ export enum CardEventType {
   CARD_DISCUSSED = 'card_discussed',
   NOTES_ADDED = 'notes_added',
   INSIGHT_RECORDED = 'insight_recorded',
+  AREA_CLEARED = 'area_cleared',
 }
 
 export interface CardEvent extends BaseEntity {

@@ -12,11 +12,14 @@ export interface Room {
   share_code: string;
   is_active: boolean;
   created_at: string;
+  expires_at?: string;
+  session_count?: number;
 }
 
 export interface CreateRoomData {
   name: string;
   description?: string;
+  expires_at?: string;
 }
 
 export interface RoomStatistics {
@@ -93,6 +96,18 @@ class RoomsAPI {
   async deleteRoom(roomId: string): Promise<void> {
     try {
       await apiClient.delete(`/api/rooms/${roomId}`);
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  }
+
+  /**
+   * Close room (end consultation session)
+   */
+  async closeRoom(roomId: string): Promise<Room> {
+    try {
+      const response = await apiClient.post<Room>(`/api/rooms/${roomId}/close`);
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

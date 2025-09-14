@@ -11,8 +11,9 @@ import {
 } from '@dnd-kit/core';
 import { Card } from './Card';
 import { CardDeck } from './CardDeck';
+import { CardNotesModal } from './CardNotesModal';
 import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
-import { CardEventType } from '@/types/api';
+import { CardEventType } from '@/lib/api/card-events';
 import { useCardSync } from '@/hooks/use-card-sync';
 
 interface ConsultationAreaProps {
@@ -24,6 +25,7 @@ interface ConsultationAreaProps {
     name?: string;
     type?: string;
   };
+  onClearAreaReady?: (clearFn: () => void) => void;
 }
 
 interface DropZone {
@@ -38,44 +40,35 @@ interface DropZone {
 
 const DROP_ZONES: DropZone[] = [
   {
-    id: 'interested',
-    name: '有興趣',
-    description: '我覺得有興趣的職業',
-    color: 'border-green-300 bg-green-50',
-    position: { x: 100, y: 100 },
-    width: 200,
-    height: 150,
+    id: 'advantage',
+    name: '優勢 (5張)',
+    description: '我的優勢能力',
+    color: 'border-green-400 bg-green-50',
+    position: { x: 400, y: 150 },
+    width: 250,
+    height: 180,
   },
   {
-    id: 'maybe',
-    name: '可能考慮',
-    description: '需要更多了解的選項',
-    color: 'border-yellow-300 bg-yellow-50',
-    position: { x: 350, y: 100 },
-    width: 200,
-    height: 150,
-  },
-  {
-    id: 'not-interested',
-    name: '不感興趣',
-    description: '目前不考慮的選項',
-    color: 'border-red-300 bg-red-50',
-    position: { x: 600, y: 100 },
-    width: 200,
-    height: 150,
+    id: 'disadvantage',
+    name: '劣勢 (5張)',
+    description: '需要改進的能力',
+    color: 'border-red-400 bg-red-50',
+    position: { x: 400, y: 350 },
+    width: 250,
+    height: 180,
   },
   {
     id: 'discussion',
     name: '討論區',
     description: '正在討論的卡片',
     color: 'border-blue-300 bg-blue-50',
-    position: { x: 250, y: 300 },
-    width: 300,
-    height: 200,
+    position: { x: 700, y: 250 },
+    width: 250,
+    height: 180,
   },
 ];
 
-function DropZoneComponent({ zone, isActive }: { zone: DropZone; isActive: boolean }) {
+function DropZoneComponent({ zone, isActive, cardCount }: { zone: DropZone; isActive: boolean; cardCount: number }) {
   const { setNodeRef } = useDroppable({ id: zone.id });
 
   return (
@@ -94,7 +87,14 @@ function DropZoneComponent({ zone, isActive }: { zone: DropZone; isActive: boole
       }}
     >
       <div className="text-center">
-        <h3 className="font-bold text-gray-700 mb-1">{zone.name}</h3>
+        <h3 className="font-bold text-gray-700 mb-1">
+          {zone.name}
+          {(zone.id === 'advantage' || zone.id === 'disadvantage') && (
+            <span className="ml-2 text-sm font-normal text-gray-600">
+              ({cardCount}/5)
+            </span>
+          )}
+        </h3>
         <p className="text-xs text-gray-600">{zone.description}</p>
       </div>
     </div>
@@ -106,10 +106,13 @@ export function ConsultationArea({
   onCardEvent,
   isReadOnly = false,
   performerInfo,
+  onClearAreaReady,
 }: ConsultationAreaProps) {
   const [cards, setCards] = useState<GameCard[]>([]);
   const [activeCard, setActiveCard] = useState<string | null>(null);
   const [activeDropZone, setActiveDropZone] = useState<string | null>(null);
+  const [noteModalCard, setNoteModalCard] = useState<CardData | null>(null);
+  const [cardNotes, setCardNotes] = useState<Record<string, string[]>>({});
 
   // Initialize card synchronization
   const {
@@ -155,7 +158,7 @@ export function ConsultationArea({
 
       // Sync card dealt event
       if (!isReadOnly) {
-        syncCardEvent(newCard.id, CardEventType.CARD_DEALT, {
+        syncCardEvent(newCard.id, 'card_dealt' as CardEventType, {
           position: newCard.position,
           card_data: cardData,
           from_deck: true,
@@ -173,7 +176,7 @@ export function ConsultationArea({
 
       // Sync card flip event
       if (!isReadOnly) {
-        syncCardEvent(cardId, CardEventType.CARD_FLIPPED, {
+        syncCardEvent(cardId, 'card_flipped' as CardEventType, {
           face_up: faceUp,
         }).catch(console.error);
       }
@@ -224,7 +227,7 @@ export function ConsultationArea({
 
           // Sync card arranged event
           if (!isReadOnly) {
-            syncCardEvent(cardId, CardEventType.CARD_ARRANGED, {
+            syncCardEvent(cardId, 'card_arranged' as CardEventType, {
               drop_zone: over.id,
               position: newPosition,
             }).catch(console.error);
@@ -247,7 +250,7 @@ export function ConsultationArea({
 
               // Sync card move event
               if (!isReadOnly) {
-                syncCardEvent(cardId, CardEventType.CARD_MOVED, {
+                syncCardEvent(cardId, 'card_moved' as CardEventType, {
                   from_position: card.position,
                   to_position: newPosition,
                 }).catch(console.error);
@@ -275,6 +278,50 @@ export function ConsultationArea({
     [onCardEvent]
   );
 
+  const handleAddNote = useCallback((cardId: string) => {
+    const card = cards.find(c => c.id === cardId);
+    if (card) {
+      setNoteModalCard(card.data);
+    }
+  }, [cards]);
+
+  const handleNoteSaved = useCallback((cardId: string, notes: string) => {
+    setCardNotes(prev => ({
+      ...prev,
+      [cardId]: [...(prev[cardId] || []), notes]
+    }));
+    setNoteModalCard(null);
+  }, []);
+
+  // Register clear area callback
+  useEffect(() => {
+    if (onClearAreaReady) {
+      const clearFn = () => {
+        setCards([]);
+        setCardNotes({});
+      };
+      onClearAreaReady(clearFn);
+    }
+  }, [onClearAreaReady]);
+
+  // Count cards in each zone
+  const getZoneCardCount = useCallback((zoneId: string) => {
+    const zone = DROP_ZONES.find(z => z.id === zoneId);
+    if (!zone) return 0;
+
+    return cards.filter(card => {
+      const cardCenterX = card.position.x + 64;
+      const cardCenterY = card.position.y + 88;
+      const zoneLeft = zone.position.x;
+      const zoneRight = zone.position.x + zone.width;
+      const zoneTop = zone.position.y;
+      const zoneBottom = zone.position.y + zone.height;
+
+      return cardCenterX >= zoneLeft && cardCenterX <= zoneRight &&
+             cardCenterY >= zoneTop && cardCenterY <= zoneBottom;
+    }).length;
+  }, [cards]);
+
   return (
     <div className="consultation-area relative w-full h-screen overflow-hidden">
       <DndContext
@@ -284,16 +331,25 @@ export function ConsultationArea({
       >
         {/* Drop Zones */}
         {DROP_ZONES.map((zone) => (
-          <DropZoneComponent key={zone.id} zone={zone} isActive={activeDropZone === zone.id} />
+          <DropZoneComponent
+            key={zone.id}
+            zone={zone}
+            isActive={activeDropZone === zone.id}
+            cardCount={getZoneCardCount(zone.id)}
+          />
         ))}
 
-        {/* Card Deck */}
-        <div className="absolute top-4 left-4 z-20">
-          <CardDeck
-            cards={DEFAULT_CAREER_CARDS}
-            onDealCard={handleDealCard}
-            onCardEvent={handleCardEvent}
-          />
+        {/* Card Deck Area */}
+        <div className="absolute top-80 left-20 z-20">
+          <div className="bg-white rounded-lg shadow-lg p-4 border-2 border-dashed border-gray-300">
+            <h3 className="text-sm font-bold text-gray-700 mb-2">牌組區</h3>
+            <CardDeck
+              cards={DEFAULT_CAREER_CARDS}
+              onDealCard={handleDealCard}
+              onCardEvent={handleCardEvent}
+            />
+            <p className="text-xs text-gray-500 mt-2">點擊發牌</p>
+          </div>
         </div>
 
         {/* Game Cards */}
@@ -317,6 +373,8 @@ export function ConsultationArea({
               onFlip={handleCardFlip}
               onSelect={handleCardSelect}
               onCardEvent={handleCardEvent}
+              onAddNote={!isReadOnly ? handleAddNote : undefined}
+              hasNotes={!!cardNotes[card.data.id]?.length}
             />
           </div>
         ))}
@@ -383,15 +441,42 @@ export function ConsultationArea({
           </div>
         </div>
 
-        {/* Clear button */}
-        {cards.length > 0 && (
-          <div className="absolute bottom-4 right-4 z-20">
-            <button onClick={() => setCards([])} className="clear-button text-sm">
-              清空桌面
-            </button>
+        {/* Selected Cards Counter */}
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-20 bg-white rounded-lg shadow-lg px-4 py-2">
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-600">優勢：</span>
+              <span className={`font-bold ${getZoneCardCount('advantage') === 5 ? 'text-green-600' : 'text-gray-800'}`}>
+                {getZoneCardCount('advantage')}/5
+              </span>
+            </div>
+            <div className="w-px h-4 bg-gray-300"></div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-600">劣勢：</span>
+              <span className={`font-bold ${getZoneCardCount('disadvantage') === 5 ? 'text-red-600' : 'text-gray-800'}`}>
+                {getZoneCardCount('disadvantage')}/5
+              </span>
+            </div>
+            <div className="w-px h-4 bg-gray-300"></div>
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-600">總計：</span>
+              <span className="font-bold text-blue-600">
+                {cards.length} 張牌
+              </span>
+            </div>
           </div>
-        )}
+        </div>
       </DndContext>
+
+      {/* Card Notes Modal */}
+      <CardNotesModal
+        card={noteModalCard}
+        isOpen={!!noteModalCard}
+        onClose={() => setNoteModalCard(null)}
+        roomId={roomId}
+        performerInfo={performerInfo}
+        onNoteSaved={handleNoteSaved}
+      />
     </div>
   );
 }

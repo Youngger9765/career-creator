@@ -44,6 +44,12 @@ export default function HomePage() {
                 {user.roles.includes('counselor') && (
                   <div className="space-y-3">
                     <Link
+                      href="/dashboard"
+                      className="block w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-center"
+                    >
+                      Go to Dashboard
+                    </Link>
+                    <Link
                       href="/rooms/create"
                       className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center"
                     >

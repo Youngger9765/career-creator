@@ -1,9 +1,11 @@
 # CLAUDE.md - Project Guidelines
 
 ## Project Overview
+
 Building an online card consultation system for career counselors and their visitors.
 
 ## Commit Message Convention
+
 - **Language**: Always use English for commit messages
 - **Format**: Use conventional commits format
   - `feat:` for new features
@@ -17,6 +19,7 @@ Building an online card consultation system for career counselors and their visi
 ## Code Standards
 
 ### Frontend
+
 - **Framework**: Next.js 14 with TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui
 - **State Management**: Zustand
@@ -24,6 +27,7 @@ Building an online card consultation system for career counselors and their visi
 - **API Client**: Axios + React Query
 
 ### Backend
+
 - **Framework**: FastAPI with Python 3.11+
 - **ORM**: SQLModel (unified SQLAlchemy + Pydantic)
 - **Database Migrations**: Alembic
@@ -31,11 +35,13 @@ Building an online card consultation system for career counselors and their visi
 - **Async**: asyncio
 
 ### Database & Infrastructure
+
 - **Database**: PostgreSQL (Supabase)
 - **Deployment**: GCP Cloud Run
 - **Storage**: GCP Cloud Storage
 
 ## Development Guidelines
+
 1. **Mobile First**: Always prioritize mobile experience
 2. **Type Safety**: Use TypeScript for all code
 3. **Component Structure**: Keep components small and focused
@@ -45,6 +51,7 @@ Building an online card consultation system for career counselors and their visi
 ## TDD with AI Development (Kent Beck's Principles)
 
 ### Canon TDD Process
+
 Following Kent Beck's canonical TDD workflow:
 
 1. **List Expected Behaviors**: Before coding, list all expected variants in the new behavior
@@ -60,6 +67,7 @@ Following Kent Beck's canonical TDD workflow:
 3. **One Test at a Time**: Focus on a single test, make it pass, then move to the next
 
 ### TDD as AI "Superpower"
+
 According to Kent Beck, TDD is a "superpower" when working with AI agents:
 
 1. **Tests as Prompts**: Writing tests first essentially "prompts" the AI with exact requirements
@@ -68,12 +76,14 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 4. **Immediate Feedback**: Tests catch when AI strays off course
 
 ### Common Mistakes to Avoid
+
 - Don't write tests without assertions just for coverage
 - Don't convert all test items to concrete tests at once
 - Don't mix refactoring with making tests pass
 - Watch for AI trying to delete/disable tests to "pass"
 
 ### AI-Assisted TDD Workflow
+
 1. Write a failing test that describes the desired behavior
 2. Use AI to generate code that passes the test
 3. Feed test results back to AI for iterations
@@ -81,12 +91,14 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 5. Repeat for next behavior
 
 ### Key Benefits
+
 - **Better Context**: Tests provide crucial context to AI assistants
 - **Higher Quality**: Edge cases in tests lead to more robust generated code
 - **Faster Iteration**: Clear requirements reduce back-and-forth
 - **Confidence**: Tests catch AI-introduced bugs immediately
 
 ## File Structure (Monorepo)
+
 ```
 /frontend
   /src
@@ -108,14 +120,71 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 ```
 
 ## Key Decisions
+
 - Use polling for MVP (no WebSocket initially)
 - Visitors don't need registration
 - Room expires after 7 days by default
-- Start with single card deck (職能盤點卡)
+- ~~Start with single card deck (職能盤點卡)~~ **CHANGED**: Implement all 3 game types with universal rules engine
+
+## Game Rules Engine Architecture
+
+### Strategic Decision
+
+Following iGaming industry best practices, we implement a **Three-Layer Universal Framework**:
+
+1. **Engine Layer**: Rule-agnostic core logic
+2. **Configuration Layer**: Game rules and content management
+3. **Application Layer**: Business logic and user interactions
+
+### Three Game Types (MVP全做)
+
+```
+1. 職能盤點卡 - 優劣勢分析 (2 zones, max 5 each)
+2. 價值導航卡 - 價值觀排序 (3x3 grid, unique ranking)
+3. 職游旅人卡 - 六大性格 (3 columns, like/neutral/dislike)
+```
+
+### Technical Benefits
+
+- **Rapid Expansion**: New rules in days, not weeks
+- **Configuration Driven**: No code changes for new game types
+- **Future Proof**: Supports user-defined cards later
+- **Consistent UX**: Unified interaction patterns
+
+### Implementation Strategy
+
+1. **Phase 1**: Core engine + 3 official rule sets
+2. **Phase 2**: User-defined card content
+3. **Phase 3**: Advanced game analytics
+
+### TDD for Game Engine
+
+Apply TDD principles specifically for rules engine:
+
+```typescript
+// Example test-first approach
+describe('GameEngine', () => {
+  it('should validate card placement within zone limits', () => {
+    const state = createGameState('skill_assessment');
+    const action = createPlaceCardAction('advantage', 6); // Over limit
+
+    expect(engine.validateAction(action, state)).toBe(false);
+  });
+
+  it('should execute valid card arrangement', () => {
+    const action = createArrangeAction('skill_001', 'advantage');
+    const result = engine.executeAction(action);
+
+    expect(result.isSuccess).toBe(true);
+    expect(result.newState.zones.get('advantage').cards).toContain('skill_001');
+  });
+});
+```
 
 ## Testing Commands
 
 ### Frontend
+
 ```bash
 cd frontend
 npm run dev      # Development server (port 3000)
@@ -125,6 +194,7 @@ npm run test     # Run tests
 ```
 
 ### Backend
+
 ```bash
 cd backend
 uvicorn app.main:app --reload  # Dev server (port 8000)
@@ -135,11 +205,13 @@ alembic upgrade head             # Run migrations
 ```
 
 ### Full Stack
+
 ```bash
 docker-compose up               # Run both frontend and backend
 ```
 
 ## Deployment
+
 - Platform: GCP Cloud Run
 - Database: Supabase PostgreSQL
 - Storage: GCP Cloud Storage

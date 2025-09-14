@@ -63,8 +63,27 @@ export default function RoomsPage() {
     }
   };
 
+  const handleCloseRoom = async (roomId: string, roomName: string) => {
+    if (confirm(`確定要結束「${roomName}」嗎？房間將會關閉。`)) {
+      try {
+        await roomsAPI.closeRoom(roomId);
+        alert('房間已結束');
+        // Reload rooms
+        const myRooms = await roomsAPI.getMyRooms();
+        setRooms(myRooms);
+      } catch (error) {
+        console.error('Failed to close room:', error);
+        alert('結束房間失敗，請重試');
+      }
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('zh-TW');
+  };
+
+  const isExpired = (dateString: string) => {
+    return new Date(dateString) < new Date();
   };
 
   if (!user) {
@@ -84,6 +103,12 @@ export default function RoomsPage() {
               <p className="text-sm text-gray-600">歡迎回來，{user.full_name || user.email}</p>
             </div>
             <div className="flex items-center space-x-4">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+              >
+                儀表板
+              </Link>
               <Link
                 href="/rooms/create"
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -177,6 +202,14 @@ export default function RoomsPage() {
                       <span>創建時間：</span>
                       <span>{formatDate(room.created_at)}</span>
                     </div>
+                    {room.expires_at && (
+                      <div className="flex items-center justify-between">
+                        <span>有效期限：</span>
+                        <span className={isExpired(room.expires_at) ? 'text-red-600' : ''}>
+                          {isExpired(room.expires_at) ? '已過期' : formatDate(room.expires_at)}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex space-x-2">
@@ -200,6 +233,15 @@ export default function RoomsPage() {
                     >
                       📱
                     </button>
+                    {room.is_active && (
+                      <button
+                        onClick={() => handleCloseRoom(room.id, room.name)}
+                        className="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+                        title="結束房間"
+                      >
+                        結束
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,18 +1,21 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
-from app.api.rooms import router as rooms_router
 from app.api.auth import router as auth_router
-from app.api.visitors import router as visitors_router
 from app.api.card_events import router as card_events_router
+from app.api.game_rules import router as game_rules_router
+from app.api.game_sessions import router as game_sessions_router
+from app.api.rooms import router as rooms_router
+from app.api.visitors import router as visitors_router
 from app.api.websocket import router as websocket_router
-
+from app.core.config import settings
 # Import models to ensure they are registered with SQLModel
-from app.models.user import User
-from app.models.room import Room
-from app.models.visitor import Visitor
-from app.models.card_event import CardEvent
+from app.models.card_event import CardEvent  # noqa: F401
+from app.models.game_rule import Card, CardDeck, GameRuleTemplate  # noqa: F401
+from app.models.game_state import GameActionRecord, GameSession  # noqa: F401
+from app.models.room import Room  # noqa: F401
+from app.models.user import User  # noqa: F401
+from app.models.visitor import Visitor  # noqa: F401
 
 app = FastAPI(
     title="Career Creator API",
@@ -38,10 +41,14 @@ app.include_router(rooms_router)
 app.include_router(visitors_router)
 app.include_router(card_events_router)
 app.include_router(websocket_router)
+app.include_router(game_rules_router, prefix="/api/game-rules", tags=["game-rules"])
+app.include_router(game_sessions_router)
+
 
 @app.get("/")
 async def root():
     return {"message": "Career Creator API", "version": "1.0.0"}
+
 
 @app.get("/health")
 async def health_check():

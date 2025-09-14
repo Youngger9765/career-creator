@@ -2,23 +2,25 @@
 Authentication API endpoints
 認證 API - Demo 帳號登入系統
 """
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
+
 from datetime import timedelta
 from typing import List
 
-from app.core.database import get_session
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlmodel import Session, select
+
 from app.core.auth import (
-    verify_password, 
-    create_access_token, 
+    DEMO_ACCOUNTS,
+    create_access_token,
+    find_demo_account_by_email,
     get_current_user_from_token,
     get_demo_accounts_list,
-    find_demo_account_by_email,
     get_password_hash,
-    DEMO_ACCOUNTS
+    verify_password,
 )
 from app.core.config import settings
-from app.models.auth import LoginRequest, LoginResponse, DemoAccount
+from app.core.database import get_session
+from app.models.auth import DemoAccount, LoginRequest, LoginResponse
 from app.models.user import User, UserResponse
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
@@ -31,15 +33,12 @@ def get_demo_accounts():
 
 
 @router.post("/login", response_model=LoginResponse)
-def login(
-    login_data: LoginRequest,
-    session: Session = Depends(get_session)
-):
+def login(login_data: LoginRequest, session: Session = Depends(get_session)):
     """Login with email and password (supports demo accounts)"""
-    
+
     # First check if it's a demo account
     demo_account = find_demo_account_by_email(login_data.email)
-    
+
     if demo_account and login_data.password == "demo123":
         # Demo account login
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
@@ -47,11 +46,11 @@ def login(
             data={
                 "sub": demo_account["id"],
                 "email": demo_account["email"],
-                "roles": demo_account["roles"]
+                "roles": demo_account["roles"],
             },
-            expires_delta=access_token_expires
+            expires_delta=access_token_expires,
         )
-        
+
         return LoginResponse(
             access_token=access_token,
             token_type="bearer",
@@ -61,38 +60,33 @@ def login(
                 "email": demo_account["email"],
                 "roles": demo_account["roles"],
                 "is_active": True,
-                "created_at": "2024-01-01T00:00:00"  # Mock timestamp for demo
-            }
+                "created_at": "2024-01-01T00:00:00",  # Mock timestamp for demo
+            },
         )
-    
+
     # Check regular database users
     statement = select(User).where(User.email == login_data.email)
     user = session.exec(statement).first()
-    
+
     if not user or not verify_password(login_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
-    
+
     # Create access token
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
-        data={
-            "sub": str(user.id),
-            "email": user.email,
-            "roles": user.roles
-        },
-        expires_delta=access_token_expires
+        data={"sub": str(user.id), "email": user.email, "roles": user.roles},
+        expires_delta=access_token_expires,
     )
-    
+
     return LoginResponse(
         access_token=access_token,
         token_type="bearer",
@@ -102,23 +96,22 @@ def login(
             "email": user.email,
             "roles": user.roles,
             "is_active": user.is_active,
-            "created_at": user.created_at.isoformat()
-        }
+            "created_at": user.created_at.isoformat(),
+        },
     )
 
 
 @router.get("/me", response_model=UserResponse)
 def get_current_user(
     current_user: dict = Depends(get_current_user_from_token),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ):
     """Get current user information"""
-    
+
     # Check if it's a demo account
     if current_user["user_id"].startswith("demo-"):
         demo_account = next(
-            (acc for acc in DEMO_ACCOUNTS if acc["id"] == current_user["user_id"]), 
-            None
+            (acc for acc in DEMO_ACCOUNTS if acc["id"] == current_user["user_id"]), None
         )
         if demo_account:
             return UserResponse(
@@ -127,32 +120,31 @@ def get_current_user(
                 email=demo_account["email"],
                 roles=demo_account["roles"],
                 is_active=True,
-                created_at="2024-01-01T00:00:00"
+                created_at="2024-01-01T00:00:00",
             )
-    
+
     # Regular database user
     user = session.get(User, current_user["user_id"])
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
-    
+
     return user
 
 
 @router.post("/init-demo-accounts")
 def initialize_demo_accounts(session: Session = Depends(get_session)):
     """Initialize demo accounts in database (for development)"""
-    
+
     created_accounts = []
-    
+
     for demo_data in DEMO_ACCOUNTS:
         # Check if account already exists
         existing_user = session.exec(
             select(User).where(User.email == demo_data["email"])
         ).first()
-        
+
         if not existing_user:
             # Create new demo user
             user = User(
@@ -160,15 +152,15 @@ def initialize_demo_accounts(session: Session = Depends(get_session)):
                 name=demo_data["name"],
                 hashed_password=get_password_hash(demo_data["password"]),
                 roles=demo_data["roles"],
-                is_active=True
+                is_active=True,
             )
             session.add(user)
             created_accounts.append(demo_data["email"])
-    
+
     session.commit()
-    
+
     return {
-        "message": f"Demo accounts initialized",
+        "message": "Demo accounts initialized",
         "created": created_accounts,
-        "total_demo_accounts": len(DEMO_ACCOUNTS)
+        "total_demo_accounts": len(DEMO_ACCOUNTS),
     }

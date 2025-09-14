@@ -1,13 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { authAPI } from '@/lib/api/auth';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    const checkAuth = () => {
+      const token = localStorage.getItem('access_token');
+      const user = localStorage.getItem('user');
+
+      if (token && user) {
+        // User is already logged in, redirect to dashboard
+        router.push('/dashboard');
+      } else {
+        setCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-2 text-gray-600">檢查登入狀態...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

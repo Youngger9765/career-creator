@@ -79,8 +79,11 @@ export function Card({
   const cardStyle = {
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${scale}) rotate(${rotation}deg)`
-      : `translate3d(${position.x}px, ${position.y}px, 0) scale(${scale}) rotate(${rotation}deg)`,
+      : `scale(${scale}) rotate(${rotation}deg)`,
     transformStyle: 'preserve-3d' as const,
+    position: 'absolute' as const,
+    left: position?.x || 0,
+    top: position?.y || 0,
     zIndex: isDndDragging ? 1000 : isSelected ? 100 : 1,
   };
 

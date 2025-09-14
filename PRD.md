@@ -94,16 +94,49 @@
 
 ## 頁面架構
 
-### URL結構（簡化版）
+### URL結構（詳細需求版）
 
 ```
-/                           # 首頁
+# 基本頁面
+/                           # 首頁 / 登入畫面
 /login                      # 諮詢師登入
 /register                   # 諮詢師註冊
-/dashboard                  # 房間列表（諮詢師）
-/room/[roomId]             # 諮詢房間
-/room/[roomId]?name=小明    # 來訪者進入
+/dashboard                  # 諮詢列表 / 房間管理
+
+# 房間系統
+/rooms/create              # 新增房間
+/room/[roomId]             # 房間（諮詢詳情）
+/room/[roomId]?visitor=true&name=小明    # 來訪者進入
+
+# 未來擴展（目前不實作）
+/sessions                  # 諮詢列表（等同 /dashboard）
+/sessions/<session_id>     # 諮詢詳情（等同 /room/[roomId]）
+/sessions/<session_id>/decks/<deck_id>/plays/<play_id>  # 遊戲階層
 ```
+
+### 網域架構（目標架構 vs 目前實作）
+
+**目標架構：**
+
+```
+第一層：諮詢師 (https://careercreator.tw/counselor1)
+第二層：空間 (https://careercreator.tw/counselor1/room1)
+第三層：牌卡 (https://careercreator.tw/counselor1/room1/card1)
+第四層：玩法 (https://careercreator.tw/counselor1/room1/card1/play1)
+```
+
+**目前 MVP 實作：**
+
+```
+# 簡化為單層結構，所有諮詢師共用同一個域名
+/room/[roomId]  # 直接房間 ID，內建權限控制
+```
+
+**實作差異說明：**
+
+- 目前採用簡化架構，不區分諮詢師子域名
+- 權限透過登入狀態和房間創建者來控制
+- 牌卡和玩法整合在房間內，不獨立分層
 
 ### 核心頁面
 
@@ -226,12 +259,40 @@
 3. **查看**：長按或雙擊查看詳情
 4. **註記**：諮詢師可加註解
 
-### 牌卡狀態
+### 牌卡狀態（詳細需求）
 
-- `deck`：在牌組中
-- `flipped`：已翻面
-- `dropped`：已放置
-- `annotated`：有註記
+- **正面**：顯示牌卡標題和圖片
+- **反面**：顯示牌卡詳細描述
+- **檢閱詳情**：彈出詳細資訊視窗
+- **dropped**：已放置到目標區域
+
+### 房間區塊結構
+
+#### Deck Area（牌卡區）
+
+- Search/filter 功能
+- Action on Card
+  - 正面/反面切換
+  - 詳情檢視
+  - choices 操作
+  - hover effect (待定)
+- randomized cards 打亂功能
+- reorder by drag and drop 重新排序
+
+#### Dropped Area（放置區）
+
+- choice 選擇顯示
+- name 標籤
+- card limit 限制顯示 (e.g. 0/5 優劣勢分析)
+- drop animation/effect 拖放動效
+
+#### Navigation Area（導航區）
+
+- Back 回到牌卡選擇
+- 上一步 / 下一步
+- 清空畫面 (or 開新房間就好)
+- 儲存畫面 (or 開新房間就好 or 諮詢師自行截圖)
+- 分享房間連結 (QR code / raw link)
 
 ## 資料模型（簡化版）
 
@@ -379,6 +440,33 @@
 - 資料儲存
 - 測試修正
 - 部署上線
+
+## 第1個月：原型設計與核心雛形（詳細需求）
+
+### 目標
+
+完成 Prototype，具備最小可行產品 (MVP)
+
+### 線上牌卡空間的結構
+
+- 建立基本權限（主持人/來訪者）
+- 介面與互動雛形
+- 建立可操作的互動畫面與 UI 原型 (Figma/前端雛形)
+- 基礎滑鼠操作（翻牌、拖曳、選取）
+
+### 牌卡資訊設計
+
+- 單副牌卡 → 支援正反面翻轉顯示
+- 基本資料結構（牌卡標題、描述、圖片欄位）
+
+### 資料儲存
+
+- 建立來訪者基本資訊紀錄（姓名、日期、備註）
+- 暫存到本地或簡易資料庫
+
+### 交付
+
+Prototype Demo → 可做一次內部測試，收集早期使用者回饋
 
 ## 成功指標
 

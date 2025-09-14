@@ -16,6 +16,31 @@ export default function RoomPage() {
   const [isReady, setIsReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
+  
+  // 牌卡和玩法選擇狀態
+  const [selectedDeck, setSelectedDeck] = useState('職游旅人卡');
+  const [selectedGameRule, setSelectedGameRule] = useState('六大性格分析');
+
+  // 牌卡與可用玩法的映射關係
+  const deckGameRuleMapping = {
+    '職游旅人卡': ['六大性格分析', '優劣勢分析'],
+    '職能盤點卡': ['優劣勢分析'],
+    '價值導航卡': ['價值觀排序', '優劣勢分析']
+  };
+
+  // 根據選擇的牌卡，取得可用玩法
+  const getAvailableGameRules = (deck: string) => {
+    return deckGameRuleMapping[deck as keyof typeof deckGameRuleMapping] || [];
+  };
+
+  // 當牌卡改變時，檢查當前玩法是否還可用
+  const handleDeckChange = (newDeck: string) => {
+    setSelectedDeck(newDeck);
+    const availableRules = getAvailableGameRules(newDeck);
+    if (!availableRules.includes(selectedGameRule)) {
+      setSelectedGameRule(availableRules[0] || '優劣勢分析');
+    }
+  };
 
   // 檢查是否為訪客
   const isVisitor = searchParams.get('visitor') === 'true';
@@ -112,11 +137,11 @@ export default function RoomPage() {
   console.log('Will be read-only:', !isCounselor && !isVisitor);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
       {/* 頂部標題欄 */}
       <div className="bg-white shadow-sm border-b">
         <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <button onClick={() => router.push('/')} className="text-gray-600 hover:text-gray-800">
               ← 返回
             </button>
@@ -129,6 +154,39 @@ export default function RoomPage() {
                 )}
               </div>
             )}
+
+            {/* 牌卡選擇和玩法選擇 */}
+            <div className="flex items-center space-x-4">
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-500 mb-1">牌卡選擇</label>
+                <select 
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={selectedDeck}
+                  onChange={(e) => handleDeckChange(e.target.value)}
+                >
+                  <option value="職游旅人卡">職游旅人卡</option>
+                  <option value="職能盤點卡">職能盤點卡</option>
+                  <option value="價值導航卡">價值導航卡</option>
+                </select>
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-500 mb-1">玩法選擇</label>
+                <select 
+                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={selectedGameRule}
+                  onChange={(e) => setSelectedGameRule(e.target.value)}
+                >
+                  {getAvailableGameRules(selectedDeck).map((rule) => (
+                    <option key={rule} value={rule}>
+                      {rule === '六大性格分析' ? '性格分類' : 
+                       rule === '價值觀排序' ? '價值排序' : 
+                       rule === '優劣勢分析' ? '優劣分析' : rule}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -143,13 +201,16 @@ export default function RoomPage() {
       </div>
 
       {/* 主要內容區 */}
-      <div className="p-6">
+      <div className="flex-1 flex flex-col">
         {currentRoom ? (
           <ConsultationArea
             roomId={roomId}
+            selectedDeck={selectedDeck}
+            selectedGameRule={selectedGameRule}
             onCardEvent={(cardId, eventType, data) => {
               console.log('Card event:', cardId, eventType, data);
-              // 之後這裡會加入 WebSocket 發送
+              // 臨時停用 API 同步，讓拖放正常工作
+              // TODO: 修復 API 端點後再啟用
             }}
             isReadOnly={!isCounselor && !isVisitor}
             performerInfo={{
@@ -163,7 +224,7 @@ export default function RoomPage() {
             }}
           />
         ) : (
-          <div className="text-center py-12">
+          <div className="flex-1 flex items-center justify-center">
             <p className="text-gray-600">載入房間資訊中...</p>
           </div>
         )}

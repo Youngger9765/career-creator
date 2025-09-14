@@ -267,12 +267,14 @@ Based on iGaming industry best practices, we implement a flexible game rules eng
 #### Engine Layer (引擎層) - 核心邏輯
 
 **職責：**
+
 - **狀態管理**: 遊戲狀態的存儲、更新、查詢
 - **動作執行**: 處理所有遊戲動作的執行邏輯
 - **規則驗證**: 驗證動作是否符合當前規則
 - **事件發布**: 觸發狀態變更事件
 
 **核心組件：**
+
 ```typescript
 // 遊戲引擎核心
 interface GameEngine {
@@ -312,6 +314,7 @@ interface GameAction {
 ```
 
 **實現特點：**
+
 - **規則無關**: 不關心具體規則，只處理通用邏輯
 - **狀態不可變**: 每次更新產生新狀態
 - **事務安全**: 支持原子操作和回滾
@@ -320,12 +323,14 @@ interface GameAction {
 #### Configuration Layer (配置層) - 規則與內容
 
 **職責：**
+
 - **規則定義**: 定義各種遊戲規則和限制
 - **內容管理**: 管理牌卡內容和布局
 - **驗證邏輯**: 實現具體的規則驗證
 - **UI配置**: 定義用戶界面布局
 
 **核心組件：**
+
 ```typescript
 // 規則配置接口
 interface GameRuleConfig {
@@ -377,12 +382,14 @@ interface CardDeck {
 #### Application Layer (應用層) - 業務流程
 
 **職責：**
+
 - **用戶交互**: 處理用戶請求和響應
 - **會話管理**: 管理房間和用戶會話
 - **權限控制**: 處理用戶權限和安全
 - **業務流程**: 協調底層服務完成業務邏輯
 
 **核心組件：**
+
 ```typescript
 // 房間服務
 interface RoomService {

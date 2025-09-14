@@ -131,6 +131,7 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 ### Strategic Decision: Why Universal Framework?
 
 **Business Reality:**
+
 1. **持續演進需求**: 職涯諮詢工具會持續演進，市場會出現新的測評工具和方法
 2. **競爭優勢**: 新規則上線不能花費數週開發時間
 3. **用戶多樣化**: 不同諮詢師可能偏好不同工具
@@ -140,6 +141,7 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 
 **Industry Best Practices:**
 現代iGaming平台（如EveryMatrix、NuxGame）都採用相同架構：
+
 - 統一遊戲引擎 + 可配置規則 + 多遊戲內容 = 快速擴展能力
 - 上新遊戲週期：1-2週（vs 傳統數月）
 
@@ -161,27 +163,31 @@ Following iGaming industry best practices, we implement a **Three-Layer Universa
 
 - **Rapid Expansion**: New rules in days, not weeks
 - **Configuration Driven**: No code changes for new game types
-- **Future Proof**: Supports user-defined cards later  
+- **Future Proof**: Supports user-defined cards later
 - **Consistent UX**: Unified interaction patterns
 
 ### Architecture Advantages
 
 **1. 可擴展性**
+
 - 新規則只需實現 GameRules 接口
 - 新牌組只需配置數據
 - UI可通過配置自動生成
 
 **2. 可維護性**
+
 - 核心邏輯集中在引擎
 - 規則和內容分離
 - 清晰的抽象邊界
 
 **3. 可測試性**
+
 - 規則邏輯可獨立測試
 - 狀態變化可預測
 - 動作可重放和調試
 
 **4. 性能優化**
+
 - 規則配置可緩存
 - 狀態更新可批量處理
 - 可實現增量同步

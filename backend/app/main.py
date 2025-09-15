@@ -68,4 +68,8 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "environment": settings.environment}
+    return {
+        "status": "healthy",
+        "environment": settings.environment,
+        "admin_loaded": True,
+    }

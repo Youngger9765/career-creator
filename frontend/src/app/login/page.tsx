@@ -90,6 +90,24 @@ export default function LoginPage() {
     setPassword('demo123');
   };
 
+  const fillTestAccount2 = () => {
+    console.log('Filling test account 2...');
+    setEmail('test@example.com');
+    setPassword('demo123');
+  };
+
+  const fillCounselorAccount = () => {
+    console.log('Filling counselor account...');
+    setEmail('counselor@example.com');
+    setPassword('test1234');
+  };
+
+  const fillAdminAccount = () => {
+    console.log('Filling admin account...');
+    setEmail('admin@example.com');
+    setPassword('admin123');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -155,22 +173,74 @@ export default function LoginPage() {
 
         {/* Demo accounts for testing */}
         <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className="text-sm font-medium text-yellow-800">開發測試帳號</h3>
-              <p className="mt-1 text-sm text-yellow-700">
-                帳號：demo.counselor@example.com
-                <br />
-                密碼：demo123
-              </p>
+          <h3 className="text-sm font-medium text-yellow-800 mb-3">開發測試帳號</h3>
+
+          {/* Demo Account 1 */}
+          <div className="mb-3 p-2 bg-white rounded border">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-medium text-gray-800">Demo 諮詢師</p>
+                <p className="text-xs text-gray-600">demo.counselor@example.com / demo123</p>
+              </div>
+              <button
+                type="button"
+                onClick={fillTestAccount}
+                className="ml-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                填入
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={fillTestAccount}
-              className="ml-4 px-3 py-1 text-xs bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
-            >
-              快速填入
-            </button>
+          </div>
+
+          {/* Test Account */}
+          <div className="mb-3 p-2 bg-white rounded border">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-medium text-gray-800">測試諮詢師</p>
+                <p className="text-xs text-gray-600">test@example.com / demo123</p>
+              </div>
+              <button
+                type="button"
+                onClick={fillTestAccount2}
+                className="ml-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+              >
+                填入
+              </button>
+            </div>
+          </div>
+
+          {/* Counselor Account */}
+          <div className="mb-3 p-2 bg-white rounded border">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-medium text-gray-800">王諮詢師</p>
+                <p className="text-xs text-gray-600">counselor@example.com / test1234</p>
+              </div>
+              <button
+                type="button"
+                onClick={fillCounselorAccount}
+                className="ml-2 px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+              >
+                填入
+              </button>
+            </div>
+          </div>
+
+          {/* Admin Account */}
+          <div className="p-2 bg-white rounded border">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-xs font-medium text-gray-800">系統管理員</p>
+                <p className="text-xs text-gray-600">admin@example.com / admin123</p>
+              </div>
+              <button
+                type="button"
+                onClick={fillAdminAccount}
+                className="ml-2 px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              >
+                填入
+              </button>
+            </div>
           </div>
         </div>
 

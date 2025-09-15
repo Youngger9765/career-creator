@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { roomsAPI, Room } from '@/lib/api/rooms';
+import { roomsAPI, Room } from '../../../lib/api/rooms';
 
 export default function JoinByShareCodePage() {
   const params = useParams();

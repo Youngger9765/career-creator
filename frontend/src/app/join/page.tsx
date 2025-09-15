@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useRoomStore } from '@/stores/room-store';
-import { useAuthStore } from '@/stores/auth-store';
+import { useRoomStore } from '../../stores/room-store';
+import { useAuthStore } from '../../stores/auth-store';
 import Link from 'next/link';
 
 export default function JoinRoomPage() {

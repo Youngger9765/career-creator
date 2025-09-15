@@ -26,7 +26,7 @@ function DraggableCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="w-full h-28 bg-white border-2 border-gray-300 rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow relative group"
+      className="w-28 h-36 bg-white border-2 border-gray-300 rounded-lg shadow-md p-2 hover:shadow-lg transition-shadow relative group"
     >
       {/* Delete button */}
       {onRemove && (
@@ -41,9 +41,10 @@ function DraggableCard({
           ×
         </button>
       )}
-      <div {...listeners} {...attributes} className="cursor-move h-full">
-        <div className="text-sm font-bold mb-1">{card.title}</div>
-        <div className="text-xs text-gray-600 line-clamp-2">{card.description}</div>
+      <div {...listeners} {...attributes} className="cursor-move h-full flex flex-col">
+        <div className="text-xs font-bold mb-1 line-clamp-2">{card.title}</div>
+        <div className="text-xs text-gray-600 line-clamp-3 flex-1">{card.description}</div>
+        {card.category && <div className="text-xs text-blue-600 mt-auto">{card.category}</div>}
       </div>
     </div>
   );
@@ -78,7 +79,7 @@ function PersonalityZone({ id, title, cards, color, onRemoveCard }: PersonalityZ
       `}
     >
       <h3 className="text-lg font-bold mb-4 text-center">{title}</h3>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap gap-3">
         {cards.map((card) => (
           <DraggableCard key={card.id} card={card} onRemove={onRemoveCard} />
         ))}

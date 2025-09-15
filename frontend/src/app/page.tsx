@@ -28,72 +28,10 @@ export default function HomePage() {
   };
 
   if (isAuthenticated && user) {
-    return (
-      <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome back, {user.name}!</h1>
-            <p className="text-gray-600 mb-6">Ready to start your career consultation session?</p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-blue-50 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-blue-800 mb-4">
-                  {user.roles.includes('counselor') ? 'Counselor Actions' : 'Your Options'}
-                </h2>
-
-                {user.roles.includes('counselor') && (
-                  <div className="space-y-3">
-                    <Link
-                      href="/dashboard"
-                      className="block w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors text-center"
-                    >
-                      Go to Dashboard
-                    </Link>
-                    <Link
-                      href="/rooms/create"
-                      className="block w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-center"
-                    >
-                      Create New Room
-                    </Link>
-                    <Link
-                      href="/rooms"
-                      className="block w-full bg-blue-100 text-blue-600 py-2 px-4 rounded-md hover:bg-blue-200 transition-colors text-center"
-                    >
-                      View My Rooms
-                    </Link>
-                  </div>
-                )}
-
-                <Link
-                  href="/join"
-                  className="block w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors text-center mt-3"
-                >
-                  Join Room by Code
-                </Link>
-              </div>
-
-              <div className="bg-indigo-50 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-indigo-800 mb-4">Quick Access</h2>
-                <div className="space-y-3">
-                  <div className="text-sm text-gray-600">
-                    <strong>Role:</strong> {user.roles.join(', ')}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    <strong>Email:</strong> {user.email}
-                  </div>
-                  <button
-                    onClick={() => useAuthStore.getState().logout()}
-                    className="block w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors text-center mt-4"
-                  >
-                    Logout
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    );
+    // Redirect all authenticated users to dashboard
+    // Dashboard will handle role-based functionality
+    window.location.href = '/dashboard';
+    return null;
   }
 
   return (

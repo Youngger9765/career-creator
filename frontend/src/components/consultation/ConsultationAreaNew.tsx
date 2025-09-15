@@ -370,6 +370,7 @@ export function ConsultationAreaNew({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNotesCard, setSelectedNotesCard] = useState<CardData | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'cards' | 'auxiliary' | 'tokens'>('cards');
 
   // Game state
   const [gameState, setGameState] = useState<{
@@ -401,7 +402,23 @@ export function ConsultationAreaNew({
       neutral: [],
       dislike: [],
     });
+
+    // Reset to cards tab when game mode or deck changes
+    // This prevents showing empty tab content
+    setActiveTab('cards');
   }, [gameMode, selectedDeck]);
+
+  // Validate current tab when conditions change
+  useEffect(() => {
+    // If current tab is auxiliary but it's not available anymore
+    if (activeTab === 'auxiliary' && !shouldShowAuxiliaryCards()) {
+      setActiveTab('cards');
+    }
+    // If current tab is tokens but it's not available anymore
+    if (activeTab === 'tokens' && !shouldShowTokens(gameMode, selectedDeck)) {
+      setActiveTab('cards');
+    }
+  }, [activeTab, gameMode, selectedDeck]);
 
   // Check if should show auxiliary cards
   const shouldShowAuxiliaryCards = () => {
@@ -638,52 +655,130 @@ export function ConsultationAreaNew({
       onDragEnd={handleDragEnd}
     >
       <div className="flex h-screen bg-gray-50">
-        {/* Left Sidebar - Card List */}
-        <div className="w-80 bg-white border-r border-gray-200 p-4 flex flex-col">
-          <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="搜尋卡片..."
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+        {/* Left Sidebar with Tabs */}
+        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+          {/* Tab Headers */}
+          <div className="flex bg-gray-100 border-b-2 border-gray-300">
+            <button
+              onClick={() => setActiveTab('cards')}
+              className={`flex-1 px-4 py-3 font-semibold transition-all relative ${
+                activeTab === 'cards'
+                  ? 'text-blue-700 bg-white border-l-2 border-t-2 border-r-2 border-gray-300 rounded-t-lg shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xl">🃏</span>
+                <span>牌卡</span>
+              </div>
+              {activeTab === 'cards' && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+              )}
+            </button>
+            {shouldShowAuxiliaryCards() && (
+              <button
+                onClick={() => setActiveTab('auxiliary')}
+                className={`flex-1 px-4 py-3 font-semibold transition-all relative ${
+                  activeTab === 'auxiliary'
+                    ? 'text-blue-700 bg-white border-l-2 border-t-2 border-r-2 border-gray-300 rounded-t-lg shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-xl">📚</span>
+                  <span>輔助卡</span>
+                </div>
+                {activeTab === 'auxiliary' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                )}
+              </button>
+            )}
+            {shouldShowTokens(gameMode, selectedDeck) && (
+              <button
+                onClick={() => setActiveTab('tokens')}
+                className={`flex-1 px-4 py-3 font-semibold transition-all relative ${
+                  activeTab === 'tokens'
+                    ? 'text-blue-700 bg-white border-l-2 border-t-2 border-r-2 border-gray-300 rounded-t-lg shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-xl">💰</span>
+                  <span>籌碼</span>
+                </div>
+                {activeTab === 'tokens' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                )}
+              </button>
+            )}
           </div>
 
-          {/* Auxiliary Cards - Show when needed */}
-          {shouldShowAuxiliaryCards() && (
-            <div className="mb-4 pb-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold mb-3">解釋卡 (Holland)</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {AUXILIARY_CARDS.map((card) => (
-                  <DraggableAuxCard key={card.id} card={card} onDoubleClick={handleAddCard} />
-                ))}
+          {/* Tab Content */}
+          <div className="flex-1 p-4 overflow-hidden flex flex-col">
+            {/* Search Bar - Only show for cards tab */}
+            {activeTab === 'cards' && (
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="搜尋卡片..."
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <CardList
-            title={selectedDeck}
-            cards={getDeckCards()}
-            deckType={gameMode}
-            onDoubleClick={handleAddCard}
-            searchQuery={searchQuery}
-          />
+            {/* Cards Tab */}
+            {activeTab === 'cards' && (
+              <CardList
+                title={selectedDeck}
+                cards={getDeckCards()}
+                deckType={gameMode}
+                onDoubleClick={handleAddCard}
+                searchQuery={searchQuery}
+              />
+            )}
 
-          {/* Game Tokens - Show based on configuration */}
-          {shouldShowTokens(gameMode, selectedDeck) && (
-            <div className="mt-4 pt-4 border-t border-gray-200 flex-shrink-0">
-              <h3 className="text-lg font-semibold mb-3">遊戲籌碼</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {getGameTokens().map((token) => (
-                  <DraggableToken key={token.id} token={token} />
-                ))}
+            {/* Auxiliary Cards Tab */}
+            {activeTab === 'auxiliary' && shouldShowAuxiliaryCards() && (
+              <div className="flex-1 overflow-y-auto">
+                <h3 className="text-lg font-semibold mb-3">Holland 性格解釋卡</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {AUXILIARY_CARDS.map((card) => (
+                    <DraggableAuxCard key={card.id} card={card} onDoubleClick={handleAddCard} />
+                  ))}
+                </div>
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                  <p className="text-xs text-blue-700">
+                    這些輔助卡用於解釋六大性格類型，可以拖曳到畫布上作為參考。
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Tokens Tab */}
+            {activeTab === 'tokens' && shouldShowTokens(gameMode, selectedDeck) && (
+              <div className="flex-1 overflow-y-auto">
+                <h3 className="text-lg font-semibold mb-3">遊戲籌碼</h3>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {getGameTokens().map((token) => (
+                    <DraggableToken key={token.id} token={token} />
+                  ))}
+                </div>
+                <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                  <p className="text-xs text-green-700 mb-2">籌碼說明：</p>
+                  <ul className="text-xs text-green-600 space-y-1">
+                    <li>• 紅色圓形 = 10分（最重要）</li>
+                    <li>• 藍色方形 = 5分（重要）</li>
+                    <li>• 綠色三角 = 1分（一般）</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Main Canvas Area */}

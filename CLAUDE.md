@@ -260,5 +260,35 @@ docker-compose up               # Run both frontend and backend
 - Storage: GCP Cloud Storage
 - Environment: Production branch = main
 
+### GCloud Configuration
+
+Project uses dedicated gcloud configuration:
+
+```bash
+# Switch to career-creator configuration
+gcloud config configurations activate career-creator
+
+# Verify configuration
+gcloud config list
+```
+
+**Expected configuration:**
+- **Active configuration**: `career-creator`
+- **Project**: `career-creator-472207`
+- **Region**: `asia-east1`
+
+### Cloud Run Services
+
+- **Staging**: `https://career-creator-frontend-staging-990202338378.asia-east1.run.app`
+- **Production**: `https://career-creator-frontend-production-990202338378.asia-east1.run.app`
+
+### GitHub Actions Deployment
+
+Auto-deployment configured:
+- `staging` branch → staging environment
+- `main` branch → production environment
+
+Service Account configured for automated deployment.
+
 ---
-*Last updated: 2025-09-13*
+*Last updated: 2025-09-15*

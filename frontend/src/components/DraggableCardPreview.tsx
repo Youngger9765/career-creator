@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 
 interface DraggableCardPreviewProps {
@@ -14,6 +14,7 @@ export function DraggableCardPreview({
   selectedDeck,
   onAddToCanvas,
 }: DraggableCardPreviewProps) {
+  const [isFlipped, setIsFlipped] = useState(false);
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `preview-${card?.id || 'empty'}`,
     data: {
@@ -46,45 +47,107 @@ export function DraggableCardPreview({
         ? 'bg-blue-600'
         : 'bg-purple-600';
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFlipped(!isFlipped);
+  };
+
+  // Reset flip state when card changes
+  React.useEffect(() => {
+    setIsFlipped(false);
+  }, [card?.id]);
+
   return (
-    <div
-      ref={setNodeRef}
-      style={cardStyle}
-      className={`w-full h-80 rounded-lg shadow-lg flex flex-col items-center justify-center text-white cursor-grab active:cursor-grabbing transition-all duration-200 relative ${deckColor} ${
-        isDragging ? 'opacity-50 scale-105 shadow-2xl' : 'hover:shadow-xl hover:scale-[1.02]'
-      }`}
-      {...listeners}
-      {...attributes}
-    >
-      <div className="text-center px-4 relative z-10">
-        <div className="text-lg font-bold mb-3">{card.title}</div>
-        <div className="text-sm leading-relaxed mb-4">{card.description}</div>
-        <div className="text-xs opacity-75">類型: {card.category}</div>
-      </div>
-
-      {/* Drag indicator */}
-      <div className="absolute top-3 right-3 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
-        <svg
-          className="w-4 h-4 text-white/80"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+    <div className="relative w-full h-80 preserve-3d">
+      <div
+        className={`absolute inset-0 transition-transform duration-700 preserve-3d ${
+          isFlipped ? 'rotate-y-180' : ''
+        }`}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {/* Front side of card */}
+        <div
+          ref={setNodeRef}
+          style={{ ...cardStyle, backfaceVisibility: 'hidden' }}
+          className={`absolute inset-0 rounded-lg shadow-lg flex flex-col items-center justify-center text-white cursor-pointer transition-all duration-200 ${deckColor} ${
+            isDragging ? 'opacity-50 scale-105 shadow-2xl' : 'hover:shadow-xl hover:scale-[1.02]'
+          }`}
+          onClick={handleCardClick}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M7 16l-4-4m0 0l4-4m-4 4h18"
-          />
-        </svg>
-      </div>
+          <div className="text-center px-4 relative z-10">
+            <div className="text-2xl font-bold mb-3">{card.title}</div>
+            <div className="text-xs opacity-75 mb-4">類型: {card.category}</div>
+          </div>
 
-      {/* Subtle gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg pointer-events-none"></div>
+          {/* Click indicator */}
+          <div className="absolute top-3 right-3 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <svg
+              className="w-5 h-5 text-white/80"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </div>
 
-      {/* Instructions text */}
-      <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-xs opacity-60 text-center">
-        拖拽到畫布添加卡片
+          {/* Subtle gradient overlay for depth */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-lg pointer-events-none"></div>
+
+          {/* Instructions text */}
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-xs opacity-60 text-center">
+            點擊翻轉查看詳情
+          </div>
+        </div>
+
+        {/* Back side of card */}
+        <div
+          className={`absolute inset-0 rounded-lg shadow-lg flex flex-col p-6 text-white cursor-pointer transition-all duration-200 rotate-y-180 ${deckColor}`}
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          onClick={handleCardClick}
+        >
+          <div className="flex flex-col h-full">
+            <h3 className="text-lg font-bold mb-3">{card.title}</h3>
+            <div className="flex-1 overflow-y-auto">
+              <p className="text-sm leading-relaxed mb-4">{card.description}</p>
+              {card.tags && card.tags.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold opacity-75">相關技能：</p>
+                  <div className="flex flex-wrap gap-2">
+                    {card.tags.map((tag: string, index: number) => (
+                      <span key={index} className="px-2 py-1 bg-white/20 rounded-full text-xs">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Drag instruction on back */}
+            <div className="mt-4 pt-3 border-t border-white/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs opacity-60">點擊返回</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToCanvas(card);
+                  }}
+                  className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs transition-colors"
+                  {...listeners}
+                  {...attributes}
+                >
+                  拖拽到畫布
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

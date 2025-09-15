@@ -86,8 +86,8 @@ export default function LoginPage() {
 
   const fillTestAccount = () => {
     console.log('Filling test account...');
-    setEmail('test@example.com');
-    setPassword('CareerCreator2025!Dev@Testing#Safe');
+    setEmail('demo.counselor@example.com');
+    setPassword('demo123');
   };
 
   return (
@@ -159,9 +159,9 @@ export default function LoginPage() {
             <div>
               <h3 className="text-sm font-medium text-yellow-800">開發測試帳號</h3>
               <p className="mt-1 text-sm text-yellow-700">
-                帳號：test@example.com
+                帳號：demo.counselor@example.com
                 <br />
-                密碼：CareerCreator2025!Dev@Testing#Safe
+                密碼：demo123
               </p>
             </div>
             <button

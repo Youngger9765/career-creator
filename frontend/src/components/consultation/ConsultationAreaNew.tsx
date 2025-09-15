@@ -378,6 +378,7 @@ export function ConsultationAreaNew({
     advantage: CardData[];
     disadvantage: CardData[];
     gridCards: Map<string, CardData>;
+    gridTokens: Map<string, CardData>; // Tokens placed on grid positions
     like: CardData[];
     neutral: CardData[];
     dislike: CardData[];
@@ -385,6 +386,7 @@ export function ConsultationAreaNew({
     advantage: [],
     disadvantage: [],
     gridCards: new Map(),
+    gridTokens: new Map(),
     like: [],
     neutral: [],
     dislike: [],
@@ -402,6 +404,7 @@ export function ConsultationAreaNew({
       advantage: [],
       disadvantage: [],
       gridCards: new Map(),
+      gridTokens: new Map(),
       like: [],
       neutral: [],
       dislike: [],
@@ -513,19 +516,19 @@ export function ConsultationAreaNew({
     let draggedCard: CardData | undefined;
     let sourceZone: string | undefined;
 
-    // Check all zones for existing cards
-    Object.entries(gameState).forEach(([zone, cards]) => {
-      if (Array.isArray(cards)) {
-        const card = cards.find((c) => c.id === activeId);
+    // Check all zones for existing cards/tokens
+    Object.entries(gameState).forEach(([zone, items]) => {
+      if (Array.isArray(items)) {
+        const card = items.find((c) => c.id === activeId);
         if (card) {
           draggedCard = card;
           sourceZone = zone;
         }
-      } else if (cards instanceof Map) {
-        cards.forEach((card, position) => {
-          if (card.id === activeId) {
-            draggedCard = card;
-            sourceZone = position;
+      } else if (items instanceof Map) {
+        items.forEach((item, position) => {
+          if (item.id === activeId) {
+            draggedCard = item;
+            sourceZone = zone === 'gridTokens' ? `gridTokens-${position}` : position;
           }
         });
       }
@@ -584,7 +587,12 @@ export function ConsultationAreaNew({
 
       // Remove from source (only if not a new card)
       if (!isNewCard) {
-        if (sourceZone && sourceZone.startsWith('grid-')) {
+        if (sourceZone && sourceZone.startsWith('gridTokens-')) {
+          // Remove from gridTokens
+          const position = sourceZone.replace('gridTokens-', '');
+          newState.gridTokens = new Map(prev.gridTokens);
+          newState.gridTokens.delete(position);
+        } else if (sourceZone && sourceZone.startsWith('grid-')) {
           newState.gridCards = new Map(prev.gridCards);
           newState.gridCards.delete(sourceZone);
         } else if (sourceZone && Array.isArray(prev[sourceZone as keyof typeof prev])) {
@@ -596,8 +604,14 @@ export function ConsultationAreaNew({
 
       // Add to target
       if (overId.startsWith('grid-')) {
-        newState.gridCards = new Map(newState.gridCards);
-        newState.gridCards.set(overId, draggedCard!);
+        // Check if it's a token
+        if (draggedCard!.category === 'token') {
+          newState.gridTokens = new Map(newState.gridTokens);
+          newState.gridTokens.set(overId, draggedCard!);
+        } else {
+          newState.gridCards = new Map(newState.gridCards);
+          newState.gridCards.set(overId, draggedCard!);
+        }
       } else if (overId in newState && Array.isArray(newState[overId as keyof typeof newState])) {
         newState[overId as keyof typeof newState] = [
           ...(newState[overId as keyof typeof newState] as CardData[]),
@@ -631,13 +645,19 @@ export function ConsultationAreaNew({
     if (!activeId) return null;
 
     // Check all zones
-    for (const cards of Object.values(gameState)) {
-      if (Array.isArray(cards)) {
-        const card = cards.find((c) => c.id === activeId);
+    for (const [key, value] of Object.entries(gameState)) {
+      if (Array.isArray(value)) {
+        const card = value.find((c) => c.id === activeId);
         if (card) return { type: 'card', data: card };
-      } else if (cards instanceof Map) {
-        for (const card of Array.from(cards.values())) {
-          if (card.id === activeId) return { type: 'card', data: card };
+      } else if (value instanceof Map) {
+        for (const item of Array.from(value.values())) {
+          if (item.id === activeId) {
+            // Check if it's a token based on the key or card category
+            if (key === 'gridTokens' || item.category === 'token') {
+              return { type: 'token', data: item };
+            }
+            return { type: 'card', data: item };
+          }
         }
       }
     }
@@ -681,7 +701,7 @@ export function ConsultationAreaNew({
       newState.neutral = prev.neutral.filter((c) => c.id !== cardId);
       newState.dislike = prev.dislike.filter((c) => c.id !== cardId);
 
-      // Remove from grid
+      // Remove from grid cards
       const newGrid = new Map(prev.gridCards);
       for (const [key, card] of Array.from(newGrid.entries())) {
         if (card.id === cardId) {
@@ -690,6 +710,16 @@ export function ConsultationAreaNew({
         }
       }
       newState.gridCards = newGrid;
+
+      // Remove from grid tokens
+      const newTokenGrid = new Map(prev.gridTokens);
+      for (const [key, token] of Array.from(newTokenGrid.entries())) {
+        if (token.id === cardId) {
+          newTokenGrid.delete(key);
+          break;
+        }
+      }
+      newState.gridTokens = newTokenGrid;
 
       return newState;
     });
@@ -715,6 +745,7 @@ export function ConsultationAreaNew({
       advantage: [],
       disadvantage: [],
       gridCards: new Map(),
+      gridTokens: new Map(),
       like: [],
       neutral: [],
       dislike: [],
@@ -900,7 +931,11 @@ export function ConsultationAreaNew({
               />
             )}
             {gameMode === '價值觀排序' && (
-              <ResponsiveValueGrid cards={gameState.gridCards} onRemoveCard={handleRemoveCard} />
+              <ResponsiveValueGrid
+                cards={gameState.gridCards}
+                tokens={gameState.gridTokens}
+                onRemoveCard={handleRemoveCard}
+              />
             )}
             {gameMode === '六大性格分析' && (
               <PersonalityCanvas

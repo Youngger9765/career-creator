@@ -60,11 +60,13 @@ function GridCell({
   id,
   position,
   card,
+  token,
   onRemoveCard,
 }: {
   id: string;
   position: number;
   card?: CardData;
+  token?: CardData;
   onRemoveCard?: (cardId: string) => void;
 }) {
   const { isOver, setNodeRef } = useDroppable({
@@ -76,27 +78,96 @@ function GridCell({
       ref={setNodeRef}
       className={`
         border-2 border-dashed border-gray-300 rounded-lg p-1.5
-        flex items-center justify-center
+        flex items-center justify-center relative
         ${isOver ? 'bg-blue-50 border-blue-400' : 'bg-white'}
         transition-all duration-200
       `}
     >
-      {!card && (
+      {!card && !token && (
         <div className="text-center">
           <div className="text-sm sm:text-base font-bold text-gray-300">{position}</div>
         </div>
       )}
       {card && <DraggableCard card={card} onRemove={onRemoveCard} />}
+      {/* Token overlay on top of card */}
+      {token && (
+        <div className="absolute top-1 right-1 z-10">
+          <DraggableTokenBadge token={token} onRemove={onRemoveCard} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Token badge component for displaying on cards
+function DraggableTokenBadge({
+  token,
+  onRemove,
+}: {
+  token: CardData;
+  onRemove?: (cardId: string) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: token.id,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: 1000,
+      }
+    : undefined;
+
+  // Extract token value from title (e.g., "10分" -> "10")
+  const tokenValue = token.title.replace('分', '');
+
+  // Determine color based on value
+  const getTokenColor = () => {
+    if (tokenValue === '10') return 'bg-red-400';
+    if (tokenValue === '5') return 'bg-blue-400';
+    if (tokenValue === '1') return 'bg-green-400';
+    return 'bg-gray-400';
+  };
+
+  const getTokenShape = () => {
+    if (tokenValue === '10') return 'rounded-full';
+    if (tokenValue === '5') return 'rounded-lg';
+    if (tokenValue === '1') return ''; // Triangle shape would need custom CSS
+    return 'rounded-full';
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`w-8 h-8 ${getTokenColor()} ${getTokenShape()} flex items-center justify-center cursor-move shadow-md group relative`}
+    >
+      <div {...listeners} {...attributes}>
+        <span className="text-white text-xs font-bold">{tokenValue}</span>
+      </div>
+      {onRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(token.id);
+          }}
+          className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-20 text-xs"
+          title="移除籌碼"
+        >
+          ×
+        </button>
+      )}
     </div>
   );
 }
 
 interface ResponsiveValueGridProps {
   cards: Map<string, CardData>;
+  tokens: Map<string, CardData>;
   onRemoveCard?: (cardId: string) => void;
 }
 
-export function ResponsiveValueGrid({ cards, onRemoveCard }: ResponsiveValueGridProps) {
+export function ResponsiveValueGrid({ cards, tokens, onRemoveCard }: ResponsiveValueGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [gridLayout, setGridLayout] = useState({ rows: 3, cols: 3 });
   const [cellHeight, setCellHeight] = useState(120);
@@ -139,6 +210,9 @@ export function ResponsiveValueGrid({ cards, onRemoveCard }: ResponsiveValueGrid
   const gridCards: (CardData | undefined)[] = new Array(gridLayout.rows * gridLayout.cols).fill(
     undefined
   );
+  const gridTokensArray: (CardData | undefined)[] = new Array(
+    gridLayout.rows * gridLayout.cols
+  ).fill(undefined);
 
   cards.forEach((card, position) => {
     const match = position.match(/grid-(\d+)-(\d+)/);
@@ -152,10 +226,20 @@ export function ResponsiveValueGrid({ cards, onRemoveCard }: ResponsiveValueGrid
     }
   });
 
+  tokens.forEach((token, position) => {
+    const match = position.match(/grid-(\d+)-(\d+)/);
+    if (match) {
+      const row = parseInt(match[1], 10);
+      const col = parseInt(match[2], 10);
+      const index = row * gridLayout.cols + col;
+      if (index < gridTokensArray.length) {
+        gridTokensArray[index] = token;
+      }
+    }
+  });
+
   return (
     <div ref={containerRef} className="w-full h-full flex flex-col p-2">
-      <h3 className="text-base sm:text-lg font-bold mb-2 text-center flex-shrink-0">價值觀排序</h3>
-
       <div className="flex-1 flex items-center justify-center">
         <div className="w-full max-w-5xl">
           <div
@@ -175,7 +259,8 @@ export function ResponsiveValueGrid({ cards, onRemoveCard }: ResponsiveValueGrid
                   key={gridId}
                   id={gridId}
                   position={index + 1}
-                  card={card}
+                  card={gridCards[index]}
+                  token={gridTokensArray[index]}
                   onRemoveCard={onRemoveCard}
                 />
               );

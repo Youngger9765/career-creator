@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { authAPI } from '@/lib/api/auth';
-import { roomsAPI } from '@/lib/api/rooms';
-import { cardEventsAPI } from '@/lib/api/card-events';
-import { Room, CardEvent } from '@/types/api';
+import { authAPI } from '../../lib/api/auth';
+import { roomsAPI } from '../../lib/api/rooms';
+import { cardEventsAPI } from '../../lib/api/card-events';
+import { Room, CardEvent } from '../../types/api';
 import { Calendar, Users, Clock, TrendingUp, Activity, Archive, LogOut } from 'lucide-react';
 
 interface DashboardStats {

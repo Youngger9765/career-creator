@@ -86,9 +86,14 @@ function GridCell({
         transition-all duration-200
       `}
     >
+      {/* Position number always visible in top-left corner */}
+      <div className="absolute top-1 left-1 text-sm sm:text-base font-bold text-gray-400 z-20">
+        {position}
+      </div>
+
       {!card && !token && (
         <div className="text-center">
-          <div className="text-sm sm:text-base font-bold text-gray-300">{position}</div>
+          <div className="text-xs text-gray-300 mt-4">拖放卡片或籌碼</div>
         </div>
       )}
       {card && <DraggableCard card={card} onRemove={onRemoveCard} />}

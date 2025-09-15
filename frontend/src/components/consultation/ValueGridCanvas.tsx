@@ -50,15 +50,20 @@ function GridCell({ id, row, col, card }: GridCellProps) {
       ref={setNodeRef}
       className={`
         border-2 border-dashed border-gray-300 rounded-lg p-2
-        flex flex-col items-center justify-center h-full
+        flex flex-col items-center justify-center h-full relative
         ${isOver ? 'bg-blue-50 border-blue-400' : 'bg-white'}
         transition-all duration-200
       `}
       style={{ minHeight: '100px' }}
     >
+      {/* Position number always visible in top-left corner */}
+      <div className="absolute top-1 left-1 text-lg font-bold text-gray-400 z-10">
+        {row * 3 + col + 1}
+      </div>
+
       {!card && (
         <div className="text-center">
-          <div className="text-lg font-bold text-gray-300">位置 {row * 3 + col + 1}</div>
+          <div className="text-sm text-gray-300 mt-4">拖放卡片至此</div>
         </div>
       )}
       {card && <DraggableGridCard card={card} position={id} />}

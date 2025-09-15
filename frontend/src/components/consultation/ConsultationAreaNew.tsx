@@ -132,10 +132,10 @@ function DraggableAuxCard({
       {...listeners}
       {...attributes}
       onDoubleClick={() => onDoubleClick(card)}
-      className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-3 cursor-move hover:shadow-lg transition-shadow"
+      className="w-28 h-36 bg-yellow-50 border-2 border-yellow-300 rounded-lg p-3 cursor-move hover:shadow-lg transition-shadow flex flex-col"
     >
-      <div className="text-sm font-bold mb-1">{card.title}</div>
-      <div className="text-xs text-gray-600">{card.description}</div>
+      <div className="text-sm font-bold mb-2">{card.title}</div>
+      <div className="text-xs text-gray-600 flex-1">{card.description}</div>
     </div>
   );
 }

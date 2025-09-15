@@ -8,8 +8,13 @@ import {
   DragOverlay,
   closestCenter,
   useDraggable,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  TouchSensor,
 } from '@dnd-kit/core';
 import { CardList } from './CardList';
+import { DraggableCard } from './DraggableCard';
 import { AdvantageDisadvantageCanvas } from './AdvantageDisadvantageCanvas';
 import { ValueGridCanvas } from './ValueGridCanvas';
 import { ResponsiveValueGrid } from './ResponsiveValueGrid';
@@ -106,39 +111,6 @@ function DraggableToken({ token }: { token: GameToken }) {
       className={`w-12 h-12 ${token.color} rounded-full flex items-center justify-center cursor-move hover:scale-110 transition-transform shadow-md relative`}
     >
       <span className="text-white text-sm font-bold">{getTokenLabel()}</span>
-    </div>
-  );
-}
-
-// Draggable Auxiliary Card Component
-function DraggableAuxCard({
-  card,
-  onDoubleClick,
-}: {
-  card: CardData;
-  onDoubleClick: (card: CardData) => void;
-}) {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: `aux-${card.id}`,
-  });
-
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...listeners}
-      {...attributes}
-      onDoubleClick={() => onDoubleClick(card)}
-      className="w-28 h-36 bg-yellow-50 border-2 border-yellow-300 rounded-lg p-3 cursor-move hover:shadow-lg transition-shadow flex flex-col"
-    >
-      <div className="text-sm font-bold mb-2">{card.title}</div>
-      <div className="text-xs text-gray-600 flex-1">{card.description}</div>
     </div>
   );
 }
@@ -370,6 +342,21 @@ export function ConsultationAreaNew({
   gameMode,
   selectedDeck,
 }: ConsultationAreaNewProps) {
+  // Configure drag sensors with activation constraints to prevent clicks from triggering drags
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10, // Require 10px movement before starting drag
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // 250ms delay for touch
+        tolerance: 5, // 5px tolerance
+      },
+    })
+  );
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNotesCard, setSelectedNotesCard] = useState<CardData | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -455,51 +442,6 @@ export function ConsultationAreaNew({
         return CAREER_CARDS;
     }
   };
-
-  // Handle adding card by double-click
-  const handleAddCard = useCallback(
-    (card: CardData) => {
-      const newCardId = `game-${card.id}-${Date.now()}`;
-      const newCard = { ...card, id: newCardId };
-
-      // Add to appropriate default zone based on game mode
-      if (gameMode === '優劣勢分析') {
-        setGameState((prev) => ({
-          ...prev,
-          advantage: [...prev.advantage, newCard],
-        }));
-        syncCardEvent(newCardId, CardEventType.CARD_DEALT, {
-          zone: 'advantage',
-        });
-      } else if (gameMode === '價值觀排序') {
-        // Find first empty grid position
-        for (let row = 0; row < 3; row++) {
-          for (let col = 0; col < 3; col++) {
-            const position = `grid-${row}-${col}`;
-            if (!gameState.gridCards.has(position)) {
-              setGameState((prev) => ({
-                ...prev,
-                gridCards: new Map(prev.gridCards).set(position, newCard),
-              }));
-              syncCardEvent(newCardId, CardEventType.CARD_DEALT, {
-                zone: position,
-              });
-              return;
-            }
-          }
-        }
-      } else if (gameMode === '六大性格分析') {
-        setGameState((prev) => ({
-          ...prev,
-          neutral: [...prev.neutral, newCard],
-        }));
-        syncCardEvent(newCardId, CardEventType.CARD_DEALT, {
-          zone: 'neutral',
-        });
-      }
-    },
-    [gameMode, gameState.gridCards, syncCardEvent]
-  );
 
   // Drag handlers
   const handleDragStart = (event: DragStartEvent) => {
@@ -786,6 +728,7 @@ export function ConsultationAreaNew({
 
   return (
     <DndContext
+      sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
@@ -873,7 +816,6 @@ export function ConsultationAreaNew({
                 title={selectedDeck}
                 cards={getDeckCards()}
                 deckType={gameMode}
-                onDoubleClick={handleAddCard}
                 searchQuery={searchQuery}
                 usedCardIds={usedCardIds}
               />
@@ -885,7 +827,7 @@ export function ConsultationAreaNew({
                 <h3 className="text-lg font-semibold mb-3">Holland 性格解釋卡</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {AUXILIARY_CARDS.filter((card) => !usedAuxCards.has(card.id)).map((card) => (
-                    <DraggableAuxCard key={card.id} card={card} onDoubleClick={handleAddCard} />
+                    <DraggableCard key={card.id} card={card} idPrefix="aux" cardStyle="auxiliary" />
                   ))}
                 </div>
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">

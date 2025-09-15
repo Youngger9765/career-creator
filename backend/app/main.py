@@ -9,6 +9,7 @@ from app.api.rooms import router as rooms_router
 from app.api.visitors import router as visitors_router
 from app.api.websocket import router as websocket_router
 from app.core.config import settings
+
 # Import models to ensure they are registered with SQLModel
 from app.models.card_event import CardEvent  # noqa: F401
 from app.models.game_rule import Card, CardDeck, GameRuleTemplate  # noqa: F401
@@ -27,9 +28,22 @@ app = FastAPI(
 )
 
 # CORS middleware
+# Configure CORS based on environment
+if settings.environment == "production":
+    origins = [
+        "https://career-creator-frontend-production-990202338378.asia-east1.run.app",
+    ]
+elif settings.environment == "staging":
+    origins = [
+        "https://career-creator-frontend-staging-990202338378.asia-east1.run.app",
+        "http://localhost:3000",  # Allow local development
+    ]
+else:
+    origins = ["*"]  # Allow all origins in development
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

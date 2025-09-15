@@ -1,0 +1,125 @@
+name: Deploy Backend to Cloud Run
+
+on:
+  push:
+    branches:
+      - main        # Deploy to production
+      - staging     # Deploy to staging
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yaml'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  PROJECT_ID: career-creator-472207
+  REGION: asia-east1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'staging' || github.ref_name == 'main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set environment variables based on branch
+        run: |
+          if [ "${{ github.ref_name }}" = "staging" ]; then
+            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+            echo "SERVICE_NAME=career-creator-backend-staging" >> $GITHUB_ENV
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "DIRECT_DATABASE_URL=${{ secrets.DIRECT_DATABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET_STAGING }}" >> $GITHUB_ENV
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_STAGING }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref_name }}" = "main" ]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            echo "SERVICE_NAME=career-creator-backend-production" >> $GITHUB_ENV
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "DIRECT_DATABASE_URL=${{ secrets.DIRECT_DATABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET_PRODUCTION }}" >> $GITHUB_ENV
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_PRODUCTION }}" >> $GITHUB_ENV
+          fi
+          echo "IMAGE_TAG=gcr.io/${{ env.PROJECT_ID }}/career-creator-backend:${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f backend/Dockerfile \
+            -t ${{ env.IMAGE_TAG }} \
+            backend
+
+      - name: Push Docker image
+        run: docker push ${{ env.IMAGE_TAG }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE_TAG }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --port 8000 \
+            --memory 1Gi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --set-env-vars DATABASE_URL="${{ env.DATABASE_URL }}",DIRECT_DATABASE_URL="${{ env.DIRECT_DATABASE_URL }}",JWT_SECRET="${{ env.JWT_SECRET }}",JWT_ALGORITHM=HS256,ACCESS_TOKEN_EXPIRE_MINUTES=15,REFRESH_TOKEN_EXPIRE_DAYS=7,ENVIRONMENT="${{ env.ENVIRONMENT }}",SUPABASE_URL="${{ env.SUPABASE_URL }}",SUPABASE_ANON_KEY="${{ env.SUPABASE_ANON_KEY }}" \
+            --timeout 300s \
+            --project ${{ env.PROJECT_ID }}
+
+      - name: Get service URL
+        id: get-url
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)")
+          echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "🌐 Backend deployed to: $SERVICE_URL"
+
+      - name: Run database migrations
+        run: |
+          echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
+          # Note: Migrations should be run from a secure environment
+          # For now, we'll skip this and run manually
+
+      - name: Run health check
+        run: |
+          echo "Waiting for service to be ready..."
+          sleep 30
+          curl -f ${{ steps.get-url.outputs.SERVICE_URL }}/health || exit 1
+          echo "✅ Health check passed"
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "🚀 Successfully deployed backend to ${{ env.ENVIRONMENT }} environment"
+          echo "📱 Backend URL: ${{ steps.get-url.outputs.SERVICE_URL }}"
+          echo "🔧 Environment: ${{ env.ENVIRONMENT }}"
+          echo "📦 Image: ${{ env.IMAGE_TAG }}"

@@ -35,9 +35,6 @@ ENV GCLOUD_PROJECT_ID=$GCLOUD_PROJECT_ID
 # Disable telemetry during the build
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Debug: Check file structure
-RUN node test-imports.js
-
 RUN npm run build
 
 # Production image, copy all the files and run next

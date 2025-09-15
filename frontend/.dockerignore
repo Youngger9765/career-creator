@@ -15,3 +15,7 @@ README.md
 coverage
 public/sw.js
 public/workbox-*.js
+**/__tests__
+**/*.test.*
+**/*.spec.*
+test-imports.js

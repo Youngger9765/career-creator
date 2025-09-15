@@ -15,6 +15,7 @@ export interface CardData {
   category: string;
   imageUrl?: string;
   tags: string[];
+  emoji?: string;
 }
 
 export interface GameCard {

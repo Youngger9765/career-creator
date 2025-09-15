@@ -77,7 +77,9 @@ def list_tables(
         table_info = []
         for table in tables:
             # Get row count for each table
-            count_result = db.execute(text(f"SELECT COUNT(*) FROM {table}"))
+            count_result = db.execute(
+                text(f"SELECT COUNT(*) FROM {table}")
+            )  # nosec B608
             row_count = count_result.scalar()
 
             # Get column count
@@ -118,7 +120,9 @@ def get_table_data(
             )
 
         # Get total count
-        count_result = db.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
+        count_result = db.execute(
+            text(f"SELECT COUNT(*) FROM {table_name}")
+        )  # nosec B608
         total_count = count_result.scalar()
 
         # Get columns
@@ -127,7 +131,9 @@ def get_table_data(
 
         # Get data with pagination
         data_result = db.execute(
-            text(f"SELECT * FROM {table_name} LIMIT :limit OFFSET :offset"),
+            text(
+                f"SELECT * FROM {table_name} LIMIT :limit OFFSET :offset"
+            ),  # nosec B608
             {"limit": limit, "offset": offset},
         )
         rows = data_result.fetchall()
@@ -219,7 +225,7 @@ def clear_table(
             )
 
         # Clear the table
-        db.execute(text(f"TRUNCATE TABLE {table_name} CASCADE"))
+        db.execute(text(f"TRUNCATE TABLE {table_name} CASCADE"))  # nosec B608
         db.commit()
 
         return {

@@ -375,6 +375,9 @@ export function ConsultationAreaNew({
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'cards' | 'auxiliary' | 'tokens'>('cards');
 
+  // Track used auxiliary cards to prevent re-dragging
+  const [usedAuxCards, setUsedAuxCards] = useState<Set<string>>(new Set());
+
   // Game state
   const [gameState, setGameState] = useState<{
     advantage: CardData[];
@@ -554,6 +557,13 @@ export function ConsultationAreaNew({
           // Create new game card with unique ID
           draggedCard = { ...auxCard, id: `game-${auxCard.id}-${Date.now()}` };
           isNewCard = true;
+
+          // Mark auxiliary card as used to prevent re-dragging
+          setUsedAuxCards((prev) => {
+            const newSet = new Set(prev);
+            newSet.add(auxCard.id);
+            return newSet;
+          });
         }
       } else if (activeId.startsWith('token-')) {
         const tokenId = activeId.replace('token-', '');
@@ -731,11 +741,23 @@ export function ConsultationAreaNew({
     const match = cardId.match(/^game-(.+)-\d+$/);
     if (match) {
       const originalId = match[1];
-      setUsedCardIds((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(originalId);
-        return newSet;
-      });
+
+      // Check if this was an auxiliary card and restore it
+      const isAuxCard = AUXILIARY_CARDS.some((card) => card.id === originalId);
+      if (isAuxCard) {
+        setUsedAuxCards((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(originalId);
+          return newSet;
+        });
+      } else {
+        // Regular deck card
+        setUsedCardIds((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(originalId);
+          return newSet;
+        });
+      }
     }
 
     syncCardEvent(cardId, CardEventType.CARD_MOVED, { zone: 'removed' });
@@ -862,7 +884,7 @@ export function ConsultationAreaNew({
               <div className="flex-1 overflow-y-auto">
                 <h3 className="text-lg font-semibold mb-3">Holland 性格解釋卡</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  {AUXILIARY_CARDS.map((card) => (
+                  {AUXILIARY_CARDS.filter((card) => !usedAuxCards.has(card.id)).map((card) => (
                     <DraggableAuxCard key={card.id} card={card} onDoubleClick={handleAddCard} />
                   ))}
                 </div>

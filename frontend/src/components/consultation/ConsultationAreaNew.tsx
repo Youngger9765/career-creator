@@ -12,6 +12,7 @@ import {
 import { CardList } from './CardList';
 import { AdvantageDisadvantageCanvas } from './AdvantageDisadvantageCanvas';
 import { ValueGridCanvas } from './ValueGridCanvas';
+import { ResponsiveValueGrid } from './ResponsiveValueGrid';
 import { PersonalityCanvas } from './PersonalityCanvas';
 import { Card } from '../Card';
 import { CardNotesModal } from '../CardNotesModal';
@@ -720,7 +721,7 @@ export function ConsultationAreaNew({
                 disadvantageCards={gameState.disadvantage}
               />
             )}
-            {gameMode === '價值觀排序' && <ValueGridCanvas cards={gameState.gridCards} />}
+            {gameMode === '價值觀排序' && <ResponsiveValueGrid cards={gameState.gridCards} />}
             {gameMode === '六大性格分析' && (
               <PersonalityCanvas
                 likeCards={gameState.like}

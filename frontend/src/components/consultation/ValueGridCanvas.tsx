@@ -22,10 +22,13 @@ function DraggableGridCard({ card, position }: { card: CardData; position: strin
       style={style}
       {...listeners}
       {...attributes}
-      className="w-full h-full bg-white border-2 border-gray-300 rounded-lg shadow-md p-2 cursor-move hover:shadow-lg transition-shadow"
+      className="w-full h-full bg-white border-2 border-blue-400 rounded-lg shadow-lg p-2 cursor-move hover:shadow-xl transition-all flex flex-col justify-center"
     >
-      <div className="text-xs font-bold mb-1">{card.title}</div>
-      <div className="text-xs text-gray-600 line-clamp-2">{card.description}</div>
+      <div className="text-sm font-bold mb-1 text-center">{card.title}</div>
+      <div className="text-xs text-gray-600 text-center line-clamp-2">{card.description}</div>
+      {card.category && (
+        <div className="text-xs text-blue-600 mt-1 text-center">{card.category}</div>
+      )}
     </div>
   );
 }
@@ -47,15 +50,18 @@ function GridCell({ id, row, col, card }: GridCellProps) {
       ref={setNodeRef}
       className={`
         border-2 border-dashed border-gray-300 rounded-lg p-2
-        min-h-[180px] flex items-center justify-center
+        flex flex-col items-center justify-center h-full
         ${isOver ? 'bg-blue-50 border-blue-400' : 'bg-white'}
+        transition-all duration-200
       `}
+      style={{ minHeight: '100px' }}
     >
-      {card ? (
-        <DraggableGridCard card={card} position={id} />
-      ) : (
-        <span className="text-gray-400 text-sm">位置 {row * 3 + col + 1}</span>
+      {!card && (
+        <div className="text-center">
+          <div className="text-lg font-bold text-gray-300">位置 {row * 3 + col + 1}</div>
+        </div>
       )}
+      {card && <DraggableGridCard card={card} position={id} />}
     </div>
   );
 }
@@ -84,22 +90,34 @@ export function ValueGridCanvas({ cards }: ValueGridCanvasProps) {
   });
 
   return (
-    <div className="w-full h-full flex flex-col justify-center">
-      <h3 className="text-2xl font-bold mb-6 text-center">價值觀排序</h3>
-      <div className="grid grid-cols-3 gap-4 max-w-4xl mx-auto">
-        {gridCards.map((row, rowIndex) =>
-          row.map((card, colIndex) => (
-            <GridCell
-              key={`grid-${rowIndex}-${colIndex}`}
-              id={`grid-${rowIndex}-${colIndex}`}
-              row={rowIndex}
-              col={colIndex}
-              card={card}
-            />
-          ))
-        )}
+    <div className="w-full h-full flex flex-col p-2">
+      <h3 className="text-lg font-bold mb-2 text-center">價值觀排序</h3>
+      <div className="flex-1 overflow-auto">
+        <div className="min-h-full flex items-center justify-center p-2">
+          <div className="w-full max-w-5xl">
+            <div
+              className="grid gap-2"
+              style={{
+                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                gridAutoRows: 'minmax(100px, 1fr)',
+              }}
+            >
+              {gridCards.map((row, rowIndex) =>
+                row.map((card, colIndex) => (
+                  <GridCell
+                    key={`grid-${rowIndex}-${colIndex}`}
+                    id={`grid-${rowIndex}-${colIndex}`}
+                    row={rowIndex}
+                    col={colIndex}
+                    card={card}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="mt-6 text-center text-sm text-gray-600">
+      <div className="mt-2 text-center text-xs text-gray-600">
         <p>將卡片拖放到九宮格中，排序你的價值觀優先順序</p>
       </div>
     </div>

@@ -7,6 +7,7 @@ import {
   DragStartEvent,
   DragOverlay,
   closestCenter,
+  useDraggable,
 } from '@dnd-kit/core';
 import { CardList } from './CardList';
 import { AdvantageDisadvantageCanvas } from './AdvantageDisadvantageCanvas';
@@ -25,9 +26,169 @@ interface ConsultationAreaNewProps {
   roomId: string;
   isHost: boolean;
   gameMode: '優劣勢分析' | '價值觀排序' | '六大性格分析';
+  selectedDeck: '職游旅人卡' | '職能盤點卡' | '價值導航卡';
 }
 
-// Card deck data
+// 輔助卡數據（Holland 六大性格類型解釋卡）
+const AUXILIARY_CARDS: CardData[] = [
+  {
+    id: 'aux-r',
+    title: 'R - 實務型',
+    description: '喜歡具體操作和實際工作',
+    category: 'personality',
+    tags: [],
+  },
+  {
+    id: 'aux-i',
+    title: 'I - 研究型',
+    description: '喜歡分析研究和思考',
+    category: 'personality',
+    tags: [],
+  },
+  {
+    id: 'aux-a',
+    title: 'A - 藝術型',
+    description: '喜歡創作和藝術表達',
+    category: 'personality',
+    tags: [],
+  },
+  {
+    id: 'aux-s',
+    title: 'S - 社會型',
+    description: '喜歡幫助他人和社交',
+    category: 'personality',
+    tags: [],
+  },
+  {
+    id: 'aux-e',
+    title: 'E - 企業型',
+    description: '喜歡領導和說服他人',
+    category: 'personality',
+    tags: [],
+  },
+  {
+    id: 'aux-c',
+    title: 'C - 事務型',
+    description: '喜歡有序和規範的工作',
+    category: 'personality',
+    tags: [],
+  },
+];
+
+// Draggable Auxiliary Card Component
+function DraggableAuxCard({
+  card,
+  onDoubleClick,
+}: {
+  card: CardData;
+  onDoubleClick: (card: CardData) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: `aux-${card.id}`,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      onDoubleClick={() => onDoubleClick(card)}
+      className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-3 cursor-move hover:shadow-lg transition-shadow"
+    >
+      <div className="text-sm font-bold mb-1">{card.title}</div>
+      <div className="text-xs text-gray-600">{card.description}</div>
+    </div>
+  );
+}
+
+// Card deck data - 職游旅人卡（職業卡）
+const CAREER_CARDS: CardData[] = [
+  // 實際的職業卡片
+  {
+    id: 'career-001',
+    title: '軟體工程師',
+    description: '開發軟體應用程式',
+    category: '資訊科技',
+    tags: [],
+  },
+  {
+    id: 'career-002',
+    title: '產品經理',
+    description: '規劃產品策略與發展',
+    category: '管理',
+    tags: [],
+  },
+  {
+    id: 'career-003',
+    title: '行銷專員',
+    description: '推廣產品與品牌',
+    category: '行銷',
+    tags: [],
+  },
+  {
+    id: 'career-004',
+    title: '會計師',
+    description: '處理財務報表與稅務',
+    category: '財務',
+    tags: [],
+  },
+  {
+    id: 'career-005',
+    title: '人資專員',
+    description: '招募與管理人才',
+    category: '人力資源',
+    tags: [],
+  },
+  {
+    id: 'career-006',
+    title: '業務代表',
+    description: '開發客戶與銷售',
+    category: '業務',
+    tags: [],
+  },
+  {
+    id: 'career-007',
+    title: '設計師',
+    description: '視覺設計與創意發想',
+    category: '設計',
+    tags: [],
+  },
+  {
+    id: 'career-008',
+    title: '數據分析師',
+    description: '分析數據提供洞察',
+    category: '數據',
+    tags: [],
+  },
+  {
+    id: 'career-009',
+    title: '專案經理',
+    description: '管理專案進度與資源',
+    category: '管理',
+    tags: [],
+  },
+  {
+    id: 'career-010',
+    title: '客服專員',
+    description: '處理客戶問題與需求',
+    category: '服務',
+    tags: [],
+  },
+  { id: 'career-011', title: '教師', description: '教育與培養學生', category: '教育', tags: [] },
+  { id: 'career-012', title: '護理師', description: '照護病患健康', category: '醫療', tags: [] },
+  { id: 'career-013', title: '律師', description: '提供法律諮詢服務', category: '法律', tags: [] },
+  { id: 'career-014', title: '建築師', description: '設計建築空間', category: '建築', tags: [] },
+  { id: 'career-015', title: '廚師', description: '烹飪美食料理', category: '餐飲', tags: [] },
+];
+
+// 職能盤點卡（技能卡）
 const SKILL_CARDS: CardData[] = [
   {
     id: 'skill-001',
@@ -64,8 +225,44 @@ const SKILL_CARDS: CardData[] = [
     category: '自我管理',
     tags: [],
   },
+  {
+    id: 'skill-006',
+    title: '問題解決',
+    description: '找出問題根源並解決',
+    category: '思維能力',
+    tags: [],
+  },
+  {
+    id: 'skill-007',
+    title: '團隊合作',
+    description: '與他人協作達成目標',
+    category: '人際能力',
+    tags: [],
+  },
+  {
+    id: 'skill-008',
+    title: '專案管理',
+    description: '規劃執行專案進度',
+    category: '管理能力',
+    tags: [],
+  },
+  {
+    id: 'skill-009',
+    title: '簡報技巧',
+    description: '清楚表達與說服他人',
+    category: '溝通能力',
+    tags: [],
+  },
+  {
+    id: 'skill-010',
+    title: '數據分析',
+    description: '解讀數據找出洞察',
+    category: '分析能力',
+    tags: [],
+  },
 ];
 
+// 價值導航卡
 const VALUE_CARDS: CardData[] = [
   {
     id: 'value-001',
@@ -83,7 +280,7 @@ const VALUE_CARDS: CardData[] = [
   },
   {
     id: 'value-003',
-    title: '團隊合作',
+    title: '團隊歸屬',
     description: '與他人協作的價值',
     category: '人際價值',
     tags: [],
@@ -102,54 +299,42 @@ const VALUE_CARDS: CardData[] = [
     category: '外在價值',
     tags: [],
   },
-];
-
-const PERSONALITY_CARDS: CardData[] = [
   {
-    id: 'person-001',
-    title: '現實型',
-    description: '喜歡具體的任務和動手操作',
-    category: 'Holland',
+    id: 'value-006',
+    title: '工作穩定',
+    description: '穩定的職涯發展',
+    category: '安全價值',
     tags: [],
   },
   {
-    id: 'person-002',
-    title: '研究型',
-    description: '喜歡分析和解決問題',
-    category: 'Holland',
+    id: 'value-007',
+    title: '社會貢獻',
+    description: '對社會產生正面影響',
+    category: '意義價值',
     tags: [],
   },
   {
-    id: 'person-003',
-    title: '藝術型',
-    description: '喜歡創造和自我表達',
-    category: 'Holland',
+    id: 'value-008',
+    title: '自主彈性',
+    description: '工作的自由度與彈性',
+    category: '自主價值',
     tags: [],
   },
   {
-    id: 'person-004',
-    title: '社會型',
-    description: '喜歡幫助和服務他人',
-    category: 'Holland',
-    tags: [],
-  },
-  {
-    id: 'person-005',
-    title: '企業型',
-    description: '喜歡領導和影響他人',
-    category: 'Holland',
-    tags: [],
-  },
-  {
-    id: 'person-006',
-    title: '常規型',
-    description: '喜歡有組織和規律的工作',
-    category: 'Holland',
+    id: 'value-009',
+    title: '創新挑戰',
+    description: '追求創新與突破',
+    category: '成長價值',
     tags: [],
   },
 ];
 
-export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAreaNewProps) {
+export function ConsultationAreaNew({
+  roomId,
+  isHost,
+  gameMode,
+  selectedDeck,
+}: ConsultationAreaNewProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNotesCard, setSelectedNotesCard] = useState<CardData | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -173,17 +358,35 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
 
   const { syncCardEvent } = useCardSync({ roomId });
 
-  // Get deck based on game mode
+  // Handle game mode changes
+  useEffect(() => {
+    // Clear the canvas when game mode changes
+    setGameState({
+      advantage: [],
+      disadvantage: [],
+      gridCards: new Map(),
+      like: [],
+      neutral: [],
+      dislike: [],
+    });
+  }, [gameMode, selectedDeck]);
+
+  // Check if should show auxiliary cards
+  const shouldShowAuxiliaryCards = () => {
+    return selectedDeck === '職游旅人卡' && gameMode === '六大性格分析';
+  };
+
+  // Get deck based on selected deck type
   const getDeckCards = () => {
-    switch (gameMode) {
-      case '優劣勢分析':
-        return SKILL_CARDS;
-      case '價值觀排序':
-        return VALUE_CARDS;
-      case '六大性格分析':
-        return PERSONALITY_CARDS;
+    switch (selectedDeck) {
+      case '職游旅人卡':
+        return CAREER_CARDS; // 返回職業卡
+      case '職能盤點卡':
+        return SKILL_CARDS; // 返回技能卡
+      case '價值導航卡':
+        return VALUE_CARDS; // 返回價值卡
       default:
-        return SKILL_CARDS;
+        return CAREER_CARDS;
     }
   };
 
@@ -252,7 +455,7 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
     let draggedCard: CardData | undefined;
     let sourceZone: string | undefined;
 
-    // Check all zones for the card
+    // Check all zones for existing cards
     Object.entries(gameState).forEach(([zone, cards]) => {
       if (Array.isArray(cards)) {
         const card = cards.find((c) => c.id === activeId);
@@ -270,7 +473,35 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
       }
     });
 
-    if (!draggedCard || sourceZone === overId) {
+    // If card not found in zones, it's a new card from the list or auxiliary cards
+    let isNewCard = false;
+    if (!draggedCard) {
+      if (activeId.startsWith('list-')) {
+        const deckId = activeId.replace('list-', '');
+        const deckCard = getDeckCards().find((c) => c.id === deckId);
+        if (deckCard) {
+          // Create new game card with unique ID
+          draggedCard = { ...deckCard, id: `game-${deckCard.id}-${Date.now()}` };
+          isNewCard = true;
+        }
+      } else if (activeId.startsWith('aux-')) {
+        const auxId = activeId.replace('aux-', '');
+        const auxCard = AUXILIARY_CARDS.find((c) => c.id === auxId);
+        if (auxCard) {
+          // Create new game card with unique ID
+          draggedCard = { ...auxCard, id: `game-${auxCard.id}-${Date.now()}` };
+          isNewCard = true;
+        }
+      }
+    }
+
+    if (!draggedCard) {
+      setActiveId(null);
+      return;
+    }
+
+    // Don't move if dropping on same zone
+    if (sourceZone === overId) {
       setActiveId(null);
       return;
     }
@@ -279,14 +510,16 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
     setGameState((prev) => {
       const newState = { ...prev };
 
-      // Remove from source
-      if (sourceZone && sourceZone.startsWith('grid-')) {
-        newState.gridCards = new Map(prev.gridCards);
-        newState.gridCards.delete(sourceZone);
-      } else if (sourceZone && Array.isArray(prev[sourceZone as keyof typeof prev])) {
-        newState[sourceZone as keyof typeof newState] = (
-          prev[sourceZone as keyof typeof prev] as CardData[]
-        ).filter((c) => c.id !== activeId) as any;
+      // Remove from source (only if not a new card)
+      if (!isNewCard) {
+        if (sourceZone && sourceZone.startsWith('grid-')) {
+          newState.gridCards = new Map(prev.gridCards);
+          newState.gridCards.delete(sourceZone);
+        } else if (sourceZone && Array.isArray(prev[sourceZone as keyof typeof prev])) {
+          newState[sourceZone as keyof typeof newState] = (
+            prev[sourceZone as keyof typeof prev] as CardData[]
+          ).filter((c) => c.id !== draggedCard!.id) as any;
+        }
       }
 
       // Add to target
@@ -303,8 +536,8 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
       return newState;
     });
 
-    // Sync the move
-    syncCardEvent(activeId, CardEventType.CARD_ARRANGED, {
+    // Sync the move (use the new card ID if it's a new card)
+    syncCardEvent(draggedCard.id, CardEventType.CARD_ARRANGED, {
       zone: overId,
     });
 
@@ -331,6 +564,12 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
     if (activeId.startsWith('list-')) {
       const deckId = activeId.replace('list-', '');
       return getDeckCards().find((c) => c.id === deckId);
+    }
+
+    // Check auxiliary cards (when dragging from aux cards)
+    if (activeId.startsWith('aux-')) {
+      const auxId = activeId.replace('aux-', '');
+      return AUXILIARY_CARDS.find((c) => c.id === auxId);
     }
 
     return null;
@@ -363,7 +602,7 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
     >
       <div className="flex h-screen bg-gray-50">
         {/* Left Sidebar - Card List */}
-        <div className="w-80 bg-white border-r border-gray-200 p-4 overflow-y-auto">
+        <div className="w-80 bg-white border-r border-gray-200 p-4 flex flex-col">
           <div className="mb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -377,22 +616,28 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
             </div>
           </div>
 
+          {/* Auxiliary Cards - Show when needed */}
+          {shouldShowAuxiliaryCards() && (
+            <div className="mb-4 pb-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold mb-3">解釋卡 (Holland)</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {AUXILIARY_CARDS.map((card) => (
+                  <DraggableAuxCard key={card.id} card={card} onDoubleClick={handleAddCard} />
+                ))}
+              </div>
+            </div>
+          )}
+
           <CardList
-            title={
-              gameMode === '優劣勢分析'
-                ? '職能盤點卡'
-                : gameMode === '價值觀排序'
-                  ? '價值導航卡'
-                  : '職游旅人卡'
-            }
+            title={selectedDeck}
             cards={getDeckCards()}
             deckType={gameMode}
             onDoubleClick={handleAddCard}
             searchQuery={searchQuery}
           />
 
-          {/* Game Tokens */}
-          <div className="mt-6">
+          {/* Game Tokens - Fixed at bottom */}
+          <div className="mt-4 pt-4 border-t border-gray-200 flex-shrink-0">
             <h3 className="text-lg font-semibold mb-3">遊戲籌碼</h3>
             <div className="grid grid-cols-3 gap-2">
               {['star', 'heart', 'diamond', 'circle', 'square', 'triangle'].map((shape) => (
@@ -451,19 +696,10 @@ export function ConsultationAreaNew({ roomId, isHost, gameMode }: ConsultationAr
 
       {/* Drag Overlay */}
       <DragOverlay>
-        {activeId ? (
-          <div className="opacity-90 transform scale-105">
-            {getActiveCard() ? (
-              <Card
-                card={getActiveCard()!}
-                isFaceUp={true}
-                isSelected={false}
-                isDragging={true}
-                position={{ x: 0, y: 0 }}
-                rotation={0}
-                scale={1.1}
-              />
-            ) : null}
+        {activeId && getActiveCard() ? (
+          <div className="w-32 h-44 bg-blue-100 border-2 border-blue-400 rounded-lg shadow-xl p-4 opacity-90">
+            <div className="text-sm font-semibold">{getActiveCard()?.title}</div>
+            <div className="text-xs text-gray-600 mt-2">{getActiveCard()?.description}</div>
           </div>
         ) : null}
       </DragOverlay>

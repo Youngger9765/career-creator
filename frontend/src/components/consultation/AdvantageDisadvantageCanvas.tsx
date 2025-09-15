@@ -1,9 +1,35 @@
 'use client';
 
 import React from 'react';
-import { useDroppable } from '@dnd-kit/core';
-import { Card } from '../Card';
+import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { CardData } from '@/types/cards';
+
+// Simple draggable card without absolute positioning
+function DraggableCard({ card }: { card: CardData }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: card.id,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="w-32 h-44 bg-white border-2 border-gray-300 rounded-lg shadow-md p-3 cursor-move hover:shadow-lg transition-shadow"
+    >
+      <div className="text-sm font-bold mb-1">{card.title}</div>
+      <div className="text-xs text-gray-600 line-clamp-3">{card.description}</div>
+      {card.category && <div className="text-xs text-blue-600 mt-2">{card.category}</div>}
+    </div>
+  );
+}
 
 interface DroppableZoneProps {
   id: string;
@@ -39,17 +65,7 @@ function DroppableZone({ id, title, cards, className = '' }: DroppableZoneProps)
       <h3 className="text-xl font-bold mb-4">{title}</h3>
       <div className="flex flex-wrap gap-3">
         {cards.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            draggableId={card.id}
-            isFaceUp={true}
-            isSelected={false}
-            isDragging={false}
-            position={{ x: 0, y: 0 }}
-            rotation={0}
-            scale={1}
-          />
+          <DraggableCard key={card.id} card={card} />
         ))}
       </div>
     </div>

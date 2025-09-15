@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Card } from '../Card';
 import { CardData } from '@/types/cards';
 import { useDraggable } from '@dnd-kit/core';
 
@@ -39,15 +38,11 @@ function DraggableListCard({
       {...attributes}
       onDoubleClick={() => onDoubleClick(card)}
     >
-      <Card
-        card={card}
-        isFaceUp={true}
-        isSelected={false}
-        isDragging={false}
-        position={{ x: 0, y: 0 }}
-        rotation={0}
-        scale={0.8}
-      />
+      <div className="w-full h-32 bg-white rounded-lg shadow-md p-3 border-2 border-gray-200">
+        <div className="text-sm font-bold mb-1">{card.title}</div>
+        <div className="text-xs text-gray-600 line-clamp-2">{card.description}</div>
+        {card.category && <div className="text-xs text-blue-600 mt-2">{card.category}</div>}
+      </div>
     </div>
   );
 }
@@ -60,12 +55,14 @@ export function CardList({ title, cards, deckType, onDoubleClick, searchQuery }:
   );
 
   return (
-    <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-3">{title}</h3>
-      <div className="grid grid-cols-2 gap-2">
-        {filteredCards.map((card) => (
-          <DraggableListCard key={card.id} card={card} onDoubleClick={onDoubleClick} />
-        ))}
+    <div className="flex-1 flex flex-col min-h-0">
+      <h3 className="text-lg font-semibold mb-3 flex-shrink-0">{title}</h3>
+      <div className="flex-1 overflow-y-auto pr-2">
+        <div className="grid grid-cols-2 gap-2">
+          {filteredCards.map((card) => (
+            <DraggableListCard key={card.id} card={card} onDoubleClick={onDoubleClick} />
+          ))}
+        </div>
       </div>
     </div>
   );

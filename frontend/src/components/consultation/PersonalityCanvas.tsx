@@ -1,9 +1,34 @@
 'use client';
 
 import React from 'react';
-import { useDroppable } from '@dnd-kit/core';
-import { Card } from '../Card';
+import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { CardData } from '@/types/cards';
+
+// Simple draggable card without absolute positioning
+function DraggableCard({ card }: { card: CardData }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: card.id,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="w-full h-28 bg-white border-2 border-gray-300 rounded-lg shadow-md p-3 cursor-move hover:shadow-lg transition-shadow"
+    >
+      <div className="text-sm font-bold mb-1">{card.title}</div>
+      <div className="text-xs text-gray-600 line-clamp-2">{card.description}</div>
+    </div>
+  );
+}
 
 interface PersonalityZoneProps {
   id: string;
@@ -35,17 +60,7 @@ function PersonalityZone({ id, title, cards, color }: PersonalityZoneProps) {
       <h3 className="text-lg font-bold mb-4 text-center">{title}</h3>
       <div className="flex flex-col gap-3">
         {cards.map((card) => (
-          <Card
-            key={card.id}
-            card={card}
-            draggableId={card.id}
-            isFaceUp={true}
-            isSelected={false}
-            isDragging={false}
-            position={{ x: 0, y: 0 }}
-            rotation={0}
-            scale={0.95}
-          />
+          <DraggableCard key={card.id} card={card} />
         ))}
       </div>
     </div>

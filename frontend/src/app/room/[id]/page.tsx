@@ -211,6 +211,7 @@ export default function RoomPage() {
             roomId={roomId}
             isHost={isCounselor || false}
             gameMode={selectedGameRule as any}
+            selectedDeck={selectedDeck as any}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">

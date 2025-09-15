@@ -5,7 +5,13 @@ import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { CardData } from '@/types/cards';
 
 // Simple draggable card without absolute positioning
-function DraggableCard({ card }: { card: CardData }) {
+function DraggableCard({
+  card,
+  onRemove,
+}: {
+  card: CardData;
+  onRemove?: (cardId: string) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: card.id,
   });
@@ -20,13 +26,26 @@ function DraggableCard({ card }: { card: CardData }) {
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
-      className="w-32 h-44 bg-white border-2 border-gray-300 rounded-lg shadow-md p-3 cursor-move hover:shadow-lg transition-shadow"
+      className="w-32 h-44 bg-white border-2 border-gray-300 rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow relative group"
     >
-      <div className="text-sm font-bold mb-1">{card.title}</div>
-      <div className="text-xs text-gray-600 line-clamp-3">{card.description}</div>
-      {card.category && <div className="text-xs text-blue-600 mt-2">{card.category}</div>}
+      {/* Delete button */}
+      {onRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(card.id);
+          }}
+          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-10"
+          title="移除卡片"
+        >
+          ×
+        </button>
+      )}
+      <div {...listeners} {...attributes} className="cursor-move h-full flex flex-col">
+        <div className="text-sm font-bold mb-1">{card.title}</div>
+        <div className="text-xs text-gray-600 line-clamp-3">{card.description}</div>
+        {card.category && <div className="text-xs text-blue-600 mt-2">{card.category}</div>}
+      </div>
     </div>
   );
 }
@@ -36,9 +55,10 @@ interface DroppableZoneProps {
   title: string;
   cards: CardData[];
   className?: string;
+  onRemoveCard?: (cardId: string) => void;
 }
 
-function DroppableZone({ id, title, cards, className = '' }: DroppableZoneProps) {
+function DroppableZone({ id, title, cards, className = '', onRemoveCard }: DroppableZoneProps) {
   const { isOver, setNodeRef } = useDroppable({
     id: id,
   });
@@ -65,7 +85,7 @@ function DroppableZone({ id, title, cards, className = '' }: DroppableZoneProps)
       <h3 className="text-xl font-bold mb-4">{title}</h3>
       <div className="flex flex-wrap gap-3">
         {cards.map((card) => (
-          <DraggableCard key={card.id} card={card} />
+          <DraggableCard key={card.id} card={card} onRemove={onRemoveCard} />
         ))}
       </div>
     </div>
@@ -75,16 +95,28 @@ function DroppableZone({ id, title, cards, className = '' }: DroppableZoneProps)
 interface AdvantageDisadvantageCanvasProps {
   advantageCards: CardData[];
   disadvantageCards: CardData[];
+  onRemoveCard?: (cardId: string) => void;
 }
 
 export function AdvantageDisadvantageCanvas({
   advantageCards,
   disadvantageCards,
+  onRemoveCard,
 }: AdvantageDisadvantageCanvasProps) {
   return (
     <div className="grid grid-cols-2 gap-6 h-full">
-      <DroppableZone id="advantage" title="優勢區域" cards={advantageCards} />
-      <DroppableZone id="disadvantage" title="劣勢區域" cards={disadvantageCards} />
+      <DroppableZone
+        id="advantage"
+        title="優勢區域"
+        cards={advantageCards}
+        onRemoveCard={onRemoveCard}
+      />
+      <DroppableZone
+        id="disadvantage"
+        title="劣勢區域"
+        cards={disadvantageCards}
+        onRemoveCard={onRemoveCard}
+      />
     </div>
   );
 }

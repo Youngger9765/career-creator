@@ -389,6 +389,9 @@ export function ConsultationAreaNew({
     dislike: [],
   });
 
+  // Track used cards (cards that are on the canvas)
+  const [usedCardIds, setUsedCardIds] = useState<Set<string>>(new Set());
+
   const { syncCardEvent } = useCardSync({ roomId });
 
   // Handle game mode changes
@@ -590,6 +593,16 @@ export function ConsultationAreaNew({
       return newState;
     });
 
+    // Track the original card ID as used (for hiding from left panel)
+    if (isNewCard) {
+      const originalId = activeId.startsWith('list-')
+        ? activeId.replace('list-', '')
+        : activeId.startsWith('aux-')
+          ? activeId.replace('aux-', '')
+          : activeId;
+      setUsedCardIds((prev) => new Set(Array.from(prev).concat(originalId)));
+    }
+
     // Sync the move (use the new card ID if it's a new card)
     syncCardEvent(draggedCard.id, CardEventType.CARD_ARRANGED, {
       zone: overId,
@@ -629,6 +642,49 @@ export function ConsultationAreaNew({
     return null;
   };
 
+  // Remove card from canvas and return it to the deck
+  const handleRemoveCard = (cardId: string) => {
+    // Find and remove the card from game state
+    setGameState((prev) => {
+      const newState = { ...prev };
+
+      // Remove from advantage/disadvantage
+      newState.advantage = prev.advantage.filter((c) => c.id !== cardId);
+      newState.disadvantage = prev.disadvantage.filter((c) => c.id !== cardId);
+
+      // Remove from like/neutral/dislike
+      newState.like = prev.like.filter((c) => c.id !== cardId);
+      newState.neutral = prev.neutral.filter((c) => c.id !== cardId);
+      newState.dislike = prev.dislike.filter((c) => c.id !== cardId);
+
+      // Remove from grid
+      const newGrid = new Map(prev.gridCards);
+      for (const [key, card] of Array.from(newGrid.entries())) {
+        if (card.id === cardId) {
+          newGrid.delete(key);
+          break;
+        }
+      }
+      newState.gridCards = newGrid;
+
+      return newState;
+    });
+
+    // Extract original card ID from game card ID
+    // Format is "game-{originalId}-{timestamp}"
+    const match = cardId.match(/^game-(.+)-\d+$/);
+    if (match) {
+      const originalId = match[1];
+      setUsedCardIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(originalId);
+        return newSet;
+      });
+    }
+
+    syncCardEvent(cardId, CardEventType.CARD_MOVED, { zone: 'removed' });
+  };
+
   // Clear canvas
   const handleClearCanvas = () => {
     setGameState({
@@ -639,6 +695,7 @@ export function ConsultationAreaNew({
       neutral: [],
       dislike: [],
     });
+    setUsedCardIds(new Set()); // Clear all used cards
     syncCardEvent('', CardEventType.AREA_CLEARED, {});
   };
 
@@ -739,6 +796,7 @@ export function ConsultationAreaNew({
                 deckType={gameMode}
                 onDoubleClick={handleAddCard}
                 searchQuery={searchQuery}
+                usedCardIds={usedCardIds}
               />
             )}
 
@@ -814,14 +872,18 @@ export function ConsultationAreaNew({
               <AdvantageDisadvantageCanvas
                 advantageCards={gameState.advantage}
                 disadvantageCards={gameState.disadvantage}
+                onRemoveCard={handleRemoveCard}
               />
             )}
-            {gameMode === '價值觀排序' && <ResponsiveValueGrid cards={gameState.gridCards} />}
+            {gameMode === '價值觀排序' && (
+              <ResponsiveValueGrid cards={gameState.gridCards} onRemoveCard={handleRemoveCard} />
+            )}
             {gameMode === '六大性格分析' && (
               <PersonalityCanvas
                 likeCards={gameState.like}
                 neutralCards={gameState.neutral}
                 dislikeCards={gameState.dislike}
+                onRemoveCard={handleRemoveCard}
               />
             )}
           </div>

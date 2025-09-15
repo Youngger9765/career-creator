@@ -10,6 +10,7 @@ interface CardListProps {
   deckType: string;
   onDoubleClick: (card: CardData) => void;
   searchQuery: string;
+  usedCardIds?: Set<string>;
 }
 
 // Draggable card wrapper for the list
@@ -47,11 +48,19 @@ function DraggableListCard({
   );
 }
 
-export function CardList({ title, cards, deckType, onDoubleClick, searchQuery }: CardListProps) {
+export function CardList({
+  title,
+  cards,
+  deckType,
+  onDoubleClick,
+  searchQuery,
+  usedCardIds,
+}: CardListProps) {
   const filteredCards = cards.filter(
     (card) =>
-      card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      card.description.toLowerCase().includes(searchQuery.toLowerCase())
+      !usedCardIds?.has(card.id) && // Hide used cards
+      (card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (

@@ -5,7 +5,13 @@ import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { CardData } from '@/types/cards';
 
 // Draggable card component
-function DraggableCard({ card }: { card: CardData }) {
+function DraggableCard({
+  card,
+  onRemove,
+}: {
+  card: CardData;
+  onRemove?: (cardId: string) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: card.id,
   });
@@ -20,18 +26,47 @@ function DraggableCard({ card }: { card: CardData }) {
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
-      className="w-full h-full bg-white border-2 border-blue-400 rounded-lg shadow-md p-2 cursor-move hover:shadow-lg transition-all flex flex-col justify-center"
+      className="w-full h-full bg-white border-2 border-blue-400 rounded-lg shadow-md p-2 hover:shadow-lg transition-all flex flex-col justify-center relative group"
     >
-      <div className="text-xs sm:text-sm font-bold text-center line-clamp-2">{card.title}</div>
-      <div className="text-xs text-gray-600 text-center line-clamp-1 mt-1">{card.description}</div>
+      {/* Delete button */}
+      {onRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove(card.id);
+          }}
+          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-10"
+          title="移除卡片"
+        >
+          ×
+        </button>
+      )}
+      <div
+        {...listeners}
+        {...attributes}
+        className="cursor-move h-full flex flex-col justify-center"
+      >
+        <div className="text-xs sm:text-sm font-bold text-center line-clamp-2">{card.title}</div>
+        <div className="text-xs text-gray-600 text-center line-clamp-1 mt-1">
+          {card.description}
+        </div>
+      </div>
     </div>
   );
 }
 
 // Grid cell component
-function GridCell({ id, position, card }: { id: string; position: number; card?: CardData }) {
+function GridCell({
+  id,
+  position,
+  card,
+  onRemoveCard,
+}: {
+  id: string;
+  position: number;
+  card?: CardData;
+  onRemoveCard?: (cardId: string) => void;
+}) {
   const { isOver, setNodeRef } = useDroppable({
     id: id,
   });
@@ -51,16 +86,17 @@ function GridCell({ id, position, card }: { id: string; position: number; card?:
           <div className="text-sm sm:text-base font-bold text-gray-300">{position}</div>
         </div>
       )}
-      {card && <DraggableCard card={card} />}
+      {card && <DraggableCard card={card} onRemove={onRemoveCard} />}
     </div>
   );
 }
 
 interface ResponsiveValueGridProps {
   cards: Map<string, CardData>;
+  onRemoveCard?: (cardId: string) => void;
 }
 
-export function ResponsiveValueGrid({ cards }: ResponsiveValueGridProps) {
+export function ResponsiveValueGrid({ cards, onRemoveCard }: ResponsiveValueGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [gridLayout, setGridLayout] = useState({ rows: 3, cols: 3 });
   const [cellHeight, setCellHeight] = useState(120);
@@ -134,7 +170,15 @@ export function ResponsiveValueGrid({ cards }: ResponsiveValueGridProps) {
               const col = index % gridLayout.cols;
               const gridId = `grid-${row}-${col}`;
 
-              return <GridCell key={gridId} id={gridId} position={index + 1} card={card} />;
+              return (
+                <GridCell
+                  key={gridId}
+                  id={gridId}
+                  position={index + 1}
+                  card={card}
+                  onRemoveCard={onRemoveCard}
+                />
+              );
             })}
           </div>
         </div>

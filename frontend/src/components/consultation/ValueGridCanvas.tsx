@@ -1,9 +1,34 @@
 'use client';
 
 import React from 'react';
-import { useDroppable } from '@dnd-kit/core';
-import { Card } from '../Card';
+import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { CardData } from '@/types/cards';
+
+// Simple draggable card for grid
+function DraggableGridCard({ card, position }: { card: CardData; position: string }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: card.id,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className="w-full h-full bg-white border-2 border-gray-300 rounded-lg shadow-md p-2 cursor-move hover:shadow-lg transition-shadow"
+    >
+      <div className="text-xs font-bold mb-1">{card.title}</div>
+      <div className="text-xs text-gray-600 line-clamp-2">{card.description}</div>
+    </div>
+  );
+}
 
 interface GridCellProps {
   id: string;
@@ -27,16 +52,7 @@ function GridCell({ id, row, col, card }: GridCellProps) {
       `}
     >
       {card ? (
-        <Card
-          card={card}
-          draggableId={card.id}
-          isFaceUp={true}
-          isSelected={false}
-          isDragging={false}
-          position={{ x: 0, y: 0 }}
-          rotation={0}
-          scale={0.9}
-        />
+        <DraggableGridCard card={card} position={id} />
       ) : (
         <span className="text-gray-400 text-sm">位置 {row * 3 + col + 1}</span>
       )}

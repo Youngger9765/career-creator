@@ -14,13 +14,13 @@ import { AdvantageDisadvantageCanvas } from './AdvantageDisadvantageCanvas';
 import { ValueGridCanvas } from './ValueGridCanvas';
 import { PersonalityCanvas } from './PersonalityCanvas';
 import { Card } from '../Card';
-import { GameToken } from '../GameToken';
 import { CardNotesModal } from '../CardNotesModal';
 import { useCardSync } from '@/hooks/use-card-sync';
 import { CardData } from '@/types/cards';
 import { Button } from '../ui/button';
 import { CardEventType } from '@/lib/api/card-events';
 import { Search, Save, Trash2 } from 'lucide-react';
+import { getTokensForMode, shouldShowTokens, type GameToken } from '@/config/gameTokens';
 
 interface ConsultationAreaNewProps {
   roomId: string;
@@ -74,6 +74,37 @@ const AUXILIARY_CARDS: CardData[] = [
     tags: [],
   },
 ];
+
+// Draggable Token Component (價值觀排序專用)
+function DraggableToken({ token }: { token: GameToken }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: token.id,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
+  const shapeClasses = {
+    circle: 'rounded-full',
+    square: 'rounded-lg',
+    triangle: 'clip-path-triangle',
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className={`w-12 h-12 ${token.color} ${shapeClasses[token.shape]} flex items-center justify-center cursor-move hover:scale-110 transition-transform shadow-md`}
+    >
+      <span className="text-lg font-bold">{token.label}</span>
+    </div>
+  );
+}
 
 // Draggable Auxiliary Card Component
 function DraggableAuxCard({
@@ -376,6 +407,11 @@ export function ConsultationAreaNew({
     return selectedDeck === '職游旅人卡' && gameMode === '六大性格分析';
   };
 
+  // Get game tokens for current game mode
+  const getGameTokens = () => {
+    return getTokensForMode(gameMode, selectedDeck);
+  };
+
   // Get deck based on selected deck type
   const getDeckCards = () => {
     switch (selectedDeck) {
@@ -636,15 +672,17 @@ export function ConsultationAreaNew({
             searchQuery={searchQuery}
           />
 
-          {/* Game Tokens - Fixed at bottom */}
-          <div className="mt-4 pt-4 border-t border-gray-200 flex-shrink-0">
-            <h3 className="text-lg font-semibold mb-3">遊戲籌碼</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {['star', 'heart', 'diamond', 'circle', 'square', 'triangle'].map((shape) => (
-                <div key={shape} className="w-12 h-12 bg-blue-100 rounded-full" />
-              ))}
+          {/* Game Tokens - Show based on configuration */}
+          {shouldShowTokens(gameMode, selectedDeck) && (
+            <div className="mt-4 pt-4 border-t border-gray-200 flex-shrink-0">
+              <h3 className="text-lg font-semibold mb-3">遊戲籌碼</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {getGameTokens().map((token) => (
+                  <DraggableToken key={token.id} token={token} />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Main Canvas Area */}

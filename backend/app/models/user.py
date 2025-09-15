@@ -1,8 +1,10 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, Column
+from sqlalchemy import Column
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.types import String
 from sqlmodel import Field, SQLModel
 
 
@@ -21,7 +23,7 @@ class User(UserBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     hashed_password: str
     # ["counselor", "client", "observer", "admin"]
-    roles: List[str] = Field(default=["client"], sa_column=Column(JSON))
+    roles: List[str] = Field(default=["client"], sa_column=Column(ARRAY(String)))
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 

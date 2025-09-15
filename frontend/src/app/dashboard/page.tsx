@@ -158,6 +158,14 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-600">歡迎回來，{user?.full_name || user?.email}</p>
             </div>
             <div className="flex items-center space-x-4">
+              {user?.roles?.includes('admin') && (
+                <Link
+                  href="/admin/database"
+                  className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  資料庫管理
+                </Link>
+              )}
               <Link
                 href="/rooms/create"
                 className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"

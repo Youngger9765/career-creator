@@ -132,21 +132,25 @@ function DraggableTokenBadge({
     return 'bg-gray-400';
   };
 
+  const getTokenLabel = () => {
+    if (tokenValue === '10') return '10萬';
+    if (tokenValue === '5') return '5萬';
+    if (tokenValue === '1') return '1萬';
+    return tokenValue;
+  };
+
   const getTokenShape = () => {
-    if (tokenValue === '10') return 'rounded-full';
-    if (tokenValue === '5') return 'rounded-lg';
-    if (tokenValue === '1') return ''; // Triangle shape would need custom CSS
-    return 'rounded-full';
+    return 'rounded-full'; // All tokens are circular for better visual consistency
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`w-8 h-8 ${getTokenColor()} ${getTokenShape()} flex items-center justify-center cursor-move shadow-md group relative`}
+      className={`w-10 h-10 ${getTokenColor()} ${getTokenShape()} flex items-center justify-center cursor-move shadow-md group relative`}
     >
       <div {...listeners} {...attributes}>
-        <span className="text-white text-xs font-bold">{tokenValue}</span>
+        <span className="text-white text-xs font-bold">{getTokenLabel()}</span>
       </div>
       {onRemove && (
         <button

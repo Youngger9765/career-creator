@@ -89,10 +89,12 @@ function DraggableToken({ token }: { token: GameToken }) {
       }
     : undefined;
 
-  const shapeClasses = {
-    circle: 'rounded-full',
-    square: 'rounded-lg',
-    triangle: 'clip-path-triangle',
+  // Get display label for token
+  const getTokenLabel = () => {
+    if (token.label === '10') return '10萬';
+    if (token.label === '5') return '5萬';
+    if (token.label === '1') return '1萬';
+    return token.label;
   };
 
   return (
@@ -101,9 +103,9 @@ function DraggableToken({ token }: { token: GameToken }) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`w-12 h-12 ${token.color} ${shapeClasses[token.shape]} flex items-center justify-center cursor-move hover:scale-110 transition-transform shadow-md relative`}
+      className={`w-12 h-12 ${token.color} rounded-full flex items-center justify-center cursor-move hover:scale-110 transition-transform shadow-md relative`}
     >
-      <span className="text-white text-lg font-bold">{token.label}</span>
+      <span className="text-white text-sm font-bold">{getTokenLabel()}</span>
     </div>
   );
 }

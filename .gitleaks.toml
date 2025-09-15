@@ -1,0 +1,68 @@
+# Gitleaks configuration for career-creator project
+
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config
+useDefault = true
+
+[allowlist]
+# Global allowlist
+paths = [
+    '''\.env\.example''',
+    '''\.env\.local\.example''',
+    '''frontend/node_modules''',
+    '''backend/venv''',
+    '''backend/__pycache__''',
+    '''\.git''',
+    '''\.next''',
+    '''tests''',
+    '''test_.*\.py''',
+    '''.*_test\.ts''',
+    '''.*\.test\.tsx?''',
+]
+
+# Allow localhost and example URLs
+regexes = [
+    '''http://localhost''',
+    '''http://127\.0\.0\.1''',
+    '''example\.com''',
+    '''test@example\.com''',
+    '''demo123''', # Demo password used in examples
+]
+
+# Additional custom rules for your project
+[[rules]]
+id = "database-url"
+description = "Database connection string"
+regex = '''postgresql://[^:]+:[^@]+@[^/]+/[^"']+'''
+tags = ["database", "secret"]
+severity = "HIGH"
+
+[[rules]]
+id = "jwt-secret"
+description = "JWT Secret Key"
+regex = '''JWT_SECRET[_KEY]*\s*=\s*["'][^"']+["']'''
+tags = ["jwt", "secret"]
+severity = "CRITICAL"
+
+[[rules]]
+id = "api-key"
+description = "Generic API Key"
+regex = '''(?i)(api[_\-]?key|apikey)\s*[:=]\s*["'][a-zA-Z0-9\-_]{20,}["']'''
+tags = ["api", "key"]
+severity = "HIGH"
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----'''
+tags = ["key", "private"]
+severity = "CRITICAL"
+
+# Entropy checks for high-entropy strings that might be secrets
+[entropy]
+# Minimum entropy value for a string to be considered a secret
+minEntropy = 4.5
+# Maximum entropy value (set to 0 to disable maximum)
+maxEntropy = 0
+# Group of characters to use for entropy calculation
+group = "alphanumeric"

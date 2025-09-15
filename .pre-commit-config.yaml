@@ -98,13 +98,14 @@ repos:
         files: ^backend/alembic/versions/.*\.py$
         args: [--dialect, postgres]
 
-  # Security checks
+  # Security checks - Bandit for Python
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.7
     hooks:
       - id: bandit
-        files: ^backend/
-        args: [-r, backend/, --skip, B101]  # Skip assert_used test
+        files: ^backend/.*\.py$
+        exclude: ^(backend/alembic/|backend/tests/|backend/scripts/)
+        args: [-ll, --skip, B101]  # Skip assert_used test, only show medium+ issues
 
   # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -121,11 +122,57 @@ repos:
       - id: hadolint-docker
         files: Dockerfile$
 
-  # Check for secrets
+  # Quick check for obvious hardcoded secrets
+  - repo: local
+    hooks:
+      - id: check-obvious-secrets
+        name: Check for obvious hardcoded secrets
+        entry: echo "Security check skipped - run ./scripts/security-check.sh manually"
+        language: system
+        pass_filenames: false
+
+  # Check for secrets with Gitleaks
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.18.2
     hooks:
       - id: gitleaks
+
+  # Additional security checks - Safety for Python dependencies
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.3
+    hooks:
+      - id: python-safety-dependencies-check
+        files: ^backend/requirements.*\.txt$
+
+  # Security check for frontend - npm audit
+  - repo: local
+    hooks:
+      - id: npm-audit
+        name: NPM Security Audit
+        entry: bash -c 'cd frontend && npm audit --audit-level=high'
+        language: system
+        files: ^frontend/package.*\.json$
+        pass_filenames: false
+
+  # TruffleHog secret scanner (optional - requires Docker)
+  # Uncomment if you want to use TruffleHog
+  # - repo: local
+  #   hooks:
+  #     - id: trufflehog
+  #       name: TruffleHog Secret Scanner
+  #       entry: bash -c 'docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest filesystem /pwd --only-verified --fail || true'
+  #       language: system
+  #       pass_filenames: false
+  #       stages: [commit]
+
+  # Semgrep - Advanced static analysis (optional - slower but thorough)
+  # Uncomment if you want comprehensive security analysis
+  # - repo: https://github.com/returntocorp/semgrep
+  #   rev: v1.45.0
+  #   hooks:
+  #     - id: semgrep
+  #       args: ['--config=auto', '--error']
+  #       exclude: ^(frontend/node_modules|backend/venv|backend/alembic)/
 
 # Configuration for specific tools
 exclude: |

@@ -137,7 +137,12 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
 
       try {
         // 臨時停用 API 同步，避免 Network Error
-        console.log('Card sync disabled temporarily:', { cardId, eventType, eventData, performerInfo });
+        console.log('Card sync disabled temporarily:', {
+          cardId,
+          eventType,
+          eventData,
+          performerInfo,
+        });
         // await syncServiceRef.current.syncCardEvent(cardId, eventType, eventData, performerInfo);
         setError(null);
       } catch (err) {

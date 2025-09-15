@@ -7,6 +7,7 @@ import { CardEventType } from '@/lib/api/card-events';
 
 interface CardProps {
   card: CardData;
+  draggableId?: string; // Allow custom draggable ID
   isFaceUp?: boolean;
   isSelected?: boolean;
   isDragging?: boolean;
@@ -23,6 +24,7 @@ interface CardProps {
 
 export function Card({
   card,
+  draggableId,
   isFaceUp = false,
   isSelected = false,
   isDragging = false,
@@ -45,7 +47,7 @@ export function Card({
     transform,
     isDragging: isDndDragging,
   } = useDraggable({
-    id: card.id,
+    id: draggableId || card.id, // Use draggableId if provided
     data: {
       type: 'card',
       card,
@@ -95,7 +97,7 @@ export function Card({
       style={{
         ...cardStyle,
         position: isDndDragging ? 'fixed' : cardStyle.position,
-        zIndex: isDndDragging ? 999999 : cardStyle.zIndex
+        zIndex: isDndDragging ? 999999 : cardStyle.zIndex,
       }}
       className={`
         relative w-32 h-44 cursor-pointer ${isDndDragging || isDragging ? '' : 'transition-all duration-300'}
@@ -159,14 +161,15 @@ export function Card({
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1 mb-2">
-            {card.tags && card.tags.slice(0, 2).map((tag, index) => (
-              <span
-                key={index}
-                className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
-              >
-                {tag}
-              </span>
-            ))}
+            {card.tags &&
+              card.tags.slice(0, 2).map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
+                >
+                  {tag}
+                </span>
+              ))}
             {card.tags && card.tags.length > 2 && (
               <span className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
                 +{card.tags.length - 2}

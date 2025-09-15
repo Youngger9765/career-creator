@@ -9,14 +9,12 @@ interface DraggableCardPreviewProps {
   onAddToCanvas: (card: any) => void;
 }
 
-export function DraggableCardPreview({ card, selectedDeck, onAddToCanvas }: DraggableCardPreviewProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    isDragging,
-  } = useDraggable({
+export function DraggableCardPreview({
+  card,
+  selectedDeck,
+  onAddToCanvas,
+}: DraggableCardPreviewProps) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `preview-${card?.id || 'empty'}`,
     data: {
       type: 'card-preview',
@@ -42,8 +40,11 @@ export function DraggableCardPreview({ card, selectedDeck, onAddToCanvas }: Drag
   };
 
   const deckColor =
-    selectedDeck === '職游旅人卡' ? 'bg-teal-600' :
-    selectedDeck === '職能盤點卡' ? 'bg-blue-600' : 'bg-purple-600';
+    selectedDeck === '職游旅人卡'
+      ? 'bg-teal-600'
+      : selectedDeck === '職能盤點卡'
+        ? 'bg-blue-600'
+        : 'bg-purple-600';
 
   return (
     <div
@@ -56,15 +57,9 @@ export function DraggableCardPreview({ card, selectedDeck, onAddToCanvas }: Drag
       {...attributes}
     >
       <div className="text-center px-4 relative z-10">
-        <div className="text-lg font-bold mb-3">
-          {card.title}
-        </div>
-        <div className="text-sm leading-relaxed mb-4">
-          {card.description}
-        </div>
-        <div className="text-xs opacity-75">
-          類型: {card.category}
-        </div>
+        <div className="text-lg font-bold mb-3">{card.title}</div>
+        <div className="text-sm leading-relaxed mb-4">{card.description}</div>
+        <div className="text-xs opacity-75">類型: {card.category}</div>
       </div>
 
       {/* Drag indicator */}

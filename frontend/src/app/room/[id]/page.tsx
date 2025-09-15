@@ -23,9 +23,9 @@ export default function RoomPage() {
 
   // 牌卡與可用玩法的映射關係
   const deckGameRuleMapping = {
-    '職游旅人卡': ['六大性格分析', '優劣勢分析'],
-    '職能盤點卡': ['優劣勢分析'],
-    '價值導航卡': ['價值觀排序', '優劣勢分析']
+    職游旅人卡: ['六大性格分析', '優劣勢分析'],
+    職能盤點卡: ['優劣勢分析'],
+    價值導航卡: ['價值觀排序', '優劣勢分析'],
   };
 
   // 根據選擇的牌卡，取得可用玩法
@@ -179,9 +179,13 @@ export default function RoomPage() {
                 >
                   {getAvailableGameRules(selectedDeck).map((rule) => (
                     <option key={rule} value={rule}>
-                      {rule === '六大性格分析' ? '性格分類' :
-                       rule === '價值觀排序' ? '價值排序' :
-                       rule === '優劣勢分析' ? '優劣分析' : rule}
+                      {rule === '六大性格分析'
+                        ? '性格分類'
+                        : rule === '價值觀排序'
+                          ? '價值排序'
+                          : rule === '優劣勢分析'
+                            ? '優劣分析'
+                            : rule}
                     </option>
                   ))}
                 </select>

@@ -26,7 +26,7 @@ function DraggableCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="w-full h-full bg-white border-2 border-blue-400 rounded-lg shadow-md p-2 hover:shadow-lg transition-all flex flex-col justify-center relative group"
+      className="w-28 h-36 bg-white border-2 border-blue-400 rounded-lg shadow-md p-2 hover:shadow-lg transition-all flex flex-col justify-center relative group"
     >
       {/* Delete button */}
       {onRemove && (
@@ -46,10 +46,13 @@ function DraggableCard({
         {...attributes}
         className="cursor-move h-full flex flex-col justify-center"
       >
-        <div className="text-xs sm:text-sm font-bold text-center line-clamp-2">{card.title}</div>
-        <div className="text-xs text-gray-600 text-center line-clamp-1 mt-1">
+        <div className="text-xs font-bold text-center line-clamp-2 mb-1">{card.title}</div>
+        <div className="text-xs text-gray-600 text-center line-clamp-3 flex-1">
           {card.description}
         </div>
+        {card.category && (
+          <div className="text-xs text-blue-600 text-center mt-auto">{card.category}</div>
+        )}
       </div>
     </div>
   );
@@ -89,9 +92,9 @@ function GridCell({
         </div>
       )}
       {card && <DraggableCard card={card} onRemove={onRemoveCard} />}
-      {/* Token overlay on top of card */}
+      {/* Token overlay on bottom-right of card */}
       {token && (
-        <div className="absolute top-1 right-1 z-10">
+        <div className="absolute bottom-1 right-1 z-10">
           <DraggableTokenBadge token={token} onRemove={onRemoveCard} />
         </div>
       )}
@@ -151,7 +154,7 @@ function DraggableTokenBadge({
             e.stopPropagation();
             onRemove(token.id);
           }}
-          className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-20 text-xs"
+          className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-600 z-20 text-xs"
           title="移除籌碼"
         >
           ×

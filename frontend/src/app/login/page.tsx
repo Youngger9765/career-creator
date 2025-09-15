@@ -104,8 +104,8 @@ export default function LoginPage() {
 
   const fillAdminAccount = () => {
     console.log('Filling admin account...');
-    setEmail('admin@example.com');
-    setPassword('admin123');
+    setEmail('demo.admin@example.com');
+    setPassword('demo123');
   };
 
   return (
@@ -231,7 +231,7 @@ export default function LoginPage() {
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-xs font-medium text-gray-800">系統管理員</p>
-                <p className="text-xs text-gray-600">admin@example.com / admin123</p>
+                <p className="text-xs text-gray-600">demo.admin@example.com / demo123</p>
               </div>
               <button
                 type="button"

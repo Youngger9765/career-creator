@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRoomStore } from '@/stores/room-store';
-import { ConsultationArea } from '@/components/ConsultationArea';
+import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaNew';
 
 export default function RoomPage() {
   const params = useParams();
@@ -207,25 +207,10 @@ export default function RoomPage() {
       {/* 主要內容區 */}
       <div className="flex-1 flex flex-col">
         {currentRoom ? (
-          <ConsultationArea
+          <ConsultationAreaNew
             roomId={roomId}
-            selectedDeck={selectedDeck}
-            selectedGameRule={selectedGameRule}
-            onCardEvent={(cardId, eventType, data) => {
-              console.log('Card event:', cardId, eventType, data);
-              // 臨時停用 API 同步，讓拖放正常工作
-              // TODO: 修復 API 端點後再啟用
-            }}
-            isReadOnly={!isCounselor && !isVisitor}
-            performerInfo={{
-              id: isVisitor ? `visitor_${Date.now()}` : user?.id,
-              name: isVisitor ? visitorName : user?.name,
-              type: isVisitor ? 'visitor' : isCounselor ? 'counselor' : 'client',
-            }}
-            onClearAreaReady={(clearFn) => {
-              // 儲存清空函數，但不會造成重新渲染
-              console.log('Clear function ready');
-            }}
+            isHost={isCounselor || false}
+            gameMode={selectedGameRule as any}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">

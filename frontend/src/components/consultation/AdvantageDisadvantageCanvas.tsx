@@ -26,7 +26,7 @@ function DraggableCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="w-32 h-44 bg-white border-2 border-gray-300 rounded-lg shadow-md p-3 hover:shadow-lg transition-shadow relative group"
+      className="w-28 h-36 bg-white border-2 border-gray-300 rounded-lg shadow-md p-2 hover:shadow-lg transition-shadow relative group"
     >
       {/* Delete button */}
       {onRemove && (
@@ -42,9 +42,9 @@ function DraggableCard({
         </button>
       )}
       <div {...listeners} {...attributes} className="cursor-move h-full flex flex-col">
-        <div className="text-sm font-bold mb-1">{card.title}</div>
-        <div className="text-xs text-gray-600 line-clamp-3">{card.description}</div>
-        {card.category && <div className="text-xs text-blue-600 mt-2">{card.category}</div>}
+        <div className="text-xs font-bold mb-1 line-clamp-2">{card.title}</div>
+        <div className="text-xs text-gray-600 line-clamp-2">{card.description}</div>
+        {card.category && <div className="text-xs text-blue-600 mt-auto">{card.category}</div>}
       </div>
     </div>
   );
@@ -76,13 +76,13 @@ function DroppableZone({ id, title, cards, className = '', onRemoveCard }: Dropp
     <div
       ref={setNodeRef}
       className={`
-        min-h-[300px] p-4 border-2 border-dashed rounded-lg transition-all
+        min-h-[200px] p-4 border-2 border-dashed rounded-lg transition-all
         ${bgColor} ${borderColor}
         ${isOver ? 'border-solid scale-102 shadow-lg' : ''}
         ${className}
       `}
     >
-      <h3 className="text-xl font-bold mb-4">{title}</h3>
+      <h3 className="text-lg font-bold mb-3">{title}</h3>
       <div className="flex flex-wrap gap-3">
         {cards.map((card) => (
           <DraggableCard key={card.id} card={card} onRemove={onRemoveCard} />
@@ -104,18 +104,20 @@ export function AdvantageDisadvantageCanvas({
   onRemoveCard,
 }: AdvantageDisadvantageCanvasProps) {
   return (
-    <div className="grid grid-cols-2 gap-6 h-full">
+    <div className="flex flex-col gap-6 h-full">
       <DroppableZone
         id="advantage"
         title="優勢區域"
         cards={advantageCards}
         onRemoveCard={onRemoveCard}
+        className="flex-1"
       />
       <DroppableZone
         id="disadvantage"
         title="劣勢區域"
         cards={disadvantageCards}
         onRemoveCard={onRemoveCard}
+        className="flex-1"
       />
     </div>
   );

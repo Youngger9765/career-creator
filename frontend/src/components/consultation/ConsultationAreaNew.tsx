@@ -79,12 +79,13 @@ const AUXILIARY_CARDS: CardData[] = [
 // Draggable Token Component (價值觀排序專用)
 function DraggableToken({ token }: { token: GameToken }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: token.id,
+    id: `token-${token.id}`,
   });
 
   const style = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: 1000,
       }
     : undefined;
 
@@ -100,9 +101,9 @@ function DraggableToken({ token }: { token: GameToken }) {
       style={style}
       {...listeners}
       {...attributes}
-      className={`w-12 h-12 ${token.color} ${shapeClasses[token.shape]} flex items-center justify-center cursor-move hover:scale-110 transition-transform shadow-md`}
+      className={`w-12 h-12 ${token.color} ${shapeClasses[token.shape]} flex items-center justify-center cursor-move hover:scale-110 transition-transform shadow-md relative`}
     >
-      <span className="text-lg font-bold">{token.label}</span>
+      <span className="text-white text-lg font-bold">{token.label}</span>
     </div>
   );
 }
@@ -530,7 +531,7 @@ export function ConsultationAreaNew({
       }
     });
 
-    // If card not found in zones, it's a new card from the list or auxiliary cards
+    // If card not found in zones, it's a new card from the list, auxiliary cards, or tokens
     let isNewCard = false;
     if (!draggedCard) {
       if (activeId.startsWith('list-')) {
@@ -547,6 +548,20 @@ export function ConsultationAreaNew({
         if (auxCard) {
           // Create new game card with unique ID
           draggedCard = { ...auxCard, id: `game-${auxCard.id}-${Date.now()}` };
+          isNewCard = true;
+        }
+      } else if (activeId.startsWith('token-')) {
+        const tokenId = activeId.replace('token-', '');
+        const token = getGameTokens().find((t) => t.id === tokenId);
+        if (token) {
+          // Create a card representation of the token
+          draggedCard = {
+            id: `game-token-${token.id}-${Date.now()}`,
+            title: `${token.label}分`,
+            description: `價值權重：${token.value}分`,
+            category: 'token',
+            tags: [],
+          };
           isNewCard = true;
         }
       }
@@ -612,17 +627,17 @@ export function ConsultationAreaNew({
   };
 
   // Get active card for drag overlay
-  const getActiveCard = () => {
+  const getActiveItem = () => {
     if (!activeId) return null;
 
     // Check all zones
     for (const cards of Object.values(gameState)) {
       if (Array.isArray(cards)) {
         const card = cards.find((c) => c.id === activeId);
-        if (card) return card;
+        if (card) return { type: 'card', data: card };
       } else if (cards instanceof Map) {
         for (const card of Array.from(cards.values())) {
-          if (card.id === activeId) return card;
+          if (card.id === activeId) return { type: 'card', data: card };
         }
       }
     }
@@ -630,13 +645,22 @@ export function ConsultationAreaNew({
     // Check deck cards (when dragging from list)
     if (activeId.startsWith('list-')) {
       const deckId = activeId.replace('list-', '');
-      return getDeckCards().find((c) => c.id === deckId);
+      const card = getDeckCards().find((c) => c.id === deckId);
+      if (card) return { type: 'card', data: card };
     }
 
     // Check auxiliary cards (when dragging from aux cards)
     if (activeId.startsWith('aux-')) {
       const auxId = activeId.replace('aux-', '');
-      return AUXILIARY_CARDS.find((c) => c.id === auxId);
+      const card = AUXILIARY_CARDS.find((c) => c.id === auxId);
+      if (card) return { type: 'card', data: card };
+    }
+
+    // Check tokens (when dragging tokens)
+    if (activeId.startsWith('token-')) {
+      const tokenId = activeId.replace('token-', '');
+      const token = getGameTokens().find((t) => t.id === tokenId);
+      if (token) return { type: 'token', data: token };
     }
 
     return null;
@@ -892,12 +916,35 @@ export function ConsultationAreaNew({
 
       {/* Drag Overlay */}
       <DragOverlay>
-        {activeId && getActiveCard() ? (
-          <div className="w-32 h-44 bg-blue-100 border-2 border-blue-400 rounded-lg shadow-xl p-4 opacity-90">
-            <div className="text-sm font-semibold">{getActiveCard()?.title}</div>
-            <div className="text-xs text-gray-600 mt-2">{getActiveCard()?.description}</div>
-          </div>
-        ) : null}
+        {(() => {
+          const activeItem = getActiveItem();
+          if (!activeItem || !activeId) return null;
+
+          if (activeItem.type === 'card') {
+            const card = activeItem.data as CardData;
+            return (
+              <div className="w-32 h-44 bg-blue-100 border-2 border-blue-400 rounded-lg shadow-xl p-4 opacity-90">
+                <div className="text-sm font-semibold">{card.title}</div>
+                <div className="text-xs text-gray-600 mt-2">{card.description}</div>
+              </div>
+            );
+          } else if (activeItem.type === 'token') {
+            const token = activeItem.data as GameToken;
+            const shapeClasses = {
+              circle: 'rounded-full',
+              square: 'rounded-lg',
+              triangle: 'clip-path-triangle',
+            };
+            return (
+              <div
+                className={`w-12 h-12 ${token.color} ${shapeClasses[token.shape]} flex items-center justify-center shadow-xl opacity-90`}
+              >
+                <span className="text-white text-lg font-bold">{token.label}</span>
+              </div>
+            );
+          }
+          return null;
+        })()}
       </DragOverlay>
 
       {/* Card Notes Modal */}

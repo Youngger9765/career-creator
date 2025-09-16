@@ -99,7 +99,7 @@ def create_room(
         # 查找遊戲規則模板
         statement = select(GameRuleTemplate).where(
             GameRuleTemplate.slug == room_data.game_rule_slug,
-            GameRuleTemplate.is_active == True,
+            GameRuleTemplate.is_active.is_(True),
         )
         game_rule = session.exec(statement).first()
 
@@ -182,8 +182,7 @@ def list_user_rooms(
     """List active rooms where user is counselor"""
 
     statement = select(Room).where(
-        Room.counselor_id == current_user["id"],
-        Room.is_active == True
+        Room.counselor_id == current_user["id"], Room.is_active.is_(True)
     )
     rooms = session.exec(statement).all()
 

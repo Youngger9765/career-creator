@@ -116,6 +116,31 @@ jobs:
           curl -f ${{ steps.get-url.outputs.SERVICE_URL }}/health || exit 1
           echo "✅ Health check passed"
 
+      - name: Clean up old images
+        if: success()
+        continue-on-error: true
+        run: |
+          echo "🧹 Cleaning up old backend images..."
+          # Keep only the latest 3 images for each environment
+          IMAGE_NAME="gcr.io/${{ env.PROJECT_ID }}/career-creator-backend"
+
+          # Get all digests for the current environment tag pattern
+          DIGESTS=$(gcloud container images list-tags $IMAGE_NAME \
+            --filter="tags:${{ github.ref_name }}-*" \
+            --format="get(digest)" \
+            --sort-by="~timestamp" | tail -n +4)
+
+          # Delete old images
+          if [ ! -z "$DIGESTS" ]; then
+            for DIGEST in $DIGESTS; do
+              echo "Deleting old image: $IMAGE_NAME@$DIGEST"
+              gcloud container images delete "$IMAGE_NAME@$DIGEST" --quiet --force-delete-tags || true
+            done
+            echo "✅ Old backend images cleaned up"
+          else
+            echo "No old backend images to clean up"
+          fi
+
       - name: Notify deployment success
         if: success()
         run: |

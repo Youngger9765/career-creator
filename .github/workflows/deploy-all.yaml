@@ -1,0 +1,285 @@
+name: Deploy All Services
+
+on:
+  push:
+    branches:
+      - main        # Deploy to production
+      - staging     # Deploy to staging
+    paths:
+      - 'docker-compose*.yml'
+      - '.env.example'
+      - '.env.*.example'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+      - '.dockerignore'
+      - '.gitignore'
+      - 'Makefile'
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  PROJECT_ID: career-creator-472207
+  REGION: asia-east1
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'staging' || github.ref_name == 'main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set environment variables based on branch
+        run: |
+          if [ "${{ github.ref_name }}" = "staging" ]; then
+            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+            echo "SERVICE_NAME=career-creator-backend-staging" >> $GITHUB_ENV
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "DIRECT_DATABASE_URL=${{ secrets.DIRECT_DATABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET_STAGING }}" >> $GITHUB_ENV
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_STAGING }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref_name }}" = "main" ]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            echo "SERVICE_NAME=career-creator-backend-production" >> $GITHUB_ENV
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "DIRECT_DATABASE_URL=${{ secrets.DIRECT_DATABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET_PRODUCTION }}" >> $GITHUB_ENV
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_PRODUCTION }}" >> $GITHUB_ENV
+          fi
+          echo "IMAGE_TAG=gcr.io/${{ env.PROJECT_ID }}/career-creator-backend:${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Backend Docker image
+        run: |
+          docker build \
+            -f backend/Dockerfile \
+            -t ${{ env.IMAGE_TAG }} \
+            backend
+
+      - name: Push Backend Docker image
+        run: docker push ${{ env.IMAGE_TAG }}
+
+      - name: Deploy Backend to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE_TAG }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --port 8000 \
+            --memory 1Gi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --set-env-vars DATABASE_URL="${{ env.DATABASE_URL }}",DIRECT_DATABASE_URL="${{ env.DIRECT_DATABASE_URL }}",JWT_SECRET="${{ env.JWT_SECRET }}",JWT_ALGORITHM=HS256,ACCESS_TOKEN_EXPIRE_MINUTES=15,REFRESH_TOKEN_EXPIRE_DAYS=7,ENVIRONMENT="${{ env.ENVIRONMENT }}",SUPABASE_URL="${{ env.SUPABASE_URL }}",SUPABASE_ANON_KEY="${{ env.SUPABASE_ANON_KEY }}" \
+            --timeout 300s \
+            --project ${{ env.PROJECT_ID }}
+
+      - name: Get Backend service URL
+        id: get-backend-url
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)")
+          echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "🌐 Backend deployed to: $SERVICE_URL"
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'staging' || github.ref_name == 'main'
+    needs: deploy-backend  # Frontend depends on backend being ready
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set environment variables based on branch
+        run: |
+          if [ "${{ github.ref_name }}" = "staging" ]; then
+            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+            echo "SERVICE_NAME=career-creator-frontend-staging" >> $GITHUB_ENV
+            echo "API_URL=${{ secrets.API_URL_STAGING }}" >> $GITHUB_ENV
+            echo "APP_URL=${{ secrets.APP_URL_STAGING }}" >> $GITHUB_ENV
+            echo "WS_URL=${{ secrets.WS_URL_STAGING }}" >> $GITHUB_ENV
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "SUPABASE_KEY=${{ secrets.SUPABASE_ANON_KEY_STAGING }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref_name }}" = "main" ]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+            echo "SERVICE_NAME=career-creator-frontend-production" >> $GITHUB_ENV
+            echo "API_URL=${{ secrets.API_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "APP_URL=${{ secrets.APP_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "WS_URL=${{ secrets.WS_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "SUPABASE_KEY=${{ secrets.SUPABASE_ANON_KEY_PRODUCTION }}" >> $GITHUB_ENV
+          fi
+          echo "IMAGE_TAG=gcr.io/${{ env.PROJECT_ID }}/career-creator-frontend:${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_ENV
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Frontend Docker image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL="${{ env.API_URL }}" \
+            --build-arg NEXT_PUBLIC_APP_URL="${{ env.APP_URL }}" \
+            --build-arg NEXT_PUBLIC_WS_URL="${{ env.WS_URL }}" \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL="${{ env.SUPABASE_URL }}" \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ env.SUPABASE_KEY }}" \
+            --build-arg GCLOUD_PROJECT_ID="${{ env.PROJECT_ID }}" \
+            -f frontend/Dockerfile \
+            -t ${{ env.IMAGE_TAG }} \
+            frontend
+
+      - name: Push Frontend Docker image
+        run: docker push ${{ env.IMAGE_TAG }}
+
+      - name: Deploy Frontend to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE_TAG }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --port 3000 \
+            --memory 1Gi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --set-env-vars NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXT_PUBLIC_API_URL=${{ env.API_URL }} \
+            --timeout 300s \
+            --project ${{ env.PROJECT_ID }}
+
+      - name: Get Frontend service URL
+        id: get-frontend-url
+        run: |
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)")
+          echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_OUTPUT
+          echo "🌐 Frontend deployed to: $SERVICE_URL"
+
+  health-check:
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    if: success()
+
+    steps:
+      - name: Set environment name
+        run: |
+          if [ "${{ github.ref_name }}" = "staging" ]; then
+            echo "ENVIRONMENT=staging" >> $GITHUB_ENV
+          elif [ "${{ github.ref_name }}" = "main" ]; then
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
+          fi
+
+      - name: Health check Backend
+        run: |
+          echo "Checking backend health..."
+          BACKEND_URL="https://career-creator-backend-${{ env.ENVIRONMENT }}-990202338378.asia-east1.run.app"
+          curl -f ${BACKEND_URL}/health || exit 1
+          echo "✅ Backend health check passed"
+
+      - name: Health check Frontend
+        run: |
+          echo "Checking frontend health..."
+          FRONTEND_URL="https://career-creator-frontend-${{ env.ENVIRONMENT }}-990202338378.asia-east1.run.app"
+          curl -f ${FRONTEND_URL} || exit 1
+          echo "✅ Frontend health check passed"
+
+      - name: Summary
+        run: |
+          echo "🎉 All services deployed successfully to ${{ env.ENVIRONMENT }}!"
+          echo "📱 Frontend: https://career-creator-frontend-${{ env.ENVIRONMENT }}-990202338378.asia-east1.run.app"
+          echo "🔧 Backend: https://career-creator-backend-${{ env.ENVIRONMENT }}-990202338378.asia-east1.run.app"
+
+  cleanup:
+    runs-on: ubuntu-latest
+    needs: [health-check]
+    if: success()
+    continue-on-error: true
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Clean up old images
+        run: |
+          echo "🧹 Cleaning up old Docker images..."
+
+          # Clean Frontend images
+          FRONTEND_IMAGE="gcr.io/${{ env.PROJECT_ID }}/career-creator-frontend"
+          echo "Cleaning frontend images..."
+          FRONTEND_DIGESTS=$(gcloud container images list-tags $FRONTEND_IMAGE \
+            --filter="tags:${{ github.ref_name }}-*" \
+            --format="get(digest)" \
+            --sort-by="~timestamp" | tail -n +4)
+
+          if [ ! -z "$FRONTEND_DIGESTS" ]; then
+            for DIGEST in $FRONTEND_DIGESTS; do
+              echo "Deleting: $FRONTEND_IMAGE@$DIGEST"
+              gcloud container images delete "$FRONTEND_IMAGE@$DIGEST" --quiet --force-delete-tags || true
+            done
+          fi
+
+          # Clean Backend images
+          BACKEND_IMAGE="gcr.io/${{ env.PROJECT_ID }}/career-creator-backend"
+          echo "Cleaning backend images..."
+          BACKEND_DIGESTS=$(gcloud container images list-tags $BACKEND_IMAGE \
+            --filter="tags:${{ github.ref_name }}-*" \
+            --format="get(digest)" \
+            --sort-by="~timestamp" | tail -n +4)
+
+          if [ ! -z "$BACKEND_DIGESTS" ]; then
+            for DIGEST in $BACKEND_DIGESTS; do
+              echo "Deleting: $BACKEND_IMAGE@$DIGEST"
+              gcloud container images delete "$BACKEND_IMAGE@$DIGEST" --quiet --force-delete-tags || true
+            done
+          fi
+
+          echo "✅ Image cleanup completed"

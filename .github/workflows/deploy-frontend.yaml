@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run
+name: Deploy Frontend to Cloud Run
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - staging     # Deploy to staging
     paths:
       - 'frontend/**'
-      - '.github/workflows/deploy.yaml'
+      - '.github/workflows/deploy-frontend.yaml'
 
   workflow_dispatch:
     inputs:

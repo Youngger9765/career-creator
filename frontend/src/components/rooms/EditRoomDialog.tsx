@@ -3,6 +3,17 @@
 import { useState } from 'react';
 import { Room } from '@/lib/api/rooms';
 import { roomsAPI } from '@/lib/api/rooms';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface EditRoomDialogProps {
   room: Room;
@@ -16,8 +27,6 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
   const [description, setDescription] = useState(room.description || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  if (!open) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,32 +56,19 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div
-        className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
-        role="dialog"
-        aria-labelledby="edit-room-title"
-        aria-describedby="edit-room-description"
-      >
-        <div className="flex justify-between items-center mb-4">
-          <h2 id="edit-room-title" className="text-xl font-bold text-gray-800">
-            編輯房間
-          </h2>
-          <button onClick={onClose} aria-label="關閉" className="text-gray-400 hover:text-gray-600">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>編輯房間</DialogTitle>
+          <DialogDescription>修改房間的名稱和描述</DialogDescription>
+        </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="room-name" className="block text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <label
+              htmlFor="room-name"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
               房間名稱 <span className="text-red-500">*</span>
             </label>
             <input
@@ -81,16 +77,17 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
               value={name}
               onChange={(e) => setName(e.target.value.slice(0, 100))}
               maxLength={100}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               aria-label="房間名稱"
+              placeholder="輸入房間名稱"
             />
-            <p className="text-xs text-gray-500 mt-1">{name.length}/100 字</p>
+            <p className="text-xs text-muted-foreground">{name.length}/100 字</p>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <label
               htmlFor="room-description"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
               房間描述
             </label>
@@ -100,37 +97,30 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
               onChange={(e) => setDescription(e.target.value.slice(0, 500))}
               maxLength={500}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
               aria-label="房間描述"
+              placeholder="輸入房間描述（選填）"
             />
-            <p className="text-xs text-gray-500 mt-1">{description.length}/500 字</p>
+            <p className="text-xs text-muted-foreground">{description.length}/500 字</p>
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
-            </div>
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
 
-          <div className="flex space-x-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="flex-1 py-2 px-4 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               取消
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? '儲存中...' : '儲存變更'}
-            </button>
-          </div>
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -5,6 +5,7 @@ An online card consultation system for career counselors and their visitors.
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Python 3.11+
 - Node.js 18.17.0+
 - PostgreSQL 15
@@ -13,20 +14,34 @@ An online card consultation system for career counselors and their visitors.
 ### Development Setup
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/Youngger9765/career-creator.git
 cd career-creator
 ```
 
-2. **Install pre-commit hooks:**
+2. **Setup environment variables (重要!):**
+
+```bash
+# Frontend 必須設定環境變數
+cd frontend
+cp .env.local.example .env.local
+cd ..
+```
+
+⚠️ **注意**: 不要依賴程式碼中的 fallback 值，必須正確設定環境變數！
+
+3. **Install pre-commit hooks:**
+
 ```bash
 pip install pre-commit
 pre-commit install
 ```
 
-3. Install dependencies:
+4. Install dependencies:
 
 **Backend:**
+
 ```bash
 cd backend
 python -m venv venv
@@ -36,6 +51,7 @@ alembic upgrade head  # Run database migrations
 ```
 
 **Frontend:**
+
 ```bash
 cd frontend
 npm install
@@ -44,19 +60,22 @@ npm install
 4. Run development servers:
 
 **With Docker Compose:**
+
 ```bash
 docker-compose up
 ```
 
 **Or run separately:**
 
-Backend (http://localhost:8000):
+Backend (<http://localhost:8000>):
+
 ```bash
 cd backend
 uvicorn app.main:app --reload
 ```
 
-Frontend (http://localhost:3000):
+Frontend (<http://localhost:3000>):
+
 ```bash
 cd frontend
 npm run dev
@@ -65,6 +84,7 @@ npm run dev
 ## 🧪 Testing
 
 ### Backend Tests (TDD)
+
 ```bash
 cd backend
 pytest
@@ -73,6 +93,7 @@ pytest --cov=app --cov-report=term-missing  # with coverage report
 ```
 
 ### Frontend Tests
+
 ```bash
 cd frontend
 npm test
@@ -82,18 +103,21 @@ npm test
 
 This project uses pre-commit hooks to ensure code quality. They run automatically on `git commit`.
 
-### Tools included:
+### Tools included
+
 - **Python**: Black, Flake8, mypy, isort, Bandit
 - **TypeScript/JavaScript**: ESLint, TypeScript compiler, Prettier
 - **Security**: Gitleaks (secret detection)
 - **Other**: SQL formatter, Markdown linter, Dockerfile linter
 
-### Run manually:
+### Run manually
+
 ```bash
 pre-commit run --all-files
 ```
 
-### Update hooks:
+### Update hooks
+
 ```bash
 pre-commit autoupdate
 ```

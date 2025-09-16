@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CardData } from '@/types/cards';
+import { useCardEvents } from '@/hooks/use-card-events';
 
 interface DraggableCardProps {
   card: CardData;
   idPrefix: string; // 'list' for main cards, 'aux' for auxiliary cards
   cardColor?: string; // Custom color class for the card
   cardStyle?: 'default' | 'auxiliary'; // Visual style variant
+  roomId?: string; // Room ID for event tracking
 }
 
 export function DraggableCard({
@@ -16,8 +18,15 @@ export function DraggableCard({
   idPrefix,
   cardColor = 'bg-gray-600',
   cardStyle = 'default',
+  roomId,
 }: DraggableCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+
+  // Initialize card events hook - always call but only use if roomId is provided
+  const cardEvents = useCardEvents({
+    roomId: roomId || 'dummy',
+    realtime: false,
+  });
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `${idPrefix}-${card.id}`,
@@ -30,9 +39,22 @@ export function DraggableCard({
     : undefined;
 
   // Handle click to flip
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsFlipped(!isFlipped);
+    const newFlippedState = !isFlipped;
+    setIsFlipped(newFlippedState);
+
+    // Record card flip event only if roomId is provided
+    if (roomId) {
+      try {
+        await cardEvents.flipCard(card.id, newFlippedState);
+        console.log(
+          `Card flip recorded: ${card.id} -> ${newFlippedState ? 'face up' : 'face down'}`
+        );
+      } catch (error) {
+        console.error('Failed to record card flip:', error);
+      }
+    }
   };
 
   // Auxiliary card style (smaller, yellow)

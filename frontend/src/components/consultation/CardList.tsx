@@ -10,9 +10,17 @@ interface CardListProps {
   deckType: string;
   searchQuery: string;
   usedCardIds?: Set<string>;
+  roomId?: string; // Room ID for event tracking
 }
 
-export function CardList({ title, cards, deckType, searchQuery, usedCardIds }: CardListProps) {
+export function CardList({
+  title,
+  cards,
+  deckType,
+  searchQuery,
+  usedCardIds,
+  roomId,
+}: CardListProps) {
   const filteredCards = cards.filter(
     (card) =>
       !usedCardIds?.has(card.id) && // Hide used cards
@@ -42,6 +50,7 @@ export function CardList({ title, cards, deckType, searchQuery, usedCardIds }: C
               idPrefix="list"
               cardColor={deckColor}
               cardStyle="default"
+              roomId={roomId}
             />
           ))}
         </div>

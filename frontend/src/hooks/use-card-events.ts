@@ -23,9 +23,13 @@ export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions)
 
     try {
       const latestEvents = await cardEventsAPI.getLatestRoomEvents(roomId);
-      setEvents(latestEvents as any);
+      // Sort events by sequence_number to maintain order
+      const sortedEvents = latestEvents.sort(
+        (a: any, b: any) => a.sequence_number - b.sequence_number
+      );
+      setEvents(sortedEvents as any);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to load events');
+      setError(err.response?.data?.detail || err.message || 'Failed to load events');
     } finally {
       setIsLoading(false);
     }
@@ -48,7 +52,7 @@ export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions)
 
         return event;
       } catch (err: any) {
-        setError(err.response?.data?.detail || 'Failed to create event');
+        setError(err.response?.data?.detail || err.message || 'Failed to create event');
         throw err;
       }
     },

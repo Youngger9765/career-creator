@@ -818,6 +818,7 @@ export function ConsultationAreaNew({
                 deckType={gameMode}
                 searchQuery={searchQuery}
                 usedCardIds={usedCardIds}
+                roomId={roomId}
               />
             )}
 
@@ -827,7 +828,13 @@ export function ConsultationAreaNew({
                 <h3 className="text-lg font-semibold mb-3">Holland 性格解釋卡</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {AUXILIARY_CARDS.filter((card) => !usedAuxCards.has(card.id)).map((card) => (
-                    <DraggableCard key={card.id} card={card} idPrefix="aux" cardStyle="auxiliary" />
+                    <DraggableCard
+                      key={card.id}
+                      card={card}
+                      idPrefix="aux"
+                      cardStyle="auxiliary"
+                      roomId={roomId}
+                    />
                   ))}
                 </div>
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">

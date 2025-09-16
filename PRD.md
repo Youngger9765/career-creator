@@ -479,7 +479,7 @@ Prototype Demo → 可做一次內部測試，收集早期使用者回饋
 - ✅ Demo帳號快速登入 - **已連接後端API**
 - ✅ JWT Token認證機制 - **已實作**
 
-#### 房間系統 (CRUD完成度80%)
+#### 房間系統 (CRUD完成度100%)
 
 - ✅ 儀表板頁面 (`/dashboard`) - **已連接後端API**
 - ✅ 創建房間 (Create) - **完整實作**
@@ -492,14 +492,15 @@ Prototype Demo → 可做一次內部測試，收集早期使用者回饋
 - ✅ 結束房間 (Close) - **完整實作**
   - Dashboard有結束按鈕
   - 設定is_active = false
-- ⚠️ 更新房間 (Update) - **API有但無UI**
+- ✅ 更新房間 (Update) - **完整實作**
   - 後端API: `PUT /api/rooms/{id}` ✅
   - 前端API: `roomsAPI.updateRoom()` ✅
-  - UI介面: ❌ 無編輯功能
-- ⚠️ 刪除房間 (Delete) - **API有但無UI**
-  - 後端API: `DELETE /api/rooms/{id}` ✅
+  - UI介面: ✅ **編輯對話框 (EditRoomDialog)**
+- ✅ 刪除房間 (Delete) - **完整實作**
+  - 後端API: `DELETE /api/rooms/{id}` ✅ (軟刪除is_active=false)
   - 前端API: `roomsAPI.deleteRoom()` ✅
-  - UI介面: ❌ 無刪除按鈕
+  - UI介面: ✅ **刪除對話框 (DeleteRoomDialog)**
+  - 資料一致性: ✅ **刷新後已刪除房間不會重現**
 - ✅ QR Code生成與分享功能
 - ✅ **資料持久化**: 房間資料儲存在PostgreSQL，刷新不會遺失
 
@@ -533,9 +534,9 @@ Prototype Demo → 可做一次內部測試，收集早期使用者回饋
 - ✅ `/api/rooms/{id}` - 取得房間詳情 **已連接**
 - ✅ `/api/rooms/by-code/{code}` - 透過分享碼查詢 **已連接**
 - ✅ `/api/rooms/{id}/close` - 結束房間 **已連接**
-- ⚠️ `/api/rooms/{id}` - 更新房間 **API有但無UI使用**
-- ⚠️ `/api/rooms/{id}` - 刪除房間 **API有但無UI使用**
-- ❌ `/api/rooms/{id}/statistics` - 房間統計 **未使用**
+- ✅ `/api/rooms/{id}` - 更新房間 **完整實作含UI**
+- ✅ `/api/rooms/{id}` - 刪除房間 **完整實作含UI**
+- ✅ `/api/rooms/{id}/statistics` - 房間統計 **已實作TDD測試**
 - ✅ `/api/visitors/*` - 訪客管理 **已連接**
 - ✅ JWT Token認證 **已實作**
 - ✅ Session管理 **已實作**
@@ -572,6 +573,7 @@ Prototype Demo → 可做一次內部測試，收集早期使用者回饋
 - ✅ 可創建房間並分享（**已完成**）
 - ⚠️ 可操作牌卡（前端完成，但**無即時同步**）
 - ✅ 手機可正常使用（**已完成**）
+- ✅ 房間CRUD完整功能（**已完成含編輯刪除**）
 - ⚠️ 5位諮詢師測試通過（**基本功能OK，但無即時協作**）
 
 ### 未來指標
@@ -639,9 +641,9 @@ Prototype Demo → 可做一次內部測試，收集早期使用者回饋
 
 ---
 
-*版本：3.3（房間功能詳細版）*
-*更新：2025-09-16*
-*狀態：前端UI完成90%，後端整合70%，房間CRUD 80%，WebSocket未實作*
+*版本：3.4（房間CRUD完整版）*
+*更新：2025-09-17*
+*狀態：前端UI完成95%，後端整合85%，房間CRUD 100%，TDD測試覆蓋，WebSocket未實作*
 
 ## 總結
 
@@ -649,17 +651,15 @@ Prototype Demo → 可做一次內部測試，收集早期使用者回饋
 
 - **基本功能可用**：登入、註冊、創建房間、牌卡操作都正常
 - **資料會持久化**：存在PostgreSQL資料庫，刷新不會消失
-- **房間管理**：Create/Read/Close完整，Update/Delete缺UI
+- **房間管理**：Create/Read/Update/Delete/Close**完整實作**，包含編輯和刪除UI
+- **TDD測試覆蓋**：46項綜合測試覆蓋房間統計、訪客流程、過期邏輯
 - **最大問題**：沒有WebSocket，無法多人即時協作
 - **次要問題**：
-  - 牌卡操作沒有記錄到card_events表
-  - 無法編輯或刪除房間（只能結束）
-  - 房間統計功能未實作
+  - 牌卡操作沒有記錄到card_events表（API存在但前端未串接）
 
 ### 適用場景
 
 - ✅ **單人使用**：諮詢師自己操作給來訪者看（螢幕分享）
-- ✅ **房間管理**：創建、查看、結束房間都正常
+- ✅ **房間管理**：創建、查看、編輯、刪除、結束房間**完整功能**
 - ❌ **遠距協作**：來訪者無法看到諮詢師的即時操作
 - ❌ **多人同時**：多人操作會互相覆蓋，沒有同步
-- ❌ **房間維護**：無法修改房間資訊或永久刪除

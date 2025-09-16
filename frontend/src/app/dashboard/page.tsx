@@ -7,7 +7,19 @@ import { authAPI } from '../../lib/api/auth';
 import { roomsAPI } from '../../lib/api/rooms';
 import { cardEventsAPI } from '../../lib/api/card-events';
 import { Room, CardEvent } from '../../types/api';
-import { Calendar, Users, Clock, TrendingUp, Activity, Archive, LogOut } from 'lucide-react';
+import {
+  Calendar,
+  Users,
+  Clock,
+  TrendingUp,
+  Activity,
+  Archive,
+  LogOut,
+  Edit2,
+  Trash2,
+} from 'lucide-react';
+import { EditRoomDialog } from '@/components/rooms/EditRoomDialog';
+import { DeleteRoomDialog } from '@/components/rooms/DeleteRoomDialog';
 
 interface DashboardStats {
   totalRooms: number;
@@ -28,6 +40,8 @@ export default function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState<'overview' | 'active' | 'history'>('overview');
+  const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const [deletingRoom, setDeletingRoom] = useState<Room | null>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -123,6 +137,26 @@ export default function DashboardPage() {
     const diff = new Date(expiresAt).getTime() - new Date().getTime();
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
     return days > 0 ? days : 0;
+  };
+
+  const handleEditSuccess = (updatedRoom: Room) => {
+    setRooms(rooms.map((r) => (r.id === updatedRoom.id ? updatedRoom : r)));
+    setEditingRoom(null);
+  };
+
+  const handleDeleteSuccess = (deletedRoomId: string) => {
+    setRooms(rooms.filter((r) => r.id !== deletedRoomId));
+    setDeletingRoom(null);
+    // Update stats
+    const newRooms = rooms.filter((r) => r.id !== deletedRoomId);
+    const activeRooms = newRooms.filter(
+      (room) => room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
+    );
+    setStats((prev) => ({
+      ...prev,
+      totalRooms: newRooms.length,
+      activeRooms: activeRooms.length,
+    }));
   };
 
   if (loading) {
@@ -349,13 +383,27 @@ export default function DashboardPage() {
                       <div className="font-mono text-blue-600">分享碼：{room.share_code}</div>
                     </div>
 
-                    <div className="flex space-x-2">
+                    <div className="flex gap-2">
                       <Link
                         href={`/room/${room.id}`}
                         className="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
                       >
-                        進入房間
+                        進入
                       </Link>
+                      <button
+                        onClick={() => setEditingRoom(room)}
+                        className="p-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                        title="編輯房間"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setDeletingRoom(room)}
+                        className="p-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
+                        title="刪除房間"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                       {room.is_active && (
                         <button
                           onClick={async () => {
@@ -370,7 +418,7 @@ export default function DashboardPage() {
                               }
                             }
                           }}
-                          className="px-3 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors"
+                          className="px-3 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700 transition-colors"
                           title="結束房間"
                         >
                           結束
@@ -393,7 +441,7 @@ export default function DashboardPage() {
                 {historyRooms.map((room) => (
                   <div key={room.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between">
-                      <div>
+                      <div className="flex-1">
                         <h4 className="font-semibold text-gray-900">{room.name}</h4>
                         <p className="text-sm text-gray-600 mt-1">
                           創建於 {formatDate(room.created_at)}
@@ -401,11 +449,27 @@ export default function DashboardPage() {
                             ` • 過期於 ${formatDate((room as any).expires_at)}`}
                         </p>
                       </div>
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}
-                      >
-                        {getRoomStatus(room).label}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}
+                        >
+                          {getRoomStatus(room).label}
+                        </span>
+                        <button
+                          onClick={() => setEditingRoom(room)}
+                          className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                          title="編輯房間"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setDeletingRoom(room)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                          title="刪除房間"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -418,6 +482,26 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Room Dialog */}
+      {editingRoom && (
+        <EditRoomDialog
+          room={editingRoom}
+          open={!!editingRoom}
+          onClose={() => setEditingRoom(null)}
+          onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {/* Delete Room Dialog */}
+      {deletingRoom && (
+        <DeleteRoomDialog
+          room={deletingRoom}
+          open={!!deletingRoom}
+          onClose={() => setDeletingRoom(null)}
+          onSuccess={handleDeleteSuccess}
+        />
+      )}
     </div>
   );
 }

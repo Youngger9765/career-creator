@@ -54,6 +54,13 @@ export interface RoomCreate {
   description?: string;
 }
 
+export interface RoomStatistics {
+  total_events: number;
+  unique_visitors: number;
+  last_activity?: string;
+  event_breakdown: Record<string, number>;
+}
+
 // Visitor types
 export interface Visitor extends BaseEntity {
   name: string;

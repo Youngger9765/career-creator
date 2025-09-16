@@ -12,6 +12,13 @@ export interface Visitor {
   is_active: boolean;
   joined_at: string;
   last_seen: string;
+  created_at: string;
+}
+
+export interface VisitorCreate {
+  name: string;
+  room_id: string;
+  session_id: string;
 }
 
 export interface JoinRoomData {
@@ -21,6 +28,13 @@ export interface JoinRoomData {
 }
 
 class VisitorsAPI {
+  /**
+   * Create a new visitor (same as joinRoom for backward compatibility)
+   */
+  async createVisitor(data: VisitorCreate): Promise<Visitor> {
+    return this.joinRoom(data);
+  }
+
   /**
    * Join a room as visitor
    */

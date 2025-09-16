@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRoomStore } from '../../stores/room-store';
 import { useAuthStore } from '../../stores/auth-store';
+import { useVisitorJoin } from '../../hooks/use-visitor-join';
 import Link from 'next/link';
 
 export default function JoinRoomPage() {
   const router = useRouter();
   const { joinRoomByShareCode, isLoading, error } = useRoomStore();
   const { isAuthenticated, user } = useAuthStore();
+  const visitorJoin = useVisitorJoin();
 
   const [shareCode, setShareCode] = useState('');
   const [visitorName, setVisitorName] = useState('');
@@ -24,8 +26,13 @@ export default function JoinRoomPage() {
 
     try {
       if (joinAsVisitor || !isAuthenticated) {
-        // TODO: Implement visitor join functionality
-        alert('訪客加入功能開發中...');
+        // Validate visitor name
+        if (!visitorName.trim()) {
+          return;
+        }
+
+        // Join as visitor using the new API
+        await visitorJoin.joinRoomAndRedirect(shareCode.trim().toUpperCase(), visitorName.trim());
         return;
       }
 
@@ -131,19 +138,24 @@ export default function JoinRoomPage() {
           )}
 
           {/* Error Display */}
-          {error && (
+          {(error || visitorJoin.error) && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div className="text-sm text-red-600">{error}</div>
+              <div className="text-sm text-red-600">{error || visitorJoin.error}</div>
             </div>
           )}
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isLoading || !shareCode.trim() || (joinAsVisitor && !visitorName.trim())}
+            disabled={
+              isLoading ||
+              visitorJoin.isLoading ||
+              !shareCode.trim() ||
+              (joinAsVisitor && !visitorName.trim())
+            }
             className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
           >
-            {isLoading ? '加入中...' : '加入房間'}
+            {isLoading || visitorJoin.isLoading ? '加入中...' : '加入房間'}
           </button>
         </form>
 

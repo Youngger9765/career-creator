@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { roomsAPI, Room } from '../../../lib/api/rooms';
+import { useVisitorJoin } from '../../../hooks/use-visitor-join';
 
 export default function JoinByShareCodePage() {
   const params = useParams();
@@ -14,7 +15,8 @@ export default function JoinByShareCodePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [visitorName, setVisitorName] = useState('');
-  const [joining, setJoining] = useState(false);
+
+  const visitorJoin = useVisitorJoin();
 
   useEffect(() => {
     const loadRoom = async () => {
@@ -44,25 +46,10 @@ export default function JoinByShareCodePage() {
     if (!room || !visitorName.trim()) return;
 
     try {
-      setJoining(true);
-
-      // Store visitor session in localStorage
-      const visitorSession = {
-        shareCode: room.share_code,
-        name: visitorName.trim(),
-        joinedAt: new Date().toISOString(),
-        sessionId: `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      };
-
-      localStorage.setItem('visitor_session', JSON.stringify(visitorSession));
-
-      // Redirect to room
-      router.push(`/room/${room.id}?visitor=true&name=${encodeURIComponent(visitorName)}`);
+      await visitorJoin.joinRoomAndRedirect(room.share_code, visitorName.trim());
     } catch (error) {
       console.error('Failed to join as visitor:', error);
-      setError('加入房間失敗，請重試');
-    } finally {
-      setJoining(false);
+      setError(error instanceof Error ? error.message : '加入房間失敗，請重試');
     }
   };
 
@@ -191,14 +178,21 @@ export default function JoinByShareCodePage() {
               </div>
             </div>
 
+            {/* Error Display */}
+            {(error || visitorJoin.error) && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="text-sm text-red-600">{error || visitorJoin.error}</div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="space-y-3">
               <button
                 type="submit"
-                disabled={joining || !visitorName.trim() || !room.is_active}
+                disabled={visitorJoin.isLoading || !visitorName.trim() || !room.is_active}
                 className="w-full py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
               >
-                {joining ? '正在加入...' : '加入諮詢房間'}
+                {visitorJoin.isLoading ? '正在加入...' : '加入諮詢房間'}
               </button>
 
               {!room.is_active && (

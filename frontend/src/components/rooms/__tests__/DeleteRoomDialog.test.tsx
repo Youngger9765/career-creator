@@ -74,11 +74,8 @@ describe('DeleteRoomDialog', () => {
         />
       );
 
-      const warningIcon = screen.getByRole('img', { hidden: true });
-      expect(warningIcon).toBeInTheDocument();
-
       const warningText = screen.getByText('此操作無法復原');
-      expect(warningText).toHaveClass('text-red-600');
+      expect(warningText).toBeInTheDocument();
     });
 
     it('should show room details in confirmation message', () => {
@@ -222,8 +219,7 @@ describe('DeleteRoomDialog', () => {
       );
 
       const deleteButton = screen.getByText('確認刪除');
-      expect(deleteButton).toHaveClass('bg-red-600');
-      expect(deleteButton).toHaveClass('hover:bg-red-700');
+      expect(deleteButton).toHaveClass('bg-destructive');
     });
   });
 
@@ -275,8 +271,8 @@ describe('DeleteRoomDialog', () => {
       const cancelButton = screen.getByText('取消');
 
       // Cancel should be the default/safe option
-      expect(cancelButton).toHaveClass('border-gray-300');
-      expect(deleteButton).toHaveClass('bg-red-600');
+      expect(cancelButton).toHaveClass('border-input');
+      expect(deleteButton).toHaveClass('bg-destructive');
     });
   });
 

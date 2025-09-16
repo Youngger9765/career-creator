@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { EditRoomDialog } from '@/components/rooms/EditRoomDialog';
 import { DeleteRoomDialog } from '@/components/rooms/DeleteRoomDialog';
+import { RoomCard } from '@/components/rooms/RoomCard';
+import { useRoomExpiration } from '@/hooks/use-room-expiration';
 
 interface DashboardStats {
   totalRooms: number;
@@ -42,6 +44,8 @@ export default function DashboardPage() {
   const [selectedTab, setSelectedTab] = useState<'overview' | 'active' | 'history'>('overview');
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [deletingRoom, setDeletingRoom] = useState<Room | null>(null);
+
+  const roomExpiration = useRoomExpiration();
 
   useEffect(() => {
     const checkAuth = () => {
@@ -83,10 +87,8 @@ export default function DashboardPage() {
         const myRooms = await roomsAPI.getMyRooms();
         setRooms(myRooms);
 
-        // Calculate stats
-        const activeRooms = myRooms.filter(
-          (room) => room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
-        );
+        // Calculate stats using the new expiration hook
+        const activeRooms = roomExpiration.filterActiveRooms(myRooms);
 
         // Load recent events from all rooms
         const recentEvents: CardEvent[] = [];
@@ -126,17 +128,11 @@ export default function DashboardPage() {
   };
 
   const getRoomStatus = (room: Room) => {
-    if (!room.is_active) return { label: '已關閉', color: 'bg-gray-100 text-gray-800' };
-    if (room.expires_at && new Date(room.expires_at) < new Date()) {
-      return { label: '已過期', color: 'bg-red-100 text-red-800' };
-    }
-    return { label: '活躍中', color: 'bg-green-100 text-green-800' };
+    return roomExpiration.getRoomStatus(room);
   };
 
-  const getDaysRemaining = (expiresAt: string) => {
-    const diff = new Date(expiresAt).getTime() - new Date().getTime();
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    return days > 0 ? days : 0;
+  const getDaysRemaining = (expiresAt: string | undefined) => {
+    return roomExpiration.getDaysRemaining(expiresAt) || 0;
   };
 
   const handleEditSuccess = (updatedRoom: Room) => {
@@ -149,9 +145,7 @@ export default function DashboardPage() {
     setDeletingRoom(null);
     // Update stats
     const newRooms = rooms.filter((r) => r.id !== deletedRoomId);
-    const activeRooms = newRooms.filter(
-      (room) => room.is_active && (!room.expires_at || new Date(room.expires_at) > new Date())
-    );
+    const activeRooms = roomExpiration.filterActiveRooms(newRooms);
     setStats((prev) => ({
       ...prev,
       totalRooms: newRooms.length,
@@ -170,16 +164,8 @@ export default function DashboardPage() {
     );
   }
 
-  const activeRooms = rooms.filter(
-    (room) =>
-      room.is_active &&
-      (!(room as any).expires_at || new Date((room as any).expires_at) > new Date())
-  );
-  const historyRooms = rooms.filter(
-    (room) =>
-      !room.is_active ||
-      ((room as any).expires_at && new Date((room as any).expires_at) < new Date())
-  );
+  const activeRooms = roomExpiration.filterActiveRooms(rooms);
+  const historyRooms = roomExpiration.filterInactiveRooms(rooms);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -356,76 +342,15 @@ export default function DashboardPage() {
             {selectedTab === 'active' && (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {activeRooms.map((room) => (
-                  <div
+                  <RoomCard
                     key={room.id}
-                    className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <h4 className="font-semibold text-gray-900">{room.name}</h4>
-                      <span
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}
-                      >
-                        {getRoomStatus(room).label}
-                      </span>
-                    </div>
-
-                    <div className="space-y-2 text-sm text-gray-600 mb-4">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span>創建：{formatDate(room.created_at)}</span>
-                      </div>
-                      {room.expires_at && (
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2" />
-                          <span>剩餘 {getDaysRemaining(room.expires_at)} 天</span>
-                        </div>
-                      )}
-                      <div className="font-mono text-blue-600">分享碼：{room.share_code}</div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Link
-                        href={`/room/${room.id}`}
-                        className="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        進入
-                      </Link>
-                      <button
-                        onClick={() => setEditingRoom(room)}
-                        className="p-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                        title="編輯房間"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setDeletingRoom(room)}
-                        className="p-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
-                        title="刪除房間"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                      {room.is_active && (
-                        <button
-                          onClick={async () => {
-                            if (confirm(`確定要結束「${room.name}」嗎？`)) {
-                              try {
-                                await roomsAPI.closeRoom(room.id);
-                                alert('房間已結束');
-                                window.location.reload();
-                              } catch (error) {
-                                console.error('Failed to close room:', error);
-                                alert('結束房間失敗');
-                              }
-                            }
-                          }}
-                          className="px-3 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700 transition-colors"
-                          title="結束房間"
-                        >
-                          結束
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                    room={room}
+                    onEdit={setEditingRoom}
+                    onDelete={setDeletingRoom}
+                    getRoomStatus={getRoomStatus}
+                    formatDate={formatDate}
+                    getDaysRemaining={getDaysRemaining}
+                  />
                 ))}
 
                 {activeRooms.length === 0 && (
@@ -437,45 +362,21 @@ export default function DashboardPage() {
             )}
 
             {selectedTab === 'history' && (
-              <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {historyRooms.map((room) => (
-                  <div key={room.id} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{room.name}</h4>
-                        <p className="text-sm text-gray-600 mt-1">
-                          創建於 {formatDate(room.created_at)}
-                          {(room as any).expires_at &&
-                            ` • 過期於 ${formatDate((room as any).expires_at)}`}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-1 text-xs font-medium rounded-full ${getRoomStatus(room).color}`}
-                        >
-                          {getRoomStatus(room).label}
-                        </span>
-                        <button
-                          onClick={() => setEditingRoom(room)}
-                          className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                          title="編輯房間"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => setDeletingRoom(room)}
-                          className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                          title="刪除房間"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <RoomCard
+                    key={room.id}
+                    room={room}
+                    onEdit={setEditingRoom}
+                    onDelete={setDeletingRoom}
+                    getRoomStatus={getRoomStatus}
+                    formatDate={formatDate}
+                    getDaysRemaining={getDaysRemaining}
+                  />
                 ))}
 
                 {historyRooms.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">沒有歷史記錄</div>
+                  <div className="col-span-full text-center py-12 text-gray-500">沒有歷史記錄</div>
                 )}
               </div>
             )}

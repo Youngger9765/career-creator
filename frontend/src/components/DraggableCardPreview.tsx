@@ -23,6 +23,11 @@ export function DraggableCardPreview({
     },
   });
 
+  // Reset flip state when card changes
+  React.useEffect(() => {
+    setIsFlipped(false);
+  }, [card?.id]);
+
   if (!card) {
     return (
       <div className="w-full h-80 rounded-lg shadow-lg flex flex-col items-center justify-center text-white bg-gray-400">
@@ -51,11 +56,6 @@ export function DraggableCardPreview({
     e.stopPropagation();
     setIsFlipped(!isFlipped);
   };
-
-  // Reset flip state when card changes
-  React.useEffect(() => {
-    setIsFlipped(false);
-  }, [card?.id]);
 
   return (
     <div className="relative w-full h-80 preserve-3d">

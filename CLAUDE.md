@@ -47,6 +47,7 @@ Building an online card consultation system for career counselors and their visi
 3. **Component Structure**: Keep components small and focused
 4. **Testing**: Write tests for critical functionality
 5. **Documentation**: Comment complex logic
+6. **⚠️ NO AUTO COMMIT**: NEVER commit new features without user testing first. Always wait for user to test and approve before committing.
 
 ## TDD with AI Development (Kent Beck's Principles)
 
@@ -273,6 +274,7 @@ gcloud config list
 ```
 
 **Expected configuration:**
+
 - **Active configuration**: `career-creator`
 - **Project**: `career-creator-472207`
 - **Region**: `asia-east1`
@@ -285,6 +287,7 @@ gcloud config list
 ### GitHub Actions Deployment
 
 Auto-deployment configured:
+
 - `staging` branch → staging environment
 - `main` branch → production environment
 

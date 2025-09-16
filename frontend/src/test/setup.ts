@@ -2,6 +2,7 @@
  * Test setup file for Vitest
  */
 import { beforeAll, afterEach, afterAll } from 'vitest';
+import '@testing-library/jest-dom';
 
 // Mock localStorage for tests
 const localStorageMock: Storage = {

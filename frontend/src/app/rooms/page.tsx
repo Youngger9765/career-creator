@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { authAPI } from '@/lib/api/auth';
 import { roomsAPI, Room } from '@/lib/api/rooms';
 import QRCodeModal from '@/components/QRCodeModal';
+import { EditRoomDialog } from '@/components/rooms/EditRoomDialog';
+import { DeleteRoomDialog } from '@/components/rooms/DeleteRoomDialog';
 
 export default function RoomsPage() {
   const router = useRouter();
@@ -14,6 +16,8 @@ export default function RoomsPage() {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [qrModalRoom, setQrModalRoom] = useState<Room | null>(null);
+  const [editRoom, setEditRoom] = useState<Room | null>(null);
+  const [deleteRoom, setDeleteRoom] = useState<Room | null>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -76,6 +80,18 @@ export default function RoomsPage() {
         alert('結束房間失敗，請重試');
       }
     }
+  };
+
+  const handleEditSuccess = async (updatedRoom: Room) => {
+    // Update the room in the list
+    setRooms(rooms.map((r) => (r.id === updatedRoom.id ? updatedRoom : r)));
+    setEditRoom(null);
+  };
+
+  const handleDeleteSuccess = async (roomId: string) => {
+    // Remove the room from the list
+    setRooms(rooms.filter((r) => r.id !== roomId));
+    setDeleteRoom(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -235,13 +251,29 @@ export default function RoomsPage() {
                     </button>
                     {room.is_active && (
                       <button
+                        onClick={() => setEditRoom(room)}
+                        className="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+                        title="編輯房間"
+                      >
+                        ✏️
+                      </button>
+                    )}
+                    {room.is_active && (
+                      <button
                         onClick={() => handleCloseRoom(room.id, room.name)}
-                        className="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+                        className="px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
                         title="結束房間"
                       >
                         結束
                       </button>
                     )}
+                    <button
+                      onClick={() => setDeleteRoom(room)}
+                      className="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+                      title="刪除房間"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
               </div>
@@ -255,6 +287,26 @@ export default function RoomsPage() {
             room={qrModalRoom}
             isOpen={!!qrModalRoom}
             onClose={() => setQrModalRoom(null)}
+          />
+        )}
+
+        {/* Edit Room Dialog */}
+        {editRoom && (
+          <EditRoomDialog
+            room={editRoom}
+            open={!!editRoom}
+            onClose={() => setEditRoom(null)}
+            onSuccess={handleEditSuccess}
+          />
+        )}
+
+        {/* Delete Room Dialog */}
+        {deleteRoom && (
+          <DeleteRoomDialog
+            room={deleteRoom}
+            open={!!deleteRoom}
+            onClose={() => setDeleteRoom(null)}
+            onSuccess={handleDeleteSuccess}
           />
         )}
       </main>

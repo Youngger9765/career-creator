@@ -8,6 +8,10 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/deploy-frontend.yaml'
+      - 'docker-compose*.yml'
+      - '.gitignore'
+      - 'README.md'
+      - 'CLAUDE.md'
 
   workflow_dispatch:
     inputs:

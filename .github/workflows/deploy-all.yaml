@@ -9,14 +9,8 @@ on:
       - 'docker-compose*.yml'
       - '.env.example'
       - '.env.*.example'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'yarn.lock'
-      - 'pnpm-lock.yaml'
-      - 'tsconfig.json'
-      - '.dockerignore'
-      - '.gitignore'
       - 'Makefile'
+      - '.dockerignore'
 
   workflow_dispatch:
     inputs:

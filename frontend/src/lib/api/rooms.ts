@@ -43,12 +43,13 @@ class RoomsAPI {
   }
 
   /**
-   * Get all rooms for current counselor
+   * Get all active rooms for current counselor
    */
   async getMyRooms(): Promise<Room[]> {
     try {
       const response = await apiClient.get<Room[]>('/api/rooms/');
-      return response.data;
+      // Extra protection: filter out inactive rooms on frontend too
+      return response.data.filter((room) => room.is_active);
     } catch (error) {
       throw new Error(handleApiError(error));
     }

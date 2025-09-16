@@ -179,9 +179,12 @@ def list_user_rooms(
     session: Session = Depends(get_session),
     current_user: dict = Depends(get_current_user_info),
 ):
-    """List rooms where user is counselor"""
+    """List active rooms where user is counselor"""
 
-    statement = select(Room).where(Room.counselor_id == current_user["id"])
+    statement = select(Room).where(
+        Room.counselor_id == current_user["id"],
+        Room.is_active == True
+    )
     rooms = session.exec(statement).all()
 
     return rooms

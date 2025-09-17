@@ -56,17 +56,17 @@ export function DeleteRoomDialog({ room, open, onClose, onSuccess }: DeleteRoomD
             確認刪除房間
           </DialogTitle>
           <DialogDescription className="space-y-3 pt-3">
-            <p>
+            <span className="block">
               確定要刪除房間「<strong className="text-foreground font-semibold">{room.name}</strong>
               」嗎？
-            </p>
+            </span>
             {room.share_code && (
-              <p className="text-sm flex items-center gap-2">
+              <span className="text-sm flex items-center gap-2">
                 <span className="text-muted-foreground">分享碼:</span>
                 <code className="px-2 py-1 bg-muted rounded text-xs font-mono">
                   {room.share_code}
                 </code>
-              </p>
+              </span>
             )}
             <Alert variant="destructive" className="mt-4">
               <AlertTriangle className="h-4 w-4" />

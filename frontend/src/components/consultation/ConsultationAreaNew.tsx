@@ -22,10 +22,11 @@ import { PersonalityCanvas } from './PersonalityCanvas';
 import { Card } from '../Card';
 import { CardNotesModal } from '../CardNotesModal';
 import { useCardSync } from '@/hooks/use-card-sync';
+import { useCardEvents } from '@/hooks/use-card-events';
 import { CardData } from '@/types/cards';
 import { Button } from '../ui/button';
 import { CardEventType } from '@/lib/api/card-events';
-import { Search, Save, Trash2 } from 'lucide-react';
+import { Search, Save, Trash2, RotateCcw } from 'lucide-react';
 import { getTokensForMode, shouldShowTokens, type GameToken } from '@/config/gameTokens';
 
 interface ConsultationAreaNewProps {
@@ -33,6 +34,15 @@ interface ConsultationAreaNewProps {
   isHost: boolean;
   gameMode: '優劣勢分析' | '價值觀排序' | '六大性格分析';
   selectedDeck: '職游旅人卡' | '職能盤點卡' | '價值導航卡';
+  gameSession?: {
+    updateCardPosition: (cardId: string, zone: string, position: { x: number; y: number }) => void;
+    toggleCardFlip: (cardId: string) => void;
+    getCardPosition: (
+      cardId: string
+    ) => { zone: string; position: { x: number; y: number } } | null;
+    isCardFlipped: (cardId: string) => boolean;
+    resetGameState: () => void;
+  };
 }
 
 // 輔助卡數據（Holland 六大性格類型解釋卡）
@@ -341,6 +351,7 @@ export function ConsultationAreaNew({
   isHost,
   gameMode,
   selectedDeck,
+  gameSession,
 }: ConsultationAreaNewProps) {
   // Configure drag sensors with activation constraints to prevent clicks from triggering drags
   const sensors = useSensors(
@@ -388,6 +399,7 @@ export function ConsultationAreaNew({
   const [usedCardIds, setUsedCardIds] = useState<Set<string>>(new Set());
 
   const { syncCardEvent } = useCardSync({ roomId });
+  const { createEvent, dealCard, flipCard, moveCard } = useCardEvents({ roomId });
 
   // Handle game mode changes
   useEffect(() => {
@@ -586,6 +598,33 @@ export function ConsultationAreaNew({
       setUsedCardIds((prev) => new Set(Array.from(prev).concat(originalId)));
     }
 
+    // Use gameSession for persistence if available
+    if (gameSession) {
+      // Calculate position based on drop location (simplified for now)
+      const position = { x: 0, y: 0 }; // TODO: Get actual position from event
+      gameSession.updateCardPosition(draggedCard.id, overId, position);
+    }
+
+    // Create card event for operation history
+    if (isNewCard) {
+      dealCard(
+        draggedCard.id,
+        { x: 0, y: 0 },
+        {
+          zone: overId,
+          sourceType: activeId.startsWith('list-')
+            ? 'deck'
+            : activeId.startsWith('aux-')
+              ? 'auxiliary'
+              : 'token',
+        }
+      ).catch((err) => console.error('Failed to create deal event:', err));
+    } else {
+      moveCard(draggedCard.id, { x: 0, y: 0 }, { x: 0, y: 0 }).catch((err) =>
+        console.error('Failed to create move event:', err)
+      );
+    }
+
     // Sync the move (use the new card ID if it's a new card)
     syncCardEvent(draggedCard.id, CardEventType.CARD_ARRANGED, {
       zone: overId,
@@ -717,7 +756,39 @@ export function ConsultationAreaNew({
       dislike: [],
     });
     setUsedCardIds(new Set()); // Clear all used cards
+
+    // Use gameSession to reset state if available
+    if (gameSession) {
+      gameSession.resetGameState();
+    }
+
     syncCardEvent('', CardEventType.AREA_CLEARED, {});
+  };
+
+  // Reset canvas to initial state
+  const handleResetCanvas = () => {
+    setGameState({
+      advantage: [],
+      disadvantage: [],
+      gridCards: new Map(),
+      gridTokens: new Map(),
+      like: [],
+      neutral: [],
+      dislike: [],
+    });
+    setUsedCardIds(new Set());
+    setUsedAuxCards(new Set());
+
+    // Use gameSession to reset state if available
+    if (gameSession) {
+      gameSession.resetGameState();
+    }
+
+    // Create reset event for history
+    createEvent({
+      event_type: CardEventType.AREA_CLEARED,
+      notes: 'Canvas reset to initial state',
+    }).catch((err) => console.error('Failed to create reset event:', err));
   };
 
   // Save canvas (placeholder)
@@ -874,13 +945,22 @@ export function ConsultationAreaNew({
             <h2 className="text-2xl font-bold">{gameMode}</h2>
             <div className="flex gap-2">
               <Button
+                onClick={handleResetCanvas}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <RotateCcw className="w-4 h-4" />
+                重置
+              </Button>
+              <Button
                 onClick={handleClearCanvas}
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
               >
                 <Trash2 className="w-4 h-4" />
-                清空畫面
+                清空
               </Button>
               <Button
                 onClick={handleSaveCanvas}
@@ -889,7 +969,7 @@ export function ConsultationAreaNew({
                 className="flex items-center gap-2"
               >
                 <Save className="w-4 h-4" />
-                儲存畫面
+                儲存
               </Button>
             </div>
           </div>

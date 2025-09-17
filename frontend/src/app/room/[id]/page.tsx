@@ -4,7 +4,10 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRoomStore } from '@/stores/room-store';
+import { useGameSession } from '@/hooks/use-game-session';
 import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaNew';
+import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
+import { VisitorGuidance } from '@/components/visitor/VisitorGuidance';
 
 export default function RoomPage() {
   const params = useParams();
@@ -16,10 +19,20 @@ export default function RoomPage() {
   const [isReady, setIsReady] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
+  const [showVisitorWelcome, setShowVisitorWelcome] = useState(false);
+  const [showVisitorGuidance, setShowVisitorGuidance] = useState(false);
+  const [visitorName, setVisitorName] = useState('');
 
-  // 牌卡和玩法選擇狀態
-  const [selectedDeck, setSelectedDeck] = useState('職游旅人卡');
-  const [selectedGameRule, setSelectedGameRule] = useState('六大性格分析');
+  // Game Session for state persistence
+  const gameSession = useGameSession({
+    roomId,
+    autoLoad: true,
+    gameRuleSlug: 'career_personality',
+  });
+
+  // 牌卡和玩法選擇狀態 (從 game session 載入)
+  const selectedDeck = gameSession.gameState.selectedDeck;
+  const selectedGameRule = gameSession.gameState.selectedGameRule;
 
   // 牌卡與可用玩法的映射關係
   const deckGameRuleMapping = {
@@ -35,16 +48,27 @@ export default function RoomPage() {
 
   // 當牌卡改變時，檢查當前玩法是否還可用
   const handleDeckChange = (newDeck: string) => {
-    setSelectedDeck(newDeck);
     const availableRules = getAvailableGameRules(newDeck);
-    if (!availableRules.includes(selectedGameRule)) {
-      setSelectedGameRule(availableRules[0] || '優劣勢分析');
-    }
+    const newGameRule = !availableRules.includes(selectedGameRule)
+      ? availableRules[0] || '優劣勢分析'
+      : selectedGameRule;
+
+    // 獲取遊戲模式映射
+    const gameModeMapping: Record<string, string> = {
+      六大性格分析: 'career_personality',
+      優劣勢分析: 'skill_assessment',
+      價值觀排序: 'value_navigation',
+    };
+
+    const gameMode = gameModeMapping[newGameRule] || 'career_personality';
+
+    // 更新 game session
+    gameSession.updateGameMode(newDeck, newGameRule, gameMode);
   };
 
   // 檢查是否為訪客
   const isVisitor = searchParams.get('visitor') === 'true';
-  const visitorName = searchParams.get('name') || '';
+  const urlVisitorName = searchParams.get('name') || '';
 
   // 取得認證狀態
   const { user, isAuthenticated } = useAuthStore();
@@ -54,10 +78,19 @@ export default function RoomPage() {
 
   // 簡單的認證檢查
   useEffect(() => {
-    // 訪客直接通過
+    // 訪客處理
     if (isVisitor) {
-      setIsChecking(false);
-      setIsReady(true);
+      if (urlVisitorName) {
+        // URL 已有訪客名稱，直接使用
+        setVisitorName(urlVisitorName);
+        setIsChecking(false);
+        setIsReady(true);
+        setShowVisitorGuidance(true);
+      } else {
+        // 沒有訪客名稱，顯示歡迎對話框
+        setIsChecking(false);
+        setShowVisitorWelcome(true);
+      }
       return;
     }
 
@@ -175,7 +208,17 @@ export default function RoomPage() {
                 <select
                   className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedGameRule}
-                  onChange={(e) => setSelectedGameRule(e.target.value)}
+                  onChange={(e) => {
+                    const newGameRule = e.target.value;
+                    // 獲取遊戲模式映射
+                    const gameModeMapping: Record<string, string> = {
+                      六大性格分析: 'career_personality',
+                      優劣勢分析: 'skill_assessment',
+                      價值觀排序: 'value_navigation',
+                    };
+                    const gameMode = gameModeMapping[newGameRule] || 'career_personality';
+                    gameSession.updateGameMode(selectedDeck, newGameRule, gameMode);
+                  }}
                 >
                   {getAvailableGameRules(selectedDeck).map((rule) => (
                     <option key={rule} value={rule}>
@@ -195,8 +238,18 @@ export default function RoomPage() {
 
           <div className="flex items-center space-x-4">
             <div className="text-sm text-gray-600">
-              {isVisitor ? `訪客: ${visitorName}` : `${user?.name} (${user?.roles?.join(', ')})`}
+              {isVisitor
+                ? `訪客: ${visitorName || urlVisitorName}`
+                : `${user?.name} (${user?.roles?.join(', ')})`}
             </div>
+            {isVisitor && (
+              <button
+                onClick={() => setShowVisitorGuidance(!showVisitorGuidance)}
+                className="text-sm px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
+              >
+                {showVisitorGuidance ? '隱藏指引' : '顯示指引'}
+              </button>
+            )}
             {currentRoom && (
               <div className="text-sm text-gray-500">分享碼: {currentRoom.share_code}</div>
             )}
@@ -212,6 +265,13 @@ export default function RoomPage() {
             isHost={isCounselor || false}
             gameMode={selectedGameRule as any}
             selectedDeck={selectedDeck as any}
+            gameSession={{
+              updateCardPosition: gameSession.updateCardPosition,
+              toggleCardFlip: gameSession.toggleCardFlip,
+              getCardPosition: gameSession.getCardPosition,
+              isCardFlipped: gameSession.isCardFlipped,
+              resetGameState: gameSession.resetGameState,
+            }}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">
@@ -224,6 +284,35 @@ export default function RoomPage() {
         <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {errorMessage || roomError}
         </div>
+      )}
+
+      {/* Visitor Welcome Modal */}
+      <VisitorWelcome
+        isOpen={showVisitorWelcome}
+        roomName={currentRoom?.name}
+        onComplete={(name) => {
+          setVisitorName(name);
+          setShowVisitorWelcome(false);
+          setIsReady(true);
+          setShowVisitorGuidance(true);
+
+          // Update URL to include visitor name
+          const newUrl = new URL(window.location.href);
+          newUrl.searchParams.set('name', name);
+          window.history.replaceState({}, '', newUrl.toString());
+        }}
+        onCancel={() => {
+          router.push('/');
+        }}
+      />
+
+      {/* Visitor Guidance Panel */}
+      {isVisitor && (
+        <VisitorGuidance
+          gameMode={selectedGameRule}
+          isVisible={showVisitorGuidance}
+          onClose={() => setShowVisitorGuidance(false)}
+        />
       )}
     </div>
   );

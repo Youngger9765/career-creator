@@ -1,0 +1,150 @@
+name: 🧹 Artifact Registry Cleanup
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨 2 點
+  workflow_dispatch:
+    inputs:
+      keep_images:
+        description: '保留映像數量'
+        required: false
+        default: '2'
+        type: choice
+        options: ['1', '2', '3', '5']
+
+env:
+  PROJECT_ID: career-creator-472207
+  REGION: us
+  FRONTEND_IMAGE: gcr.io/career-creator-472207/career-creator-frontend
+  BACKEND_IMAGE: gcr.io/career-creator-472207/career-creator-backend
+
+jobs:
+  cleanup:
+    name: 🗑️ Clean Docker Images
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: 🔐 Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: ☁️ Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: 📊 Check Repository Status
+        id: check
+        run: |
+          echo "🔍 檢查 Repository 狀態..."
+
+          SIZE=$(gcloud artifacts repositories describe gcr.io \
+            --location=$REGION \
+            --project=$PROJECT_ID \
+            --format="get(sizeBytes)" 2>/dev/null || echo "0")
+
+          SIZE_MB=$(echo "scale=0; $SIZE / 1024 / 1024" | bc)
+          echo "Repository 大小: ${SIZE_MB}MB"
+          echo "size=${SIZE_MB}" >> $GITHUB_OUTPUT
+
+      - name: 🧹 Clean Frontend Images
+        run: |
+          KEEP_COUNT=${{ github.event.inputs.keep_images || '2' }}
+          echo "📌 清理 Frontend 映像，保留最新 $KEEP_COUNT 個"
+
+          # 獲取所有 tags，按時間排序 (最新在前)
+          TAGS=$(gcloud container images list-tags $FRONTEND_IMAGE \
+            --format="get(digest)" \
+            --sort-by="~timestamp" 2>/dev/null || echo "")
+
+          if [ ! -z "$TAGS" ]; then
+            TOTAL=$(echo "$TAGS" | wc -l)
+            echo "  📊 總共 $TOTAL 個映像"
+
+            if [ $TOTAL -gt $KEEP_COUNT ]; then
+              TO_DELETE=$(echo "$TAGS" | tail -n +$((KEEP_COUNT + 1)))
+              DELETE_COUNT=$(echo "$TO_DELETE" | wc -l)
+
+              echo "  🗑️ 刪除 $DELETE_COUNT 個舊映像..."
+
+              for DIGEST in $TO_DELETE; do
+                IMAGE_REF="${FRONTEND_IMAGE}@${DIGEST}"
+                echo "    刪除: $IMAGE_REF"
+                if gcloud container images delete "$IMAGE_REF" \
+                  --force-delete-tags --quiet 2>/dev/null; then
+                  echo "    ✅ 成功刪除"
+                else
+                  echo "    ⚠️ 刪除失敗"
+                fi
+              done
+            else
+              echo "  ✅ 無需清理，只有 $TOTAL 個映像"
+            fi
+          else
+            echo "  ⚠️ 無法獲取映像列表"
+          fi
+
+      - name: 🧹 Clean Backend Images
+        run: |
+          KEEP_COUNT=${{ github.event.inputs.keep_images || '2' }}
+          echo "📌 清理 Backend 映像，保留最新 $KEEP_COUNT 個"
+
+          # 獲取所有 tags，按時間排序 (最新在前)
+          TAGS=$(gcloud container images list-tags $BACKEND_IMAGE \
+            --format="get(digest)" \
+            --sort-by="~timestamp" 2>/dev/null || echo "")
+
+          if [ ! -z "$TAGS" ]; then
+            TOTAL=$(echo "$TAGS" | wc -l)
+            echo "  📊 總共 $TOTAL 個映像"
+
+            if [ $TOTAL -gt $KEEP_COUNT ]; then
+              TO_DELETE=$(echo "$TAGS" | tail -n +$((KEEP_COUNT + 1)))
+              DELETE_COUNT=$(echo "$TO_DELETE" | wc -l)
+
+              echo "  🗑️ 刪除 $DELETE_COUNT 個舊映像..."
+
+              for DIGEST in $TO_DELETE; do
+                IMAGE_REF="${BACKEND_IMAGE}@${DIGEST}"
+                echo "    刪除: $IMAGE_REF"
+                if gcloud container images delete "$IMAGE_REF" \
+                  --force-delete-tags --quiet 2>/dev/null; then
+                  echo "    ✅ 成功刪除"
+                else
+                  echo "    ⚠️ 刪除失敗"
+                fi
+              done
+            else
+              echo "  ✅ 無需清理，只有 $TOTAL 個映像"
+            fi
+          else
+            echo "  ⚠️ 無法獲取映像列表"
+          fi
+
+      - name: 📊 Final Report
+        run: |
+          echo "## 🧹 清理報告" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          FINAL_SIZE=$(gcloud artifacts repositories describe gcr.io \
+            --location=$REGION \
+            --project=$PROJECT_ID \
+            --format="get(sizeBytes)" 2>/dev/null || echo "0")
+
+          FINAL_SIZE_MB=$(echo "scale=0; $FINAL_SIZE / 1024 / 1024" | bc)
+
+          echo "- 清理前大小: ${{ steps.check.outputs.size }}MB" >> $GITHUB_STEP_SUMMARY
+          echo "- 清理後大小: ${FINAL_SIZE_MB}MB" >> $GITHUB_STEP_SUMMARY
+          echo "- 保留映像數: ${{ github.event.inputs.keep_images || '2' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 執行時間: $(date)" >> $GITHUB_STEP_SUMMARY
+
+          # 剩餘映像統計
+          FRONTEND_COUNT=$(gcloud container images list-tags $FRONTEND_IMAGE --format="value(digest)" | wc -l)
+          BACKEND_COUNT=$(gcloud container images list-tags $BACKEND_IMAGE --format="value(digest)" | wc -l)
+
+          echo "- Frontend 剩餘: ${FRONTEND_COUNT} 個映像" >> $GITHUB_STEP_SUMMARY
+          echo "- Backend 剩餘: ${BACKEND_COUNT} 個映像" >> $GITHUB_STEP_SUMMARY

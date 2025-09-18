@@ -398,7 +398,13 @@ export function ConsultationAreaNew({
   // Track used cards (cards that are on the canvas)
   const [usedCardIds, setUsedCardIds] = useState<Set<string>>(new Set());
 
-  const { syncCardEvent } = useCardSync({ roomId });
+  const { syncCardEvent, triggerUserActivity, isPolling, pendingOperations } = useCardSync({
+    roomId,
+    optimisticUpdates: true,
+    smartPolling: true,
+    syncInterval: 4000, // 4 second polling
+    idleTimeout: 30000, // Stop after 30s inactivity
+  });
   const { createEvent, dealCard, flipCard, moveCard } = useCardEvents({ roomId });
 
   // Handle game mode changes
@@ -458,10 +464,15 @@ export function ConsultationAreaNew({
   // Drag handlers
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    // Trigger activity to ensure polling is active
+    triggerUserActivity();
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+
+    // Trigger activity for any drag operation
+    triggerUserActivity();
 
     if (!over) {
       setActiveId(null);
@@ -746,6 +757,9 @@ export function ConsultationAreaNew({
 
   // Clear canvas
   const handleClearCanvas = () => {
+    // Trigger activity
+    triggerUserActivity();
+
     setGameState({
       advantage: [],
       disadvantage: [],
@@ -767,6 +781,9 @@ export function ConsultationAreaNew({
 
   // Reset canvas to initial state
   const handleResetCanvas = () => {
+    // Trigger activity
+    triggerUserActivity();
+
     setGameState({
       advantage: [],
       disadvantage: [],
@@ -793,6 +810,9 @@ export function ConsultationAreaNew({
 
   // Save canvas (placeholder)
   const handleSaveCanvas = () => {
+    // Trigger activity
+    triggerUserActivity();
+
     console.log('Saving canvas state:', gameState);
     // TODO: Implement save functionality
   };
@@ -942,7 +962,29 @@ export function ConsultationAreaNew({
         <div className="flex-1 p-6">
           {/* Toolbar */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">{gameMode}</h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-2xl font-bold">{gameMode}</h2>
+              {/* Sync Status Indicator */}
+              <div className="flex items-center gap-2 text-sm">
+                {isPolling ? (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>同步中</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-gray-500">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                    <span>待機</span>
+                  </div>
+                )}
+                {pendingOperations.size > 0 && (
+                  <div className="flex items-center gap-1 text-blue-600">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                    <span>{pendingOperations.size} 待處理</span>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="flex gap-2">
               <Button
                 onClick={handleResetCanvas}

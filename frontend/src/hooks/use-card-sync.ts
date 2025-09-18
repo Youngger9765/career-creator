@@ -13,6 +13,9 @@ export interface UseCardSyncOptions {
   enabled?: boolean;
   syncInterval?: number;
   useWebSocket?: boolean;
+  optimisticUpdates?: boolean;
+  smartPolling?: boolean;
+  idleTimeout?: number;
   performerInfo?: {
     id?: string;
     name?: string;
@@ -26,6 +29,8 @@ export interface UseCardSyncReturn {
   isWebSocketConnected: boolean;
   lastSyncTime: string | null;
   error: Error | null;
+  isPolling: boolean;
+  pendingOperations: Map<string, PendingOperation>;
   syncCardEvent: (
     cardId: string,
     eventType: CardEventType,
@@ -34,14 +39,27 @@ export interface UseCardSyncReturn {
   updateLocalCard: (cardId: string, updates: Partial<SyncedCardState>) => void;
   applyToGameCards: (gameCards: GameCard[]) => GameCard[];
   clearError: () => void;
+  triggerUserActivity: () => void;
+}
+
+interface PendingOperation {
+  id: string;
+  cardId: string;
+  eventType: CardEventType;
+  eventData?: Record<string, any>;
+  timestamp: number;
+  status: 'pending' | 'resolved' | 'failed';
 }
 
 export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   const {
     roomId,
     enabled = true,
-    syncInterval = 2000,
-    useWebSocket = true,
+    syncInterval = 4000, // Default to 4 seconds for smart polling
+    useWebSocket = false, // Default to polling for MVP
+    optimisticUpdates = true,
+    smartPolling = true,
+    idleTimeout = 30000, // Stop polling after 30s of inactivity
     performerInfo,
   } = options;
 
@@ -50,8 +68,83 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
+  const [pendingOperations, setPendingOperations] = useState<Map<string, PendingOperation>>(
+    new Map()
+  );
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
+
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const syncServiceRef = useRef<CardSyncService | null>(null);
+
+  // Smart polling with idle detection
+  const startSmartPolling = useCallback(() => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+    }
+
+    setIsPolling(true);
+
+    const poll = async () => {
+      try {
+        // Check if we should stop due to inactivity
+        if (smartPolling && Date.now() - lastActivity > idleTimeout) {
+          console.log('Stopping polling due to inactivity');
+          setIsPolling(false);
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+          return;
+        }
+
+        // Create sync service if not exists
+        if (!syncServiceRef.current) {
+          const syncService = createCardSyncService({
+            roomId,
+            syncInterval,
+            useWebSocket,
+            wsClient: useWebSocket ? wsClient : undefined,
+            onStateUpdate: (cards) => {
+              setSyncedCards(cards);
+              setLastSyncTime(new Date().toISOString());
+
+              // Resolve pending operations based on server state
+              if (optimisticUpdates) {
+                resolvePendingOperations(cards);
+              }
+            },
+            onError: (err) => {
+              setError(err);
+              console.error('Card sync error:', err);
+            },
+          });
+          syncServiceRef.current = syncService;
+        }
+
+        // Fetch latest state
+        await syncServiceRef.current.fetchState();
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    };
+
+    // Initial poll
+    poll();
+
+    // Set up interval
+    pollingIntervalRef.current = setInterval(poll, syncInterval);
+  }, [
+    roomId,
+    syncInterval,
+    useWebSocket,
+    smartPolling,
+    lastActivity,
+    idleTimeout,
+    optimisticUpdates,
+  ]);
 
   // Create sync service
   useEffect(() => {
@@ -61,37 +154,60 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         syncServiceRef.current = null;
         setIsActive(false);
       }
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+        setIsPolling(false);
+      }
       return;
     }
 
-    const syncService = createCardSyncService({
-      roomId,
-      syncInterval,
-      useWebSocket,
-      wsClient: useWebSocket ? wsClient : undefined,
-      onStateUpdate: (cards) => {
-        setSyncedCards(cards);
-        setLastSyncTime(new Date().toISOString());
-      },
-      onError: (err) => {
-        setError(err);
-        console.error('Card sync error:', err);
-      },
-    });
+    if (useWebSocket) {
+      // WebSocket mode
+      const syncService = createCardSyncService({
+        roomId,
+        syncInterval,
+        useWebSocket,
+        wsClient: wsClient,
+        onStateUpdate: (cards) => {
+          setSyncedCards(cards);
+          setLastSyncTime(new Date().toISOString());
+        },
+        onError: (err) => {
+          setError(err);
+          console.error('Card sync error:', err);
+        },
+      });
 
-    syncServiceRef.current = syncService;
+      syncServiceRef.current = syncService;
 
-    // Start sync service
-    syncService
-      .start()
-      .then(() => setIsActive(true))
-      .catch(setError);
+      // Start sync service
+      syncService
+        .start()
+        .then(() => setIsActive(true))
+        .catch(setError);
+    } else {
+      // Smart polling mode
+      setIsActive(true);
+      startSmartPolling();
+    }
 
     return () => {
-      syncService.stop();
+      if (syncServiceRef.current) {
+        syncServiceRef.current.stop();
+      }
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+      if (idleTimeoutRef.current) {
+        clearTimeout(idleTimeoutRef.current);
+        idleTimeoutRef.current = null;
+      }
       setIsActive(false);
+      setIsPolling(false);
     };
-  }, [roomId, enabled, syncInterval, useWebSocket]);
+  }, [roomId, enabled, useWebSocket, startSmartPolling]);
 
   // Monitor WebSocket connection status
   useEffect(() => {
@@ -124,34 +240,113 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     };
   }, [useWebSocket]);
 
-  // Sync card event
+  // Resolve pending operations based on server state
+  const resolvePendingOperations = useCallback((serverCards: SyncedCardState[]) => {
+    setPendingOperations((prev) => {
+      const updated = new Map(prev);
+      const serverCardIds = new Set(serverCards.map((c) => c.id));
+
+      // Mark operations as resolved if card exists on server
+      for (const [opId, operation] of Array.from(updated.entries())) {
+        if (operation.status === 'pending') {
+          if (serverCardIds.has(operation.cardId)) {
+            updated.set(opId, { ...operation, status: 'resolved' });
+          } else if (Date.now() - operation.timestamp > 10000) {
+            // Mark as failed if pending for > 10s
+            updated.set(opId, { ...operation, status: 'failed' });
+          }
+        }
+      }
+
+      // Clean up resolved/failed operations older than 30s
+      const cutoff = Date.now() - 30000;
+      for (const [opId, operation] of Array.from(updated.entries())) {
+        if (operation.status !== 'pending' && operation.timestamp < cutoff) {
+          updated.delete(opId);
+        }
+      }
+
+      return updated;
+    });
+  }, []);
+
+  // Trigger user activity (resets idle timer)
+  const triggerUserActivity = useCallback(() => {
+    setLastActivity(Date.now());
+
+    // Restart polling if it was stopped due to inactivity
+    if (smartPolling && !isPolling && enabled) {
+      startSmartPolling();
+    }
+  }, [smartPolling, isPolling, enabled, startSmartPolling]);
+
+  // Sync card event with optimistic updates
   const syncCardEvent = useCallback(
     async (
       cardId: string,
       eventType: CardEventType,
       eventData?: Record<string, any>
     ): Promise<void> => {
-      if (!syncServiceRef.current) {
-        throw new Error('Sync service not initialized');
-      }
+      // Trigger user activity
+      triggerUserActivity();
 
-      try {
-        // 臨時停用 API 同步，避免 Network Error
-        console.log('Card sync disabled temporarily:', {
+      const operationId = `${cardId}-${eventType}-${Date.now()}`;
+
+      if (optimisticUpdates) {
+        // Add optimistic operation
+        const pendingOp: PendingOperation = {
+          id: operationId,
           cardId,
           eventType,
           eventData,
-          performerInfo,
-        });
-        // await syncServiceRef.current.syncCardEvent(cardId, eventType, eventData, performerInfo);
+          timestamp: Date.now(),
+          status: 'pending',
+        };
+
+        setPendingOperations((prev) => new Map(prev).set(operationId, pendingOp));
+
+        // Apply optimistic update immediately
+        if (syncServiceRef.current) {
+          syncServiceRef.current.updateLocalCard(cardId, {
+            id: cardId,
+            lastModified: new Date().toISOString(),
+            isModified: true,
+            pending: true,
+            ...eventData,
+          });
+        }
+      }
+
+      try {
+        if (syncServiceRef.current) {
+          await syncServiceRef.current.syncCardEvent(cardId, eventType, eventData, performerInfo);
+        } else {
+          console.log('Sync service not ready, operation queued:', {
+            cardId,
+            eventType,
+            eventData,
+          });
+        }
         setError(null);
       } catch (err) {
+        // Mark operation as failed
+        if (optimisticUpdates) {
+          setPendingOperations((prev) => {
+            const updated = new Map(prev);
+            const op = updated.get(operationId);
+            if (op) {
+              updated.set(operationId, { ...op, status: 'failed' });
+            }
+            return updated;
+          });
+        }
+
         const error = err instanceof Error ? err : new Error('Failed to sync card event');
         setError(error);
         throw error;
       }
     },
-    [performerInfo]
+    [performerInfo, optimisticUpdates, triggerUserActivity]
   );
 
   // Update local card
@@ -193,10 +388,13 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     isWebSocketConnected,
     lastSyncTime,
     error,
+    isPolling,
+    pendingOperations,
     syncCardEvent,
     updateLocalCard,
     applyToGameCards,
     clearError,
+    triggerUserActivity,
   };
 }
 
@@ -207,8 +405,10 @@ export function useCardSyncReadOnly(roomId: string, enabled = true) {
   return useCardSync({
     roomId,
     enabled,
-    syncInterval: 3000, // Longer interval for read-only
-    useWebSocket: true, // Enable WebSocket for real-time updates
+    syncInterval: 5000, // 5s for read-only
+    useWebSocket: false, // Use smart polling for MVP
+    optimisticUpdates: false, // No optimistic updates for observers
+    smartPolling: true,
     performerInfo: { type: 'observer' },
   });
 }

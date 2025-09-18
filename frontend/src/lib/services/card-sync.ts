@@ -16,6 +16,9 @@ export interface SyncedCardState {
   zIndex: number;
   lastUpdated: string;
   lastEventId?: string;
+  lastModified?: string;
+  isModified?: boolean;
+  pending?: boolean;
 }
 
 export interface CardSyncOptions {
@@ -186,6 +189,14 @@ export class CardSyncService {
    */
   getCardStates(): SyncedCardState[] {
     return Array.from(this.localCards.values());
+  }
+
+  /**
+   * Fetch current state from server (public method for manual polling)
+   */
+  async fetchState(): Promise<SyncedCardState[]> {
+    await this.performSync();
+    return this.getCardStates();
   }
 
   /**

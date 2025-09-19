@@ -91,7 +91,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
       try {
         // Check if we should stop due to inactivity
         if (smartPolling && Date.now() - lastActivity > idleTimeout) {
-          console.log('Stopping polling due to inactivity');
+          console.log('⏸️ Stopping polling due to inactivity');
           setIsPolling(false);
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
@@ -125,9 +125,16 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         }
 
         // Fetch latest state
+        console.log('🔄 Smart polling: fetching state...');
         await syncServiceRef.current.fetchState();
+
+        // Always check pending operations in smart polling mode
+        if (optimisticUpdates && syncServiceRef.current) {
+          const currentCards = syncServiceRef.current.getCardStates();
+          resolvePendingOperations(currentCards);
+        }
       } catch (err) {
-        console.error('Polling error:', err);
+        console.error('❌ Polling error:', err);
       }
     };
 
@@ -244,27 +251,66 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   const resolvePendingOperations = useCallback((serverCards: SyncedCardState[]) => {
     setPendingOperations((prev) => {
       const updated = new Map(prev);
-      const serverCardIds = new Set(serverCards.map((c) => c.id));
 
-      // Mark operations as resolved if card exists on server
+      // Create a map of server cards by ID and timestamp for efficient lookup
+      const serverCardMap = new Map(serverCards.map((c) => [c.id, c]));
+
+      // Mark operations as resolved based on server state
       for (const [opId, operation] of Array.from(updated.entries())) {
         if (operation.status === 'pending') {
-          if (serverCardIds.has(operation.cardId)) {
+          const serverCard = serverCardMap.get(operation.cardId);
+
+          // Check if operation should be considered resolved
+          let shouldResolve = false;
+
+          if (serverCard) {
+            // If card exists on server and was updated after our operation
+            const operationTime = new Date(operation.timestamp);
+            const serverUpdateTime = new Date(serverCard.lastUpdated);
+
+            // Consider resolved if server card was updated after our operation
+            if (serverUpdateTime >= operationTime) {
+              shouldResolve = true;
+            }
+          }
+
+          // Alternative: resolve if operation is older than 5 seconds (likely processed)
+          const ageMs = Date.now() - operation.timestamp;
+          if (ageMs > 5000) {
+            shouldResolve = true;
+          }
+
+          if (shouldResolve) {
             updated.set(opId, { ...operation, status: 'resolved' });
-          } else if (Date.now() - operation.timestamp > 10000) {
-            // Mark as failed if pending for > 10s
+          } else if (ageMs > 15000) {
+            // Mark as failed if pending for > 15s
             updated.set(opId, { ...operation, status: 'failed' });
           }
         }
       }
 
-      // Clean up resolved/failed operations older than 30s
-      const cutoff = Date.now() - 30000;
+      // Clean up resolved/failed operations older than 5s (faster cleanup for better UX)
+      const cutoff = Date.now() - 5000;
+      let cleanedCount = 0;
       for (const [opId, operation] of Array.from(updated.entries())) {
         if (operation.status !== 'pending' && operation.timestamp < cutoff) {
           updated.delete(opId);
+          cleanedCount++;
         }
       }
+
+      if (cleanedCount > 0) {
+        console.log(`🧹 Cleaned up ${cleanedCount} old operations`);
+      }
+
+      const pendingCount = Array.from(updated.values()).filter(
+        (op) => op.status === 'pending'
+      ).length;
+      const resolvedCount = Array.from(updated.values()).filter(
+        (op) => op.status === 'resolved'
+      ).length;
+
+      // Removed verbose logging to prevent performance issues
 
       return updated;
     });
@@ -303,6 +349,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
           status: 'pending',
         };
 
+        console.log('➕ Adding pending operation:', { operationId, cardId, eventType, eventData });
         setPendingOperations((prev) => new Map(prev).set(operationId, pendingOp));
 
         // Apply optimistic update immediately

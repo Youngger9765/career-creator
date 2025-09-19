@@ -22,7 +22,6 @@ import { PersonalityCanvas } from './PersonalityCanvas';
 import { Card } from '../Card';
 import { CardNotesModal } from '../CardNotesModal';
 import { useCardSync } from '@/hooks/use-card-sync';
-import { useCardEvents } from '@/hooks/use-card-events';
 import { CardData } from '@/types/cards';
 import { Button } from '../ui/button';
 import { CardEventType } from '@/lib/api/card-events';
@@ -405,7 +404,6 @@ export function ConsultationAreaNew({
     syncInterval: 4000, // 4 second polling
     idleTimeout: 30000, // Stop after 30s inactivity
   });
-  const { createEvent, dealCard, flipCard, moveCard } = useCardEvents({ roomId });
 
   // Handle game mode changes
   useEffect(() => {
@@ -616,27 +614,20 @@ export function ConsultationAreaNew({
       gameSession.updateCardPosition(draggedCard.id, overId, position);
     }
 
-    // Create card event for operation history
+    // Sync the card event (this handles both new cards and moves with optimistic updates)
     if (isNewCard) {
-      dealCard(
-        draggedCard.id,
-        { x: 0, y: 0 },
-        {
-          zone: overId,
-          sourceType: activeId.startsWith('list-')
-            ? 'deck'
-            : activeId.startsWith('aux-')
-              ? 'auxiliary'
-              : 'token',
-        }
-      ).catch((err) => console.error('Failed to create deal event:', err));
-    } else {
-      moveCard(draggedCard.id, { x: 0, y: 0 }, { x: 0, y: 0 }).catch((err) =>
-        console.error('Failed to create move event:', err)
-      );
+      // For new cards, first create a CARD_DEALT event
+      syncCardEvent(draggedCard.id, CardEventType.CARD_DEALT, {
+        position: { x: 0, y: 0 },
+        zone: overId,
+        sourceType: activeId.startsWith('list-')
+          ? 'deck'
+          : activeId.startsWith('aux-')
+            ? 'auxiliary'
+            : 'token',
+      });
     }
-
-    // Sync the move (use the new card ID if it's a new card)
+    // Then arrange the card in the zone (for both new cards and moves)
     syncCardEvent(draggedCard.id, CardEventType.CARD_ARRANGED, {
       zone: overId,
     });
@@ -801,11 +792,10 @@ export function ConsultationAreaNew({
       gameSession.resetGameState();
     }
 
-    // Create reset event for history
-    createEvent({
-      event_type: CardEventType.AREA_CLEARED,
+    // Create reset event for history with optimistic updates
+    syncCardEvent('', CardEventType.AREA_CLEARED, {
       notes: 'Canvas reset to initial state',
-    }).catch((err) => console.error('Failed to create reset event:', err));
+    });
   };
 
   // Save canvas (placeholder)
@@ -977,12 +967,19 @@ export function ConsultationAreaNew({
                     <span>待機</span>
                   </div>
                 )}
-                {pendingOperations.size > 0 && (
-                  <div className="flex items-center gap-1 text-blue-600">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-                    <span>{pendingOperations.size} 待處理</span>
-                  </div>
-                )}
+                {(() => {
+                  const actualPendingCount = Array.from(pendingOperations.values()).filter(
+                    (op) => op.status === 'pending'
+                  ).length;
+                  return (
+                    actualPendingCount > 0 && (
+                      <div className="flex items-center gap-1 text-blue-600">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                        <span>{actualPendingCount} 待處理</span>
+                      </div>
+                    )
+                  );
+                })()}
               </div>
             </div>
             <div className="flex gap-2">

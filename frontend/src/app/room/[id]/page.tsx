@@ -8,6 +8,7 @@ import { useGameSession } from '@/hooks/use-game-session';
 import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaNew';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
 import { VisitorGuidance } from '@/components/visitor/VisitorGuidance';
+import { ParticipantList } from '@/components/room/ParticipantList';
 
 export default function RoomPage() {
   const params = useParams();
@@ -75,6 +76,25 @@ export default function RoomPage() {
 
   // 取得房間狀態
   const { currentRoom, isLoading: roomLoading, error: roomError, joinRoom } = useRoomStore();
+
+  // 檢查是否為諮詢師
+  const isCounselor = user?.roles?.includes('counselor') || user?.roles?.includes('admin');
+
+  // 簡單的參與者顯示 (暫時用靜態資料)
+  const participants = [
+    {
+      id: user?.id || 'current-user',
+      name: isVisitor ? visitorName || urlVisitorName : user?.name || 'User',
+      type: isVisitor ? 'visitor' : isCounselor ? 'counselor' : 'user',
+      initials: isVisitor
+        ? (visitorName || urlVisitorName || 'V').substring(0, 2).toUpperCase()
+        : (user?.name || 'U').substring(0, 2).toUpperCase(),
+      lastActiveAt: new Date().toISOString(),
+      isOnline: true,
+    },
+  ];
+  const onlineCount = 1;
+  const participantsLoading = false;
 
   // 簡單的認證檢查
   useEffect(() => {
@@ -160,9 +180,6 @@ export default function RoomPage() {
     );
   }
 
-  // 檢查是否為諮詢師
-  const isCounselor = user?.roles?.includes('counselor') || user?.roles?.includes('admin');
-
   // Debug 資訊
   console.log('User roles:', user?.roles);
   console.log('Is counselor:', isCounselor);
@@ -234,6 +251,14 @@ export default function RoomPage() {
                 </select>
               </div>
             </div>
+
+            {/* 參與者列表 */}
+            <ParticipantList
+              participants={participants as any}
+              onlineCount={onlineCount}
+              isLoading={participantsLoading}
+              className="ml-6"
+            />
           </div>
 
           <div className="flex items-center space-x-4">

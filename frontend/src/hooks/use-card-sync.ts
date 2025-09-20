@@ -72,7 +72,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   const [pendingOperations, setPendingOperations] = useState<Map<string, PendingOperation>>(
     new Map()
   );
-  const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const lastActivityRef = useRef<number>(Date.now());
 
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,7 +90,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     const poll = async () => {
       try {
         // Check if we should stop due to inactivity
-        if (smartPolling && Date.now() - lastActivity > idleTimeout) {
+        if (smartPolling && Date.now() - lastActivityRef.current > idleTimeout) {
           console.log('⏸️ Stopping polling due to inactivity');
           setIsPolling(false);
           if (pollingIntervalRef.current) {
@@ -148,9 +148,9 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     syncInterval,
     useWebSocket,
     smartPolling,
-    lastActivity,
     idleTimeout,
     optimisticUpdates,
+    // Remove lastActivity from dependencies to prevent re-creating interval on every activity
   ]);
 
   // Create sync service
@@ -318,7 +318,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
 
   // Trigger user activity (resets idle timer)
   const triggerUserActivity = useCallback(() => {
-    setLastActivity(Date.now());
+    lastActivityRef.current = Date.now();
 
     // Restart polling if it was stopped due to inactivity
     if (smartPolling && !isPolling && enabled) {

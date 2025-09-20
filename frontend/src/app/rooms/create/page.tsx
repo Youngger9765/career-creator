@@ -141,7 +141,7 @@ export default function CreateRoomPage() {
               onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="例：張同學的職業探索諮詢"
               maxLength={100}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400"
               required
             />
             <p className="text-xs text-gray-500 mt-1">房間名稱將顯示給所有參與者</p>
@@ -159,7 +159,7 @@ export default function CreateRoomPage() {
               placeholder="描述這次諮詢的目標和重點..."
               maxLength={500}
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-gray-900 placeholder-gray-400"
             />
             <p className="text-xs text-gray-500 mt-1">
               {formData.description.length}/500 字 (選填)
@@ -178,7 +178,7 @@ export default function CreateRoomPage() {
               id="expirationDays"
               value={formData.expirationDays}
               onChange={(e) => handleInputChange('expirationDays', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             >
               <option value={1}>1 天</option>
               <option value={3}>3 天</option>

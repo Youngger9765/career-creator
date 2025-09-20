@@ -34,7 +34,7 @@ export default function RoomPage() {
   // 牌卡和玩法選擇狀態
   const [selectedDeck, setSelectedDeck] = useState('職游旅人卡');
   const [selectedGameRule, setSelectedGameRule] = useState('六大性格分析');
-  
+
   // 當 gameSession 載入後，更新本地狀態
   useEffect(() => {
     if (gameSession.gameState.selectedDeck) {
@@ -57,12 +57,10 @@ export default function RoomPage() {
     return deckGameRuleMapping[deck as keyof typeof deckGameRuleMapping] || [];
   };
 
-  // 當牌卡改變時，檢查當前玩法是否還可用
+  // 當牌卡改變時，總是選擇第一個可用玩法
   const handleDeckChange = (newDeck: string) => {
     const availableRules = getAvailableGameRules(newDeck);
-    const newGameRule = !availableRules.includes(selectedGameRule)
-      ? availableRules[0] || '優劣勢分析'
-      : selectedGameRule;
+    const newGameRule = availableRules[0] || '優劣勢分析';
 
     // 獲取遊戲模式映射
     const gameModeMapping: Record<string, string> = {
@@ -248,10 +246,10 @@ export default function RoomPage() {
                       價值觀排序: 'value_navigation',
                     };
                     const gameMode = gameModeMapping[newGameRule] || 'career_personality';
-                    
+
                     // 更新本地狀態
                     setSelectedGameRule(newGameRule);
-                    
+
                     // 更新 game session
                     gameSession.updateGameMode(selectedDeck, newGameRule, gameMode);
                   }}

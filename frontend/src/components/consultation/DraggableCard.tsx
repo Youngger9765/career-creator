@@ -25,7 +25,6 @@ export function DraggableCard({
   // Initialize card events hook - always call but only use if roomId is provided
   const cardEvents = useCardEvents({
     roomId: roomId || 'dummy',
-    realtime: false,
   });
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({

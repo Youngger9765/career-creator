@@ -6,7 +6,6 @@ import { create } from 'zustand';
 import { Room, CreateRoomData } from '@/lib/api/rooms';
 import { roomsAPI } from '@/lib/api/rooms';
 // TODO: Import Visitor and CardEvent types when implemented
-// import wsClient from '@/lib/websocket-client';
 
 interface RoomState {
   // Current room data

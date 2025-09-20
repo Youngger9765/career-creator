@@ -113,34 +113,6 @@ export interface CardEventCreate {
   performer_name?: string;
 }
 
-// WebSocket message types
-export interface WebSocketMessage {
-  type: string;
-  data: any;
-}
-
-export interface CardEventMessage extends WebSocketMessage {
-  type: 'card_event';
-  data: CardEventCreate;
-}
-
-export interface ChatMessage extends WebSocketMessage {
-  type: 'chat_message';
-  data: {
-    message: string;
-  };
-}
-
-export interface UserActionMessage extends WebSocketMessage {
-  type: 'user_action';
-  data: {
-    action: string;
-    position?: { x: number; y: number };
-    target?: string;
-    [key: string]: any;
-  };
-}
-
 // API Response types
 export interface ApiError {
   detail: string;

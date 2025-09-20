@@ -26,7 +26,7 @@ function DraggableCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="w-28 h-36 bg-white border-2 border-gray-300 rounded-lg shadow-md p-2 hover:shadow-lg transition-shadow relative group"
+      className="w-28 h-36 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg shadow-md p-2 hover:shadow-lg transition-shadow relative group"
     >
       {/* Delete button */}
       {onRemove && (
@@ -42,9 +42,15 @@ function DraggableCard({
         </button>
       )}
       <div {...listeners} {...attributes} className="cursor-move h-full flex flex-col">
-        <div className="text-xs font-bold mb-1 line-clamp-2">{card.title}</div>
-        <div className="text-xs text-gray-600 line-clamp-2">{card.description}</div>
-        {card.category && <div className="text-xs text-blue-600 mt-auto">{card.category}</div>}
+        <div className="text-xs font-bold mb-1 line-clamp-2 text-gray-900 dark:text-gray-100">
+          {card.title}
+        </div>
+        <div className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+          {card.description}
+        </div>
+        {card.category && (
+          <div className="text-xs text-blue-600 dark:text-blue-400 mt-auto">{card.category}</div>
+        )}
       </div>
     </div>
   );
@@ -64,13 +70,17 @@ function DroppableZone({ id, title, cards, className = '', onRemoveCard }: Dropp
   });
 
   const bgColor =
-    id === 'advantage' ? 'bg-green-50' : id === 'disadvantage' ? 'bg-red-50' : 'bg-gray-50';
+    id === 'advantage'
+      ? 'bg-green-50 dark:bg-green-900/20'
+      : id === 'disadvantage'
+        ? 'bg-red-50 dark:bg-red-900/20'
+        : 'bg-gray-50 dark:bg-gray-800/50';
   const borderColor =
     id === 'advantage'
-      ? 'border-green-400'
+      ? 'border-green-400 dark:border-green-500'
       : id === 'disadvantage'
-        ? 'border-red-400'
-        : 'border-gray-400';
+        ? 'border-red-400 dark:border-red-500'
+        : 'border-gray-400 dark:border-gray-600';
 
   return (
     <div
@@ -82,7 +92,7 @@ function DroppableZone({ id, title, cards, className = '', onRemoveCard }: Dropp
         ${className}
       `}
     >
-      <h3 className="text-lg font-bold mb-3">{title}</h3>
+      <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-gray-100">{title}</h3>
       <div className="flex flex-wrap gap-3">
         {cards.map((card) => (
           <DraggableCard key={card.id} card={card} onRemove={onRemoveCard} />

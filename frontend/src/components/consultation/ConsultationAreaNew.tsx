@@ -814,22 +814,22 @@ export function ConsultationAreaNew({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex h-screen bg-gray-50">
+      <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
         {/* Left Sidebar with Tabs */}
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+        <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
           {/* Tab Headers */}
-          <div className="flex bg-gray-100 border-b-2 border-gray-300">
+          <div className="flex bg-gray-100 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
             <button
               onClick={() => setActiveTab('cards')}
               className={`flex-1 px-4 py-3 font-semibold transition-all relative ${
                 activeTab === 'cards'
-                  ? 'text-blue-700 bg-white border-l-2 border-t-2 border-r-2 border-gray-300 rounded-t-lg shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
+                  ? 'text-blue-700 dark:text-blue-400 bg-white dark:bg-gray-700 border-l-2 border-t-2 border-r-2 border-gray-300 dark:border-gray-600 rounded-t-lg shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <span className="text-xl">🃏</span>
-                <span>牌卡</span>
+                <span className="text-gray-900 dark:text-gray-100">牌組模式</span>
               </div>
               {activeTab === 'cards' && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
@@ -918,8 +918,8 @@ export function ConsultationAreaNew({
                     />
                   ))}
                 </div>
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <p className="text-xs text-blue-700">
+                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                  <p className="text-xs text-blue-700 dark:text-blue-300">
                     這些輔助卡用於解釋六大性格類型，可以拖曳到畫布上作為參考。
                   </p>
                 </div>
@@ -953,17 +953,17 @@ export function ConsultationAreaNew({
           {/* Toolbar */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold">{gameMode}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{gameMode}</h2>
               {/* Sync Status Indicator */}
               <div className="flex items-center gap-2 text-sm">
                 {isPolling ? (
-                  <div className="flex items-center gap-1 text-green-600">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                    <div className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full animate-pulse"></div>
                     <span>同步中</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                    <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full"></div>
                     <span>待機</span>
                   </div>
                 )}
@@ -987,7 +987,7 @@ export function ConsultationAreaNew({
                 onClick={handleResetCanvas}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <RotateCcw className="w-4 h-4" />
                 重置
@@ -996,7 +996,7 @@ export function ConsultationAreaNew({
                 onClick={handleClearCanvas}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <Trash2 className="w-4 h-4" />
                 清空
@@ -1005,7 +1005,7 @@ export function ConsultationAreaNew({
                 onClick={handleSaveCanvas}
                 variant="default"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600"
               >
                 <Save className="w-4 h-4" />
                 儲存
@@ -1014,7 +1014,7 @@ export function ConsultationAreaNew({
           </div>
 
           {/* Game Canvas */}
-          <div className="bg-white rounded-lg shadow-lg p-6 h-[calc(100%-80px)]">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 h-[calc(100%-80px)]">
             {gameMode === '優劣勢分析' && (
               <AdvantageDisadvantageCanvas
                 advantageCards={gameState.advantage}

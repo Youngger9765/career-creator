@@ -45,7 +45,7 @@ describe('Card Events Integration', () => {
 
       (cardEventsAPI.createEvent as any).mockResolvedValueOnce(mockEvent);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.flipCard(mockCardId, true);
@@ -79,7 +79,7 @@ describe('Card Events Integration', () => {
 
       (cardEventsAPI.createEvent as any).mockResolvedValueOnce(mockEvent);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.moveCard(mockCardId, fromPosition, toPosition);
@@ -112,7 +112,7 @@ describe('Card Events Integration', () => {
 
       (cardEventsAPI.createEvent as any).mockResolvedValueOnce(mockEvent);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.selectCard(mockCardId);
@@ -142,7 +142,7 @@ describe('Card Events Integration', () => {
 
       (cardEventsAPI.createEvent as any).mockResolvedValueOnce(mockEvent);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.addNotes(mockCardId, notes);
@@ -173,7 +173,7 @@ describe('Card Events Integration', () => {
 
       (cardEventsAPI.createEvent as any).mockResolvedValueOnce(mockEvent);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.recordInsight(insight);
@@ -222,7 +222,7 @@ describe('Card Events Integration', () => {
     it('should load events for a room', async () => {
       (cardEventsAPI.getLatestRoomEvents as any).mockResolvedValueOnce(mockEvents);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.loadEvents();
@@ -236,7 +236,7 @@ describe('Card Events Integration', () => {
     it('should filter events by type', async () => {
       (cardEventsAPI.getLatestRoomEvents as any).mockResolvedValueOnce(mockEvents);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.loadEvents();
@@ -250,7 +250,7 @@ describe('Card Events Integration', () => {
     it('should filter events by card', async () => {
       (cardEventsAPI.getLatestRoomEvents as any).mockResolvedValueOnce(mockEvents);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.loadEvents();
@@ -264,7 +264,7 @@ describe('Card Events Integration', () => {
     it('should filter events by performer', async () => {
       (cardEventsAPI.getLatestRoomEvents as any).mockResolvedValueOnce(mockEvents);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.loadEvents();
@@ -281,7 +281,7 @@ describe('Card Events Integration', () => {
       const errorMessage = 'Network error';
       (cardEventsAPI.createEvent as any).mockRejectedValueOnce(new Error(errorMessage));
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         try {
@@ -296,7 +296,7 @@ describe('Card Events Integration', () => {
     });
 
     it('should clear error state', async () => {
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       // Set error state
       (cardEventsAPI.getLatestRoomEvents as any).mockRejectedValueOnce(new Error('Error'));
@@ -330,7 +330,7 @@ describe('Card Events Integration', () => {
 
       (cardEventsAPI.getLatestRoomEvents as any).mockResolvedValueOnce(unorderedEvents);
 
-      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId, realtime: false }));
+      const { result } = renderHook(() => useCardEvents({ roomId: mockRoomId }));
 
       await act(async () => {
         await result.current.loadEvents();

@@ -198,7 +198,7 @@ export const useGameSessionStore = create<GameSessionState>((set, get) => ({
           },
         });
       } else if (!result.success) {
-        set({ error: result.error_message || 'Action failed' });
+        set({ error: result.message || 'Action failed' });
       }
     } catch (error: any) {
       set({

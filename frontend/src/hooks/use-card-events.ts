@@ -5,14 +5,12 @@
 import { useState, useCallback } from 'react';
 import { CardEvent, CardEventCreate, CardEventType } from '@/types/api';
 import { cardEventsAPI } from '@/lib/api/card-events';
-import { useWebSocket } from './use-websocket';
 
 interface UseCardEventsOptions {
   roomId: string;
-  realtime?: boolean;
 }
 
-export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions) {
+export function useCardEvents({ roomId }: UseCardEventsOptions) {
   const [events, setEvents] = useState<CardEvent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,12 +41,8 @@ export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions)
           room_id: roomId,
         });
 
-        // Add to local state if not using realtime (realtime will handle via WebSocket)
-        if (!realtime) {
-          setEvents((prev) =>
-            [...prev, event].sort((a, b) => a.sequence_number - b.sequence_number)
-          );
-        }
+        // Add to local state immediately
+        setEvents((prev) => [...prev, event].sort((a, b) => a.sequence_number - b.sequence_number));
 
         return event;
       } catch (err: any) {
@@ -56,20 +50,8 @@ export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions)
         throw err;
       }
     },
-    [roomId, realtime]
+    [roomId]
   );
-
-  // Real-time event handling
-  const handleRealtimeEvent = useCallback((event: CardEvent) => {
-    setEvents((prev) => {
-      // Check if event already exists
-      if (prev.some((e) => e.id === event.id)) {
-        return prev;
-      }
-
-      return [...prev, event].sort((a, b) => a.sequence_number - b.sequence_number);
-    });
-  }, []);
 
   // Convenience methods for specific event types
   const dealCard = useCallback(
@@ -176,7 +158,6 @@ export function useCardEvents({ roomId, realtime = true }: UseCardEventsOptions)
     error,
     loadEvents,
     createEvent,
-    handleRealtimeEvent,
 
     // Convenience methods
     dealCard,

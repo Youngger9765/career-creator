@@ -180,7 +180,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <h3 className="font-semibold text-gray-800 mb-2">即時同步</h3>
-              <p className="text-sm text-gray-600">WebSocket 技術確保所有操作即時同步</p>
+              <p className="text-sm text-gray-600">智能輪詢技術確保操作狀態同步</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">

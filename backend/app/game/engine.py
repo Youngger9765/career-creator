@@ -206,6 +206,20 @@ class GameEngine:
                 new_state = state.place_card_in_zone(action.card_id, action.target_zone)
                 return ActionResult.success_result(new_state)
 
+            elif action.type == ActionType.ARRANGE:
+                # For ARRANGE action, just increment version to track state change
+                # The actual game state data is passed through action.data
+                new_state = GameState(
+                    room_id=state.room_id,
+                    rule_id=state.rule_id,
+                    zones=state.zones,
+                    version=state.version + 1,
+                    deck_remaining=state.deck_remaining,
+                    turn_count=state.turn_count,
+                    current_player=state.current_player,
+                )
+                return ActionResult.success_result(new_state)
+
             # 其他動作類型的處理...
             return ActionResult.error_result(f"Unsupported action type: {action.type}")
 

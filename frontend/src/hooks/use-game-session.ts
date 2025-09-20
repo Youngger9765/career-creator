@@ -87,8 +87,10 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
         // Execute update action asynchronously without blocking state update
         gameSessionsAPI
           .executeAction(session.id, {
-            type: 'arrange',
-            data: updatedState,
+            action_type: 'arrange',
+            action_data: updatedState,
+            player_id: 'demo-counselor-001', // TODO: Get from auth context
+            player_role: 'counselor',
           })
           .catch((err) => {
             setError(`Failed to save state: ${err.message}`);

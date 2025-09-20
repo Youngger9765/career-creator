@@ -712,11 +712,10 @@ export function ConsultationArea({
     return gameRuleCardMapping[gameRule as keyof typeof gameRuleCardMapping] || [];
   };
 
-  // Initialize card synchronization
+  // Disable card synchronization for single-machine mode
   const {
     syncedCards,
     isActive: isSyncActive,
-    isWebSocketConnected,
     error: syncError,
     syncCardEvent,
     updateLocalCard,
@@ -724,8 +723,7 @@ export function ConsultationArea({
     clearError: clearSyncError,
   } = useCardSync({
     roomId,
-    enabled: !isReadOnly,
-    useWebSocket: true,
+    enabled: false, // Disable polling for single-machine mode
     performerInfo,
   });
 

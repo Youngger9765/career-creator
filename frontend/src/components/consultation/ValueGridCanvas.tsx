@@ -22,12 +22,18 @@ function DraggableGridCard({ card, position }: { card: CardData; position: strin
       style={style}
       {...listeners}
       {...attributes}
-      className="w-full h-full bg-white border-2 border-blue-400 rounded-lg shadow-lg p-2 cursor-move hover:shadow-xl transition-all flex flex-col justify-center"
+      className="w-full h-full bg-white dark:bg-gray-700 border-2 border-blue-400 dark:border-blue-500 rounded-lg shadow-lg p-2 cursor-move hover:shadow-xl transition-all flex flex-col justify-center"
     >
-      <div className="text-sm font-bold mb-1 text-center">{card.title}</div>
-      <div className="text-xs text-gray-600 text-center line-clamp-2">{card.description}</div>
+      <div className="text-sm font-bold mb-1 text-center text-gray-900 dark:text-gray-100">
+        {card.title}
+      </div>
+      <div className="text-xs text-gray-600 dark:text-gray-300 text-center line-clamp-2">
+        {card.description}
+      </div>
       {card.category && (
-        <div className="text-xs text-blue-600 mt-1 text-center">{card.category}</div>
+        <div className="text-xs text-blue-600 dark:text-blue-400 mt-1 text-center">
+          {card.category}
+        </div>
       )}
     </div>
   );
@@ -49,21 +55,21 @@ function GridCell({ id, row, col, card }: GridCellProps) {
     <div
       ref={setNodeRef}
       className={`
-        border-2 border-dashed border-gray-300 rounded-lg p-2
+        border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-2
         flex flex-col items-center justify-center h-full relative
-        ${isOver ? 'bg-blue-50 border-blue-400' : 'bg-white'}
+        ${isOver ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-500' : 'bg-white dark:bg-gray-800'}
         transition-all duration-200
       `}
       style={{ minHeight: '100px' }}
     >
       {/* Position number always visible in top-left corner */}
-      <div className="absolute top-1 left-1 text-lg font-bold text-gray-400 z-10">
+      <div className="absolute top-1 left-1 text-lg font-bold text-gray-400 dark:text-gray-500 z-10">
         {row * 3 + col + 1}
       </div>
 
       {!card && (
         <div className="text-center">
-          <div className="text-sm text-gray-300 mt-4">拖放卡片至此</div>
+          <div className="text-sm text-gray-300 dark:text-gray-600 mt-4">拖放卡片至此</div>
         </div>
       )}
       {card && <DraggableGridCard card={card} position={id} />}
@@ -122,7 +128,7 @@ export function ValueGridCanvas({ cards }: ValueGridCanvasProps) {
           </div>
         </div>
       </div>
-      <div className="mt-2 text-center text-xs text-gray-600">
+      <div className="mt-2 text-center text-xs text-gray-600 dark:text-gray-400">
         <p>將卡片拖放到九宮格中，排序你的價值觀優先順序</p>
       </div>
     </div>

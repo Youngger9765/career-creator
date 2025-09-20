@@ -1,10 +1,9 @@
 /**
  * Card Synchronization Service
- * 卡牌同步服務 - 管理卡牌狀態的同步
+ * 卡牌同步服務 - 管理卡牌狀態的同步 (Polling Only for MVP)
  */
 import { CardEvent, CardEventType, cardEventsAPI } from '@/lib/api/card-events';
 import { GameCard } from '@/types/cards';
-import wsClient from '@/lib/websocket-client';
 
 export interface SyncedCardState {
   id: string;
@@ -23,377 +22,324 @@ export interface SyncedCardState {
 
 export interface CardSyncOptions {
   roomId: string;
-  onStateUpdate: (cards: SyncedCardState[]) => void;
-  onError: (error: Error) => void;
   syncInterval?: number; // ms
-  useWebSocket?: boolean; // Enable real-time sync via WebSocket
-  wsClient?: typeof wsClient; // WebSocket client instance
+  optimisticUpdates?: boolean;
+  smartPolling?: boolean;
+  performerInfo?: {
+    id?: string;
+    name?: string;
+    type?: string;
+  };
+}
+
+export interface SyncResult {
+  cards: SyncedCardState[];
+  changed: boolean;
+  lastSyncTime: string;
 }
 
 export class CardSyncService {
   private roomId: string;
-  private onStateUpdate: (cards: SyncedCardState[]) => void;
-  private onError: (error: Error) => void;
   private syncInterval: number;
-  private syncTimer: NodeJS.Timeout | null = null;
+  private optimisticUpdates: boolean;
+  private smartPolling: boolean;
+  private performerInfo: { id?: string; name?: string; type?: string };
+
   private lastSyncTime: string | null = null;
-  private isActive = false;
   private localCards = new Map<string, SyncedCardState>();
-  private useWebSocket: boolean;
-  private ws: typeof wsClient | null = null;
-  private wsEventCleanup: (() => void) | null = null;
+  private lastSequenceNumber = 0;
 
   constructor(options: CardSyncOptions) {
     this.roomId = options.roomId;
-    this.onStateUpdate = options.onStateUpdate;
-    this.onError = options.onError;
-    this.syncInterval = options.syncInterval || 2000; // Default 2 seconds
-    this.useWebSocket = options.useWebSocket || false;
-    this.ws = options.wsClient || (this.useWebSocket ? wsClient : null);
+    this.syncInterval = options.syncInterval || 4000; // Default 4 seconds
+    this.optimisticUpdates = options.optimisticUpdates ?? true;
+    this.smartPolling = options.smartPolling ?? true;
+    this.performerInfo = options.performerInfo || {};
   }
 
   /**
-   * Start synchronization
+   * Poll for changes from the server
    */
-  async start(): Promise<void> {
-    if (this.isActive) return;
-
-    this.isActive = true;
-
+  async pollChanges(): Promise<SyncResult> {
     try {
-      // Initial sync
-      await this.performSync();
+      // Get latest events (simple polling approach for MVP)
+      const events = await cardEventsAPI.getLatestRoomEvents(this.roomId, 50);
 
-      if (this.useWebSocket && this.ws) {
-        // Set up WebSocket event listener for real-time updates
-        this.setupWebSocketListener();
+      const currentTime = new Date().toISOString();
+      let hasChanges = false;
 
-        // Use longer sync interval when WebSocket is active (as a fallback)
-        this.syncTimer = setInterval(() => {
-          this.performSync().catch(this.onError);
-        }, this.syncInterval * 3); // 3x longer interval with WebSocket
-      } else {
-        // Set up regular polling when WebSocket is not available
-        this.syncTimer = setInterval(() => {
-          this.performSync().catch(this.onError);
-        }, this.syncInterval);
+      // Process new events (only those with sequence number > our last seen)
+      for (const event of events) {
+        if (event.sequence_number > this.lastSequenceNumber) {
+          this.applyEvent(event);
+          this.lastSequenceNumber = event.sequence_number;
+          hasChanges = true;
+        }
       }
+
+      this.lastSyncTime = currentTime;
+
+      return {
+        cards: Array.from(this.localCards.values()),
+        changed: hasChanges,
+        lastSyncTime: currentTime,
+      };
     } catch (error) {
-      this.isActive = false;
-      this.onError(error instanceof Error ? error : new Error('Failed to start sync'));
+      throw new Error(
+        `Failed to poll changes: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   /**
-   * Stop synchronization
+   * Submit a card event to the server
    */
-  stop(): void {
-    this.isActive = false;
-
-    if (this.syncTimer) {
-      clearInterval(this.syncTimer);
-      this.syncTimer = null;
-    }
-
-    // Clean up WebSocket listener
-    if (this.wsEventCleanup) {
-      this.wsEventCleanup();
-      this.wsEventCleanup = null;
-    }
-  }
-
-  /**
-   * Send card event to server and update local state
-   */
-  async syncCardEvent(
+  async submitCardEvent(
     cardId: string,
     eventType: CardEventType,
-    eventData?: Record<string, any>,
-    performerInfo?: {
-      id?: string;
-      name?: string;
-      type?: string;
-    }
-  ): Promise<void> {
+    eventData?: Record<string, any>
+  ): Promise<CardEvent> {
     try {
-      if (this.useWebSocket && this.ws && this.ws.isConnected()) {
-        // Send via WebSocket for real-time sync
-        this.ws.sendCardEvent({
-          room_id: this.roomId,
-          event_type: eventType,
-          card_id: cardId,
-          event_data: eventData,
-          performer_id: performerInfo?.id,
-          performer_name: performerInfo?.name,
-          performer_type: (performerInfo?.type as 'user' | 'visitor' | undefined) || 'visitor',
-        });
-
-        // Update local state immediately for responsive UI
-        const mockEvent: CardEvent = {
-          id: `temp-${Date.now()}`,
-          room_id: this.roomId,
-          event_type: eventType,
-          card_id: cardId,
-          event_data: eventData,
-          performer_id: performerInfo?.id,
-          performer_type: (performerInfo?.type as 'user' | 'visitor') || 'visitor',
-          performer_name: performerInfo?.name,
-          sequence_number: 0,
-          created_at: new Date().toISOString(),
-        };
-        this.applyEventToLocalState(mockEvent);
-      } else {
-        // Fall back to API call
-        const event = await cardEventsAPI.createEvent({
-          room_id: this.roomId,
-          event_type: eventType,
-          card_id: cardId,
-          event_data: eventData,
-          performer_id: performerInfo?.id,
-          performer_name: performerInfo?.name,
-          performer_type: performerInfo?.type || 'visitor',
-        });
-
-        // Update local state immediately for responsive UI
-        this.applyEventToLocalState(event);
+      // Apply optimistic update if enabled
+      if (this.optimisticUpdates) {
+        this.applyOptimisticUpdate(cardId, eventType, eventData);
       }
+
+      const event = await cardEventsAPI.createEvent({
+        room_id: this.roomId,
+        event_type: eventType,
+        card_id: cardId,
+        event_data: eventData,
+        performer_id: this.performerInfo.id,
+        performer_type: this.performerInfo.type as 'user' | 'visitor' | undefined,
+        performer_name: this.performerInfo.name,
+      });
+
+      // Update sequence number
+      if (event.sequence_number > this.lastSequenceNumber) {
+        this.lastSequenceNumber = event.sequence_number;
+      }
+
+      // Apply the actual server response
+      this.applyEvent(event);
+
+      return event;
     } catch (error) {
-      this.onError(error instanceof Error ? error : new Error('Failed to sync card event'));
+      // Revert optimistic update on error
+      if (this.optimisticUpdates) {
+        this.revertOptimisticUpdate(cardId);
+      }
+      throw error;
     }
   }
 
   /**
-   * Update local card state (for immediate UI feedback)
+   * Get current synced card states
    */
-  updateLocalCard(cardId: string, updates: Partial<SyncedCardState>): void {
-    const existing = this.localCards.get(cardId);
-    const updated: SyncedCardState = {
-      id: cardId,
-      position: { x: 0, y: 0 },
-      isFaceUp: false,
-      isSelected: false,
-      rotation: 0,
-      scale: 1,
-      zIndex: 1,
-      lastUpdated: new Date().toISOString(),
-      ...existing,
-      ...updates,
-    };
-
-    this.localCards.set(cardId, updated);
-    this.emitStateUpdate();
-  }
-
-  /**
-   * Get current synchronized card states
-   */
-  getCardStates(): SyncedCardState[] {
+  getCards(): SyncedCardState[] {
     return Array.from(this.localCards.values());
   }
 
   /**
-   * Fetch current state from server (public method for manual polling)
+   * Update local card state
    */
-  async fetchState(): Promise<SyncedCardState[]> {
-    await this.performSync();
-    return this.getCardStates();
+  updateLocalCard(cardId: string, updates: Partial<SyncedCardState>): void {
+    const existing = this.localCards.get(cardId);
+    if (existing) {
+      this.localCards.set(cardId, {
+        ...existing,
+        ...updates,
+        lastUpdated: new Date().toISOString(),
+        isModified: true,
+      });
+    } else {
+      // Create new card if it doesn't exist
+      this.localCards.set(cardId, {
+        id: cardId,
+        position: { x: 0, y: 0 },
+        isFaceUp: false,
+        isSelected: false,
+        rotation: 0,
+        scale: 1,
+        zIndex: 0,
+        lastUpdated: new Date().toISOString(),
+        isModified: true,
+        ...updates,
+      });
+    }
   }
 
   /**
-   * Perform synchronization with server
+   * Clear all local state
    */
-  private async performSync(): Promise<void> {
-    if (!this.isActive) return;
+  clear(): void {
+    this.localCards.clear();
+    this.lastSyncTime = null;
+    this.lastSequenceNumber = 0;
+  }
 
-    try {
-      // Get latest events since last sync
-      const events = await cardEventsAPI.getLatestRoomEvents(
-        this.roomId,
-        100 // Get last 100 events
-      );
-
-      // Filter events newer than last sync
-      const newEvents = this.lastSyncTime
-        ? events.filter((event) => event.created_at > this.lastSyncTime!)
-        : events;
-
-      if (newEvents.length === 0) return;
-
-      // Apply new events to local state
-      newEvents.forEach((event) => this.applyEventToLocalState(event));
-
-      // Update last sync time
-      if (events.length > 0) {
-        this.lastSyncTime = events[0].created_at;
-      }
-
-      this.emitStateUpdate();
-    } catch (error) {
-      console.error('Sync failed:', error);
-      // Don't call onError for periodic sync failures to avoid spam
-      // Only log them
-    }
+  /**
+   * Destroy the service and clean up resources
+   */
+  destroy(): void {
+    this.clear();
   }
 
   /**
    * Apply a card event to local state
    */
-  private applyEventToLocalState(event: CardEvent): void {
+  private applyEvent(event: CardEvent): void {
     if (!event.card_id) return;
 
     const cardId = event.card_id;
-    const existing = this.localCards.get(cardId) || {
+    const existing = this.localCards.get(cardId) || this.createDefaultCardState(cardId);
+
+    switch (event.event_type) {
+      case CardEventType.CARD_FLIPPED:
+        existing.isFaceUp = event.event_data?.isFaceUp ?? !existing.isFaceUp;
+        break;
+
+      case CardEventType.CARD_MOVED:
+        if (event.event_data?.position) {
+          existing.position = event.event_data.position;
+        }
+        break;
+
+      case CardEventType.CARD_SELECTED:
+        existing.isSelected = event.event_data?.isSelected ?? true;
+        break;
+
+      case CardEventType.CARD_ARRANGED:
+        if (event.event_data) {
+          Object.assign(existing, {
+            position: event.event_data.position || existing.position,
+            rotation: event.event_data.rotation ?? existing.rotation,
+            scale: event.event_data.scale ?? existing.scale,
+            zIndex: event.event_data.zIndex ?? existing.zIndex,
+          });
+        }
+        break;
+
+      case CardEventType.AREA_CLEARED:
+        // Remove all cards or reset their positions based on event data
+        if (event.event_data?.resetToDefault) {
+          this.localCards.clear();
+          return;
+        }
+        break;
+    }
+
+    existing.lastUpdated = event.created_at;
+    existing.lastEventId = event.id;
+    existing.pending = false;
+    existing.isModified = false;
+
+    this.localCards.set(cardId, existing);
+  }
+
+  /**
+   * Apply optimistic update for immediate UI feedback
+   */
+  private applyOptimisticUpdate(
+    cardId: string,
+    eventType: CardEventType,
+    eventData?: Record<string, any>
+  ): void {
+    const existing = this.localCards.get(cardId) || this.createDefaultCardState(cardId);
+
+    // Mark as pending
+    existing.pending = true;
+    existing.lastUpdated = new Date().toISOString();
+
+    // Apply the update based on event type
+    switch (eventType) {
+      case CardEventType.CARD_FLIPPED:
+        existing.isFaceUp = eventData?.isFaceUp ?? !existing.isFaceUp;
+        break;
+
+      case CardEventType.CARD_MOVED:
+        if (eventData?.position) {
+          existing.position = eventData.position;
+        }
+        break;
+
+      case CardEventType.CARD_SELECTED:
+        existing.isSelected = eventData?.isSelected ?? true;
+        break;
+
+      case CardEventType.CARD_ARRANGED:
+        if (eventData) {
+          Object.assign(existing, {
+            position: eventData.position || existing.position,
+            rotation: eventData.rotation ?? existing.rotation,
+            scale: eventData.scale ?? existing.scale,
+            zIndex: eventData.zIndex ?? existing.zIndex,
+          });
+        }
+        break;
+    }
+
+    this.localCards.set(cardId, existing);
+  }
+
+  /**
+   * Revert optimistic update on error
+   */
+  private revertOptimisticUpdate(cardId: string): void {
+    const card = this.localCards.get(cardId);
+    if (card && card.pending) {
+      // For now, just mark as not pending
+      // In a more sophisticated implementation, we'd store the previous state
+      card.pending = false;
+    }
+  }
+
+  /**
+   * Create default card state
+   */
+  private createDefaultCardState(cardId: string): SyncedCardState {
+    return {
       id: cardId,
       position: { x: 0, y: 0 },
       isFaceUp: false,
       isSelected: false,
       rotation: 0,
       scale: 1,
-      zIndex: 1,
-      lastUpdated: event.created_at,
-    };
-
-    let updated = { ...existing };
-
-    switch (event.event_type) {
-      case CardEventType.CARD_DEALT:
-        updated = {
-          ...updated,
-          position: event.event_data?.position || { x: 400, y: 300 },
-          lastUpdated: event.created_at,
-          lastEventId: event.id,
-        };
-        break;
-
-      case CardEventType.CARD_FLIPPED:
-        updated = {
-          ...updated,
-          isFaceUp: event.event_data?.face_up ?? !updated.isFaceUp,
-          lastUpdated: event.created_at,
-          lastEventId: event.id,
-        };
-        break;
-
-      case CardEventType.CARD_MOVED:
-        if (event.event_data?.to_position) {
-          updated = {
-            ...updated,
-            position: event.event_data.to_position,
-            lastUpdated: event.created_at,
-            lastEventId: event.id,
-          };
-        }
-        break;
-
-      case CardEventType.CARD_ARRANGED:
-        if (event.event_data?.position) {
-          updated = {
-            ...updated,
-            position: event.event_data.position,
-            lastUpdated: event.created_at,
-            lastEventId: event.id,
-          };
-        }
-        break;
-
-      case CardEventType.CARD_SELECTED:
-        // For selection events, we might want different behavior
-        // For now, we'll ignore selection sync to avoid conflicts
-        break;
-
-      default:
-        // Unknown event type, just update timestamp
-        updated = {
-          ...updated,
-          lastUpdated: event.created_at,
-          lastEventId: event.id,
-        };
-    }
-
-    this.localCards.set(cardId, updated);
-  }
-
-  /**
-   * Emit state update to callback
-   */
-  private emitStateUpdate(): void {
-    const cards = Array.from(this.localCards.values()).sort((a, b) => a.zIndex - b.zIndex);
-
-    this.onStateUpdate(cards);
-  }
-
-  /**
-   * Set up WebSocket event listener for real-time updates
-   */
-  private setupWebSocketListener(): void {
-    if (!this.ws) return;
-
-    const handleCardEvent = (eventData: any) => {
-      // Convert WebSocket event data to CardEvent format
-      const event: CardEvent = {
-        id: eventData.id || `ws-${Date.now()}`,
-        room_id: eventData.room_id || this.roomId,
-        event_type: eventData.event_type,
-        card_id: eventData.card_id,
-        event_data: eventData.event_data,
-        notes: eventData.notes,
-        performer_id: eventData.performer_id,
-        performer_type: eventData.performer_type || 'visitor',
-        performer_name: eventData.performer_name,
-        sequence_number: eventData.sequence_number || 0,
-        created_at: eventData.created_at || new Date().toISOString(),
-      };
-
-      // Apply the event to local state
-      this.applyEventToLocalState(event);
-      this.emitStateUpdate();
-    };
-
-    // Listen for card events from WebSocket
-    this.ws.on('card_event', handleCardEvent);
-
-    // Store cleanup function
-    this.wsEventCleanup = () => {
-      if (this.ws) {
-        this.ws.off('card_event', handleCardEvent);
-      }
-    };
-  }
-
-  /**
-   * Convert GameCard to SyncedCardState
-   */
-  static fromGameCard(gameCard: GameCard): SyncedCardState {
-    return {
-      id: gameCard.id,
-      position: gameCard.position,
-      isFaceUp: gameCard.isFaceUp,
-      isSelected: gameCard.isSelected,
-      rotation: gameCard.rotation,
-      scale: gameCard.scale,
-      zIndex: gameCard.zIndex,
+      zIndex: 0,
       lastUpdated: new Date().toISOString(),
-    };
-  }
-
-  /**
-   * Convert SyncedCardState to GameCard partial
-   */
-  static toGameCardUpdates(syncedCard: SyncedCardState): Partial<GameCard> {
-    return {
-      position: syncedCard.position,
-      isFaceUp: syncedCard.isFaceUp,
-      isSelected: syncedCard.isSelected,
-      rotation: syncedCard.rotation,
-      scale: syncedCard.scale,
-      zIndex: syncedCard.zIndex,
     };
   }
 }
 
 /**
- * Create a card synchronization service instance
+ * Factory function to create a card sync service
  */
 export function createCardSyncService(options: CardSyncOptions): CardSyncService {
   return new CardSyncService(options);
+}
+
+/**
+ * Helper function to apply synced state to game cards
+ */
+export function applySyncedState(
+  gameCards: GameCard[],
+  syncedCards: SyncedCardState[]
+): GameCard[] {
+  const syncedMap = new Map(syncedCards.map((card) => [card.id, card]));
+
+  return gameCards.map((gameCard) => {
+    const synced = syncedMap.get(gameCard.id);
+    if (synced) {
+      return {
+        ...gameCard,
+        position: synced.position,
+        isFaceUp: synced.isFaceUp,
+        isSelected: synced.isSelected,
+        rotation: synced.rotation,
+        scale: synced.scale,
+        zIndex: synced.zIndex,
+      };
+    }
+    return gameCard;
+  });
 }

@@ -52,7 +52,9 @@ def create_game_session(
     existing_session = db_session.exec(
         select(GameSession).where(
             GameSession.room_id == session_data.room_id,
-            GameSession.status.in_([GameStatus.WAITING.value, GameStatus.IN_PROGRESS.value]),
+            GameSession.status.in_(
+                [GameStatus.WAITING.value, GameStatus.IN_PROGRESS.value]
+            ),
         )
     ).first()
 
@@ -124,7 +126,9 @@ def get_active_game_session(room_id: UUID, db_session: Session = Depends(get_ses
     game_session = db_session.exec(
         select(GameSession).where(
             GameSession.room_id == room_id,
-            GameSession.status.in_([GameStatus.WAITING.value, GameStatus.IN_PROGRESS.value]),
+            GameSession.status.in_(
+                [GameStatus.WAITING.value, GameStatus.IN_PROGRESS.value]
+            ),
         )
     ).first()
 
@@ -230,7 +234,10 @@ def execute_game_action(
     action = GameAction(
         type=action_type,
         player_id=action_request.player_id,
-        **action_request.action_data,
+        card_id=action_request.action_data.get("card_id"),
+        target_zone=action_request.action_data.get("target_zone"),
+        position=action_request.action_data.get("position"),
+        data=action_request.action_data,
     )
 
     # 驗證動作

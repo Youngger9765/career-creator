@@ -13,7 +13,7 @@ export const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Send cookies with requests
+  withCredentials: false, // No cookies needed for JWT auth
 });
 
 // Request interceptor to add auth token

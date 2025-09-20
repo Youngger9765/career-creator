@@ -210,9 +210,13 @@ export default function RoomPage() {
 
             {currentRoom && (
               <div>
-                <h1 className="text-xl font-bold text-gray-800">{currentRoom.name}</h1>
+                <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+                  {currentRoom.name}
+                </h1>
                 {currentRoom.description && (
-                  <p className="text-sm text-gray-600">{currentRoom.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {currentRoom.description}
+                  </p>
                 )}
               </div>
             )}
@@ -220,9 +224,9 @@ export default function RoomPage() {
             {/* 牌卡選擇和玩法選擇 */}
             <div className="flex items-center space-x-4">
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500 mb-1">牌卡選擇</label>
+                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1">牌組模式</label>
                 <select
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedDeck}
                   onChange={(e) => handleDeckChange(e.target.value)}
                 >
@@ -233,9 +237,9 @@ export default function RoomPage() {
               </div>
 
               <div className="flex flex-col">
-                <label className="text-xs text-gray-500 mb-1">玩法選擇</label>
+                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1">玩法選擇</label>
                 <select
-                  className="px-3 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={selectedGameRule}
                   onChange={(e) => {
                     const newGameRule = e.target.value;

@@ -31,17 +31,17 @@ export interface GameSessionCreate {
 }
 
 export interface GameAction {
-  type: 'place_card' | 'flip' | 'move' | 'arrange' | 'annotate';
-  card_id?: string;
-  target_zone?: string;
-  position?: { x: number; y: number };
-  data?: any;
+  action_type: string;
+  action_data: Record<string, any>;
+  player_id: string;
+  player_role: 'counselor' | 'visitor';
 }
 
 export interface GameActionResponse {
   success: boolean;
+  message?: string;
   game_state?: any;
-  error_message?: string;
+  action_id?: string;
 }
 
 export const gameSessionsAPI = {

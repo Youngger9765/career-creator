@@ -103,8 +103,8 @@ export function useVisitorJoin() {
     async (shareCode: string, visitorName: string): Promise<void> => {
       const visitor = await validateAndJoinRoom(shareCode, visitorName);
 
-      // Redirect to room with visitor params
-      router.push(`/room/${visitor.room_id}?visitor=true`);
+      // Redirect to room with visitor params and visitor name
+      router.push(`/room/${visitor.room_id}?visitor=true&name=${encodeURIComponent(visitorName)}`);
     },
     [validateAndJoinRoom, router]
   );

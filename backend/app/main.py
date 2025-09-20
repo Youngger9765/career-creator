@@ -40,7 +40,11 @@ elif settings.environment == "staging":
         "http://localhost:3000",  # Allow local development
     ]
 else:
-    origins = ["*"]  # Allow all origins in development
+    # In development, specify exact origins for credentials support
+    origins = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ]
 
 app.add_middleware(
     CORSMiddleware,

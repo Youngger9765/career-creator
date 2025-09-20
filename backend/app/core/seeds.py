@@ -320,7 +320,7 @@ def seed_career_cards():
                     category=card_data["category"],
                     card_metadata={
                         "tags": [card_data["category"]],
-                        "difficulty": "beginner",
+                        "difficulty": "初級",
                     },
                 )
                 session.add(card)

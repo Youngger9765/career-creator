@@ -29,7 +29,7 @@ export function useRoomExpiration() {
           isActive: false,
           isExpired: false,
           isClosed: true,
-          label: '已關閉',
+          label: '已停用',
           color: 'bg-gray-100 text-gray-800',
         };
       }
@@ -69,7 +69,7 @@ export function useRoomExpiration() {
         isActive: true,
         isExpired: false,
         isClosed: false,
-        label: '活躍中',
+        label: '有效期內',
         color: 'bg-green-100 text-green-800',
       };
     },

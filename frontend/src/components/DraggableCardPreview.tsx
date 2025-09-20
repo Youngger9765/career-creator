@@ -101,7 +101,7 @@ export function DraggableCardPreview({
 
           {/* Instructions text */}
           <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 text-xs opacity-60 text-center">
-            點擊翻轉查看詳情
+            查看詳細說明
           </div>
         </div>
 
@@ -132,7 +132,7 @@ export function DraggableCardPreview({
             {/* Drag instruction on back */}
             <div className="mt-4 pt-3 border-t border-white/20">
               <div className="flex items-center justify-between">
-                <span className="text-xs opacity-60">點擊返回</span>
+                <span className="text-xs opacity-60">查看職業名稱</span>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

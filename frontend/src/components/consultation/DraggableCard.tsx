@@ -87,7 +87,7 @@ export function DraggableCard({
           >
             <div className="text-sm font-bold mb-2 text-gray-800">{card.title}</div>
             <div className="text-xs text-gray-600 line-clamp-3">{card.description}</div>
-            <div className="absolute bottom-1 right-1 text-[9px] text-gray-500">點擊翻轉</div>
+            <div className="absolute bottom-1 right-1 text-[9px] text-gray-500">查看詳細說明</div>
           </div>
 
           {/* Back of auxiliary card */}
@@ -115,7 +115,7 @@ export function DraggableCard({
                 </div>
               </div>
             )}
-            <div className="absolute bottom-1 right-1 text-[9px] text-gray-500">點擊返回</div>
+            <div className="absolute bottom-1 right-1 text-[9px] text-gray-500">查看職業名稱</div>
           </div>
         </div>
       </div>
@@ -153,7 +153,7 @@ export function DraggableCard({
           <div className="text-xs opacity-90 line-clamp-2">{card.description}</div>
           {card.category && <div className="text-xs opacity-75 mt-2">{card.category}</div>}
           <div className="absolute bottom-1 right-1 text-[10px] opacity-60">
-            點擊翻轉 | 拖曳加入
+            查看詳細說明 | 拖曳加入
           </div>
         </div>
 
@@ -182,7 +182,7 @@ export function DraggableCard({
             </div>
           )}
           <div className="absolute bottom-1 right-1 text-[10px] opacity-60">
-            點擊返回 | 拖曳加入
+            查看職業名稱 | 拖曳加入
           </div>
         </div>
       </div>

@@ -1,0 +1,273 @@
+{
+  "configs": [
+    {
+      "id": "three_columns",
+      "name": "三欄分類畫布",
+      "description": "用於六大性格分析，將職業卡分為喜歡、中立、討厭三類",
+      "type": "columns",
+      "gameplay": "personality_analysis",
+      "layout": {
+        "columns": [
+          {
+            "id": "like",
+            "name": "喜歡",
+            "color": "#10B981",
+            "icon": "😊",
+            "position": { "x": 0, "y": 0, "width": "33%", "height": "100%" }
+          },
+          {
+            "id": "neutral",
+            "name": "中立",
+            "color": "#6B7280",
+            "icon": "😐",
+            "position": { "x": "33%", "y": 0, "width": "34%", "height": "100%" }
+          },
+          {
+            "id": "dislike",
+            "name": "討厭",
+            "color": "#EF4444",
+            "icon": "😟",
+            "position": { "x": "67%", "y": 0, "width": "33%", "height": "100%" }
+          }
+        ]
+      },
+      "constraints": {
+        "maxPerColumn": {
+          "like": 20,
+          "dislike": 20
+        },
+        "minPerColumn": {},
+        "requireAllColumns": false
+      },
+      "features": {
+        "hasCounter": true,
+        "hasLabels": true,
+        "allowDragBetweenColumns": true,
+        "showColumnHighlight": true
+      }
+    },
+    {
+      "id": "two_zones",
+      "name": "雙區畫布",
+      "description": "用於優劣勢分析，分為優勢區和劣勢區",
+      "type": "zones",
+      "gameplay": "advantage_analysis",
+      "layout": {
+        "zones": [
+          {
+            "id": "advantage",
+            "name": "優勢",
+            "color": "#059669",
+            "icon": "💪",
+            "position": { "x": 0, "y": 0, "width": "50%", "height": "100%" }
+          },
+          {
+            "id": "disadvantage",
+            "name": "劣勢",
+            "color": "#DC2626",
+            "icon": "🎯",
+            "position": { "x": "50%", "y": 0, "width": "50%", "height": "100%" }
+          }
+        ]
+      },
+      "constraints": {
+        "maxPerZone": 5,
+        "minPerZone": 0,
+        "totalLimit": 10,
+        "uniquePlacement": true
+      },
+      "features": {
+        "hasCounter": true,
+        "showCounterFormat": "{current}/{max}",
+        "hasZoneBorder": true,
+        "allowDragBetweenZones": true
+      }
+    },
+    {
+      "id": "grid_3x3",
+      "name": "3×3九宮格",
+      "description": "用於價值觀排序，將價值卡排列成優先順序",
+      "type": "grid",
+      "gameplay": "value_ranking",
+      "layout": {
+        "grid": {
+          "rows": 3,
+          "cols": 3,
+          "cells": [
+            { "id": "grid-0-0", "row": 0, "col": 0, "priority": 1, "label": "1" },
+            { "id": "grid-0-1", "row": 0, "col": 1, "priority": 2, "label": "2" },
+            { "id": "grid-0-2", "row": 0, "col": 2, "priority": 3, "label": "3" },
+            { "id": "grid-1-0", "row": 1, "col": 0, "priority": 4, "label": "4" },
+            { "id": "grid-1-1", "row": 1, "col": 1, "priority": 5, "label": "5" },
+            { "id": "grid-1-2", "row": 1, "col": 2, "priority": 6, "label": "6" },
+            { "id": "grid-2-0", "row": 2, "col": 0, "priority": 7, "label": "7" },
+            { "id": "grid-2-1", "row": 2, "col": 1, "priority": 8, "label": "8" },
+            { "id": "grid-2-2", "row": 2, "col": 2, "priority": 9, "label": "9" }
+          ]
+        }
+      },
+      "constraints": {
+        "maxPerCell": 1,
+        "uniquePlacement": true,
+        "totalLimit": 9,
+        "requireFullGrid": false
+      },
+      "features": {
+        "hasNumbering": true,
+        "highlightTopThree": true,
+        "showGridLines": true,
+        "allowSwap": true
+      }
+    },
+    {
+      "id": "collection_zone",
+      "name": "收藏區畫布",
+      "description": "用於職業收藏家，精選最感興趣的職業卡",
+      "type": "collection",
+      "gameplay": "career_collector",
+      "layout": {
+        "collection": {
+          "id": "favorites",
+          "name": "我的職業收藏",
+          "displayMode": "grid",
+          "columns": 5,
+          "position": { "x": 0, "y": 0, "width": "100%", "height": "100%" }
+        }
+      },
+      "constraints": {
+        "maxCards": 15,
+        "minCards": 0,
+        "uniquePlacement": true
+      },
+      "features": {
+        "hasCounter": true,
+        "showCounterFormat": "已收藏 {current}/15",
+        "allowReorder": true,
+        "hasRemoveButton": true,
+        "showCardNumber": true
+      }
+    },
+    {
+      "id": "three_zones_growth",
+      "name": "三區成長畫布",
+      "description": "用於成長計畫，規劃技能發展路徑",
+      "type": "zones",
+      "gameplay": "growth_planning",
+      "layout": {
+        "zones": [
+          {
+            "id": "current_skills",
+            "name": "現有技能",
+            "color": "#3B82F6",
+            "icon": "📚",
+            "position": { "x": 0, "y": 0, "width": "33%", "height": "100%" }
+          },
+          {
+            "id": "learning_path",
+            "name": "學習路徑",
+            "color": "#8B5CF6",
+            "icon": "🛤️",
+            "position": { "x": "33%", "y": 0, "width": "34%", "height": "100%" }
+          },
+          {
+            "id": "target_skills",
+            "name": "目標技能",
+            "color": "#F59E0B",
+            "icon": "🎯",
+            "position": { "x": "67%", "y": 0, "width": "33%", "height": "100%" }
+          }
+        ]
+      },
+      "constraints": {
+        "maxPerZone": 10,
+        "minPerZone": 0,
+        "allowMultipleDecks": true
+      },
+      "features": {
+        "hasCounter": false,
+        "hasAnnotations": true,
+        "allowConnections": true,
+        "hasTimelineView": true
+      }
+    },
+    {
+      "id": "free_canvas",
+      "name": "自由畫布",
+      "description": "用於職位拆解，自由排列和連結技能卡",
+      "type": "free",
+      "gameplay": "position_breakdown",
+      "layout": {
+        "canvas": {
+          "width": 1200,
+          "height": 800,
+          "background": "grid",
+          "gridSize": 20
+        }
+      },
+      "constraints": {
+        "maxCards": 30,
+        "allowOverlap": false
+      },
+      "features": {
+        "hasScreenshotUpload": true,
+        "allowConnections": true,
+        "hasLabels": true,
+        "hasGrouping": true,
+        "allowFreePosition": true,
+        "hasZoomPan": true
+      }
+    },
+    {
+      "id": "value_gauge",
+      "name": "量表畫布",
+      "description": "用於生活改造王，分配100點生活能量",
+      "type": "gauge",
+      "gameplay": "life_redesign",
+      "layout": {
+        "gauge": {
+          "areas": [
+            { "id": "family", "name": "家庭", "icon": "👨‍👩‍👧‍👦" },
+            { "id": "career", "name": "事業", "icon": "💼" },
+            { "id": "health", "name": "健康", "icon": "💪" },
+            { "id": "wealth", "name": "財富", "icon": "💰" },
+            { "id": "love", "name": "愛情", "icon": "❤️" },
+            { "id": "friends", "name": "友誼", "icon": "🤝" },
+            { "id": "growth", "name": "成長", "icon": "📚" },
+            { "id": "leisure", "name": "休閒", "icon": "🎮" }
+          ],
+          "scale": {
+            "min": 0,
+            "max": 100,
+            "step": 5
+          }
+        }
+      },
+      "constraints": {
+        "totalTokens": 100,
+        "minPerArea": 0,
+        "maxPerArea": 100,
+        "sumEquals": 100
+      },
+      "features": {
+        "hasTokens": true,
+        "tokenName": "生活能量",
+        "hasSliders": true,
+        "hasPlusMinusButtons": true,
+        "hasVisualization": "pieChart",
+        "showRemaining": true,
+        "hasReset": true,
+        "hasAutoBalance": false,
+        "hasSatisfactionScale": true,
+        "allowComparison": true
+      },
+      "tokenConfig": {
+        "total": 100,
+        "unit": "點",
+        "color": "#FCD34D",
+        "icon": "⚡",
+        "redistributable": true,
+        "showAnimation": true
+      }
+    }
+  ]
+}

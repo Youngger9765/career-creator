@@ -1,0 +1,443 @@
+{
+  "deck": {
+    "id": "value_cards_36",
+    "name": "價值導航卡",
+    "description": "36張核心人生價值觀卡片",
+    "type": "main",
+    "version": "1.0.0"
+  },
+  "cards": [
+    {
+      "id": "value_001",
+      "title": "家庭",
+      "category": "relationships",
+      "description": "與家人共度時光，建立溫暖的家庭關係",
+      "questions": [
+        "家人對你的意義是什麼？",
+        "理想的家庭生活是什麼樣子？",
+        "如何平衡家庭與工作？"
+      ],
+      "icon": "👨‍👩‍👧‍👦"
+    },
+    {
+      "id": "value_002",
+      "title": "事業成就",
+      "category": "achievement",
+      "description": "在職業生涯中獲得成功和認可",
+      "questions": [
+        "事業成功對你代表什麼？",
+        "願意為事業犧牲什麼？",
+        "理想的職業巔峰是什麼？"
+      ],
+      "icon": "🏆"
+    },
+    {
+      "id": "value_003",
+      "title": "健康",
+      "category": "wellbeing",
+      "description": "保持身心健康，享受活力人生",
+      "questions": [
+        "健康對生活品質的影響？",
+        "如何維持身心平衡？",
+        "健康與其他目標的優先順序？"
+      ],
+      "icon": "💪"
+    },
+    {
+      "id": "value_004",
+      "title": "財富",
+      "category": "material",
+      "description": "累積財富，達到經濟自由",
+      "questions": [
+        "金錢對你的意義？",
+        "理想的財務狀態？",
+        "金錢與快樂的關係？"
+      ],
+      "icon": "💰"
+    },
+    {
+      "id": "value_005",
+      "title": "愛情",
+      "category": "relationships",
+      "description": "擁有深刻的親密關係和浪漫",
+      "questions": [
+        "理想的愛情是什麼樣子？",
+        "愛情在人生中的份量？",
+        "如何經營親密關係？"
+      ],
+      "icon": "❤️"
+    },
+    {
+      "id": "value_006",
+      "title": "友誼",
+      "category": "relationships",
+      "description": "建立真誠深厚的友誼",
+      "questions": [
+        "朋友在生命中的角色？",
+        "如何維繫友誼？",
+        "品質vs數量的選擇？"
+      ],
+      "icon": "🤝"
+    },
+    {
+      "id": "value_007",
+      "title": "自由",
+      "category": "autonomy",
+      "description": "擁有選擇權，不受限制地生活",
+      "questions": [
+        "自由對你的定義？",
+        "哪種自由最重要？",
+        "自由與責任的平衡？"
+      ],
+      "icon": "🦅"
+    },
+    {
+      "id": "value_008",
+      "title": "創造力",
+      "category": "expression",
+      "description": "發揮創意，創造新事物",
+      "questions": [
+        "創造帶來什麼滿足感？",
+        "如何培養創造力？",
+        "創意表達的方式？"
+      ],
+      "icon": "🎨"
+    },
+    {
+      "id": "value_009",
+      "title": "學習成長",
+      "category": "growth",
+      "description": "持續學習，不斷進步",
+      "questions": [
+        "學習的動力來源？",
+        "想要成長的領域？",
+        "如何保持學習熱情？"
+      ],
+      "icon": "📚"
+    },
+    {
+      "id": "value_010",
+      "title": "冒險",
+      "category": "experience",
+      "description": "追求刺激，挑戰未知",
+      "questions": [
+        "冒險對你的意義？",
+        "願意承擔的風險程度？",
+        "最想嘗試的冒險？"
+      ],
+      "icon": "🎯"
+    },
+    {
+      "id": "value_011",
+      "title": "安全穩定",
+      "category": "security",
+      "description": "生活安定，有保障",
+      "questions": [
+        "安全感的來源？",
+        "穩定vs變化的選擇？",
+        "如何建立安全感？"
+      ],
+      "icon": "🛡️"
+    },
+    {
+      "id": "value_012",
+      "title": "社會貢獻",
+      "category": "contribution",
+      "description": "對社會產生正面影響",
+      "questions": [
+        "想要改變什麼？",
+        "如何回饋社會？",
+        "貢獻的意義？"
+      ],
+      "icon": "🌍"
+    },
+    {
+      "id": "value_013",
+      "title": "權力地位",
+      "category": "achievement",
+      "description": "獲得影響力和社會地位",
+      "questions": [
+        "權力的責任？",
+        "地位的重要性？",
+        "如何運用影響力？"
+      ],
+      "icon": "👑"
+    },
+    {
+      "id": "value_014",
+      "title": "獨立自主",
+      "category": "autonomy",
+      "description": "依靠自己，不依賴他人",
+      "questions": [
+        "獨立的定義？",
+        "自主與合作的平衡？",
+        "如何培養獨立性？"
+      ],
+      "icon": "🏔️"
+    },
+    {
+      "id": "value_015",
+      "title": "和諧",
+      "category": "wellbeing",
+      "description": "內心平靜，關係和諧",
+      "questions": [
+        "和諧的重要性？",
+        "如何處理衝突？",
+        "內在vs外在和諧？"
+      ],
+      "icon": "☮️"
+    },
+    {
+      "id": "value_016",
+      "title": "誠信",
+      "category": "character",
+      "description": "堅守原則，言行一致",
+      "questions": [
+        "誠信的底線？",
+        "原則vs利益的選擇？",
+        "如何維持誠信？"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "id": "value_017",
+      "title": "快樂",
+      "category": "wellbeing",
+      "description": "享受生活，保持愉悅",
+      "questions": [
+        "快樂的來源？",
+        "短期vs長期快樂？",
+        "如何維持快樂？"
+      ],
+      "icon": "😊"
+    },
+    {
+      "id": "value_018",
+      "title": "知識智慧",
+      "category": "growth",
+      "description": "追求知識，培養智慧",
+      "questions": [
+        "知識的價值？",
+        "智慧如何累積？",
+        "知識與實踐？"
+      ],
+      "icon": "🧠"
+    },
+    {
+      "id": "value_019",
+      "title": "美感",
+      "category": "expression",
+      "description": "欣賞美好，追求美學",
+      "questions": [
+        "美的定義？",
+        "美感在生活中的角色？",
+        "如何培養美感？"
+      ],
+      "icon": "🌺"
+    },
+    {
+      "id": "value_020",
+      "title": "精神信仰",
+      "category": "meaning",
+      "description": "追求精神層面的滿足",
+      "questions": [
+        "信仰的意義？",
+        "精神寄託是什麼？",
+        "如何實踐信仰？"
+      ],
+      "icon": "🕊️"
+    },
+    {
+      "id": "value_021",
+      "title": "公平正義",
+      "category": "character",
+      "description": "維護公平，伸張正義",
+      "questions": [
+        "正義的標準？",
+        "如何實踐公平？",
+        "個人vs社會正義？"
+      ],
+      "icon": "⚖️"
+    },
+    {
+      "id": "value_022",
+      "title": "休閒娛樂",
+      "category": "experience",
+      "description": "享受休閒時光，放鬆身心",
+      "questions": [
+        "休閒的重要性？",
+        "理想的休閒方式？",
+        "工作與休閒平衡？"
+      ],
+      "icon": "🎮"
+    },
+    {
+      "id": "value_023",
+      "title": "挑戰",
+      "category": "growth",
+      "description": "接受挑戰，突破自我",
+      "questions": [
+        "挑戰帶來什麼？",
+        "如何面對困難？",
+        "舒適圈的意義？"
+      ],
+      "icon": "🎯"
+    },
+    {
+      "id": "value_024",
+      "title": "認可尊重",
+      "category": "achievement",
+      "description": "獲得他人認可和尊重",
+      "questions": [
+        "認可的重要性？",
+        "自我vs他人認可？",
+        "如何贏得尊重？"
+      ],
+      "icon": "🏅"
+    },
+    {
+      "id": "value_025",
+      "title": "助人",
+      "category": "contribution",
+      "description": "幫助他人，服務社會",
+      "questions": [
+        "助人的動機？",
+        "如何有效幫助？",
+        "付出與回報？"
+      ],
+      "icon": "🤲"
+    },
+    {
+      "id": "value_026",
+      "title": "傳承",
+      "category": "meaning",
+      "description": "留下遺產，影響後代",
+      "questions": [
+        "想要留下什麼？",
+        "傳承的方式？",
+        "對後代的責任？"
+      ],
+      "icon": "🌳"
+    },
+    {
+      "id": "value_027",
+      "title": "簡約",
+      "category": "lifestyle",
+      "description": "簡單生活，減少物慾",
+      "questions": [
+        "簡約的定義？",
+        "物質與精神？",
+        "如何實踐簡約？"
+      ],
+      "icon": "🍃"
+    },
+    {
+      "id": "value_028",
+      "title": "多元體驗",
+      "category": "experience",
+      "description": "嘗試不同經驗，豐富人生",
+      "questions": [
+        "想要的體驗？",
+        "深度vs廣度？",
+        "體驗的價值？"
+      ],
+      "icon": "🌈"
+    },
+    {
+      "id": "value_029",
+      "title": "專業卓越",
+      "category": "achievement",
+      "description": "在專業領域追求卓越",
+      "questions": [
+        "卓越的標準？",
+        "專業vs全面？",
+        "如何精進專業？"
+      ],
+      "icon": "💎"
+    },
+    {
+      "id": "value_030",
+      "title": "團隊歸屬",
+      "category": "relationships",
+      "description": "成為團隊一份子，有歸屬感",
+      "questions": [
+        "歸屬感的重要？",
+        "個人vs團隊？",
+        "如何融入團隊？"
+      ],
+      "icon": "👥"
+    },
+    {
+      "id": "value_031",
+      "title": "環境永續",
+      "category": "contribution",
+      "description": "保護環境，永續發展",
+      "questions": [
+        "環保的責任？",
+        "如何實踐永續？",
+        "便利vs環保？"
+      ],
+      "icon": "🌱"
+    },
+    {
+      "id": "value_032",
+      "title": "文化藝術",
+      "category": "expression",
+      "description": "參與文化，欣賞藝術",
+      "questions": [
+        "文化的意義？",
+        "藝術的價值？",
+        "如何參與文化？"
+      ],
+      "icon": "🎭"
+    },
+    {
+      "id": "value_033",
+      "title": "領導",
+      "category": "achievement",
+      "description": "引導他人，帶領團隊",
+      "questions": [
+        "領導的責任？",
+        "領導風格？",
+        "如何培養領導力？"
+      ],
+      "icon": "🚀"
+    },
+    {
+      "id": "value_034",
+      "title": "真實自我",
+      "category": "autonomy",
+      "description": "做真實的自己，不偽裝",
+      "questions": [
+        "真實的定義？",
+        "面具的必要？",
+        "如何保持真實？"
+      ],
+      "icon": "🎭"
+    },
+    {
+      "id": "value_035",
+      "title": "感恩",
+      "category": "character",
+      "description": "心存感激，珍惜擁有",
+      "questions": [
+        "感恩什麼？",
+        "如何表達感謝？",
+        "感恩的力量？"
+      ],
+      "icon": "🙏"
+    },
+    {
+      "id": "value_036",
+      "title": "生活品質",
+      "category": "lifestyle",
+      "description": "追求高品質的生活方式",
+      "questions": [
+        "品質的定義？",
+        "物質vs精神品質？",
+        "如何提升生活品質？"
+      ],
+      "icon": "✨"
+    }
+  ]
+}

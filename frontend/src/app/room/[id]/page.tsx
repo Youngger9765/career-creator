@@ -9,6 +9,7 @@ import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaN
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
 import { VisitorGuidance } from '@/components/visitor/VisitorGuidance';
 import { ParticipantList } from '@/components/room/ParticipantList';
+import GameModeIntegration from './GameModeIntegration';
 
 export default function RoomPage() {
   const params = useParams();
@@ -34,6 +35,9 @@ export default function RoomPage() {
   // 牌卡和玩法選擇狀態
   const [selectedDeck, setSelectedDeck] = useState('職游旅人卡');
   const [selectedGameRule, setSelectedGameRule] = useState('六大性格分析');
+  
+  // 測試新架構整合
+  const [showNewArchitecture, setShowNewArchitecture] = useState(false);
 
   // 當 gameSession 載入後，更新本地狀態
   useEffect(() => {
@@ -221,7 +225,16 @@ export default function RoomPage() {
               </div>
             )}
 
+            {/* 新架構測試開關 */}
+            <button
+              onClick={() => setShowNewArchitecture(!showNewArchitecture)}
+              className="px-3 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm font-medium"
+            >
+              {showNewArchitecture ? '切換到舊架構' : '測試新架構'}
+            </button>
+            
             {/* 牌卡選擇和玩法選擇 */}
+            {!showNewArchitecture && (
             <div className="flex items-center space-x-4">
               <div className="flex flex-col">
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-1">牌組模式</label>
@@ -272,6 +285,7 @@ export default function RoomPage() {
                 </select>
               </div>
             </div>
+            )}
 
             {/* 參與者列表 */}
             <ParticipantList
@@ -305,7 +319,17 @@ export default function RoomPage() {
 
       {/* 主要內容區 */}
       <div className="flex-1 flex flex-col">
-        {currentRoom ? (
+        {showNewArchitecture ? (
+          <GameModeIntegration
+            roomId={roomId}
+            isVisitor={isVisitor}
+            counselorId={isCounselor ? user?.id : undefined}
+            onStateChange={(state) => {
+              console.log('[Room] Game state changed:', state);
+              // 可以在這裡更新 gameSession 或其他狀態
+            }}
+          />
+        ) : currentRoom ? (
           <ConsultationAreaNew
             roomId={roomId}
             isHost={isCounselor || false}

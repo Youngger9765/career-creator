@@ -2,7 +2,7 @@
   "deck": {
     "id": "career_cards_100",
     "name": "職業卡",
-    "description": "100張涵蓋各領域的職業卡片",
+    "description": "10張精選職業卡片，用於測試和開發",
     "type": "main",
     "version": "1.0.0"
   },
@@ -10,902 +10,133 @@
     {
       "id": "career_001",
       "title": "軟體工程師",
+      "description": "設計、開發和維護軟體系統，解決技術問題",
       "category": "I",
-      "description": "開發和維護軟體應用程式，解決技術問題",
+      "riasec_codes": ["I", "C"],
       "skills": ["程式設計", "邏輯思維", "問題解決"],
-      "education": "資訊相關科系",
-      "salary": "高"
+      "skills_required": ["程式設計", "邏輯思維", "問題解決"],
+      "industry": "科技業",
+      "education_level": "大學",
+      "salary_range": "60-150萬",
+      "work_environment": "辦公室",
+      "career_outlook": "高成長"
     },
     {
-      "id": "career_002",
-      "title": "護理師",
-      "category": "S",
-      "description": "照顧病患，提供醫療護理服務",
-      "skills": ["醫療知識", "同理心", "細心"],
-      "education": "護理系",
-      "salary": "中"
-    },
+      "id": "career_002", 
+      "title": "產品經理",
+      "description": "負責產品策略規劃、需求分析和跨部門協調",
+      "category": "E",
+      "riasec_codes": ["E", "I"],
+    "skills_required": ["產品規劃", "溝通協調", "市場分析"],
+    "industry": "科技業",
+    "education_level": "大學",
+    "salary_range": "80-200萬",
+    "work_environment": "辦公室",
+    "career_outlook": "高成長"
+  },
     {
       "id": "career_003",
       "title": "平面設計師",
+      "description": "運用視覺設計創造品牌形象和行銷素材",
       "category": "A",
-      "description": "創作視覺設計，傳達品牌理念",
-      "skills": ["美感", "創意", "軟體操作"],
-      "education": "設計相關科系",
-      "salary": "中"
-    },
+      "riasec_codes": ["A", "I"],
+    "skills_required": ["視覺設計", "創意思維", "軟體操作"],
+    "industry": "創意產業",
+    "education_level": "專科",
+    "salary_range": "35-80萬",
+    "work_environment": "工作室",
+    "career_outlook": "穩定成長"
+  },
     {
       "id": "career_004",
-      "title": "機械工程師",
-      "category": "R",
-      "description": "設計和開發機械設備與系統",
-      "skills": ["機械原理", "CAD", "問題解決"],
-      "education": "機械工程系",
-      "salary": "高"
-    },
+      "title": "護理師",
+      "description": "提供病患護理照護，協助醫療團隊執行治療",
+      "category": "S",
+      "riasec_codes": ["S", "I"],
+    "skills_required": ["醫療知識", "同理心", "細心負責"],
+    "industry": "醫療保健",
+    "education_level": "專科",
+    "salary_range": "45-70萬",
+    "work_environment": "醫院",
+    "career_outlook": "穩定需求"
+  },
     {
       "id": "career_005",
-      "title": "行銷經理",
-      "category": "E",
-      "description": "規劃和執行行銷策略，提升品牌價值",
-      "skills": ["市場分析", "領導力", "創意思維"],
-      "education": "商管相關科系",
-      "salary": "高"
-    },
+      "title": "會計師",
+      "description": "處理財務報表、稅務規劃和審計工作",
+      "category": "C",
+      "riasec_codes": ["C", "I"],
+    "skills_required": ["會計知識", "細心謹慎", "數字敏感"],
+    "industry": "金融服務",
+    "education_level": "大學",
+    "salary_range": "50-120萬",
+    "work_environment": "辦公室",
+    "career_outlook": "穩定需求"
+  },
     {
       "id": "career_006",
-      "title": "會計師",
-      "category": "C",
-      "description": "處理財務報表，提供稅務諮詢",
-      "skills": ["財務知識", "細心", "數字敏感度"],
-      "education": "會計系",
-      "salary": "中高"
-    },
+      "title": "銷售代表",
+      "description": "負責產品銷售、客戶開發和關係維護",
+      "category": "E",
+      "riasec_codes": ["E", "S"],
+    "skills_required": ["溝通能力", "說服力", "抗壓性"],
+    "industry": "各行各業",
+    "education_level": "高中",
+    "salary_range": "40-150萬",
+    "work_environment": "客戶現場",
+    "career_outlook": "持續需求"
+  },
     {
       "id": "career_007",
-      "title": "建築師",
-      "category": "A",
-      "description": "設計建築物，結合美學與功能性",
-      "skills": ["空間規劃", "美感", "工程知識"],
-      "education": "建築系",
-      "salary": "高"
-    },
+      "title": "機械工程師",
+      "description": "設計、開發和改進機械設備和系統",
+      "category": "R",
+      "riasec_codes": ["R", "I"],
+    "skills_required": ["機械原理", "3D設計", "問題解決"],
+    "industry": "製造業",
+    "education_level": "大學",
+    "salary_range": "55-100萬",
+    "work_environment": "工廠/辦公室",
+    "career_outlook": "穩定成長"
+  },
     {
       "id": "career_008",
-      "title": "心理諮商師",
+      "title": "國小老師",
+      "description": "教導小學生基礎學科知識和品格教育",
       "category": "S",
-      "description": "提供心理輔導，協助個案解決心理困擾",
-      "skills": ["傾聽", "同理心", "心理學知識"],
-      "education": "心理系碩士",
-      "salary": "中"
-    },
+      "riasec_codes": ["S", "A"],
+    "skills_required": ["教學技巧", "耐心愛心", "班級經營"],
+    "industry": "教育",
+    "education_level": "大學",
+    "salary_range": "45-65萬",
+    "work_environment": "學校",
+    "career_outlook": "穩定"
+  },
     {
       "id": "career_009",
-      "title": "資料科學家",
-      "category": "I",
-      "description": "分析大數據，提供商業洞察",
-      "skills": ["統計分析", "程式設計", "機器學習"],
-      "education": "統計/資訊相關",
-      "salary": "高"
-    },
+      "title": "廚師",
+      "description": "規劃菜單、烹飪美食和廚房管理",
+      "category": "R",
+      "riasec_codes": ["R", "A"],
+    "skills_required": ["烹飪技術", "創意", "時間管理"],
+    "industry": "餐飲業",
+    "education_level": "技職",
+    "salary_range": "30-80萬",
+    "work_environment": "廚房",
+    "career_outlook": "持續需求"
+  },
     {
       "id": "career_010",
-      "title": "電工技師",
-      "category": "R",
-      "description": "安裝和維修電力系統",
-      "skills": ["電路知識", "動手能力", "安全意識"],
-      "education": "電機科",
-      "salary": "中"
-    },
-    {
-      "id": "career_011",
-      "title": "律師",
-      "category": "E",
-      "description": "提供法律諮詢，代表客戶處理法律事務",
-      "skills": ["法律知識", "辯論能力", "分析思維"],
-      "education": "法律系",
-      "salary": "高"
-    },
-    {
-      "id": "career_012",
-      "title": "銀行櫃員",
-      "category": "C",
-      "description": "處理銀行交易，服務客戶金融需求",
-      "skills": ["金融知識", "服務態度", "細心"],
-      "education": "商科相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_013",
-      "title": "廚師",
-      "category": "R",
-      "description": "準備和烹飪食物，創造美味佳餚",
-      "skills": ["烹飪技巧", "創意", "時間管理"],
-      "education": "餐飲科系",
-      "salary": "中"
-    },
-    {
-      "id": "career_014",
-      "title": "國小教師",
+      "title": "心理諮商師",
+      "description": "提供心理諮商服務，協助個案解決心理困擾",
       "category": "S",
-      "description": "教育學童，培養基礎知識與品格",
-      "skills": ["教學能力", "耐心", "溝通"],
-      "education": "教育系",
-      "salary": "中"
-    },
-    {
-      "id": "career_015",
-      "title": "音樂家",
-      "category": "A",
-      "description": "演奏樂器或創作音樂",
-      "skills": ["音樂才能", "創造力", "表演能力"],
-      "education": "音樂系",
-      "salary": "變動"
-    },
-    {
-      "id": "career_016",
-      "title": "醫生",
-      "category": "I",
-      "description": "診斷和治療疾病，守護健康",
-      "skills": ["醫學知識", "判斷力", "同理心"],
-      "education": "醫學系",
-      "salary": "高"
-    },
-    {
-      "id": "career_017",
-      "title": "房地產經紀人",
-      "category": "E",
-      "description": "協助買賣房地產，提供市場資訊",
-      "skills": ["銷售技巧", "市場知識", "協商能力"],
-      "education": "不限",
-      "salary": "變動"
-    },
-    {
-      "id": "career_018",
-      "title": "行政助理",
-      "category": "C",
-      "description": "處理辦公室行政事務，支援日常營運",
-      "skills": ["組織能力", "電腦技能", "溝通"],
-      "education": "不限",
-      "salary": "中低"
-    },
-    {
-      "id": "career_019",
-      "title": "攝影師",
-      "category": "A",
-      "description": "拍攝照片，捕捉精彩瞬間",
-      "skills": ["攝影技術", "美感", "後製能力"],
-      "education": "攝影相關",
-      "salary": "變動"
-    },
-    {
-      "id": "career_020",
-      "title": "農夫",
-      "category": "R",
-      "description": "種植農作物，生產農產品",
-      "skills": ["農業知識", "體力", "規劃能力"],
-      "education": "農業相關",
-      "salary": "變動"
-    },
-    {
-      "id": "career_021",
-      "title": "社工師",
-      "category": "S",
-      "description": "協助弱勢群體，提供社會服務",
-      "skills": ["同理心", "資源連結", "個案管理"],
-      "education": "社工系",
-      "salary": "中低"
-    },
-    {
-      "id": "career_022",
-      "title": "化學研究員",
-      "category": "I",
-      "description": "進行化學實驗，開發新材料或藥物",
-      "skills": ["化學知識", "實驗技能", "分析能力"],
-      "education": "化學系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_023",
-      "title": "業務代表",
-      "category": "E",
-      "description": "推銷產品或服務，開發客戶",
-      "skills": ["銷售技巧", "溝通能力", "抗壓性"],
-      "education": "不限",
-      "salary": "變動"
-    },
-    {
-      "id": "career_024",
-      "title": "檔案管理員",
-      "category": "C",
-      "description": "管理和維護文件檔案系統",
-      "skills": ["組織能力", "細心", "電腦技能"],
-      "education": "圖書資訊相關",
-      "salary": "中低"
-    },
-    {
-      "id": "career_025",
-      "title": "室內設計師",
-      "category": "A",
-      "description": "規劃室內空間，創造美觀實用的環境",
-      "skills": ["空間規劃", "美感", "3D軟體"],
-      "education": "室內設計系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_026",
-      "title": "汽車維修技師",
-      "category": "R",
-      "description": "檢測和維修汽車，確保車輛安全",
-      "skills": ["機械知識", "診斷能力", "動手能力"],
-      "education": "汽修科",
-      "salary": "中"
-    },
-    {
-      "id": "career_027",
-      "title": "物理治療師",
-      "category": "S",
-      "description": "協助病患復健，恢復身體功能",
-      "skills": ["醫療知識", "耐心", "體力"],
-      "education": "物理治療系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_028",
-      "title": "生物學家",
-      "category": "I",
-      "description": "研究生物體，探索生命奧秘",
-      "skills": ["生物知識", "研究方法", "觀察力"],
-      "education": "生物系",
-      "salary": "中"
-    },
-    {
-      "id": "career_029",
-      "title": "創業家",
-      "category": "E",
-      "description": "創立和經營自己的事業",
-      "skills": ["創新思維", "風險承擔", "領導力"],
-      "education": "不限",
-      "salary": "變動"
-    },
-    {
-      "id": "career_030",
-      "title": "稅務專員",
-      "category": "C",
-      "description": "處理稅務申報和規劃",
-      "skills": ["稅法知識", "數字能力", "細心"],
-      "education": "會計/財稅系",
-      "salary": "中"
-    },
-    {
-      "id": "career_031",
-      "title": "作家",
-      "category": "A",
-      "description": "創作文學作品，表達思想和故事",
-      "skills": ["寫作能力", "創造力", "觀察力"],
-      "education": "文學相關",
-      "salary": "變動"
-    },
-    {
-      "id": "career_032",
-      "title": "木工",
-      "category": "R",
-      "description": "製作和修理木製品",
-      "skills": ["木工技術", "設計能力", "精確度"],
-      "education": "木工相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_033",
-      "title": "營養師",
-      "category": "S",
-      "description": "提供飲食建議，促進健康",
-      "skills": ["營養知識", "溝通能力", "規劃能力"],
-      "education": "營養系",
-      "salary": "中"
-    },
-    {
-      "id": "career_034",
-      "title": "天文學家",
-      "category": "I",
-      "description": "研究宇宙天體，探索太空奧秘",
-      "skills": ["物理知識", "數學能力", "觀察力"],
-      "education": "天文物理系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_035",
-      "title": "公關經理",
-      "category": "E",
-      "description": "管理企業形象，處理媒體關係",
-      "skills": ["溝通能力", "危機處理", "創意"],
-      "education": "傳播相關",
-      "salary": "高"
-    },
-    {
-      "id": "career_036",
-      "title": "出納員",
-      "category": "C",
-      "description": "管理現金收支，處理財務交易",
-      "skills": ["數字能力", "誠信", "細心"],
-      "education": "商科相關",
-      "salary": "中低"
-    },
-    {
-      "id": "career_037",
-      "title": "舞蹈家",
-      "category": "A",
-      "description": "透過肢體表演藝術",
-      "skills": ["舞蹈技巧", "表現力", "體力"],
-      "education": "舞蹈系",
-      "salary": "變動"
-    },
-    {
-      "id": "career_038",
-      "title": "園藝師",
-      "category": "R",
-      "description": "設計和維護花園景觀",
-      "skills": ["植物知識", "設計能力", "體力"],
-      "education": "園藝相關",
-      "salary": "中低"
-    },
-    {
-      "id": "career_039",
-      "title": "幼兒教師",
-      "category": "S",
-      "description": "教育和照顧幼兒",
-      "skills": ["耐心", "創意教學", "愛心"],
-      "education": "幼教系",
-      "salary": "中低"
-    },
-    {
-      "id": "career_040",
-      "title": "地質學家",
-      "category": "I",
-      "description": "研究地球構造和礦物資源",
-      "skills": ["地質知識", "野外調查", "分析能力"],
-      "education": "地質系",
-      "salary": "中"
-    },
-    {
-      "id": "career_041",
-      "title": "產品經理",
-      "category": "E",
-      "description": "規劃產品策略，管理產品生命週期",
-      "skills": ["市場分析", "專案管理", "溝通協調"],
-      "education": "不限",
-      "salary": "高"
-    },
-    {
-      "id": "career_042",
-      "title": "圖書館員",
-      "category": "C",
-      "description": "管理圖書資源，協助讀者查找資料",
-      "skills": ["資訊管理", "服務精神", "組織能力"],
-      "education": "圖書資訊系",
-      "salary": "中低"
-    },
-    {
-      "id": "career_043",
-      "title": "演員",
-      "category": "A",
-      "description": "在舞台或螢幕前表演角色",
-      "skills": ["表演能力", "情感表達", "記憶力"],
-      "education": "戲劇系",
-      "salary": "變動"
-    },
-    {
-      "id": "career_044",
-      "title": "消防員",
-      "category": "R",
-      "description": "執行救火和救援任務",
-      "skills": ["體能", "勇氣", "團隊合作"],
-      "education": "消防相關訓練",
-      "salary": "中"
-    },
-    {
-      "id": "career_045",
-      "title": "職能治療師",
-      "category": "S",
-      "description": "協助患者恢復日常生活功能",
-      "skills": ["醫療知識", "創意", "耐心"],
-      "education": "職能治療系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_046",
-      "title": "環境工程師",
-      "category": "I",
-      "description": "解決環境污染問題，保護生態",
-      "skills": ["環境科學", "工程知識", "分析能力"],
-      "education": "環境工程系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_047",
-      "title": "保險業務員",
-      "category": "E",
-      "description": "銷售保險產品，提供理財規劃",
-      "skills": ["銷售技巧", "金融知識", "人脈經營"],
-      "education": "不限",
-      "salary": "變動"
-    },
-    {
-      "id": "career_048",
-      "title": "品管專員",
-      "category": "C",
-      "description": "監控產品品質，確保符合標準",
-      "skills": ["品質管理", "細心", "問題分析"],
-      "education": "工業工程相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_049",
-      "title": "動畫師",
-      "category": "A",
-      "description": "製作動畫影片，創造動態視覺效果",
-      "skills": ["動畫軟體", "美術能力", "創意"],
-      "education": "動畫相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_050",
-      "title": "水電工",
-      "category": "R",
-      "description": "安裝和維修水電管線",
-      "skills": ["水電知識", "問題解決", "動手能力"],
-      "education": "水電相關訓練",
-      "salary": "中"
-    },
-    {
-      "id": "career_051",
-      "title": "人資專員",
-      "category": "S",
-      "description": "管理人力資源，處理員工事務",
-      "skills": ["溝通能力", "法規知識", "同理心"],
-      "education": "人資相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_052",
-      "title": "藥師",
-      "category": "I",
-      "description": "調配藥品，提供用藥諮詢",
-      "skills": ["藥學知識", "細心", "溝通能力"],
-      "education": "藥學系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_053",
-      "title": "店長",
-      "category": "E",
-      "description": "管理店面營運，達成業績目標",
-      "skills": ["管理能力", "銷售技巧", "問題解決"],
-      "education": "不限",
-      "salary": "中"
-    },
-    {
-      "id": "career_054",
-      "title": "倉管人員",
-      "category": "C",
-      "description": "管理倉庫存貨，處理進出貨",
-      "skills": ["庫存管理", "體力", "電腦操作"],
-      "education": "不限",
-      "salary": "中低"
-    },
-    {
-      "id": "career_055",
-      "title": "珠寶設計師",
-      "category": "A",
-      "description": "設計珠寶飾品，展現工藝美學",
-      "skills": ["設計能力", "美感", "手工技巧"],
-      "education": "珠寶設計相關",
-      "salary": "中高"
-    },
-    {
-      "id": "career_056",
-      "title": "焊工",
-      "category": "R",
-      "description": "進行金屬焊接作業",
-      "skills": ["焊接技術", "安全意識", "精準度"],
-      "education": "焊接訓練",
-      "salary": "中"
-    },
-    {
-      "id": "career_057",
-      "title": "輔導老師",
-      "category": "S",
-      "description": "提供學生心理輔導和生涯規劃",
-      "skills": ["輔導技巧", "傾聽能力", "同理心"],
-      "education": "輔導相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_058",
-      "title": "氣象學家",
-      "category": "I",
-      "description": "預測天氣變化，研究氣候現象",
-      "skills": ["氣象知識", "數據分析", "預測能力"],
-      "education": "大氣科學系",
-      "salary": "中"
-    },
-    {
-      "id": "career_059",
-      "title": "活動企劃",
-      "category": "E",
-      "description": "規劃和執行各類活動",
-      "skills": ["創意", "專案管理", "協調能力"],
-      "education": "傳播/行銷相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_060",
-      "title": "審計員",
-      "category": "C",
-      "description": "審查財務報表，確保合規性",
-      "skills": ["會計知識", "分析能力", "細心"],
-      "education": "會計系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_061",
-      "title": "服裝設計師",
-      "category": "A",
-      "description": "設計服裝，引領時尚潮流",
-      "skills": ["設計能力", "時尚敏感度", "縫紉技術"],
-      "education": "服裝設計系",
-      "salary": "變動"
-    },
-    {
-      "id": "career_062",
-      "title": "油漆工",
-      "category": "R",
-      "description": "進行建築物油漆粉刷工作",
-      "skills": ["油漆技術", "色彩搭配", "體力"],
-      "education": "相關訓練",
-      "salary": "中低"
-    },
-    {
-      "id": "career_063",
-      "title": "復健師",
-      "category": "S",
-      "description": "協助患者進行復健訓練",
-      "skills": ["醫療知識", "耐心", "鼓勵技巧"],
-      "education": "復健相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_064",
-      "title": "海洋生物學家",
-      "category": "I",
-      "description": "研究海洋生物和生態系統",
-      "skills": ["海洋知識", "潛水技能", "研究方法"],
-      "education": "海洋生物系",
-      "salary": "中"
-    },
-    {
-      "id": "career_065",
-      "title": "廣告企劃",
-      "category": "E",
-      "description": "創作廣告內容，提升品牌曝光",
-      "skills": ["創意", "文案能力", "市場洞察"],
-      "education": "廣告/傳播相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_066",
-      "title": "統計員",
-      "category": "C",
-      "description": "收集和分析統計數據",
-      "skills": ["統計知識", "數據分析", "報告撰寫"],
-      "education": "統計系",
-      "salary": "中"
-    },
-    {
-      "id": "career_067",
-      "title": "雕塑家",
-      "category": "A",
-      "description": "創作立體藝術作品",
-      "skills": ["雕塑技巧", "空間感", "創造力"],
-      "education": "美術系",
-      "salary": "變動"
-    },
-    {
-      "id": "career_068",
-      "title": "泥水工",
-      "category": "R",
-      "description": "進行建築砌磚和抹灰工作",
-      "skills": ["砌磚技術", "體力", "精準度"],
-      "education": "相關訓練",
-      "salary": "中"
-    },
-    {
-      "id": "career_069",
-      "title": "語言治療師",
-      "category": "S",
-      "description": "協助改善語言和溝通障礙",
-      "skills": ["語言學知識", "耐心", "創意教學"],
-      "education": "語言治療系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_070",
-      "title": "考古學家",
-      "category": "I",
-      "description": "發掘和研究古代文物遺跡",
-      "skills": ["歷史知識", "田野調查", "分析能力"],
-      "education": "考古系",
-      "salary": "中低"
-    },
-    {
-      "id": "career_071",
-      "title": "政治家",
-      "category": "E",
-      "description": "參與政治活動，制定公共政策",
-      "skills": ["演說能力", "領導力", "政策分析"],
-      "education": "政治/法律相關",
-      "salary": "高"
-    },
-    {
-      "id": "career_072",
-      "title": "採購專員",
-      "category": "C",
-      "description": "負責物資採購和供應商管理",
-      "skills": ["談判技巧", "成本分析", "供應鏈知識"],
-      "education": "商管相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_073",
-      "title": "編劇",
-      "category": "A",
-      "description": "創作影視或戲劇劇本",
-      "skills": ["故事創作", "對話寫作", "想像力"],
-      "education": "戲劇/文學相關",
-      "salary": "變動"
-    },
-    {
-      "id": "career_074",
-      "title": "裝潢工",
-      "category": "R",
-      "description": "進行室內裝潢施工",
-      "skills": ["裝潢技術", "空間概念", "工具操作"],
-      "education": "相關訓練",
-      "salary": "中"
-    },
-    {
-      "id": "career_075",
-      "title": "安養照護員",
-      "category": "S",
-      "description": "照顧老年人日常生活",
-      "skills": ["照護技能", "耐心", "同理心"],
-      "education": "照護相關訓練",
-      "salary": "中低"
-    },
-    {
-      "id": "career_076",
-      "title": "獸醫",
-      "category": "I",
-      "description": "診治動物疾病，維護動物健康",
-      "skills": ["獸醫學知識", "動物行為", "手術技能"],
-      "education": "獸醫系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_077",
-      "title": "外交官",
-      "category": "E",
-      "description": "代表國家進行國際交涉",
-      "skills": ["外語能力", "國際關係", "協商技巧"],
-      "education": "外交/國關相關",
-      "salary": "高"
-    },
-    {
-      "id": "career_078",
-      "title": "法務專員",
-      "category": "C",
-      "description": "處理企業法律事務",
-      "skills": ["法律知識", "合約審查", "風險評估"],
-      "education": "法律系",
-      "salary": "中高"
-    },
-    {
-      "id": "career_079",
-      "title": "導演",
-      "category": "A",
-      "description": "執導影視作品，統籌創作過程",
-      "skills": ["視覺敘事", "領導能力", "藝術眼光"],
-      "education": "電影/戲劇相關",
-      "salary": "變動"
-    },
-    {
-      "id": "career_080",
-      "title": "鐵工",
-      "category": "R",
-      "description": "製作和安裝鋼鐵結構",
-      "skills": ["焊接", "藍圖閱讀", "體力"],
-      "education": "相關訓練",
-      "salary": "中"
-    },
-    {
-      "id": "career_081",
-      "title": "特教老師",
-      "category": "S",
-      "description": "教育特殊需求學生",
-      "skills": ["特教知識", "耐心", "創意教學"],
-      "education": "特教系",
-      "salary": "中"
-    },
-    {
-      "id": "career_082",
-      "title": "太空工程師",
-      "category": "I",
-      "description": "設計和開發太空載具與系統",
-      "skills": ["航太知識", "系統設計", "精密計算"],
-      "education": "航太工程系",
-      "salary": "高"
-    },
-    {
-      "id": "career_083",
-      "title": "投資顧問",
-      "category": "E",
-      "description": "提供投資建議和財務規劃",
-      "skills": ["金融分析", "風險管理", "溝通能力"],
-      "education": "財金相關",
-      "salary": "高"
-    },
-    {
-      "id": "career_084",
-      "title": "秘書",
-      "category": "C",
-      "description": "協助主管處理行政事務",
-      "skills": ["行政能力", "時間管理", "保密"],
-      "education": "不限",
-      "salary": "中低"
-    },
-    {
-      "id": "career_085",
-      "title": "插畫家",
-      "category": "A",
-      "description": "創作插圖和視覺藝術",
-      "skills": ["繪畫技巧", "創意", "數位繪圖"],
-      "education": "美術相關",
-      "salary": "變動"
-    },
-    {
-      "id": "career_086",
-      "title": "園丁",
-      "category": "R",
-      "description": "維護花園和綠地",
-      "skills": ["植物知識", "園藝技術", "體力"],
-      "education": "園藝相關",
-      "salary": "低"
-    },
-    {
-      "id": "career_087",
-      "title": "運動教練",
-      "category": "S",
-      "description": "訓練運動員，提升運動表現",
-      "skills": ["運動知識", "激勵能力", "訓練規劃"],
-      "education": "體育相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_088",
-      "title": "人工智慧工程師",
-      "category": "I",
-      "description": "開發AI系統和機器學習模型",
-      "skills": ["機器學習", "程式設計", "數學"],
-      "education": "資訊/數學相關",
-      "salary": "高"
-    },
-    {
-      "id": "career_089",
-      "title": "餐廳經理",
-      "category": "E",
-      "description": "管理餐廳營運和服務品質",
-      "skills": ["管理能力", "服務精神", "成本控制"],
-      "education": "餐飲/管理相關",
-      "salary": "中"
-    },
-    {
-      "id": "career_090",
-      "title": "資料輸入員",
-      "category": "C",
-      "description": "輸入和整理電腦資料",
-      "skills": ["打字速度", "細心", "電腦操作"],
-      "education": "不限",
-      "salary": "低"
-    },
-    {
-      "id": "career_091",
-      "title": "遊戲設計師",
-      "category": "A",
-      "description": "設計電玩遊戲內容和玩法",
-      "skills": ["遊戲設計", "創意", "程式基礎"],
-      "education": "遊戲設計相關",
-      "salary": "中高"
-    },
-    {
-      "id": "career_092",
-      "title": "清潔工",
-      "category": "R",
-      "description": "維護環境清潔衛生",
-      "skills": ["清潔技能", "體力", "細心"],
-      "education": "不限",
-      "salary": "低"
-    },
-    {
-      "id": "career_093",
-      "title": "社區營造師",
-      "category": "S",
-      "description": "推動社區發展和居民參與",
-      "skills": ["社區工作", "協調能力", "企劃能力"],
-      "education": "社會相關",
-      "salary": "中低"
-    },
-    {
-      "id": "career_094",
-      "title": "神經科學家",
-      "category": "I",
-      "description": "研究大腦和神經系統",
-      "skills": ["神經科學", "實驗設計", "數據分析"],
-      "education": "神經科學博士",
-      "salary": "高"
-    },
-    {
-      "id": "career_095",
-      "title": "品牌經理",
-      "category": "E",
-      "description": "管理品牌策略和市場定位",
-      "skills": ["品牌管理", "市場分析", "創意思維"],
-      "education": "行銷相關",
-      "salary": "高"
-    },
-    {
-      "id": "career_096",
-      "title": "收銀員",
-      "category": "C",
-      "description": "處理結帳和金錢交易",
-      "skills": ["計算能力", "服務態度", "誠信"],
-      "education": "不限",
-      "salary": "低"
-    },
-    {
-      "id": "career_097",
-      "title": "調酒師",
-      "category": "A",
-      "description": "調製雞尾酒和飲料",
-      "skills": ["調酒技術", "創意", "服務精神"],
-      "education": "調酒訓練",
-      "salary": "中低"
-    },
-    {
-      "id": "career_098",
-      "title": "漁夫",
-      "category": "R",
-      "description": "捕撈海產維生",
-      "skills": ["航海知識", "體力", "天氣判斷"],
-      "education": "相關訓練",
-      "salary": "變動"
-    },
-    {
-      "id": "career_099",
-      "title": "臨床心理師",
-      "category": "S",
-      "description": "進行心理評估和治療",
-      "skills": ["心理評估", "治療技術", "同理心"],
-      "education": "臨床心理碩士",
-      "salary": "中高"
-    },
-    {
-      "id": "career_100",
-      "title": "量子物理學家",
-      "category": "I",
-      "description": "研究量子力學和微觀世界",
-      "skills": ["量子物理", "數學", "理論思考"],
-      "education": "物理博士",
-      "salary": "高"
+      "riasec_codes": ["S", "I"],
+    "skills_required": ["諮商技巧", "同理心", "傾聽能力"],
+    "industry": "醫療保健",
+    "education_level": "碩士",
+    "salary_range": "50-90萬",
+    "work_environment": "診所/醫院",
+    "career_outlook": "高成長"
     }
   ]
 }

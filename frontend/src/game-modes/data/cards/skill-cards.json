@@ -22,90 +22,90 @@
       "title": "溝通協調",
       "description": "有效表達想法並協調不同團隊合作的能力",
       "category": "soft",
-    "level": "基礎",
-    "related_careers": ["產品經理", "銷售代表", "國小老師"],
-    "learning_resources": ["演講訓練", "團隊專案", "領導課程"],
-    "time_to_develop": "6個月-1年"
-  },
+      "level": "基礎",
+      "related_careers": ["產品經理", "銷售代表", "國小老師"],
+      "learning_resources": ["演講訓練", "團隊專案", "領導課程"],
+      "time_to_develop": "6個月-1年"
+    },
     {
       "id": "skill_003",
       "title": "視覺設計",
       "description": "創造美觀且功能性視覺作品的創意能力",
       "category": "hard",
-    "level": "專業",
-    "related_careers": ["平面設計師"],
-    "learning_resources": ["設計軟體", "作品集建立", "設計理論"],
-    "time_to_develop": "1-3年"
-  },
+      "level": "專業",
+      "related_careers": ["平面設計師"],
+      "learning_resources": ["設計軟體", "作品集建立", "設計理論"],
+      "time_to_develop": "1-3年"
+    },
     {
       "id": "skill_004",
       "title": "醫療知識",
       "description": "理解人體結構、疾病診斷和治療的專業知識",
       "category": "hard",
-    "level": "專業",
-    "related_careers": ["護理師", "心理諮商師"],
-    "learning_resources": ["醫學教育", "臨床實習", "專業證照"],
-    "time_to_develop": "3-5年"
-  },
+      "level": "專業",
+      "related_careers": ["護理師", "心理諮商師"],
+      "learning_resources": ["醫學教育", "臨床實習", "專業證照"],
+      "time_to_develop": "3-5年"
+    },
     {
       "id": "skill_005",
       "title": "數字敏感",
       "description": "快速處理數字計算和財務分析的能力",
       "category": "hard",
-    "level": "中級",
-    "related_careers": ["會計師"],
-    "learning_resources": ["會計課程", "財務軟體", "實務經驗"],
-    "time_to_develop": "6個月-1年"
-  },
+      "level": "中級",
+      "related_careers": ["會計師"],
+      "learning_resources": ["會計課程", "財務軟體", "實務經驗"],
+      "time_to_develop": "6個月-1年"
+    },
     {
       "id": "skill_006",
       "title": "說服力",
       "description": "影響他人決策和建立信任關係的能力",
       "category": "soft",
-    "level": "中級",
-    "related_careers": ["銷售代表"],
-    "learning_resources": ["銷售訓練", "心理學", "實戰練習"],
-    "time_to_develop": "3-6個月"
-  },
+      "level": "中級",
+      "related_careers": ["銷售代表"],
+      "learning_resources": ["銷售訓練", "心理學", "實戰練習"],
+      "time_to_develop": "3-6個月"
+    },
     {
       "id": "skill_007",
       "title": "機械原理",
       "description": "理解機械運作原理和工程設計的技術知識",
       "category": "hard",
-    "level": "專業",
-    "related_careers": ["機械工程師"],
-    "learning_resources": ["工程教育", "CAD軟體", "實作專案"],
-    "time_to_develop": "2-4年"
-  },
+      "level": "專業",
+      "related_careers": ["機械工程師"],
+      "learning_resources": ["工程教育", "CAD軟體", "實作專案"],
+      "time_to_develop": "2-4年"
+    },
     {
       "id": "skill_008",
       "title": "教學技巧",
       "description": "有效傳授知識和引導學生學習的能力",
       "category": "soft",
-    "level": "中級",
-    "related_careers": ["國小老師"],
-    "learning_resources": ["教育訓練", "教學實習", "課程設計"],
-    "time_to_develop": "1-2年"
-  },
+      "level": "中級",
+      "related_careers": ["國小老師"],
+      "learning_resources": ["教育訓練", "教學實習", "課程設計"],
+      "time_to_develop": "1-2年"
+    },
     {
       "id": "skill_009",
       "title": "烹飪技術",
       "description": "掌握食材處理和料理製作的專業技能",
       "category": "hard",
-    "level": "專業",
-    "related_careers": ["廚師"],
-    "learning_resources": ["烹飪學校", "餐廳實習", "食譜研究"],
-    "time_to_develop": "2-3年"
-  },
+      "level": "專業",
+      "related_careers": ["廚師"],
+      "learning_resources": ["烹飪學校", "餐廳實習", "食譜研究"],
+      "time_to_develop": "2-3年"
+    },
     {
       "id": "skill_010",
       "title": "傾聽能力",
       "description": "專注理解他人需求和情感的溝通技巧",
       "category": "soft",
-    "level": "基礎",
-    "related_careers": ["心理諮商師"],
-    "learning_resources": ["諮商訓練", "心理學課程", "實務練習"],
-    "time_to_develop": "6個月-1年"
+      "level": "基礎",
+      "related_careers": ["心理諮商師"],
+      "learning_resources": ["諮商訓練", "心理學課程", "實務練習"],
+      "time_to_develop": "6個月-1年"
     }
   ]
 }

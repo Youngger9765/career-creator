@@ -1,6 +1,6 @@
 /**
  * TokenDisplay - 籌碼視覺化顯示元件
- * 
+ *
  * 提供多種視覺化方式顯示籌碼分配
  * 支援圓餅圖、長條圖、數字顯示
  */
@@ -11,9 +11,18 @@ import React, { useMemo } from 'react';
 import { TokenAllocation } from '../TokenManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { 
-  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, 
-  CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from 'recharts';
 
 interface TokenDisplayProps {
@@ -35,14 +44,20 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
   className = '',
   showLegend = true,
   showPercentage = true,
-  colorScheme = 'default'
+  colorScheme = 'default',
 }) => {
   // 顏色配置
   const getColors = useMemo(() => {
     if (colorScheme === 'gradient') {
       return [
-        '#3B82F6', '#60A5FA', '#93BBFC', '#C6DBFE',
-        '#8B5CF6', '#A78BFA', '#C4B5FD', '#E9D5FF'
+        '#3B82F6',
+        '#60A5FA',
+        '#93BBFC',
+        '#C6DBFE',
+        '#8B5CF6',
+        '#A78BFA',
+        '#C4B5FD',
+        '#E9D5FF',
       ];
     } else if (colorScheme === 'category') {
       return [
@@ -53,13 +68,10 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
         '#8B5CF6', // 紫 - 成長
         '#EC4899', // 粉 - 關係
         '#14B8A6', // 青 - 休閒
-        '#F97316'  // 橘 - 其他
+        '#F97316', // 橘 - 其他
       ];
     }
-    return [
-      '#3B82F6', '#10B981', '#F59E0B', '#EF4444',
-      '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'
-    ];
+    return ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
   }, [colorScheme]);
 
   // 計算總分配量
@@ -75,7 +87,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
       name: item.area,
       value: item.amount,
       percentage: item.percentage,
-      color: getColors[index % getColors.length]
+      color: getColors[index % getColors.length],
     }));
   }, [allocations, getColors]);
 
@@ -88,9 +100,11 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={showPercentage ? ({value, percentage}) => 
-            `${value} (${percentage.toFixed(0)}%)`
-          : false}
+          label={
+            showPercentage
+              ? ({ value, percentage }) => `${value} (${percentage.toFixed(0)}%)`
+              : false
+          }
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
@@ -110,12 +124,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={chartData}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis 
-          dataKey="name" 
-          angle={-45}
-          textAnchor="end"
-          height={100}
-        />
+        <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
         <YAxis />
         <Tooltip />
         {showLegend && <Legend />}
@@ -134,15 +143,12 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
       {allocations.map((allocation, index) => {
         const color = getColors[index % getColors.length];
         const percentage = (allocation.amount / total) * 100;
-        
+
         return (
           <div key={allocation.area} className="space-y-2">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-2">
-                <div 
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: color }}
-                />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {allocation.area}
                 </span>
@@ -158,27 +164,25 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
                 )}
               </div>
             </div>
-            <Progress 
-              value={percentage} 
+            <Progress
+              value={percentage}
               className="h-2"
-              style={{ 
-                '--progress-color': color 
-              } as React.CSSProperties}
+              style={
+                {
+                  '--progress-color': color,
+                } as React.CSSProperties
+              }
             />
           </div>
         );
       })}
-      
+
       {/* 顯示剩餘籌碼 */}
       {remaining > 0 && (
         <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              剩餘能量
-            </span>
-            <span className="text-lg font-bold text-orange-500">
-              {remaining}
-            </span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">剩餘能量</span>
+            <span className="text-lg font-bold text-orange-500">{remaining}</span>
           </div>
         </div>
       )}
@@ -191,20 +195,17 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
       {allocations.map((allocation, index) => {
         const color = getColors[index % getColors.length];
         const percentage = (allocation.amount / total) * 100;
-        
+
         return (
-          <div 
+          <div
             key={allocation.area}
-            className="bg-white dark:bg-gray-800 rounded-lg p-4 
+            className="bg-white dark:bg-gray-800 rounded-lg p-4
                      border-2 border-gray-200 dark:border-gray-700
                      hover:shadow-md transition-shadow"
             style={{ borderColor: color }}
           >
             <div className="flex items-start justify-between mb-2">
-              <div 
-                className="w-2 h-2 rounded-full mt-1"
-                style={{ backgroundColor: color }}
-              />
+              <div className="w-2 h-2 rounded-full mt-1" style={{ backgroundColor: color }} />
               <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {allocation.amount}
               </span>
@@ -220,17 +221,17 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
           </div>
         );
       })}
-      
+
       {/* 剩餘籌碼卡片 */}
       {remaining > 0 && (
-        <div className="bg-orange-50 dark:bg-orange-950 rounded-lg p-4 
-                      border-2 border-orange-300 dark:border-orange-700">
+        <div
+          className="bg-orange-50 dark:bg-orange-950 rounded-lg p-4
+                      border-2 border-orange-300 dark:border-orange-700"
+        >
           <div className="text-2xl font-bold text-orange-600 dark:text-orange-400 mb-2">
             {remaining}
           </div>
-          <div className="text-sm font-medium text-orange-700 dark:text-orange-300">
-            待分配
-          </div>
+          <div className="text-sm font-medium text-orange-700 dark:text-orange-300">待分配</div>
         </div>
       )}
     </div>
@@ -263,9 +264,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
       </CardHeader>
       <CardContent>
         {allocations.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            尚未分配任何籌碼
-          </div>
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">尚未分配任何籌碼</div>
         ) : (
           getDisplay()
         )}

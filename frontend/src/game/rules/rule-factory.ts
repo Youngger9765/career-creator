@@ -10,84 +10,93 @@ import { GameRule } from '../types';
 export class RuleFactory {
   private static rules: Map<string, GameRule> = new Map([
     // 技能評估規則（優劣勢分析）
-    ['skill_assessment', {
-      name: 'skill_assessment',
-      zones: [
-        {
-          id: 'advantage',
-          name: '優勢',
-          max_cards: 5,
-          position: { x: 100, y: 100 }
+    [
+      'skill_assessment',
+      {
+        name: 'skill_assessment',
+        zones: [
+          {
+            id: 'advantage',
+            name: '優勢',
+            max_cards: 5,
+            position: { x: 100, y: 100 },
+          },
+          {
+            id: 'disadvantage',
+            name: '劣勢',
+            max_cards: 5,
+            position: { x: 300, y: 100 },
+          },
+        ],
+        constraints: {
+          max_per_zone: {
+            advantage: 5,
+            disadvantage: 5,
+          },
+          total_limit: 10,
         },
-        {
-          id: 'disadvantage',
-          name: '劣勢',
-          max_cards: 5,
-          position: { x: 300, y: 100 }
-        }
-      ],
-      constraints: {
-        max_per_zone: {
-          advantage: 5,
-          disadvantage: 5
-        },
-        total_limit: 10
-      }
-    }],
+      },
+    ],
 
     // 價值排序規則（3x3九宮格）
-    ['value_ranking', {
-      name: 'value_ranking',
-      zones: (() => {
-        const zones = [];
-        for (let row = 0; row < 3; row++) {
-          for (let col = 0; col < 3; col++) {
-            zones.push({
-              id: `grid-${row}-${col}`,
-              name: `位置 ${row * 3 + col + 1}`,
-              max_cards: 1,
-              position: { x: col * 150, y: row * 150 }
-            });
+    [
+      'value_ranking',
+      {
+        name: 'value_ranking',
+        zones: (() => {
+          const zones = [];
+          for (let row = 0; row < 3; row++) {
+            for (let col = 0; col < 3; col++) {
+              zones.push({
+                id: `grid-${row}-${col}`,
+                name: `位置 ${row * 3 + col + 1}`,
+                max_cards: 1,
+                position: { x: col * 150, y: row * 150 },
+              });
+            }
           }
-        }
-        return zones;
-      })(),
-      constraints: {
-        unique_positions: true,
-        total_limit: 9
-      }
-    }],
+          return zones;
+        })(),
+        constraints: {
+          unique_positions: true,
+          total_limit: 9,
+        },
+      },
+    ],
 
     // 性格評估規則（六大性格分析）
-    ['personality_assessment', {
-      name: 'personality_assessment',
-      zones: [
-        {
-          id: 'like',
-          name: '喜歡',
-          max_cards: 20,
-          position: { x: 50, y: 100 }
+    [
+      'personality_assessment',
+      {
+        name: 'personality_assessment',
+        zones: [
+          {
+            id: 'like',
+            name: '喜歡',
+            max_cards: 20,
+            position: { x: 50, y: 100 },
+          },
+          {
+            id: 'neutral',
+            name: '中立',
+            max_cards: undefined, // 無限制
+            position: { x: 250, y: 100 },
+          },
+          {
+            id: 'dislike',
+            name: '討厭',
+            max_cards: 20,
+            position: { x: 450, y: 100 },
+          },
+        ],
+        constraints: {
+          max_per_zone: {
+            like: 20,
+            dislike: 20,
+          },
         },
-        {
-          id: 'neutral',
-          name: '中立',
-          max_cards: undefined, // 無限制
-          position: { x: 250, y: 100 }
-        },
-        {
-          id: 'dislike',
-          name: '討厭',
-          max_cards: 20,
-          position: { x: 450, y: 100 }
-        }
-      ],
-      constraints: {
-        max_per_zone: {
-          like: 20,
-          dislike: 20
-        }
-      }
-    }],
+      },
+    ],
   ]);
 
   /**

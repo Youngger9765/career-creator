@@ -32,10 +32,14 @@ export class LegacyGameAdapter {
    * 使用新模式系統創建遊戲會話
    * 提供更豐富的配置選項
    */
-  static createSession(modeId: string, gameplayId: string, options?: {
-    roomId?: string;
-    playerId?: string;
-  }): GameState {
+  static createSession(
+    modeId: string,
+    gameplayId: string,
+    options?: {
+      roomId?: string;
+      playerId?: string;
+    }
+  ): GameState {
     const state = this.startGameWithMode(modeId, gameplayId);
 
     // 可以在這裡添加額外的配置
@@ -50,8 +54,7 @@ export class LegacyGameAdapter {
    * 驗證模式和玩法是否有效
    */
   static validateModeAndGameplay(modeId: string, gameplayId: string): boolean {
-    return GameModeService.hasMode(modeId) &&
-           GameModeService.hasGameplay(modeId, gameplayId);
+    return GameModeService.hasMode(modeId) && GameModeService.hasGameplay(modeId, gameplayId);
   }
 
   /**
@@ -86,7 +89,10 @@ export class LegacyGameAdapter {
    * 取得遊戲配置資訊
    * 結合新模式系統和舊規則系統的資訊
    */
-  static getGameConfiguration(modeId: string, gameplayId: string): {
+  static getGameConfiguration(
+    modeId: string,
+    gameplayId: string
+  ): {
     mode: ReturnType<typeof GameModeService.getMode>;
     gameplay: ReturnType<typeof GameModeService.getGameplay>;
     legacyRuleId: string;
@@ -114,7 +120,7 @@ export class LegacyGameAdapter {
       mode,
       gameplay,
       legacyRuleId,
-      canvasType
+      canvasType,
     };
   }
 
@@ -125,9 +131,10 @@ export class LegacyGameAdapter {
   static shouldUseNewSystem(): boolean {
     // 第一階段：預設使用舊系統
     // 可以透過環境變數或 localStorage 控制
-    const featureFlag = typeof window !== 'undefined'
-      ? window.localStorage.getItem('USE_NEW_GAME_MODE_SYSTEM')
-      : null;
+    const featureFlag =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem('USE_NEW_GAME_MODE_SYSTEM')
+        : null;
 
     return featureFlag === 'true';
   }
@@ -136,10 +143,7 @@ export class LegacyGameAdapter {
    * 智能選擇使用新系統或舊系統
    * 提供平滑的遷移路徑
    */
-  static createGameState(
-    modeOrRuleId: string,
-    gameplayId?: string
-  ): GameState {
+  static createGameState(modeOrRuleId: string, gameplayId?: string): GameState {
     if (this.shouldUseNewSystem() && GameModeService.hasMode(modeOrRuleId)) {
       // 使用新系統
       return this.startGameWithMode(modeOrRuleId, gameplayId);

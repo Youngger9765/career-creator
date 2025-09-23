@@ -1,6 +1,6 @@
 /**
  * GameModeIntegration - 遊戲模式整合元件
- * 
+ *
  * 整合新的三模式架構到房間頁面
  * 測試完整的選擇流程和渲染正確性
  */
@@ -21,9 +21,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Home, Heart, Briefcase, DollarSign, 
-  Users, BookOpen, Gamepad2, TrendingUp
+import {
+  Home,
+  Heart,
+  Briefcase,
+  DollarSign,
+  Users,
+  BookOpen,
+  Gamepad2,
+  TrendingUp,
 } from 'lucide-react';
 
 interface GameModeIntegrationProps {
@@ -37,7 +43,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   roomId,
   isVisitor = false,
   counselorId,
-  onStateChange
+  onStateChange,
 }) => {
   // 模式和玩法狀態
   const [selectedMode, setSelectedMode] = useState<string>('');
@@ -73,112 +79,120 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   const addTestResult = (message: string) => {
     if (testMode) {
-      setTestResults(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
+      setTestResults((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
     }
     console.log('[GameModeIntegration]', message);
   };
 
   // 處理模式選擇
-  const handleModeSelect = useCallback(async (modeId: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      addTestResult(`📍 選擇模式: ${modeId}`);
-      setSelectedMode(modeId);
-      
-      // 重置玩法選擇
-      setSelectedGameplay('');
-      setShowTokenSystem(false);
-      
-      // 取得模式資訊
-      const mode = GameModeService.getMode(modeId);
-      if (mode) {
-        addTestResult(`✅ 模式載入成功: ${mode.name}, 包含 ${mode.gameplays.length} 種玩法`);
-      } else {
-        throw new Error(`找不到模式: ${modeId}`);
+  const handleModeSelect = useCallback(
+    async (modeId: string) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        addTestResult(`📍 選擇模式: ${modeId}`);
+        setSelectedMode(modeId);
+
+        // 重置玩法選擇
+        setSelectedGameplay('');
+        setShowTokenSystem(false);
+
+        // 取得模式資訊
+        const mode = GameModeService.getMode(modeId);
+        if (mode) {
+          addTestResult(`✅ 模式載入成功: ${mode.name}, 包含 ${mode.gameplays.length} 種玩法`);
+        } else {
+          throw new Error(`找不到模式: ${modeId}`);
+        }
+      } catch (err: any) {
+        setError(err.message);
+        addTestResult(`❌ 模式選擇錯誤: ${err.message}`);
+      } finally {
+        setIsLoading(false);
       }
-      
-    } catch (err: any) {
-      setError(err.message);
-      addTestResult(`❌ 模式選擇錯誤: ${err.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [testMode]);
+    },
+    [testMode]
+  );
 
   // 處理玩法選擇
-  const handleGameplaySelect = useCallback(async (gameplayId: string) => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      addTestResult(`📍 選擇玩法: ${gameplayId}`);
-      setSelectedGameplay(gameplayId);
-      
-      // 載入對應的牌組
-      const decks = await CardLoaderService.getDecksForGameplay(gameplayId);
-      addTestResult(`✅ 載入牌組: 主牌組=${decks.main?.cards.length || 0}張, 輔助牌組=${decks.auxiliary?.cards.length || 0}張`);
-      
-      setMainDeck(decks.main);
-      setAuxiliaryDeck(decks.auxiliary);
-      
-      // 載入畫布配置
-      const canvasConfigData = await loadCanvasConfig(gameplayId);
-      setCanvasConfig(canvasConfigData);
-      addTestResult(`✅ 載入畫布配置: ${canvasConfigData?.type || 'unknown'}`);
-      
-      // 檢查是否需要籌碼系統
-      if (gameplayId === 'life_redesign') {
-        setShowTokenSystem(true);
-        addTestResult('✅ 啟動籌碼系統 (生活改造王)');
-      } else {
-        setShowTokenSystem(false);
+  const handleGameplaySelect = useCallback(
+    async (gameplayId: string) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        addTestResult(`📍 選擇玩法: ${gameplayId}`);
+        setSelectedGameplay(gameplayId);
+
+        // 載入對應的牌組
+        const decks = await CardLoaderService.getDecksForGameplay(gameplayId);
+        addTestResult(
+          `✅ 載入牌組: 主牌組=${decks.main?.cards.length || 0}張, 輔助牌組=${decks.auxiliary?.cards.length || 0}張`
+        );
+
+        setMainDeck(decks.main);
+        setAuxiliaryDeck(decks.auxiliary);
+
+        // 載入畫布配置
+        const canvasConfigData = await loadCanvasConfig(gameplayId);
+        setCanvasConfig(canvasConfigData);
+        addTestResult(`✅ 載入畫布配置: ${canvasConfigData?.type || 'unknown'}`);
+
+        // 檢查是否需要籌碼系統
+        if (gameplayId === 'life_redesign') {
+          setShowTokenSystem(true);
+          addTestResult('✅ 啟動籌碼系統 (生活改造王)');
+        } else {
+          setShowTokenSystem(false);
+        }
+
+        // 使用 LegacyAdapter 創建遊戲狀態
+        const gameState = LegacyGameAdapter.startGameWithMode(selectedMode, gameplayId);
+        addTestResult(
+          `✅ 遊戲狀態初始化: rule_id=${gameState.rule_id}, zones=${gameState.zones.size}`
+        );
+
+        // 通知父元件
+        if (onStateChange) {
+          onStateChange({
+            mode: selectedMode,
+            gameplay: gameplayId,
+            gameState,
+            decks,
+            canvas: canvasConfigData,
+          });
+        }
+      } catch (err: any) {
+        setError(err.message);
+        addTestResult(`❌ 玩法選擇錯誤: ${err.message}`);
+      } finally {
+        setIsLoading(false);
       }
-      
-      // 使用 LegacyAdapter 創建遊戲狀態
-      const gameState = LegacyGameAdapter.startGameWithMode(selectedMode, gameplayId);
-      addTestResult(`✅ 遊戲狀態初始化: rule_id=${gameState.rule_id}, zones=${gameState.zones.size}`);
-      
-      // 通知父元件
-      if (onStateChange) {
-        onStateChange({
-          mode: selectedMode,
-          gameplay: gameplayId,
-          gameState,
-          decks,
-          canvas: canvasConfigData
-        });
-      }
-      
-    } catch (err: any) {
-      setError(err.message);
-      addTestResult(`❌ 玩法選擇錯誤: ${err.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedMode, testMode, onStateChange]);
+    },
+    [selectedMode, testMode, onStateChange]
+  );
 
   // 載入畫布配置
   const loadCanvasConfig = async (gameplayId: string): Promise<any> => {
     // 這裡應該從 canvas-configs.json 載入，暫時返回模擬資料
     const canvasMap: Record<string, any> = {
-      'personality_analysis': { type: 'three_columns', name: '三欄分類' },
-      'career_collector': { type: 'collection_zone', name: '收藏區' },
-      'advantage_analysis': { type: 'two_zones', name: '雙區' },
-      'growth_planning': { type: 'three_zones', name: '三區成長' },
-      'position_breakdown': { type: 'free_canvas', name: '自由畫布' },
-      'value_ranking': { type: 'grid_3x3', name: '3×3九宮格' },
-      'life_redesign': { type: 'value_gauge', name: '量表畫布' }
+      personality_analysis: { type: 'three_columns', name: '三欄分類' },
+      career_collector: { type: 'collection_zone', name: '收藏區' },
+      advantage_analysis: { type: 'two_zones', name: '雙區' },
+      growth_planning: { type: 'three_zones', name: '三區成長' },
+      position_breakdown: { type: 'free_canvas', name: '自由畫布' },
+      value_ranking: { type: 'grid_3x3', name: '3×3九宮格' },
+      life_redesign: { type: 'value_gauge', name: '量表畫布' },
     };
-    
+
     return canvasMap[gameplayId] || { type: 'default', name: '預設畫布' };
   };
 
   // 處理籌碼變更
   const handleTokenChange = (allocations: TokenAllocation[]) => {
     setTokenAllocations(allocations);
-    addTestResult(`🎯 籌碼更新: ${allocations.map(a => `${a.area}:${a.amount}`).join(', ')}`);
+    addTestResult(`🎯 籌碼更新: ${allocations.map((a) => `${a.area}:${a.amount}`).join(', ')}`);
   };
 
   // 生活改造王的區域配置
@@ -190,7 +204,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     { id: 'friends', name: '友誼', icon: <Users className="w-4 h-4" /> },
     { id: 'growth', name: '成長', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'leisure', name: '休閒', icon: <Gamepad2 className="w-4 h-4" /> },
-    { id: 'health', name: '健康', icon: <TrendingUp className="w-4 h-4" /> }
+    { id: 'health', name: '健康', icon: <TrendingUp className="w-4 h-4" /> },
   ];
 
   return (
@@ -198,11 +212,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       {/* 測試模式開關 */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">遊戲模式整合測試</h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setTestMode(!testMode)}
-        >
+        <Button variant="outline" size="sm" onClick={() => setTestMode(!testMode)}>
           {testMode ? '關閉測試模式' : '開啟測試模式'}
         </Button>
       </div>
@@ -295,9 +305,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                     </div>
                     <div>
                       <span className="text-gray-500">畫布類型：</span>
-                      <span className="font-medium ml-2">
-                        {canvasConfig?.name || '未知'}
-                      </span>
+                      <span className="font-medium ml-2">{canvasConfig?.name || '未知'}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -334,12 +342,12 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                     <CardTitle>遊戲畫布</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 
-                                  min-h-[400px] flex items-center justify-center">
+                    <div
+                      className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8
+                                  min-h-[400px] flex items-center justify-center"
+                    >
                       <div className="text-center space-y-4">
-                        <p className="text-gray-500">
-                          這裡將顯示 {canvasConfig?.name} 畫布
-                        </p>
+                        <p className="text-gray-500">這裡將顯示 {canvasConfig?.name} 畫布</p>
                         <p className="text-sm text-gray-400">
                           牌卡數量：{mainDeck.cards.length} 張
                         </p>

@@ -110,7 +110,7 @@ describe('GameMode Basic Integration - TDD Phase 1', () => {
         type: 'PLACE' as const,
         card_id: 'test_card',
         target_zone: 'advantage',
-        player_id: 'test_player'
+        player_id: 'test_player',
       };
 
       const isValid = GameEngine.validateAction(action, state);
@@ -139,10 +139,7 @@ describe('GameMode Basic Integration - TDD Phase 1', () => {
       const mode = GameModeService.getMode('skill_inventory');
       const gameplay = mode?.gameplays?.[0]; // 優劣勢分析
 
-      const gameState = LegacyGameAdapter.startGameWithMode(
-        mode!.id,
-        gameplay!.id
-      );
+      const gameState = LegacyGameAdapter.startGameWithMode(mode!.id, gameplay!.id);
 
       expect(gameState.rule_id).toBe('skill_assessment');
       expect(gameState.zones.has('advantage')).toBe(true);
@@ -154,10 +151,10 @@ describe('GameMode Basic Integration - TDD Phase 1', () => {
       const configs = [
         { mode: 'career_traveler', legacy: 'personality_assessment' },
         { mode: 'skill_inventory', legacy: 'skill_assessment' },
-        { mode: 'value_navigation', legacy: 'value_ranking' }
+        { mode: 'value_navigation', legacy: 'value_ranking' },
       ];
 
-      configs.forEach(config => {
+      configs.forEach((config) => {
         const state = LegacyGameAdapter.startGameWithMode(config.mode, '');
         expect(state.rule_id).toBe(config.legacy);
       });

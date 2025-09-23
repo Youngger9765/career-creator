@@ -18,7 +18,7 @@ export class GameEngine {
 
     // 根據規則創建區域
     if (rule) {
-      rule.zones.forEach(zoneConfig => {
+      rule.zones.forEach((zoneConfig) => {
         zones.set(zoneConfig.id, {
           id: zoneConfig.id,
           name: zoneConfig.name,
@@ -159,7 +159,7 @@ export class GameEngine {
         if (action.source_zone && action.card_id) {
           const zone = newState.zones.get(action.source_zone);
           if (zone) {
-            zone.cards = zone.cards.filter(id => id !== action.card_id);
+            zone.cards = zone.cards.filter((id) => id !== action.card_id);
           }
         }
         break;
@@ -169,7 +169,7 @@ export class GameEngine {
           const sourceZone = newState.zones.get(action.source_zone);
           const targetZone = newState.zones.get(action.target_zone);
           if (sourceZone && targetZone) {
-            sourceZone.cards = sourceZone.cards.filter(id => id !== action.card_id);
+            sourceZone.cards = sourceZone.cards.filter((id) => id !== action.card_id);
             targetZone.cards.push(action.card_id);
           }
         }

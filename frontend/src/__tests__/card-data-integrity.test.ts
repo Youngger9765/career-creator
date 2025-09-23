@@ -22,14 +22,14 @@ describe('Card Data Integrity', () => {
       const cards = await CardLoaderService.getCards('career_cards_100');
       const validCategories = ['R', 'I', 'A', 'S', 'E', 'C'];
 
-      cards.forEach(card => {
+      cards.forEach((card) => {
         expect(validCategories).toContain(card.category);
       });
     });
 
     it('should have unique IDs for all career cards', async () => {
       const cards = await CardLoaderService.getCards('career_cards_100');
-      const ids = cards.map(card => card.id);
+      const ids = cards.map((card) => card.id);
       const uniqueIds = new Set(ids);
 
       expect(uniqueIds.size).toBe(100);
@@ -38,7 +38,7 @@ describe('Card Data Integrity', () => {
     it('should have required properties for each career card', async () => {
       const cards = await CardLoaderService.getCards('career_cards_100');
 
-      cards.forEach(card => {
+      cards.forEach((card) => {
         expect(card.id).toBeDefined();
         expect(card.title).toBeDefined();
         expect(card.category).toBeDefined();
@@ -59,7 +59,7 @@ describe('Card Data Integrity', () => {
       const cards = await CardLoaderService.getCards('skill_cards_52');
       const validCategories = ['soft', 'hard'];
 
-      cards.forEach(card => {
+      cards.forEach((card) => {
         expect(validCategories).toContain(card.category);
       });
     });
@@ -68,15 +68,15 @@ describe('Card Data Integrity', () => {
       const cards = await CardLoaderService.getCards('skill_cards_52');
       const validLevels = ['基礎', '進階', '專家'];
 
-      cards.forEach(card => {
+      cards.forEach((card) => {
         expect(validLevels).toContain(card.level);
       });
     });
 
     it('should have balanced soft and hard skills', async () => {
       const cards = await CardLoaderService.getCards('skill_cards_52');
-      const softSkills = cards.filter(c => c.category === 'soft');
-      const hardSkills = cards.filter(c => c.category === 'hard');
+      const softSkills = cards.filter((c) => c.category === 'soft');
+      const hardSkills = cards.filter((c) => c.category === 'hard');
 
       // 應該有合理的平衡
       expect(softSkills.length).toBeGreaterThan(10);
@@ -93,13 +93,22 @@ describe('Card Data Integrity', () => {
     it('should have valid value categories', async () => {
       const cards = await CardLoaderService.getCards('value_cards_36');
       const validCategories = [
-        'relationships', 'achievement', 'wellbeing', 'material',
-        'autonomy', 'expression', 'growth', 'experience',
-        'security', 'contribution', 'character', 'meaning',
-        'lifestyle'
+        'relationships',
+        'achievement',
+        'wellbeing',
+        'material',
+        'autonomy',
+        'expression',
+        'growth',
+        'experience',
+        'security',
+        'contribution',
+        'character',
+        'meaning',
+        'lifestyle',
       ];
 
-      cards.forEach(card => {
+      cards.forEach((card) => {
         expect(validCategories).toContain(card.category);
       });
     });
@@ -107,7 +116,7 @@ describe('Card Data Integrity', () => {
     it('should have questions for each value card', async () => {
       const cards = await CardLoaderService.getCards('value_cards_36');
 
-      cards.forEach(card => {
+      cards.forEach((card) => {
         expect(card.questions).toBeDefined();
         expect(Array.isArray(card.questions)).toBe(true);
         expect(card.questions.length).toBeGreaterThanOrEqual(3);
@@ -124,7 +133,7 @@ describe('Card Data Integrity', () => {
     it('should have correct RIASEC codes', async () => {
       const cards = await CardLoaderService.getCards('riasec_explanation');
       const expectedCodes = ['R', 'I', 'A', 'S', 'E', 'C'];
-      const actualCodes = cards.map(card => card.code);
+      const actualCodes = cards.map((card) => card.code);
 
       expect(actualCodes.sort()).toEqual(expectedCodes.sort());
     });
@@ -132,7 +141,7 @@ describe('Card Data Integrity', () => {
     it('should have required properties for each RIASEC card', async () => {
       const cards = await CardLoaderService.getCards('riasec_explanation');
 
-      cards.forEach(card => {
+      cards.forEach((card) => {
         expect(card.id).toBeDefined();
         expect(card.code).toBeDefined();
         expect(card.title).toBeDefined();
@@ -152,7 +161,7 @@ describe('Card Data Integrity', () => {
         'career_cards_100',
         'skill_cards_52',
         'value_cards_36',
-        'riasec_explanation'
+        'riasec_explanation',
       ];
 
       for (const deckId of deckIds) {
@@ -166,8 +175,8 @@ describe('Card Data Integrity', () => {
       const allDecks = await CardLoaderService.getAllDecks();
       const allIds = new Set<string>();
 
-      allDecks.forEach(deck => {
-        deck.cards.forEach(card => {
+      allDecks.forEach((deck) => {
+        deck.cards.forEach((card) => {
           // 每個ID應該是唯一的（包含deck prefix）
           const fullId = `${deck.id}_${card.id}`;
           expect(allIds.has(fullId)).toBe(false);
@@ -182,10 +191,8 @@ describe('Card Data Integrity', () => {
       const results = await CardLoaderService.searchCards('工程師');
       expect(results.length).toBeGreaterThan(0);
 
-      results.forEach(card => {
-        const includesQuery =
-          card.title.includes('工程師') ||
-          card.description.includes('工程師');
+      results.forEach((card) => {
+        const includesQuery = card.title.includes('工程師') || card.description.includes('工程師');
         expect(includesQuery).toBe(true);
       });
     });
@@ -198,8 +205,8 @@ describe('Card Data Integrity', () => {
       expect(randomCards2).toHaveLength(5);
 
       // 兩次隨機應該不同（雖然有小概率相同）
-      const ids1 = randomCards1.map(c => c.id).join(',');
-      const ids2 = randomCards2.map(c => c.id).join(',');
+      const ids1 = randomCards1.map((c) => c.id).join(',');
+      const ids2 = randomCards2.map((c) => c.id).join(',');
       // 這個測試可能偶爾失敗，但概率很小
     });
 
@@ -207,7 +214,7 @@ describe('Card Data Integrity', () => {
       const rCards = await CardLoaderService.getCardsByCategory('career_cards_100', 'R');
       expect(rCards.length).toBeGreaterThan(0);
 
-      rCards.forEach(card => {
+      rCards.forEach((card) => {
         expect(card.category).toBe('R');
       });
     });
@@ -283,7 +290,7 @@ describe('Token System', () => {
     it('should enforce min/max per area constraints', () => {
       const manager = new TokenManager(100, {
         minPerArea: 10,
-        maxPerArea: 50
+        maxPerArea: 50,
       });
       manager.initializeAreas(['health']);
 
@@ -305,7 +312,7 @@ describe('Token System', () => {
 
       manager.distributeEvenly();
 
-      areas.forEach(area => {
+      areas.forEach((area) => {
         expect(manager.getAllocation(area)).toBe(25);
       });
     });
@@ -317,7 +324,7 @@ describe('Token System', () => {
       const ratios = new Map([
         ['health', 2],
         ['career', 3],
-        ['family', 5]
+        ['family', 5],
       ]);
 
       const success = manager.distributeByRatio(ratios);
@@ -334,8 +341,14 @@ describe('Token System', () => {
     it('should handle 生活改造王 gameplay correctly', () => {
       const manager = new TokenManager(100, { sumEquals: 100 });
       const lifeAreas = [
-        'family', 'career', 'health', 'wealth',
-        'love', 'friends', 'growth', 'leisure'
+        'family',
+        'career',
+        'health',
+        'wealth',
+        'love',
+        'friends',
+        'growth',
+        'leisure',
       ];
 
       manager.initializeAreas(lifeAreas);

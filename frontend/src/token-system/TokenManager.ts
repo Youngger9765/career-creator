@@ -49,7 +49,7 @@ export class TokenManager {
    * 初始化區域
    */
   initializeAreas(areas: string[]): void {
-    areas.forEach(area => {
+    areas.forEach((area) => {
       if (!this.allocations.has(area)) {
         this.allocations.set(area, 0);
       }
@@ -325,9 +325,9 @@ export class TokenManager {
     const colors = this.generateColors(allocations.length);
 
     return {
-      labels: allocations.map(a => a.area),
-      values: allocations.map(a => a.amount),
-      percentages: allocations.map(a => a.percentage),
+      labels: allocations.map((a) => a.area),
+      values: allocations.map((a) => a.amount),
+      percentages: allocations.map((a) => a.percentage),
       colors,
     };
   }
@@ -352,7 +352,7 @@ export class TokenManager {
    */
   private notifyListeners(): void {
     const allocations = this.getAllAllocations();
-    this.listeners.forEach(listener => listener(allocations));
+    this.listeners.forEach((listener) => listener(allocations));
   }
 
   /**

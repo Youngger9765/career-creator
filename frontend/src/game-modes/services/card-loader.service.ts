@@ -92,7 +92,7 @@ export class CardLoaderService {
    */
   static async getCard(deckId: string, cardId: string): Promise<Card | undefined> {
     const cards = await this.getCards(deckId);
-    return cards.find(card => card.id === cardId);
+    return cards.find((card) => card.id === cardId);
   }
 
   /**
@@ -100,7 +100,7 @@ export class CardLoaderService {
    */
   static async getCardsByCategory(deckId: string, category: string): Promise<Card[]> {
     const cards = await this.getCards(deckId);
-    return cards.filter(card => card.category === category);
+    return cards.filter((card) => card.category === category);
   }
 
   /**
@@ -110,17 +110,18 @@ export class CardLoaderService {
     await this.initialize();
 
     const decks = deckId
-      ? [await this.getDeck(deckId)].filter(Boolean) as CardDeck[]
+      ? ([await this.getDeck(deckId)].filter(Boolean) as CardDeck[])
       : Array.from(this.cache.values());
 
     const results: Card[] = [];
     const lowerQuery = query.toLowerCase();
 
     for (const deck of decks) {
-      const matchingCards = deck.cards.filter(card =>
-        card.title.toLowerCase().includes(lowerQuery) ||
-        card.description.toLowerCase().includes(lowerQuery) ||
-        (card.category && card.category.toLowerCase().includes(lowerQuery))
+      const matchingCards = deck.cards.filter(
+        (card) =>
+          card.title.toLowerCase().includes(lowerQuery) ||
+          card.description.toLowerCase().includes(lowerQuery) ||
+          (card.category && card.category.toLowerCase().includes(lowerQuery))
       );
       results.push(...matchingCards);
     }
@@ -131,18 +132,21 @@ export class CardLoaderService {
   /**
    * 取得牌組統計資訊
    */
-  static async getDeckStats(deckId: string): Promise<{
-    totalCards: number;
-    categories: Map<string, number>;
-    averageDescriptionLength: number;
-  } | undefined> {
+  static async getDeckStats(deckId: string): Promise<
+    | {
+        totalCards: number;
+        categories: Map<string, number>;
+        averageDescriptionLength: number;
+      }
+    | undefined
+  > {
     const deck = await this.getDeck(deckId);
     if (!deck) return undefined;
 
     const categories = new Map<string, number>();
     let totalDescriptionLength = 0;
 
-    deck.cards.forEach(card => {
+    deck.cards.forEach((card) => {
       if (card.category) {
         categories.set(card.category, (categories.get(card.category) || 0) + 1);
       }
@@ -188,7 +192,7 @@ export class CardLoaderService {
     const cardIds = new Set<string>();
     const duplicateIds: string[] = [];
 
-    deck.cards.forEach(card => {
+    deck.cards.forEach((card) => {
       if (cardIds.has(card.id)) {
         duplicateIds.push(card.id);
       }
@@ -224,26 +228,26 @@ export class CardLoaderService {
     switch (gameplayId) {
       case 'personality_analysis':
         return {
-          main: await this.getDeck('career_cards_100') || undefined,
-          explanation: await this.getDeck('riasec_explanation') || undefined,
+          main: (await this.getDeck('career_cards_100')) || undefined,
+          explanation: (await this.getDeck('riasec_explanation')) || undefined,
         };
 
       case 'career_collector':
         return {
-          main: await this.getDeck('career_cards_100') || undefined,
+          main: (await this.getDeck('career_cards_100')) || undefined,
         };
 
       case 'advantage_analysis':
       case 'growth_planning':
       case 'position_breakdown':
         return {
-          main: await this.getDeck('skill_cards_52') || undefined,
+          main: (await this.getDeck('skill_cards_52')) || undefined,
         };
 
       case 'value_ranking':
       case 'life_redesign':
         return {
-          main: await this.getDeck('value_cards_36') || undefined,
+          main: (await this.getDeck('value_cards_36')) || undefined,
         };
 
       default:
@@ -262,15 +266,17 @@ export class CardLoaderService {
   /**
    * 取得牌組摘要資訊
    */
-  static async getDeckSummary(): Promise<Array<{
-    id: string;
-    name: string;
-    cardCount: number;
-    type: string;
-  }>> {
+  static async getDeckSummary(): Promise<
+    Array<{
+      id: string;
+      name: string;
+      cardCount: number;
+      type: string;
+    }>
+  > {
     await this.initialize();
 
-    return Array.from(this.cache.values()).map(deck => ({
+    return Array.from(this.cache.values()).map((deck) => ({
       id: deck.id,
       name: deck.name,
       cardCount: deck.cards.length,

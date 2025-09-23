@@ -34,14 +34,14 @@ export class GameModeService {
         {
           id: 'personality_analysis',
           name: '六大性格分析',
-          description: '透過RIASEC模型分析職業性格偏好'
+          description: '透過RIASEC模型分析職業性格偏好',
         },
         {
           id: 'career_collector',
           name: '職業收藏家',
-          description: '從100張職業卡中精選最感興趣的15張'
-        }
-      ]
+          description: '從100張職業卡中精選最感興趣的15張',
+        },
+      ],
     },
     {
       id: 'skill_inventory',
@@ -52,19 +52,19 @@ export class GameModeService {
         {
           id: 'advantage_analysis',
           name: '優劣勢分析',
-          description: '識別個人的優勢與待改進領域'
+          description: '識別個人的優勢與待改進領域',
         },
         {
           id: 'growth_planning',
           name: '成長計畫',
-          description: '制定職涯發展路徑和技能提升計畫'
+          description: '制定職涯發展路徑和技能提升計畫',
         },
         {
           id: 'position_breakdown',
           name: '職位拆解',
-          description: '深度分析特定職位所需的各項能力'
-        }
-      ]
+          description: '深度分析特定職位所需的各項能力',
+        },
+      ],
     },
     {
       id: 'value_navigation',
@@ -75,15 +75,15 @@ export class GameModeService {
         {
           id: 'value_ranking',
           name: '價值觀排序',
-          description: '從36張價值卡中排出優先順序'
+          description: '從36張價值卡中排出優先順序',
         },
         {
           id: 'life_redesign',
           name: '生活改造王',
-          description: '使用100點生活能量重新分配人生重點'
-        }
-      ]
-    }
+          description: '使用100點生活能量重新分配人生重點',
+        },
+      ],
+    },
   ];
 
   /**
@@ -97,7 +97,7 @@ export class GameModeService {
    * 根據ID取得特定模式
    */
   static getMode(modeId: string): GameMode | undefined {
-    return this.modes.find(m => m.id === modeId);
+    return this.modes.find((m) => m.id === modeId);
   }
 
   /**
@@ -113,7 +113,7 @@ export class GameModeService {
    */
   static getGameplay(modeId: string, gameplayId: string): Gameplay | undefined {
     const mode = this.getMode(modeId);
-    return mode?.gameplays.find(g => g.id === gameplayId);
+    return mode?.gameplays.find((g) => g.id === gameplayId);
   }
 
   /**
@@ -139,7 +139,7 @@ export class GameModeService {
    * 檢查模式是否存在
    */
   static hasMode(modeId: string): boolean {
-    return this.modes.some(m => m.id === modeId);
+    return this.modes.some((m) => m.id === modeId);
   }
 
   /**
@@ -147,7 +147,7 @@ export class GameModeService {
    */
   static hasGameplay(modeId: string, gameplayId: string): boolean {
     const mode = this.getMode(modeId);
-    return mode?.gameplays.some(g => g.id === gameplayId) || false;
+    return mode?.gameplays.some((g) => g.id === gameplayId) || false;
   }
 
   /**
@@ -162,7 +162,7 @@ export class GameModeService {
    * 用於從舊系統遷移到新系統
    */
   static getModeIdByLegacyRule(legacyRuleId: string): string | undefined {
-    const mode = this.modes.find(m => m.legacyRuleId === legacyRuleId);
+    const mode = this.modes.find((m) => m.legacyRuleId === legacyRuleId);
     return mode?.id;
   }
 }

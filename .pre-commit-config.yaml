@@ -60,6 +60,17 @@ repos:
           - sqlmodel
           - pydantic
 
+  # Python - Run tests with pytest
+  - repo: local
+    hooks:
+      - id: pytest
+        name: Pytest
+        entry: bash -c 'cd backend && pytest --tb=short'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [push]  # Only run on push to avoid slowdown
+
   # Frontend - ESLint
   - repo: local
     hooks:
@@ -79,6 +90,28 @@ repos:
         language: system
         files: ^frontend/.*\.(ts|tsx)$
         pass_filenames: false
+
+  # Frontend - Build Check
+  - repo: local
+    hooks:
+      - id: nextjs-build
+        name: Next.js Build Check
+        entry: bash -c 'cd frontend && npm run build'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        stages: [push]  # Only run on push, not every commit
+
+  # Frontend - Tests (if exist)
+  - repo: local
+    hooks:
+      - id: frontend-tests
+        name: Frontend Tests
+        entry: bash -c 'cd frontend && npm test -- --passWithNoTests'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        stages: [push]  # Only run on push
 
   # Frontend - Prettier formatter
   - repo: local

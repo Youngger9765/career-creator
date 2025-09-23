@@ -1,6 +1,6 @@
 /**
  * TokenControls - 籌碼控制互動元件
- * 
+ *
  * 提供籌碼分配的互動控制介面
  * 支援滑桿、按鈕、拖曳等操作方式
  */
@@ -15,15 +15,15 @@ import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Plus, 
-  Minus, 
-  RotateCcw, 
+import {
+  Plus,
+  Minus,
+  RotateCcw,
   Save,
   AlertCircle,
   Sparkles,
   TrendingUp,
-  TrendingDown
+  TrendingDown,
 } from 'lucide-react';
 
 interface TokenControlsProps {
@@ -52,25 +52,25 @@ const TokenControls: React.FC<TokenControlsProps> = ({
   className = '',
   showSuggestions = true,
   minPerArea = 0,
-  maxPerArea = 100
+  maxPerArea = 100,
 }) => {
   const [tokenManager] = useState(() => {
-    const manager = new TokenManager(total, { 
-      minPerArea, 
+    const manager = new TokenManager(total, {
+      minPerArea,
       maxPerArea,
-      sumEquals: total 
+      sumEquals: total,
     });
-    
+
     // 初始化區域
-    manager.initializeAreas(areas.map(a => a.id));
-    
+    manager.initializeAreas(areas.map((a) => a.id));
+
     // 設定初始分配
     if (initialAllocations) {
       initialAllocations.forEach((amount, area) => {
         manager.setAllocation(area, amount);
       });
     }
-    
+
     return manager;
   });
 
@@ -85,7 +85,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
       setAllocations(newAllocations);
       setRemaining(tokenManager.getRemaining());
       setIsDirty(true);
-      
+
       if (onChange) {
         onChange(newAllocations);
       }
@@ -109,7 +109,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
   const handleInputChange = (areaId: string, value: string) => {
     const numValue = parseInt(value, 10);
     if (isNaN(numValue)) return;
-    
+
     const success = tokenManager.setAllocation(areaId, numValue);
     if (!success) {
       setError(`無法分配 ${numValue} 點到此區域`);
@@ -136,7 +136,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
   };
 
   const handleDistributeEvenly = () => {
-    tokenManager.distributeEvenly(areas.map(a => a.id));
+    tokenManager.distributeEvenly(areas.map((a) => a.id));
     setIsDirty(true);
   };
 
@@ -150,8 +150,8 @@ const TokenControls: React.FC<TokenControlsProps> = ({
 
     const ratio = total / currentTotal;
     const currentAllocations = new Map<string, number>();
-    
-    areas.forEach(area => {
+
+    areas.forEach((area) => {
       const current = tokenManager.getAllocation(area.id);
       if (current > 0) {
         currentAllocations.set(area.id, current * ratio);
@@ -177,7 +177,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
       love: '建議 10-15 點，感情需要經營',
       friends: '建議 5-10 點，友誼支持網',
       growth: '建議 10-15 點，持續學習',
-      leisure: '建議 5-10 點，適度放鬆'
+      leisure: '建議 5-10 點，適度放鬆',
     };
     return suggestions[areaId] || '';
   };
@@ -187,20 +187,17 @@ const TokenControls: React.FC<TokenControlsProps> = ({
       {/* 頂部狀態列 */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center space-x-4">
-          <Badge 
-            variant={remaining === 0 ? 'default' : 'secondary'}
-            className="text-lg px-3 py-1"
-          >
+          <Badge variant={remaining === 0 ? 'default' : 'secondary'} className="text-lg px-3 py-1">
             剩餘: {remaining}/{total}
           </Badge>
-          
+
           {remaining === 0 && (
             <Badge variant="outline" className="text-green-600 border-green-600">
               <Sparkles className="w-3 h-3 mr-1" />
               分配完成
             </Badge>
           )}
-          
+
           {isDirty && (
             <Badge variant="outline" className="text-orange-600 border-orange-600">
               未儲存
@@ -209,36 +206,17 @@ const TokenControls: React.FC<TokenControlsProps> = ({
         </div>
 
         <div className="flex space-x-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleDistributeEvenly}
-            title="平均分配"
-          >
+          <Button size="sm" variant="outline" onClick={handleDistributeEvenly} title="平均分配">
             平均分配
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAutoBalance}
-            title="自動平衡"
-          >
+          <Button size="sm" variant="outline" onClick={handleAutoBalance} title="自動平衡">
             自動平衡
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleReset}
-            title="重置"
-          >
+          <Button size="sm" variant="outline" onClick={handleReset} title="重置">
             <RotateCcw className="w-4 h-4" />
           </Button>
           {onSave && (
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={!isDirty || remaining !== 0}
-            >
+            <Button size="sm" onClick={handleSave} disabled={!isDirty || remaining !== 0}>
               <Save className="w-4 h-4 mr-1" />
               儲存
             </Button>
@@ -257,7 +235,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
       {/* 控制區域 */}
       <div className="space-y-4">
         {areas.map((area) => {
-          const allocation = allocations.find(a => a.area === area.id);
+          const allocation = allocations.find((a) => a.area === area.id);
           const currentValue = allocation?.amount || 0;
           const percentage = allocation?.percentage || 0;
           const suggestion = showSuggestions ? getSuggestion(area.id) : '';
@@ -269,9 +247,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   <div className="flex items-center space-x-3">
                     {area.icon}
                     <div>
-                      <CardTitle className="text-base">
-                        {area.name}
-                      </CardTitle>
+                      <CardTitle className="text-base">{area.name}</CardTitle>
                       {area.description && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {area.description}
@@ -289,7 +265,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent className="space-y-3">
                 {/* 滑桿控制 */}
                 <div className="flex items-center space-x-4">
@@ -302,7 +278,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   >
                     <Minus className="h-3 w-3" />
                   </Button>
-                  
+
                   <Slider
                     value={[currentValue]}
                     onValueChange={(value) => handleSliderChange(area.id, value)}
@@ -311,7 +287,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                     step={1}
                     className="flex-1"
                   />
-                  
+
                   <Button
                     size="icon"
                     variant="outline"
@@ -321,7 +297,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   >
                     <Plus className="h-3 w-3" />
                   </Button>
-                  
+
                   <Input
                     type="number"
                     value={currentValue}
@@ -367,9 +343,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
 
                 {/* 建議提示 */}
                 {suggestion && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-                    💡 {suggestion}
-                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 italic">💡 {suggestion}</p>
                 )}
               </CardContent>
             </Card>

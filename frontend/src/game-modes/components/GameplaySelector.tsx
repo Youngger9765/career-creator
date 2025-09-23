@@ -1,6 +1,6 @@
 /**
  * GameplaySelector - 玩法選擇器元件
- * 
+ *
  * 根據選擇的模式顯示可用的玩法選項
  * 支援玩法預覽和詳細說明
  */
@@ -12,7 +12,7 @@ import { GameModeService, Gameplay } from '../services/mode.service';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
+import {
   Sparkles,
   Grid3x3,
   Columns3,
@@ -20,7 +20,7 @@ import {
   Layers,
   Maximize2,
   BarChart3,
-  Info
+  Info,
 } from 'lucide-react';
 
 interface GameplaySelectorProps {
@@ -38,7 +38,7 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
   onGameplaySelect,
   className = '',
   disabled = false,
-  showDescription = true
+  showDescription = true,
 }) => {
   const [gameplays, setGameplays] = useState<Gameplay[]>([]);
   const [selectedGameplay, setSelectedGameplay] = useState<string | undefined>(currentGameplay);
@@ -59,21 +59,21 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
 
   const handleGameplaySelect = (gameplayId: string) => {
     if (disabled) return;
-    
+
     setSelectedGameplay(gameplayId);
     onGameplaySelect(gameplayId);
   };
 
   const getGameplayIcon = (gameplayId: string) => {
-    const iconClass = "w-6 h-6";
-    
+    const iconClass = 'w-6 h-6';
+
     switch (gameplayId) {
       // 職游旅人卡
       case 'personality_analysis':
         return <Columns3 className={iconClass} />;
       case 'career_collector':
         return <Sparkles className={iconClass} />;
-      
+
       // 職能盤點卡
       case 'advantage_analysis':
         return <Layout className={iconClass} />;
@@ -81,13 +81,13 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
         return <Layers className={iconClass} />;
       case 'position_breakdown':
         return <Maximize2 className={iconClass} />;
-      
+
       // 價值導航卡
       case 'value_ranking':
         return <Grid3x3 className={iconClass} />;
       case 'life_redesign':
         return <BarChart3 className={iconClass} />;
-      
+
       default:
         return <Info className={iconClass} />;
     }
@@ -136,9 +136,7 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
   if (gameplays.length === 0) {
     return (
       <div className={`text-center py-8 ${className}`}>
-        <p className="text-gray-500 dark:text-gray-400">
-          請先選擇遊戲模式
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">請先選擇遊戲模式</p>
       </div>
     );
   }
@@ -147,9 +145,7 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
     <div className={`space-y-4 ${className}`}>
       {showDescription && (
         <div className="text-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            選擇玩法
-          </h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">選擇玩法</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {modeName} - 共有 {gameplays.length} 種玩法
           </p>
@@ -161,7 +157,7 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
         {gameplays.map((gameplay) => {
           const isSelected = selectedGameplay === gameplay.id;
           const features = getGameplayFeatures(gameplay.id);
-          
+
           return (
             <Card
               key={gameplay.id}
@@ -181,46 +177,38 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
                       {getGameplayIcon(gameplay.id)}
                     </div>
                     <div>
-                      <CardTitle className="text-base">
-                        {gameplay.name}
-                      </CardTitle>
+                      <CardTitle className="text-base">{gameplay.name}</CardTitle>
                       {gameplay.id === 'life_redesign' && (
-                        <Badge 
-                          className={`mt-1 text-xs ${getGameplayBadgeColor(gameplay.id)}`}
-                        >
+                        <Badge className={`mt-1 text-xs ${getGameplayBadgeColor(gameplay.id)}`}>
                           特色玩法
                         </Badge>
                       )}
                     </div>
                   </div>
-                  {isSelected && (
-                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                  )}
+                  {isSelected && <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />}
                 </div>
               </CardHeader>
-              
+
               <CardContent className="pt-0">
                 {gameplay.description && (
-                  <CardDescription className="text-xs mb-3">
-                    {gameplay.description}
-                  </CardDescription>
+                  <CardDescription className="text-xs mb-3">{gameplay.description}</CardDescription>
                 )}
-                
+
                 {/* 特色標籤 */}
                 <div className="flex flex-wrap gap-1 mb-3">
                   {features.map((feature, index) => (
-                    <span 
+                    <span
                       key={index}
-                      className="inline-flex items-center px-2 py-0.5 
-                               text-xs bg-gray-50 dark:bg-gray-900 
-                               text-gray-600 dark:text-gray-400 
+                      className="inline-flex items-center px-2 py-0.5
+                               text-xs bg-gray-50 dark:bg-gray-900
+                               text-gray-600 dark:text-gray-400
                                rounded-full"
                     >
                       {feature}
                     </span>
                   ))}
                 </div>
-                
+
                 <Button
                   size="sm"
                   variant={isSelected ? 'default' : 'outline'}
@@ -239,7 +227,7 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
       <div className="md:hidden space-y-2">
         {gameplays.map((gameplay) => {
           const isSelected = selectedGameplay === gameplay.id;
-          
+
           return (
             <button
               key={gameplay.id}
@@ -247,9 +235,10 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
                 w-full p-4 rounded-lg border-2 text-left
                 transition-all duration-200
                 ${getGameplayColor(gameplay.id)}
-                ${isSelected 
-                  ? 'bg-blue-50 dark:bg-blue-950 border-blue-500' 
-                  : 'bg-white dark:bg-gray-900'
+                ${
+                  isSelected
+                    ? 'bg-blue-50 dark:bg-blue-950 border-blue-500'
+                    : 'bg-white dark:bg-gray-900'
                 }
                 ${disabled ? 'opacity-50' : ''}
               `}
@@ -279,15 +268,11 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
                 </div>
                 {isSelected && (
                   <div className="text-blue-500">
-                    <svg 
-                      className="w-5 h-5" 
-                      fill="currentColor" 
-                      viewBox="0 0 20 20"
-                    >
-                      <path 
-                        fillRule="evenodd" 
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" 
-                        clipRule="evenodd" 
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
                       />
                     </svg>
                   </div>

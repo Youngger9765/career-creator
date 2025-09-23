@@ -206,15 +206,24 @@ const TokenControls: React.FC<TokenControlsProps> = ({
         </div>
 
         <div className="flex space-x-2">
-          <Button size="sm" variant="outline" onClick={handleDistributeEvenly} title="平均分配">
+          <button
+            onClick={handleDistributeEvenly}
+            className="px-3 py-1 text-sm border border-gray-400 rounded text-gray-700 dark:text-white dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             平均分配
-          </Button>
-          <Button size="sm" variant="outline" onClick={handleAutoBalance} title="自動平衡">
+          </button>
+          <button
+            onClick={handleAutoBalance}
+            className="px-3 py-1 text-sm border border-gray-400 rounded text-gray-700 dark:text-white dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             自動平衡
-          </Button>
-          <Button size="sm" variant="outline" onClick={handleReset} title="重置">
+          </button>
+          <button
+            onClick={handleReset}
+            className="px-3 py-1 text-sm border border-gray-400 rounded text-gray-700 dark:text-white dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center"
+          >
             <RotateCcw className="w-4 h-4" />
-          </Button>
+          </button>
           {onSave && (
             <Button size="sm" onClick={handleSave} disabled={!isDirty || remaining !== 0}>
               <Save className="w-4 h-4 mr-1" />
@@ -272,7 +281,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   <Button
                     size="icon"
                     variant="outline"
-                    className="h-8 w-8"
+                    className="h-8 w-8 dark:border-gray-600 dark:text-gray-200"
                     onClick={() => handleDecrement(area.id, 5)}
                     disabled={currentValue <= minPerArea}
                   >
@@ -291,7 +300,7 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   <Button
                     size="icon"
                     variant="outline"
-                    className="h-8 w-8"
+                    className="h-8 w-8 dark:border-gray-600 dark:text-gray-200"
                     onClick={() => handleIncrement(area.id, 5)}
                     disabled={currentValue >= maxPerArea || remaining === 0}
                   >
@@ -312,8 +321,8 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                 <div className="flex space-x-2">
                   <Button
                     size="sm"
-                    variant="ghost"
-                    className="text-xs"
+                    variant="outline"
+                    className="text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleIncrement(area.id, 10)}
                     disabled={remaining < 10}
                   >
@@ -322,8 +331,8 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   </Button>
                   <Button
                     size="sm"
-                    variant="ghost"
-                    className="text-xs"
+                    variant="outline"
+                    className="text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleIncrement(area.id, 20)}
                     disabled={remaining < 20}
                   >
@@ -331,8 +340,8 @@ const TokenControls: React.FC<TokenControlsProps> = ({
                   </Button>
                   <Button
                     size="sm"
-                    variant="ghost"
-                    className="text-xs"
+                    variant="outline"
+                    className="text-xs text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => handleDecrement(area.id, 10)}
                     disabled={currentValue < 10}
                   >

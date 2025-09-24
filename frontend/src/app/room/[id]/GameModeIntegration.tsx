@@ -79,8 +79,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   const [advantageMaxCards, setAdvantageMaxCards] = useState(5);
   const [disadvantageMaxCards, setDisadvantageMaxCards] = useState(5);
   
-  // 卡片類型選擇 (職能盤點卡 vs 策略行動卡)
-  const [selectedCardType, setSelectedCardType] = useState<'skill' | 'action'>('skill');
+  // 移除卡片類型選擇狀態，優劣勢分析只使用職能盤點卡
 
   // 測試模式
   const [testMode, setTestMode] = useState(false);
@@ -94,81 +93,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   // 是否為房間擁有者 (暫時假設非訪客即為擁有者)
   const isRoomOwner = !isVisitor;
 
-  // 策略行動卡模擬數據
-  const actionCards = [
-    { id: 'action-1', title: '制定學習計劃', description: '建立系統性的學習方案', category: '學習策略' },
-    { id: 'action-2', title: '尋找導師', description: '找到合適的指導者', category: '人際網絡' },
-    { id: 'action-3', title: '參與專案', description: '通過實踐提升能力', category: '實戰經驗' },
-    { id: 'action-4', title: '加入社群', description: '建立專業人脈', category: '人際網絡' },
-    { id: 'action-5', title: '取得認證', description: '獲得相關專業證書', category: '資格認證' },
-    { id: 'action-6', title: '練習表達', description: '提升溝通表達能力', category: '軟技能' },
-    { id: 'action-7', title: '建立作品集', description: '展示個人成果', category: '個人品牌' },
-    { id: 'action-8', title: '參加工作坊', description: '學習新技術或方法', category: '學習策略' },
-  ];
-
-  // 渲染卡片列表
-  const renderCardList = () => {
-    if (selectedCardType === 'skill') {
-      // 顯示職能盤點卡 (原本的 mainDeck)
-      if (!mainDeck) return <div className="text-gray-500 dark:text-gray-400">載入中...</div>;
-      
-      return (
-        <div>
-          <div className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
-            職能盤點卡 ({mainDeck.cards.length} 張)
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {mainDeck.cards
-              .slice(0, 10)
-              .filter((card: any) => !usedCards.has(card.id))
-              .map((card: any) => (
-                <CardItem
-                  key={card.id}
-                  id={card.id}
-                  title={card.title}
-                  description={card.description}
-                  category={card.category}
-                  isUsed={false}
-                  isDraggable={true}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('cardId', card.id);
-                    addTestResult(`📋 開始拖曳職能卡: ${card.title}`);
-                  }}
-                />
-              ))}
-          </div>
-        </div>
-      );
-    } else {
-      // 顯示策略行動卡
-      return (
-        <div>
-          <div className="text-xs text-orange-600 dark:text-orange-400 mb-2 font-medium">
-            策略行動卡 ({actionCards.length} 張)
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {actionCards
-              .filter((card) => !usedCards.has(card.id))
-              .map((card) => (
-                <CardItem
-                  key={card.id}
-                  id={card.id}
-                  title={card.title}
-                  description={card.description}
-                  category={card.category}
-                  isUsed={false}
-                  isDraggable={true}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('cardId', card.id);
-                    addTestResult(`📋 開始拖曳策略卡: ${card.title}`);
-                  }}
-                />
-              ))}
-          </div>
-        </div>
-      );
-    }
-  };
+  // 移除策略行動卡相關代碼，優劣勢分析只使用職能盤點卡
 
   // 初始化服務
   useEffect(() => {
@@ -615,35 +540,37 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                   </p>
                 </div>
 
-                {/* 卡片類型切換 Tab */}
-                <div className="border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex">
-                    <button
-                      onClick={() => setSelectedCardType('skill')}
-                      className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                        selectedCardType === 'skill'
-                          ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
-                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                      }`}
-                    >
-                      職能盤點卡
-                    </button>
-                    <button
-                      onClick={() => setSelectedCardType('action')}
-                      className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                        selectedCardType === 'action'
-                          ? 'bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400 border-b-2 border-orange-600'
-                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                      }`}
-                    >
-                      策略行動卡
-                    </button>
-                  </div>
-                </div>
-
                 {/* 牌卡列表 */}
                 <div className="flex-1 overflow-y-auto p-4">
-                  {renderCardList()}
+                  {mainDeck ? (
+                    <div>
+                      <div className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
+                        職能盤點卡 ({mainDeck.cards.length} 張)
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {mainDeck.cards
+                          .slice(0, 10)
+                          .filter((card: any) => !usedCards.has(card.id))
+                          .map((card: any) => (
+                            <CardItem
+                              key={card.id}
+                              id={card.id}
+                              title={card.title}
+                              description={card.description}
+                              category={card.category}
+                              isUsed={false}
+                              isDraggable={true}
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData('cardId', card.id);
+                                addTestResult(`📋 開始拖曳職能卡: ${card.title}`);
+                              }}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-gray-500 dark:text-gray-400">載入中...</div>
+                  )}
                 </div>
               </div>
 

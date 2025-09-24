@@ -9,13 +9,18 @@
 
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
-import { TrendingUp, TrendingDown, AlertCircle, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, X, Settings, Lock, Unlock } from 'lucide-react';
 import CardItem from './CardItem';
 
 interface TwoZoneCanvasProps {
   cards?: CardData[];
   onCardMove?: (cardId: string, zone: 'advantage' | 'disadvantage') => void;
   maxCardsPerZone?: number;
+  maxAdvantageCards?: number;
+  maxDisadvantageCards?: number;
+  onMaxAdvantageCardsChange?: (newMax: number) => void;
+  onMaxDisadvantageCardsChange?: (newMax: number) => void;
+  isRoomOwner?: boolean;
   className?: string;
 }
 
@@ -23,6 +28,11 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   cards = [],
   onCardMove,
   maxCardsPerZone = 5,
+  maxAdvantageCards = 5,
+  maxDisadvantageCards = 5,
+  onMaxAdvantageCardsChange,
+  onMaxDisadvantageCardsChange,
+  isRoomOwner = false,
   className = '',
 }) => {
   const [zones, setZones] = useState<{
@@ -34,15 +44,24 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   });
 
   const [dragOverZone, setDragOverZone] = useState<string | null>(null);
+  
+  // 上限設定狀態
+  const [isEditingAdvantageLimit, setIsEditingAdvantageLimit] = useState(false);
+  const [isEditingDisadvantageLimit, setIsEditingDisadvantageLimit] = useState(false);
+  const [tempMaxAdvantageCards, setTempMaxAdvantageCards] = useState(maxAdvantageCards);
+  const [tempMaxDisadvantageCards, setTempMaxDisadvantageCards] = useState(maxDisadvantageCards);
+  const [isAdvantageLimitLocked, setIsAdvantageLimitLocked] = useState(false);
+  const [isDisadvantageLimitLocked, setIsDisadvantageLimitLocked] = useState(false);
 
   const handleDrop = (e: React.DragEvent, zone: 'advantage' | 'disadvantage') => {
     e.preventDefault();
     setDragOverZone(null);
 
     const cardId = e.dataTransfer.getData('cardId');
+    const currentMaxCards = zone === 'advantage' ? maxAdvantageCards : maxDisadvantageCards;
 
     // 檢查是否超過限制
-    if (zones[zone].length >= maxCardsPerZone && !zones[zone].includes(cardId)) {
+    if (zones[zone].length >= currentMaxCards && !zones[zone].includes(cardId)) {
       // 顯示提示訊息
       return;
     }
@@ -56,7 +75,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
       };
 
       // 如果未超過限制，加到新區域
-      if (newZones[zone].length < maxCardsPerZone) {
+      if (newZones[zone].length < currentMaxCards) {
         newZones[zone] = [...newZones[zone], cardId];
       }
 
@@ -75,6 +94,12 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   const handleDragLeave = () => {
     setDragOverZone(null);
   };
+
+  // 計算狀態
+  const hasAdvantageCards = zones.advantage.length > 0;
+  const hasDisadvantageCards = zones.disadvantage.length > 0;
+  const effectivelyAdvantageLockedLocked = isAdvantageLimitLocked || hasAdvantageCards;
+  const effectivelyDisadvantageLockedLocked = isDisadvantageLimitLocked || hasDisadvantageCards;
 
   const zoneConfig = [
     {
@@ -107,8 +132,16 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
         {zoneConfig.map((zone) => {
           const Icon = zone.icon;
           const zoneCards = zones[zone.id as keyof typeof zones];
-          const isOverLimit = zoneCards.length >= maxCardsPerZone;
+          const currentMaxCards = zone.id === 'advantage' ? maxAdvantageCards : maxDisadvantageCards;
+          const isOverLimit = zoneCards.length >= currentMaxCards;
           const isDraggingOver = dragOverZone === zone.id;
+          
+          // 獲取當前區域的設定狀態
+          const hasCards = zone.id === 'advantage' ? hasAdvantageCards : hasDisadvantageCards;
+          const isEditingLimit = zone.id === 'advantage' ? isEditingAdvantageLimit : isEditingDisadvantageLimit;
+          const tempMaxCards = zone.id === 'advantage' ? tempMaxAdvantageCards : tempMaxDisadvantageCards;
+          const isLimitLocked = zone.id === 'advantage' ? isAdvantageLimitLocked : isDisadvantageLimitLocked;
+          const effectivelyLocked = zone.id === 'advantage' ? effectivelyAdvantageLockedLocked : effectivelyDisadvantageLockedLocked;
 
           return (
             <div
@@ -136,9 +169,107 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
+                    {/* 房間擁有者控制 */}
+                    {isRoomOwner && (
+                      <div className="flex items-center space-x-1">
+                        {isEditingLimit ? (
+                          <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 rounded-full px-2 py-1 border border-gray-200 dark:border-gray-700">
+                            <input
+                              type="number"
+                              value={tempMaxCards}
+                              onChange={(e) => {
+                                const newValue = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
+                                if (zone.id === 'advantage') {
+                                  setTempMaxAdvantageCards(newValue);
+                                } else {
+                                  setTempMaxDisadvantageCards(newValue);
+                                }
+                              }}
+                              className="w-12 text-xs text-center bg-transparent border-none outline-none"
+                              min="1"
+                              max="10"
+                            />
+                            <button
+                              onClick={() => {
+                                if (zone.id === 'advantage') {
+                                  onMaxAdvantageCardsChange?.(tempMaxAdvantageCards);
+                                  setIsEditingAdvantageLimit(false);
+                                } else {
+                                  onMaxDisadvantageCardsChange?.(tempMaxDisadvantageCards);
+                                  setIsEditingDisadvantageLimit(false);
+                                }
+                              }}
+                              className="text-green-600 hover:text-green-700 p-0.5"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (zone.id === 'advantage') {
+                                  setTempMaxAdvantageCards(maxAdvantageCards);
+                                  setIsEditingAdvantageLimit(false);
+                                } else {
+                                  setTempMaxDisadvantageCards(maxDisadvantageCards);
+                                  setIsEditingDisadvantageLimit(false);
+                                }
+                              }}
+                              className="text-red-600 hover:text-red-700 p-0.5"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => {
+                                if (!effectivelyLocked) {
+                                  if (zone.id === 'advantage') {
+                                    setTempMaxAdvantageCards(maxAdvantageCards);
+                                    setIsEditingAdvantageLimit(true);
+                                  } else {
+                                    setTempMaxDisadvantageCards(maxDisadvantageCards);
+                                    setIsEditingDisadvantageLimit(true);
+                                  }
+                                }
+                              }}
+                              className={`p-1 rounded text-xs ${
+                                effectivelyLocked 
+                                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+                              }`}
+                              disabled={effectivelyLocked}
+                            >
+                              <Settings className="w-3 h-3" />
+                            </button>
+                            
+                            <button
+                              onClick={() => {
+                                if (!hasCards) {
+                                  if (zone.id === 'advantage') {
+                                    setIsAdvantageLimitLocked(!isAdvantageLimitLocked);
+                                  } else {
+                                    setIsDisadvantageLimitLocked(!isDisadvantageLimitLocked);
+                                  }
+                                }
+                              }}
+                              className={`p-1 rounded text-xs ${
+                                hasCards
+                                  ? 'bg-yellow-500 text-white cursor-default'
+                                  : isLimitLocked
+                                  ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                                  : 'bg-gray-500 hover:bg-gray-600 text-white'
+                              }`}
+                            >
+                              {effectivelyLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
+
                     <span
                       className={`
-                      text-sm font-medium px-2 py-1 rounded
+                      text-sm font-medium px-2 py-1 rounded flex items-center space-x-1
                       ${
                         isOverLimit
                           ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
@@ -146,7 +277,8 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                       }
                     `}
                     >
-                      {zoneCards.length} / {maxCardsPerZone}
+                      <span>{zoneCards.length} / {currentMaxCards}</span>
+                      {effectivelyLocked && <Lock className="w-3 h-3 ml-1" />}
                     </span>
                     {isOverLimit && <AlertCircle className="w-4 h-4 text-red-500" />}
                   </div>

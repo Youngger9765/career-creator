@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
 import { TrendingUp, TrendingDown, AlertCircle, X, Settings, Lock, Unlock } from 'lucide-react';
 import CardItem from './CardItem';
@@ -53,16 +53,27 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   const [isAdvantageLimitLocked, setIsAdvantageLimitLocked] = useState(false);
   const [isDisadvantageLimitLocked, setIsDisadvantageLimitLocked] = useState(false);
 
-  const handleDrop = (e: React.DragEvent, zone: 'advantage' | 'disadvantage') => {
+  // 內部拖放狀態
+  const [dragOverPosition, setDragOverPosition] = useState<{
+    zone: string;
+    index: number;
+  } | null>(null);
+  const [isDraggingInternal, setIsDraggingInternal] = useState(false);
+
+  const handleDrop = (e: React.DragEvent, zone: 'advantage' | 'disadvantage', insertIndex?: number) => {
     e.preventDefault();
     setDragOverZone(null);
+    setDragOverPosition(null);
+    setIsDraggingInternal(false);
 
     const cardId = e.dataTransfer.getData('cardId');
+    const sourceZone = e.dataTransfer.getData('sourceZone');
+    const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex') || '-1');
     const currentMaxCards = zone === 'advantage' ? maxAdvantageCards : maxDisadvantageCards;
 
     // TwoZoneCanvas 只處理職能盤點卡，可以放到任一區域
 
-    // 檢查是否超過限制
+    // 檢查是否超過限制（除非是同區域內移動）
     if (zones[zone].length >= currentMaxCards && !zones[zone].includes(cardId)) {
       // 顯示提示訊息
       return;
@@ -70,15 +81,31 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
 
     // 更新本地狀態
     setZones((prev) => {
-      // 從其他區域移除
-      const newZones = {
-        advantage: prev.advantage.filter((id) => id !== cardId),
-        disadvantage: prev.disadvantage.filter((id) => id !== cardId),
-      };
+      const newZones = { ...prev };
+      
+      // 從所有區域移除卡片
+      newZones.advantage = newZones.advantage.filter((id) => id !== cardId);
+      newZones.disadvantage = newZones.disadvantage.filter((id) => id !== cardId);
 
-      // 如果未超過限制，加到新區域
-      if (newZones[zone].length < currentMaxCards) {
-        newZones[zone] = [...newZones[zone], cardId];
+      // 根據是否有插入位置來決定如何添加
+      if (insertIndex !== undefined && sourceZone) {
+        // 內部重新排序
+        const targetArray = [...newZones[zone as keyof typeof newZones]];
+        
+        // 如果是同一區域內移動，調整插入位置
+        let adjustedIndex = insertIndex;
+        if (sourceZone === zone && sourceIndex !== -1 && sourceIndex < insertIndex) {
+          adjustedIndex = Math.max(0, insertIndex - 1);
+        }
+        
+        // 插入到指定位置
+        targetArray.splice(adjustedIndex, 0, cardId);
+        newZones[zone] = targetArray;
+      } else {
+        // 外部拖入，添加到末尾
+        if (newZones[zone].length < currentMaxCards) {
+          newZones[zone] = [...newZones[zone], cardId];
+        }
       }
 
       return newZones;
@@ -95,6 +122,19 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
 
   const handleDragLeave = () => {
     setDragOverZone(null);
+  };
+
+  // 內部卡片開始拖放
+  const handleCardDragStart = (
+    e: React.DragEvent,
+    cardId: string,
+    zone: string,
+    index: number
+  ) => {
+    setIsDraggingInternal(true);
+    e.dataTransfer.setData('cardId', cardId);
+    e.dataTransfer.setData('sourceZone', zone);
+    e.dataTransfer.setData('sourceIndex', index.toString());
   };
 
   // 計算狀態
@@ -304,31 +344,71 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                     {zoneCards.map((cardId, index) => {
                       const card = cards.find((c) => c.id === cardId);
                       if (!card) return null;
+                      
+                      // 檢查是否應該顯示插入線
+                      const showInsertLineBefore =
+                        dragOverPosition?.zone === zone.id && dragOverPosition?.index === index;
+                      const showInsertLineAfter =
+                        dragOverPosition?.zone === zone.id &&
+                        dragOverPosition?.index === index + 1 &&
+                        index === zoneCards.length - 1;
 
                       return (
-                        <div key={cardId} className="relative w-[100px]">
-                          <div className="absolute -top-2 -right-1 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center z-10">
-                            <span className="text-[10px] font-bold">{index + 1}</span>
-                          </div>
-                          <CardItem
-                            id={card.id}
-                            title={card.title}
-                            description=""
-                            category=""
-                            showRemoveButton={true}
-                            isDraggable={false}
-                            onRemove={() => {
-                              // 移除卡片
-                              setZones((prev) => ({
-                                ...prev,
-                                [zone.id]: prev[zone.id as keyof typeof prev].filter(
-                                  (id) => id !== cardId
-                                ),
-                              }));
-                              onCardMove?.(cardId, null as any);
+                        <React.Fragment key={cardId}>
+                          {showInsertLineBefore && (
+                            <div className="w-0.5 h-20 bg-blue-500 animate-pulse" />
+                          )}
+                          <div 
+                            className="relative w-[100px]"
+                            draggable
+                            onDragStart={(e) => handleCardDragStart(e, cardId, zone.id, index)}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              const x = e.clientX - rect.left;
+                              const insertIndex = x < rect.width / 2 ? index : index + 1;
+                              setDragOverPosition({ zone: zone.id, index: insertIndex });
                             }}
-                          />
-                        </div>
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              const rect = e.currentTarget.getBoundingClientRect();
+                              const x = e.clientX - rect.left;
+                              const insertIndex = x < rect.width / 2 ? index : index + 1;
+                              handleDrop(
+                                e,
+                                zone.id as 'advantage' | 'disadvantage',
+                                insertIndex
+                              );
+                            }}
+                          >
+                            <div className="absolute -top-2 -right-1 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center z-10">
+                              <span className="text-[10px] font-bold">{index + 1}</span>
+                            </div>
+                            <CardItem
+                              id={card.id}
+                              title={card.title}
+                              description=""
+                              category=""
+                              showRemoveButton={true}
+                              isDraggable={false}
+                              onRemove={() => {
+                                // 移除卡片
+                                setZones((prev) => ({
+                                  ...prev,
+                                  [zone.id]: prev[zone.id as keyof typeof prev].filter(
+                                    (id) => id !== cardId
+                                  ),
+                                }));
+                                onCardMove?.(cardId, null as any);
+                              }}
+                            />
+                          </div>
+                          {showInsertLineAfter && (
+                            <div className="w-0.5 h-20 bg-blue-500 animate-pulse" />
+                          )}
+                        </React.Fragment>
                       );
                     })}
                   </div>

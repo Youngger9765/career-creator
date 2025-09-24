@@ -64,6 +64,9 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   const [testMode, setTestMode] = useState(false);
   const [testResults, setTestResults] = useState<string[]>([]);
 
+  // Tab 控制
+  const [activeTab, setActiveTab] = useState('select');
+
   // 初始化服務
   useEffect(() => {
     const init = async () => {
@@ -102,6 +105,10 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
         const mode = GameModeService.getMode(modeId);
         if (mode) {
           addTestResult(`✅ 模式載入成功: ${mode.name}, 包含 ${mode.gameplays.length} 種玩法`);
+
+          // 自動前進到玩法選擇
+          setActiveTab('configure');
+          addTestResult('➡️ 自動前進到：選擇玩法');
         } else {
           throw new Error(`找不到模式: ${modeId}`);
         }
@@ -163,6 +170,10 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
             canvas: canvasConfigData,
           });
         }
+
+        // 自動前進到開始遊戲
+        setActiveTab('play');
+        addTestResult('➡️ 自動前進到：開始遊戲');
       } catch (err: any) {
         setError(err.message);
         addTestResult(`❌ 玩法選擇錯誤: ${err.message}`);
@@ -245,7 +256,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
         </Card>
       )}
 
-      <Tabs defaultValue="select" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="select">1. 選擇模式</TabsTrigger>
           <TabsTrigger value="configure" disabled={!selectedMode}>

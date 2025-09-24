@@ -42,6 +42,9 @@ export default function CreateRoomPage() {
     name: '',
     description: '',
     expirationDays: 7, // Default 7 days
+    clientId: '', // Selected client ID
+    clientEmail: '', // New client email
+    clientName: '', // New client name
   });
 
   if (checkingAuth) {
@@ -164,6 +167,45 @@ export default function CreateRoomPage() {
             <p className="text-xs text-gray-500 mt-1">
               {formData.description.length}/500 字 (選填)
             </p>
+          </div>
+
+          {/* Client Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">關聯客戶</label>
+            <div className="space-y-3">
+              <select
+                value={formData.clientId}
+                onChange={(e) => handleInputChange('clientId', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              >
+                <option value="">選擇既有客戶或新增客戶</option>
+                <option value="new">+ 新增客戶</option>
+                {/* TODO: Load clients from API */}
+                <option value="client1">陳雅琪 (alice.chen@example.com)</option>
+                <option value="client2">王建明 (bob.wang@example.com)</option>
+              </select>
+
+              {formData.clientId === 'new' && (
+                <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                  <input
+                    type="email"
+                    placeholder="客戶 Email *"
+                    value={formData.clientEmail}
+                    onChange={(e) => handleInputChange('clientEmail', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required={formData.clientId === 'new'}
+                  />
+                  <input
+                    type="text"
+                    placeholder="客戶姓名"
+                    value={formData.clientName}
+                    onChange={(e) => handleInputChange('clientName', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">將此房間關聯到特定客戶，方便管理諮詢記錄</p>
           </div>
 
           {/* Expiration Settings */}

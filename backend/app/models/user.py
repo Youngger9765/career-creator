@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import List
+from typing import TYPE_CHECKING, List
 from uuid import UUID, uuid4
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.types import String
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.models.client import ConsultationRecord, CounselorClientRelationship
 
 
 class UserBase(SQLModel):
@@ -26,6 +29,14 @@ class User(UserBase, table=True):
     roles: List[str] = Field(default=["client"], sa_column=Column(ARRAY(String)))
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # Relationships for CRM
+    client_relationships: List["CounselorClientRelationship"] = Relationship(
+        back_populates="counselor"
+    )
+    consultation_records: List["ConsultationRecord"] = Relationship(
+        back_populates="counselor"
+    )
 
     def has_role(self, role: str) -> bool:
         """Check if user has specific role"""

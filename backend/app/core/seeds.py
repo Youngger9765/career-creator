@@ -4,12 +4,21 @@ Database Seeding System
 """
 
 import uuid
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from sqlmodel import Session, select
 
 from app.core.auth import DEMO_ACCOUNTS, get_password_hash
 from app.core.database import engine
+from app.models.client import (
+    Client,
+    ClientStatus,
+    ConsultationRecord,
+    CounselorClientRelationship,
+    RelationshipStatus,
+    RelationshipType,
+    RoomClient,
+)
 from app.models.game_rule import Card, CardDeck, GameRuleTemplate
 from app.models.room import Room
 from app.models.user import User
@@ -779,6 +788,168 @@ def seed_test_rooms():
         print("✅ Test rooms seeded")
 
 
+def seed_crm_data():
+    """創建CRM系統種子資料 - 客戶和諮商師關係"""
+    print("🏢 Seeding CRM data...")
+
+    with Session(engine) as session:
+        # 獲取諮商師用戶
+        counselors = session.exec(
+            select(User).where(User.roles.contains(["counselor"]))
+        ).all()
+
+        if not counselors:
+            print("⚠️ No counselors found, skipping CRM seeding")
+            return
+
+        # 創建客戶資料
+        clients_data = [
+            {
+                "email": "alice.chen@example.com",
+                "name": "陳雅琪 (Alice Chen)",
+                "phone": "0912-345-678",
+                "notes": "大學應屆畢業生，主修資訊工程，對職涯方向感到迷茫",
+                "tags": ["應屆畢業生", "資訊科技", "職涯探索"],
+                "status": ClientStatus.ACTIVE,
+            },
+            {
+                "email": "bob.wang@example.com",
+                "name": "王建明 (Bob Wang)",
+                "phone": "0923-456-789",
+                "notes": "工作5年，考慮轉職到不同產業",
+                "tags": ["在職人士", "轉職", "中階主管"],
+                "status": ClientStatus.ACTIVE,
+            },
+            {
+                "email": "carol.liu@example.com",
+                "name": "劉佳玲 (Carol Liu)",
+                "phone": "0934-567-890",
+                "notes": "剛從國外回來，尋求本地職場建議",
+                "tags": ["海歸", "重新就業", "跨文化適應"],
+                "status": ClientStatus.ACTIVE,
+            },
+        ]
+
+        clients = []
+        for client_data in clients_data:
+            existing_client = session.exec(
+                select(Client).where(Client.email == client_data["email"])
+            ).first()
+
+            if not existing_client:
+                client = Client(**client_data)
+                session.add(client)
+                clients.append(client)
+                print(f"  ✅ Created client: {client_data['name']}")
+            else:
+                clients.append(existing_client)
+
+        session.commit()
+
+        # 創建諮商師-客戶關係
+        if len(counselors) > 0 and len(clients) > 0:
+            counselor1 = counselors[0]
+
+            for i, client in enumerate(clients[:2]):  # 前兩個客戶給第一位諮商師
+                existing_rel = session.exec(
+                    select(CounselorClientRelationship).where(
+                        CounselorClientRelationship.counselor_id == counselor1.id,
+                        CounselorClientRelationship.client_id == client.id,
+                    )
+                ).first()
+
+                if not existing_rel:
+                    relationship = CounselorClientRelationship(
+                        counselor_id=counselor1.id,
+                        client_id=client.id,
+                        relationship_type=RelationshipType.PRIMARY,
+                        status=RelationshipStatus.ACTIVE,
+                        start_date=date.today() - timedelta(days=30),
+                        notes="初次諮詢關係建立",
+                    )
+                    session.add(relationship)
+                    print(
+                        f"  ✅ Created relationship: {counselor1.name} -> {client.name}"
+                    )
+
+        # 如果有第二位諮商師，分配第三個客戶
+        if len(counselors) > 1 and len(clients) > 2:
+            counselor2 = counselors[1]
+            client3 = clients[2]
+
+            existing_rel = session.exec(
+                select(CounselorClientRelationship).where(
+                    CounselorClientRelationship.counselor_id == counselor2.id,
+                    CounselorClientRelationship.client_id == client3.id,
+                )
+            ).first()
+
+            if not existing_rel:
+                relationship = CounselorClientRelationship(
+                    counselor_id=counselor2.id,
+                    client_id=client3.id,
+                    relationship_type=RelationshipType.PRIMARY,
+                    status=RelationshipStatus.ACTIVE,
+                    start_date=date.today() - timedelta(days=15),
+                    notes="主要諮詢師",
+                )
+                session.add(relationship)
+                print(f"  ✅ Created relationship: {counselor2.name} -> {client3.name}")
+
+        session.commit()
+
+        # 為每個客戶創建一個示範房間
+        for i, client in enumerate(clients[:2]):  # 只為前兩個客戶創建房間
+            room_name = f"{client.name.split(' ')[0]} 的職涯諮詢室"
+
+            existing_room = session.exec(
+                select(Room).where(Room.name == room_name)
+            ).first()
+
+            if not existing_room:
+                counselor = (
+                    counselors[0]
+                    if i == 0
+                    else counselors[1] if len(counselors) > 1 else counselors[0]
+                )
+                room = Room(
+                    name=room_name,
+                    description=f"為 {client.name} 提供的職涯諮詢服務",
+                    counselor_id=str(counselor.id),
+                    is_active=True,
+                    expires_at=datetime.utcnow() + timedelta(days=7),
+                    session_count=i + 1,
+                )
+                session.add(room)
+                session.commit()
+                session.refresh(room)
+                print(f"  ✅ Created room: {room_name}")
+
+                # 關聯房間與客戶
+                room_client = RoomClient(room_id=room.id, client_id=client.id)
+                session.add(room_client)
+                print(f"  ✅ Linked room to client: {client.name}")
+
+                # 創建一個諮詢記錄
+                record = ConsultationRecord(
+                    room_id=room.id,
+                    client_id=client.id,
+                    counselor_id=counselor.id,
+                    session_date=datetime.utcnow() - timedelta(days=7),
+                    duration_minutes=60,
+                    topics=["職涯探索", "技能評估"],
+                    notes=f"第 {i+1} 次諮詢會議記錄",
+                    follow_up_required=True,
+                    follow_up_date=date.today() + timedelta(days=7),
+                )
+                session.add(record)
+                print(f"  ✅ Created consultation record for {client.name}")
+
+        session.commit()
+
+    print("✅ CRM data seeded successfully")
+
+
 def run_all_seeds(include_test_data=False):
     """執行所有種子資料"""
     print("🌱 Starting database seeding...")
@@ -788,6 +959,7 @@ def run_all_seeds(include_test_data=False):
         seed_career_cards()
         seed_value_cards()
         seed_skill_cards()
+        seed_crm_data()  # 新增CRM種子資料
 
         if include_test_data:
             print("\n🧪 Including test data...")

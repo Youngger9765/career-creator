@@ -41,7 +41,9 @@ export default function DashboardPage() {
     recentEvents: [],
   });
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'active' | 'history'>('overview');
+  const [selectedTab, setSelectedTab] = useState<'overview' | 'clients' | 'active' | 'history'>(
+    'overview'
+  );
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [deletingRoom, setDeletingRoom] = useState<Room | null>(null);
 
@@ -287,6 +289,16 @@ export default function DashboardPage() {
                 總覽
               </button>
               <button
+                onClick={() => setSelectedTab('clients')}
+                className={`px-6 py-3 text-sm font-medium ${
+                  selectedTab === 'clients'
+                    ? 'border-b-2 border-blue-600 text-blue-600'
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                客戶管理
+              </button>
+              <button
                 onClick={() => setSelectedTab('active')}
                 className={`px-6 py-3 text-sm font-medium ${
                   selectedTab === 'active'
@@ -341,6 +353,20 @@ export default function DashboardPage() {
                   ) : (
                     <p className="text-gray-500 text-center py-8">尚無活動記錄</p>
                   )}
+                </div>
+              </div>
+            )}
+
+            {selectedTab === 'clients' && (
+              <div className="space-y-6">
+                <div className="text-center py-12 text-gray-500">
+                  <p>客戶管理功能開發中...</p>
+                  <Link
+                    href="/dashboard/clients"
+                    className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    進入客戶管理頁面
+                  </Link>
                 </div>
               </div>
             )}

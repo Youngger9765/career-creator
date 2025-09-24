@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.card_events import router as card_events_router
+from app.api.clients import router as clients_router
 from app.api.game_rules import router as game_rules_router
 from app.api.game_sessions import router as game_sessions_router
 from app.api.rooms import router as rooms_router
@@ -58,6 +59,7 @@ app.include_router(card_events_router)
 app.include_router(game_rules_router, prefix="/api/game-rules", tags=["game-rules"])
 app.include_router(game_sessions_router)
 app.include_router(admin_router)
+app.include_router(clients_router)
 
 
 @app.get("/")

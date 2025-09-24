@@ -143,11 +143,23 @@ def create_room(
         description=room_data.description,
         counselor_id=current_user["id"],
         game_rule_id=game_rule_id,
+        expires_at=room_data.expires_at,
     )
 
     session.add(room)
     session.commit()
     session.refresh(room)
+
+    # Link room to client if client_id provided
+    if room_data.client_id:
+        from app.models.client import Client, RoomClient
+
+        # Verify client exists
+        client = session.get(Client, room_data.client_id)
+        if client:
+            room_client = RoomClient(room_id=room.id, client_id=room_data.client_id)
+            session.add(room_client)
+            session.commit()
 
     return room
 

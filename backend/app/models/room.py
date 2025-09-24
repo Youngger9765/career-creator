@@ -63,6 +63,10 @@ class RoomCreate(RoomBase):
     game_rule_slug: Optional[str] = Field(
         default="skill_assessment", description="遊戲規則標識符"
     )
+    client_id: Optional[UUID] = Field(default=None, description="Associated client ID")
+    expires_at: Optional[datetime] = Field(
+        default=None, description="Room expiration date"
+    )
 
 
 class RoomResponse(RoomBase):

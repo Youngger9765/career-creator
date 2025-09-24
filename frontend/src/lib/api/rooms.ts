@@ -20,6 +20,8 @@ export interface CreateRoomData {
   name: string;
   description?: string;
   expires_at?: string;
+  client_id?: string;
+  game_rule_slug?: string;
 }
 
 export interface RoomStatistics {

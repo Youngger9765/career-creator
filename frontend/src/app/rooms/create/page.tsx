@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRoomStore } from '@/stores/room-store';
 import { useAuthStore } from '@/stores/auth-store';
+import { clientsAPI } from '@/lib/api/clients';
+import type { Client } from '@/types/client';
 import Link from 'next/link';
 
 export default function CreateRoomPage() {
@@ -38,6 +40,25 @@ export default function CreateRoomPage() {
     setCheckingAuth(false);
   }, [isAuthenticated]);
 
+  // Load clients when component mounts and user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && user?.roles?.includes('counselor')) {
+      loadClients();
+    }
+  }, [isAuthenticated, user]);
+
+  const loadClients = async () => {
+    try {
+      setLoadingClients(true);
+      const clientsData = await clientsAPI.getMyClients();
+      setClients(clientsData);
+    } catch (error) {
+      console.error('Failed to load clients:', error);
+    } finally {
+      setLoadingClients(false);
+    }
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -45,7 +66,10 @@ export default function CreateRoomPage() {
     clientId: '', // Selected client ID
     clientEmail: '', // New client email
     clientName: '', // New client name
+    clientPhone: '', // New client phone
   });
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loadingClients, setLoadingClients] = useState(false);
 
   if (checkingAuth) {
     return (
@@ -103,10 +127,22 @@ export default function CreateRoomPage() {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + formData.expirationDays);
 
+      // Create new client if needed
+      let clientId = formData.clientId;
+      if (formData.clientId === 'new' && formData.clientEmail) {
+        const newClient = await clientsAPI.createClient({
+          email: formData.clientEmail,
+          name: formData.clientName || formData.clientEmail,
+          phone: formData.clientPhone,
+        });
+        clientId = newClient.id;
+      }
+
       const room = await createRoom({
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         expires_at: expiresAt.toISOString(),
+        client_id: clientId && clientId !== '' ? clientId : undefined,
       });
 
       // Redirect to the new room
@@ -177,12 +213,17 @@ export default function CreateRoomPage() {
                 value={formData.clientId}
                 onChange={(e) => handleInputChange('clientId', e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                disabled={loadingClients}
               >
-                <option value="">選擇既有客戶或新增客戶</option>
+                <option value="">
+                  {loadingClients ? '載入客戶列表中...' : '選擇既有客戶或新增客戶'}
+                </option>
                 <option value="new">+ 新增客戶</option>
-                {/* TODO: Load clients from API */}
-                <option value="client1">陳雅琪 (alice.chen@example.com)</option>
-                <option value="client2">王建明 (bob.wang@example.com)</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} ({client.email})
+                  </option>
+                ))}
               </select>
 
               {formData.clientId === 'new' && (
@@ -200,6 +241,13 @@ export default function CreateRoomPage() {
                     placeholder="客戶姓名"
                     value={formData.clientName}
                     onChange={(e) => handleInputChange('clientName', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <input
+                    type="tel"
+                    placeholder="客戶電話 (選填)"
+                    value={formData.clientPhone}
+                    onChange={(e) => handleInputChange('clientPhone', e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>

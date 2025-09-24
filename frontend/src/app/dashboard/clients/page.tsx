@@ -17,40 +17,31 @@ import {
   Eye,
   MessageSquare,
   FolderOpen,
+  Archive,
+  Trash2,
 } from 'lucide-react';
+import { clientsAPI } from '@/lib/api/clients';
+import type { Client } from '@/types/client';
+import type { Room } from '@/types/api';
 
-interface Client {
-  id: string;
-  email: string;
-  name: string;
-  phone?: string;
-  notes?: string;
-  tags: string[];
-  status: 'active' | 'inactive' | 'archived';
-  created_at: string;
-  updated_at: string;
+interface ClientWithStats extends Client {
   active_rooms_count: number;
   total_consultations: number;
   last_consultation_date?: string;
   rooms?: Room[];
 }
 
-interface Room {
-  id: string;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-  session_count: number;
-}
-
 export default function ClientsPage() {
   const router = useRouter();
-  const [clients, setClients] = useState<Client[]>([]);
+  const [clients, setClients] = useState<ClientWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive' | 'archived'>(
+    'all'
+  );
   const [expandedClient, setExpandedClient] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -85,68 +76,43 @@ export default function ClientsPage() {
 
       try {
         setLoading(true);
-        // TODO: Fetch clients from API
-        // const response = await clientsAPI.getMyClients();
-        // setClients(response);
+        setError(null);
 
-        // Mock data for now
-        setClients([
-          {
-            id: '1',
-            email: 'alice.chen@example.com',
-            name: '陳雅琪 (Alice Chen)',
-            phone: '0912-345-678',
-            notes: '大學應屆畢業生，主修資訊工程',
-            tags: ['應屆畢業生', '資訊科技'],
-            status: 'active',
-            created_at: '2024-01-15T10:00:00Z',
-            updated_at: '2024-01-15T10:00:00Z',
-            active_rooms_count: 2,
-            total_consultations: 5,
-            last_consultation_date: '2024-02-20T14:00:00Z',
-            rooms: [
-              {
-                id: 'r1',
-                name: '職涯探索諮詢室',
-                is_active: true,
-                created_at: '2024-01-15T10:00:00Z',
-                session_count: 3,
-              },
-              {
-                id: 'r2',
-                name: '技能評估室',
-                is_active: true,
-                created_at: '2024-02-01T10:00:00Z',
-                session_count: 2,
-              },
-            ],
-          },
-          {
-            id: '2',
-            email: 'bob.wang@example.com',
-            name: '王建明 (Bob Wang)',
-            phone: '0923-456-789',
-            notes: '工作5年，考慮轉職',
-            tags: ['在職人士', '轉職'],
-            status: 'active',
-            created_at: '2024-01-20T10:00:00Z',
-            updated_at: '2024-01-20T10:00:00Z',
-            active_rooms_count: 1,
-            total_consultations: 3,
-            last_consultation_date: '2024-02-15T14:00:00Z',
-            rooms: [
-              {
-                id: 'r3',
-                name: '轉職諮詢室',
-                is_active: true,
-                created_at: '2024-01-20T10:00:00Z',
-                session_count: 3,
-              },
-            ],
-          },
-        ]);
+        // Fetch clients from API
+        const clientsData = await clientsAPI.getMyClients();
+
+        // Fetch statistics and rooms for each client
+        const clientsWithStats = await Promise.all(
+          clientsData.map(async (client) => {
+            try {
+              const [stats, rooms] = await Promise.all([
+                clientsAPI.getClientStatistics(client.id),
+                clientsAPI.getClientRooms(client.id),
+              ]);
+
+              return {
+                ...client,
+                active_rooms_count: stats.active_rooms_count,
+                total_consultations: stats.total_consultations,
+                last_consultation_date: stats.last_consultation_date || undefined,
+                rooms,
+              };
+            } catch (err) {
+              console.error(`Failed to load stats for client ${client.id}:`, err);
+              return {
+                ...client,
+                active_rooms_count: 0,
+                total_consultations: 0,
+                rooms: [],
+              };
+            }
+          })
+        );
+
+        setClients(clientsWithStats);
       } catch (error) {
         console.error('Failed to load clients:', error);
+        setError('無法載入客戶資料，請稍後再試');
       } finally {
         setLoading(false);
       }
@@ -154,6 +120,45 @@ export default function ClientsPage() {
 
     loadClients();
   }, [router]);
+
+  const handleArchiveClient = async (clientId: string) => {
+    if (!confirm('確定要歸檔此客戶嗎？')) return;
+
+    try {
+      await clientsAPI.updateClient(clientId, { status: 'archived' });
+      // Reload clients after archiving
+      const clientsData = await clientsAPI.getMyClients();
+      const clientsWithStats = await Promise.all(
+        clientsData.map(async (client) => {
+          try {
+            const [stats, rooms] = await Promise.all([
+              clientsAPI.getClientStatistics(client.id),
+              clientsAPI.getClientRooms(client.id),
+            ]);
+
+            return {
+              ...client,
+              active_rooms_count: stats.active_rooms_count,
+              total_consultations: stats.total_consultations,
+              last_consultation_date: stats.last_consultation_date || undefined,
+              rooms,
+            };
+          } catch (err) {
+            return {
+              ...client,
+              active_rooms_count: 0,
+              total_consultations: 0,
+              rooms: [],
+            };
+          }
+        })
+      );
+      setClients(clientsWithStats);
+    } catch (error) {
+      console.error('Failed to archive client:', error);
+      setError('無法歸檔客戶，請稍後再試');
+    }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('zh-TW', {
@@ -185,7 +190,8 @@ export default function ClientsPage() {
     const matchesFilter =
       filterStatus === 'all' ||
       (filterStatus === 'active' && client.status === 'active') ||
-      (filterStatus === 'inactive' && client.status === 'inactive');
+      (filterStatus === 'inactive' && client.status === 'inactive') ||
+      (filterStatus === 'archived' && client.status === 'archived');
 
     return matchesSearch && matchesFilter;
   });
@@ -231,6 +237,16 @@ export default function ClientsPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 flex justify-between items-center">
+            <span>{error}</span>
+            <button onClick={() => setError(null)} className="text-red-700 hover:text-red-900">
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Search and Filter Bar */}
         <div className="bg-white rounded-lg shadow mb-6 p-4">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -274,6 +290,16 @@ export default function ClientsPage() {
                 }`}
               >
                 休眠 ({clients.filter((c) => c.status === 'inactive').length})
+              </button>
+              <button
+                onClick={() => setFilterStatus('archived')}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  filterStatus === 'archived'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                歸檔 ({clients.filter((c) => c.status === 'archived').length})
               </button>
             </div>
           </div>
@@ -368,6 +394,15 @@ export default function ClientsPage() {
                       <Edit className="w-4 h-4" />
                       編輯
                     </button>
+                    {client.status !== 'archived' && (
+                      <button
+                        onClick={() => handleArchiveClient(client.id)}
+                        className="px-3 py-1 text-sm border border-red-300 text-red-600 rounded-lg hover:bg-red-50 flex items-center gap-1"
+                      >
+                        <Archive className="w-4 h-4" />
+                        歸檔
+                      </button>
+                    )}
                   </div>
                 </div>
 

@@ -30,6 +30,9 @@ class Permission(str, Enum):
     SEND_MESSAGE = "send_message"
     VIEW_CHAT = "view_chat"
     
+    # CRM permissions
+    MANAGE_CLIENTS = "manage_clients"
+    
     # Admin permissions
     MANAGE_USERS = "manage_users"
     VIEW_ANALYTICS = "view_analytics"
@@ -45,6 +48,7 @@ ROLE_PERMISSIONS: dict[UserRole, Set[Permission]] = {
         Permission.ANNOTATE_CARD,
         Permission.SEND_MESSAGE,
         Permission.VIEW_CHAT,
+        Permission.MANAGE_CLIENTS,
     },
     UserRole.CLIENT: {
         Permission.JOIN_ROOM,
@@ -70,6 +74,7 @@ ROLE_PERMISSIONS: dict[UserRole, Set[Permission]] = {
         Permission.VIEW_CHAT,
         Permission.MANAGE_USERS,
         Permission.VIEW_ANALYTICS,
+        Permission.MANAGE_CLIENTS,
     }
 }
 

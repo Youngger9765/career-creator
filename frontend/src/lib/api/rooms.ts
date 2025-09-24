@@ -45,13 +45,14 @@ class RoomsAPI {
   }
 
   /**
-   * Get all active rooms for current counselor
+   * Get all rooms for current counselor (active and inactive)
    */
-  async getMyRooms(): Promise<Room[]> {
+  async getMyRooms(includeInactive = true): Promise<Room[]> {
     try {
-      const response = await apiClient.get<Room[]>('/api/rooms/');
-      // Extra protection: filter out inactive rooms on frontend too
-      return response.data.filter((room) => room.is_active);
+      const response = await apiClient.get<Room[]>('/api/rooms/', {
+        params: { include_inactive: includeInactive },
+      });
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

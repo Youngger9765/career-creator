@@ -28,6 +28,7 @@ export interface Client {
     session_count?: number;
     created_at: string;
     last_activity?: string;
+    counselor_name?: string; // 諮詢師名稱
   }>;
 }
 

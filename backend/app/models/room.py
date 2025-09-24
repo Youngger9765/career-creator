@@ -77,3 +77,7 @@ class RoomResponse(RoomBase):
     share_code: str
     is_active: bool
     created_at: datetime
+    expires_at: Optional[datetime] = None
+    session_count: int = 0
+    client_name: Optional[str] = None  # Associated client name
+    counselor_name: Optional[str] = None  # Associated counselor name

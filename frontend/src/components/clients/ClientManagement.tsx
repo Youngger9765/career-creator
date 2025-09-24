@@ -21,6 +21,7 @@ import {
   Clock,
   Home,
 } from 'lucide-react';
+import { ClientForm } from './ClientForm';
 
 interface ClientManagementProps {
   className?: string;
@@ -34,6 +35,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   useEffect(() => {
     loadClients();
@@ -48,6 +50,52 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
       console.error('Failed to load clients:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCreateClient = async (data: ClientCreate) => {
+    try {
+      setSubmitLoading(true);
+      const newClient = await clientsAPI.createClient(data);
+      setClients((prev) => [newClient, ...prev]);
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error('Failed to create client:', error);
+      alert('新增客戶失敗，請稍後再試');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  const handleUpdateClient = async (clientId: string, data: ClientUpdate) => {
+    try {
+      setSubmitLoading(true);
+      const updatedClient = await clientsAPI.updateClient(clientId, data);
+      setClients((prev) => prev.map((client) => (client.id === clientId ? updatedClient : client)));
+      setEditingClient(null);
+    } catch (error) {
+      console.error('Failed to update client:', error);
+      alert('更新客戶資料失敗，請稍後再試');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  const handleDeleteClient = async (clientId: string, clientName: string) => {
+    if (!confirm(`確定要刪除客戶「${clientName}」嗎？此操作會將客戶狀態設為封存。`)) {
+      return;
+    }
+
+    try {
+      await clientsAPI.updateClient(clientId, { status: 'archived' });
+      setClients((prev) =>
+        prev.map((client) =>
+          client.id === clientId ? { ...client, status: 'archived' as const } : client
+        )
+      );
+    } catch (error) {
+      console.error('Failed to delete client:', error);
+      alert('刪除客戶失敗，請稍後再試');
     }
   };
 
@@ -368,9 +416,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (confirm(`確定要刪除客戶「${client.name}」嗎？`)) {
-                                  // TODO: Implement delete
-                                }
+                                handleDeleteClient(client.id, client.name);
                               }}
                               className="text-red-600 hover:text-red-800"
                               title="刪除"
@@ -416,9 +462,16 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-start justify-between">
                                           <div className="flex-1">
-                                            <h5 className="text-sm font-medium text-gray-900 truncate">
-                                              {room.name}
-                                            </h5>
+                                            <div className="flex items-center gap-2">
+                                              <h5 className="text-sm font-medium text-gray-900 truncate">
+                                                {room.name}
+                                              </h5>
+                                              {room.counselor_name && (
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                                  {room.counselor_name}
+                                                </span>
+                                              )}
+                                            </div>
                                             {room.description && (
                                               <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
                                                 {room.description}
@@ -500,39 +553,23 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
         )}
       </div>
 
-      {/* TODO: Add Create/Edit Client Forms */}
+      {/* Create Client Form */}
       {showCreateForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">新增客戶</h3>
-            <p className="text-gray-600">建立新客戶的表單開發中...</p>
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => setShowCreateForm(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                取消
-              </button>
-            </div>
-          </div>
-        </div>
+        <ClientForm
+          onSubmit={handleCreateClient}
+          onClose={() => setShowCreateForm(false)}
+          loading={submitLoading}
+        />
       )}
 
+      {/* Edit Client Form */}
       {editingClient && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">編輯客戶</h3>
-            <p className="text-gray-600">編輯客戶「{editingClient.name}」的表單開發中...</p>
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => setEditingClient(null)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                取消
-              </button>
-            </div>
-          </div>
-        </div>
+        <ClientForm
+          client={editingClient}
+          onSubmit={(data) => handleUpdateClient(editingClient.id, data as ClientUpdate)}
+          onClose={() => setEditingClient(null)}
+          loading={submitLoading}
+        />
       )}
     </div>
   );

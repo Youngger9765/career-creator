@@ -80,21 +80,30 @@ async def get_my_clients(
     # Convert to response model with additional data
     responses = []
     for client in clients:
-        # Get active rooms count
+        # Get active rooms count (only for current counselor)
         active_rooms_count = (
             session.exec(
                 select(func.count(RoomClient.id))
                 .join(Room)
-                .where(RoomClient.client_id == client.id, Room.is_active)
+                .where(
+                    RoomClient.client_id == client.id,
+                    Room.is_active,
+                    Room.counselor_id
+                    == str(current_user["user_id"]),  # 只計算當前諮詢師的活躍房間
+                )
             ).first()
             or 0
         )
 
-        # Get total consultations
+        # Get total consultations (sum of session_count from all rooms for current counselor)
         total_consultations = (
             session.exec(
-                select(func.count(ConsultationRecord.id)).where(
-                    ConsultationRecord.client_id == client.id
+                select(func.sum(Room.session_count))
+                .join(RoomClient)
+                .where(
+                    RoomClient.client_id == client.id,
+                    Room.counselor_id
+                    == str(current_user["user_id"]),  # 只計算當前諮詢師的諮詢次數
                 )
             ).first()
             or 0
@@ -107,28 +116,51 @@ async def get_my_clients(
             .order_by(ConsultationRecord.session_date.desc())
         ).first()
 
-        # Get rooms associated with this client
+        # Get rooms associated with this client (only for current counselor)
         rooms = session.exec(
             select(Room)
             .join(RoomClient)
-            .where(RoomClient.client_id == client.id)
+            .where(
+                RoomClient.client_id == client.id,
+                Room.counselor_id
+                == str(current_user["user_id"]),  # 只顯示當前諮詢師的房間
+            )
             .order_by(Room.created_at.desc())
         ).all()
 
-        rooms_data = [
-            {
-                "id": str(room.id),
-                "name": room.name,
-                "description": room.description,
-                "share_code": room.share_code,
-                "is_active": room.is_active,
-                "expires_at": room.expires_at.isoformat() if room.expires_at else None,
-                "session_count": room.session_count or 0,
-                "created_at": room.created_at.isoformat(),
-                "last_activity": None,  # TODO: Add from card events if needed
-            }
-            for room in rooms
-        ]
+        rooms_data = []
+        for room in rooms:
+            # Get counselor name
+            counselor_name = None
+            if room.counselor_id.startswith("demo-"):
+                from app.core.auth import DEMO_ACCOUNTS
+
+                demo_account = next(
+                    (acc for acc in DEMO_ACCOUNTS if acc["id"] == room.counselor_id),
+                    None,
+                )
+                counselor_name = (
+                    demo_account["name"] if demo_account else room.counselor_id
+                )
+            else:
+                counselor_name = "諮詢師"  # Could extend with User lookup if needed
+
+            rooms_data.append(
+                {
+                    "id": str(room.id),
+                    "name": room.name,
+                    "description": room.description,
+                    "share_code": room.share_code,
+                    "is_active": room.is_active,
+                    "expires_at": (
+                        room.expires_at.isoformat() if room.expires_at else None
+                    ),
+                    "session_count": room.session_count or 0,
+                    "created_at": room.created_at.isoformat(),
+                    "last_activity": None,  # TODO: Add from card events if needed
+                    "counselor_name": counselor_name,
+                }
+            )
 
         response = ClientResponse(
             **client.dict(),

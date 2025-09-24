@@ -896,6 +896,34 @@ def seed_crm_data():
                 session.add(relationship)
                 print(f"  ✅ Created relationship: {counselor2.name} -> {client3.name}")
 
+        # **新增跨諮詢師測試場景** - 第一個客戶同時有兩個諮詢師
+        if len(counselors) > 1 and len(clients) > 0:
+            counselor2 = counselors[1]
+            client1 = clients[0]  # 陳雅琪 同時有兩個諮詢師
+
+            existing_cross_rel = session.exec(
+                select(CounselorClientRelationship).where(
+                    CounselorClientRelationship.counselor_id == str(counselor2.id),
+                    CounselorClientRelationship.client_id == client1.id,
+                )
+            ).first()
+
+            if not existing_cross_rel:
+                cross_relationship = CounselorClientRelationship(
+                    counselor_id=str(counselor2.id),
+                    client_id=client1.id,
+                    relationship_type=RelationshipType.SECONDARY,  # 第二諮詢師
+                    status=RelationshipStatus.ACTIVE,
+                    start_date=date.today() - timedelta(days=20),
+                    notes="第二位諮詢師，專門負責職涯轉換輔導",
+                )
+                session.add(cross_relationship)
+                print(
+                    f"  ✅ Created cross-counselor relationship: {counselor2.name} -> {client1.name} (SECONDARY)"
+                )
+
+        session.commit()
+
         session.commit()
 
         # 獲取遊戲規則和卡組
@@ -944,6 +972,9 @@ def seed_crm_data():
             },
         ]
 
+        # Use demo counselor IDs instead of UUID counselors for rooms
+        demo_counselor_ids = ["demo-counselor-001", "demo-counselor-002"]
+
         for client_idx, client in enumerate(clients[:3]):  # 為所有3個客戶創建房間
             # 為每個客戶創建 2-3 個房間
             num_rooms = 3 if client_idx < 2 else 2
@@ -956,8 +987,10 @@ def seed_crm_data():
                 ).first()
 
                 if not existing_room:
-                    # 分配不同的諮商師
-                    counselor = counselors[client_idx % len(counselors)]
+                    # Use demo counselor IDs instead of actual User IDs
+                    demo_counselor_id = demo_counselor_ids[
+                        client_idx % len(demo_counselor_ids)
+                    ]
 
                     # 根據房間類型設置不同的到期時間
                     expire_days = [30, 25, 20][room_idx] if room_idx < 3 else 15
@@ -966,7 +999,7 @@ def seed_crm_data():
                     room = Room(
                         name=room_name,
                         description=f"為 {client.name} 提供的{room_type['desc']}服務",
-                        counselor_id=str(counselor.id),
+                        counselor_id=demo_counselor_id,
                         is_active=is_active,
                         expires_at=datetime.utcnow() + timedelta(days=expire_days),
                         session_count=room_idx + 1,
@@ -974,12 +1007,65 @@ def seed_crm_data():
                     session.add(room)
                     session.commit()
                     session.refresh(room)
-                    print(f"  ✅ Created room: {room_name}")
+                    print(
+                        f"  ✅ Created room: {room_name} for counselor {demo_counselor_id}"
+                    )
 
                     # 關聯房間與客戶
                     room_client = RoomClient(room_id=room.id, client_id=client.id)
                     session.add(room_client)
                     print(f"  ✅ Linked room to client: {client.name}")
+
+                    # **特殊處理** - 為第一個客戶的第二個諮詢師也創建一個房間
+                    if client_idx == 0 and room_idx == 2:  # 第一個客戶的第三個房間類型
+                        # 為第二個諮詢師創建相同類型的房間
+                        second_counselor_room_name = (
+                            f"{client.name.split(' ')[0]} 的轉職{room_type['suffix']}"
+                        )
+
+                        existing_second_room = session.exec(
+                            select(Room).where(Room.name == second_counselor_room_name)
+                        ).first()
+
+                        if not existing_second_room:
+                            second_room = Room(
+                                name=second_counselor_room_name,
+                                description=f"為 {client.name} 提供的轉職輔導{room_type['desc']}服務",
+                                counselor_id=demo_counselor_ids[1],  # 第二個諮詢師
+                                is_active=True,
+                                expires_at=datetime.utcnow() + timedelta(days=35),
+                                session_count=1,
+                            )
+                            session.add(second_room)
+                            session.commit()
+                            session.refresh(second_room)
+                            print(
+                                f"  ✅ Created cross-counselor room: {second_counselor_room_name} for counselor {demo_counselor_ids[1]}"
+                            )
+
+                            # 關聯房間與客戶
+                            room_client_cross = RoomClient(
+                                room_id=second_room.id, client_id=client.id
+                            )
+                            session.add(room_client_cross)
+                            print(
+                                f"  ✅ Linked cross-counselor room to client: {client.name}"
+                            )
+
+                            # 為這個房間創建諮詢記錄
+                            cross_record = ConsultationRecord(
+                                room_id=second_room.id,
+                                client_id=client.id,
+                                counselor_id=demo_counselor_ids[1],
+                                session_date=datetime.utcnow() - timedelta(days=10),
+                                duration_minutes=60,
+                                topics=["轉職輔導", "第二意見"],
+                                notes="第二諮詢師的轉職專業輔導會議。提供不同角度的職涯建議。",
+                                follow_up_required=True,
+                                follow_up_date=date.today() + timedelta(days=14),
+                            )
+                            session.add(cross_record)
+                            print(f"  ✅ Created cross-counselor consultation record")
 
                     # 為每個房間創建 1-3 個諮詢記錄
                     num_records = [3, 2, 1][room_idx] if room_idx < 3 else 1
@@ -990,7 +1076,7 @@ def seed_crm_data():
                         record = ConsultationRecord(
                             room_id=room.id,
                             client_id=client.id,
-                            counselor_id=str(counselor.id),
+                            counselor_id=demo_counselor_id,
                             session_date=session_date,
                             duration_minutes=45
                             + room_idx * 15

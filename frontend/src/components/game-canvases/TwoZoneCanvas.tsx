@@ -115,8 +115,8 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   const zoneConfig = [
     {
       id: 'advantage',
-      title: 'A區',
-      subtitle: '職能盤點卡',
+      title: '優勢',
+      subtitle: '我擅長的技能',
       icon: TrendingUp,
       bgColor: 'bg-blue-50 dark:bg-blue-950',
       borderColor: 'border-blue-400 dark:border-blue-600',
@@ -126,8 +126,8 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
     },
     {
       id: 'disadvantage',
-      title: 'B區',
-      subtitle: '策略行動卡',
+      title: '劣勢',
+      subtitle: '需要加強的技能',
       icon: TrendingDown,
       bgColor: 'bg-orange-50 dark:bg-orange-950',
       borderColor: 'border-orange-400 dark:border-orange-600',

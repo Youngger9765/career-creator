@@ -352,7 +352,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       case 'advantage_analysis':
         return (
           <TwoZoneCanvas
-            cards={[...(mainDeck?.cards || []), ...actionCards]}
+            cards={mainDeck?.cards || []}
             onCardMove={(cardId, zone) => {
               if (zone === null) {
                 // 卡片被移除，回到左邊

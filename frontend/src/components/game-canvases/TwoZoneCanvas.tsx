@@ -60,16 +60,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
     const cardId = e.dataTransfer.getData('cardId');
     const currentMaxCards = zone === 'advantage' ? maxAdvantageCards : maxDisadvantageCards;
 
-    // 檢查卡片類型限制
-    const isActionCard = cardId.startsWith('action-');
-    const isSkillCard = !isActionCard;
-
-    // 職能盤點卡 (A區卡) 只能放到優勢區域
-    // 策略行動卡 (B區卡) 只能放到劣勢區域
-    if ((isSkillCard && zone === 'disadvantage') || (isActionCard && zone === 'advantage')) {
-      // 顯示錯誤提示 - 卡片類型不匹配
-      return;
-    }
+    // TwoZoneCanvas 只處理職能盤點卡，可以放到任一區域
 
     // 檢查是否超過限制
     if (zones[zone].length >= currentMaxCards && !zones[zone].includes(cardId)) {

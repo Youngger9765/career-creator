@@ -53,6 +53,16 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
       return;
     }
 
+    // 檢查卡片類型限制
+    const isActionCard = cardId.startsWith('action-');
+    const isSkillCard = !isActionCard;
+
+    // A區只能放職能盤點卡，B區只能放策略行動卡
+    if ((slot === 'A' && isActionCard) || (slot === 'B' && isSkillCard)) {
+      // 卡片類型不匹配，不允許放置
+      return;
+    }
+
     // 檢查卡片是否已經被使用
     const isCardUsed = plan.cardA?.id === cardId || plan.cardB?.id === cardId;
 

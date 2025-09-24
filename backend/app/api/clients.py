@@ -69,7 +69,8 @@ async def get_my_clients(
 
     if search:
         search_filter = or_(
-            Client.name.ilike(f"%{search}%"), Client.email.ilike(f"%{search}%")  # type: ignore
+            Client.name.ilike(f"%{search}%"),
+            Client.email.ilike(f"%{search}%"),  # type: ignore
         )
         query = query.where(search_filter)
 
@@ -113,7 +114,7 @@ async def get_my_clients(
             .where(RoomClient.client_id == client.id)
             .order_by(Room.created_at.desc())
         ).all()
-        
+
         rooms_data = [
             {
                 "id": str(room.id),
@@ -124,7 +125,7 @@ async def get_my_clients(
                 "expires_at": room.expires_at.isoformat() if room.expires_at else None,
                 "session_count": room.session_count or 0,
                 "created_at": room.created_at.isoformat(),
-                "last_activity": None  # TODO: Add from card events if needed
+                "last_activity": None,  # TODO: Add from card events if needed
             }
             for room in rooms
         ]
@@ -164,7 +165,8 @@ async def create_client(
         # Check if relationship already exists
         existing_rel = session.exec(
             select(CounselorClientRelationship).where(
-                CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
+                CounselorClientRelationship.counselor_id
+                == str(current_user["user_id"]),
                 CounselorClientRelationship.client_id == existing_client.id,
             )
         ).first()
@@ -467,7 +469,9 @@ async def create_consultation_record(
 
     # Create record
     record = ConsultationRecord(
-        **record_data.dict(), client_id=client_id, counselor_id=str(current_user["user_id"])
+        **record_data.dict(),
+        client_id=client_id,
+        counselor_id=str(current_user["user_id"]),
     )
     session.add(record)
     session.commit()
@@ -601,9 +605,9 @@ async def update_relationship(
     if not relationship:
         raise HTTPException(status_code=404, detail="Relationship not found")
 
-    if relationship.counselor_id != str(current_user[
-        "user_id"
-    ]) and not current_user.has_role("admin"):
+    if relationship.counselor_id != str(
+        current_user["user_id"]
+    ) and not current_user.has_role("admin"):
         raise HTTPException(
             status_code=403, detail="You can only update your own relationships"
         )

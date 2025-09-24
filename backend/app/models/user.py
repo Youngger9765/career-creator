@@ -5,10 +5,10 @@ from uuid import UUID, uuid4
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.types import String
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, SQLModel
 
 if TYPE_CHECKING:
-    from app.models.client import ConsultationRecord, CounselorClientRelationship
+    pass
 
 
 class UserBase(SQLModel):

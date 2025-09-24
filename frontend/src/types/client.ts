@@ -17,6 +17,18 @@ export interface Client {
   active_rooms_count?: number;
   total_consultations?: number;
   last_consultation_date?: string;
+  // Room data from expanded API response
+  rooms?: Array<{
+    id: string;
+    name: string;
+    description?: string;
+    share_code: string;
+    is_active: boolean;
+    expires_at?: string;
+    session_count: number;
+    created_at: string;
+    last_activity?: string;
+  }>;
 }
 
 export interface ClientCreate {

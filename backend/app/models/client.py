@@ -277,4 +277,3 @@ class ConsultationRecordResponse(SQLModel):
 
 # Import forward references
 from app.models.room import Room  # noqa: E402
-from app.models.user import User  # noqa: E402

@@ -5,7 +5,6 @@ Test JSON Serialization Fix - TDD approach
 
 import json
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.game.config import DropZoneConfig, GameRuleConfig, Position

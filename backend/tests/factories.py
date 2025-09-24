@@ -232,7 +232,7 @@ class TestDataBuilder:
             self.with_room()
         for i in range(count):
             visitor = VisitorFactory.create(
-                self.session, room=self.room, name=f"Visitor {i+1}", **kwargs
+                self.session, room=self.room, name=f"Visitor {i + 1}", **kwargs
             )
             self.visitors.append(visitor)
         return self

@@ -132,14 +132,14 @@ class TestWithFactories:
         counselor = UserFactory.create_counselor(session, name="資深諮詢師")
 
         rooms = [
-            RoomFactory.create(session, counselor, name=f"諮詢室 {i+1}")
+            RoomFactory.create(session, counselor, name=f"諮詢室 {i + 1}")
             for i in range(3)
         ]
 
         # 每個房間有不同數量的訪客
         for i, room in enumerate(rooms):
             for j in range(i + 1):  # 第一個房間1個訪客，第二個2個，依此類推
-                VisitorFactory.create(session, room, name=f"房間{i+1}訪客{j+1}")
+                VisitorFactory.create(session, room, name=f"房間{i + 1}訪客{j + 1}")
 
         # 驗證
         assert len(rooms) == 3

@@ -5,7 +5,7 @@ Game Rules Models - 遊戲規則模型 (Configuration Layer)
 """
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
 from sqlmodel import JSON, Column, Field, SQLModel

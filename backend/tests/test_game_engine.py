@@ -67,7 +67,7 @@ class TestGameRuleConfig:
 
         # 檢查每個位置都只能放1張牌
         for i in range(9):
-            zone = config.layout.get_zone(f"rank_{i+1}")
+            zone = config.layout.get_zone(f"rank_{i + 1}")
             assert zone is not None
             assert zone.max_cards == 1
 

@@ -899,28 +899,58 @@ def seed_crm_data():
         session.commit()
 
         # 獲取遊戲規則和卡組
-        career_rule = session.exec(select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_career")).first()
-        value_rule = session.exec(select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_values")).first()  
-        skill_rule = session.exec(select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_skills")).first()
-        
-        career_deck = session.exec(select(CardDeck).where(CardDeck.name == "職業探索卡組")).first()
-        value_deck = session.exec(select(CardDeck).where(CardDeck.name == "價值觀卡組")).first()
-        skill_deck = session.exec(select(CardDeck).where(CardDeck.name == "技能卡組")).first()
+        career_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_career")
+        ).first()
+        value_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_values")
+        ).first()
+        skill_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_skills")
+        ).first()
+
+        career_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "職業探索卡組")
+        ).first()
+        value_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "價值觀卡組")
+        ).first()
+        skill_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "技能卡組")
+        ).first()
 
         # 為每個客戶創建多個房間和諮詢記錄
         room_types = [
-            {"suffix": "職涯諮詢室", "desc": "職涯探索與規劃", "topics": ["職涯探索", "技能評估"], "game_rule": career_rule, "deck": career_deck},
-            {"suffix": "價值觀討論室", "desc": "價值觀澄清與討論", "topics": ["價值觀探索", "人生目標設定"], "game_rule": value_rule, "deck": value_deck},
-            {"suffix": "技能盤點室", "desc": "個人能力評估", "topics": ["技能盤點", "能力發展"], "game_rule": skill_rule, "deck": skill_deck},
+            {
+                "suffix": "職涯諮詢室",
+                "desc": "職涯探索與規劃",
+                "topics": ["職涯探索", "技能評估"],
+                "game_rule": career_rule,
+                "deck": career_deck,
+            },
+            {
+                "suffix": "價值觀討論室",
+                "desc": "價值觀澄清與討論",
+                "topics": ["價值觀探索", "人生目標設定"],
+                "game_rule": value_rule,
+                "deck": value_deck,
+            },
+            {
+                "suffix": "技能盤點室",
+                "desc": "個人能力評估",
+                "topics": ["技能盤點", "能力發展"],
+                "game_rule": skill_rule,
+                "deck": skill_deck,
+            },
         ]
-        
+
         for client_idx, client in enumerate(clients[:3]):  # 為所有3個客戶創建房間
             # 為每個客戶創建 2-3 個房間
             num_rooms = 3 if client_idx < 2 else 2
             for room_idx in range(num_rooms):
                 room_type = room_types[room_idx % len(room_types)]
                 room_name = f"{client.name.split(' ')[0]} 的{room_type['suffix']}"
-                
+
                 existing_room = session.exec(
                     select(Room).where(Room.name == room_name)
                 ).first()
@@ -928,11 +958,11 @@ def seed_crm_data():
                 if not existing_room:
                     # 分配不同的諮商師
                     counselor = counselors[client_idx % len(counselors)]
-                    
+
                     # 根據房間類型設置不同的到期時間
                     expire_days = [30, 25, 20][room_idx] if room_idx < 3 else 15
                     is_active = room_idx < 2  # 前兩個房間保持活躍
-                    
+
                     room = Room(
                         name=room_name,
                         description=f"為 {client.name} 提供的{room_type['desc']}服務",
@@ -956,21 +986,34 @@ def seed_crm_data():
                     for record_idx in range(num_records):
                         days_ago = 3 + room_idx * 7 + record_idx * 3  # 分散在不同時間
                         session_date = datetime.utcnow() - timedelta(days=days_ago)
-                        
+
                         record = ConsultationRecord(
                             room_id=room.id,
                             client_id=client.id,
                             counselor_id=str(counselor.id),
                             session_date=session_date,
-                            duration_minutes=45 + room_idx * 15 + record_idx * 5,  # 不同時長
-                            topics=room_type['topics'] + [f"進度檢討 #{record_idx + 1}"] if record_idx > 0 else room_type['topics'],
+                            duration_minutes=45
+                            + room_idx * 15
+                            + record_idx * 5,  # 不同時長
+                            topics=(
+                                room_type["topics"] + [f"進度檢討 #{record_idx + 1}"]
+                                if record_idx > 0
+                                else room_type["topics"]
+                            ),
                             notes=f"第 {record_idx + 1} 次{room_type['desc']}會議記錄。討論了相關主題，客戶表現積極。",
-                            follow_up_required=(client_idx + room_idx + record_idx) % 2 == 0,
-                            follow_up_date=date.today() + timedelta(days=7 + record_idx * 3) if (client_idx + room_idx + record_idx) % 2 == 0 else None,
+                            follow_up_required=(client_idx + room_idx + record_idx) % 2
+                            == 0,
+                            follow_up_date=(
+                                date.today() + timedelta(days=7 + record_idx * 3)
+                                if (client_idx + room_idx + record_idx) % 2 == 0
+                                else None
+                            ),
                         )
                         session.add(record)
-                        
-                    print(f"  ✅ Created {num_records} consultation record(s) for {client.name} in {room.name}")
+
+                    print(
+                        f"  ✅ Created {num_records} consultation record(s) for {client.name} in {room.name}"
+                    )
 
         session.commit()
 
@@ -978,7 +1021,7 @@ def seed_crm_data():
     # First, refresh clients list to get valid client IDs
     demo_clients = session.exec(select(Client)).all()
     demo_counselors = ["demo-counselor-001", "demo-counselor-002"]
-    
+
     if len(demo_clients) >= 2:
         # Give demo-counselor-001 the first two clients
         for i, client in enumerate(demo_clients[:2]):
@@ -988,7 +1031,7 @@ def seed_crm_data():
                     CounselorClientRelationship.client_id == client.id,
                 )
             ).first()
-            
+
             if not existing_demo_rel:
                 demo_relationship = CounselorClientRelationship(
                     counselor_id=demo_counselors[0],
@@ -999,8 +1042,10 @@ def seed_crm_data():
                     notes="Demo relationship for testing",
                 )
                 session.add(demo_relationship)
-                print(f"  ✅ Created demo relationship: {demo_counselors[0]} -> {client.name}")
-        
+                print(
+                    f"  ✅ Created demo relationship: {demo_counselors[0]} -> {client.name}"
+                )
+
         session.commit()
 
     print("✅ CRM data seeded successfully")

@@ -2,20 +2,21 @@
 Authentication utilities
 認證相關工具 - JWT token, password hashing, demo accounts
 """
+
 from datetime import datetime, timedelta
 from typing import Optional
-from passlib.context import CryptContext
-from jose import JWTError, jwt
+
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 
 from app.core.config import settings
-
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Token security  
+# Token security
 security = HTTPBearer(auto_error=False)
 
 
@@ -35,23 +36,31 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
-    
+        expire = datetime.utcnow() + timedelta(
+            minutes=settings.access_token_expire_minutes
+        )
+
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.jwt_secret, algorithm=settings.jwt_algorithm
+    )
     return encoded_jwt
 
 
 def verify_token(token: str) -> Optional[dict]:
     """Verify JWT token and return payload"""
     try:
-        payload = jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+        payload = jwt.decode(
+            token, settings.jwt_secret, algorithms=[settings.jwt_algorithm]
+        )
         return payload
     except JWTError:
         return None
 
 
-def get_current_user_from_token(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
+def get_current_user_from_token(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+):
     """Extract user info from JWT token"""
     if credentials is None:
         raise HTTPException(
@@ -59,17 +68,17 @@ def get_current_user_from_token(credentials: Optional[HTTPAuthorizationCredentia
             detail="Authorization header required",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     token = credentials.credentials
     payload = verify_token(token)
-    
+
     if payload is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     user_id: str = payload.get("sub")
     if user_id is None:
         raise HTTPException(
@@ -77,8 +86,12 @@ def get_current_user_from_token(credentials: Optional[HTTPAuthorizationCredentia
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
-    return {"user_id": user_id, "email": payload.get("email"), "roles": payload.get("roles", [])}
+
+    return {
+        "user_id": user_id,
+        "email": payload.get("email"),
+        "roles": payload.get("roles", []),
+    }
 
 
 # Demo accounts configuration
@@ -89,15 +102,15 @@ DEMO_ACCOUNTS = [
         "email": "demo.counselor@example.com",
         "roles": ["counselor"],
         "description": "Senior career counselor with 10+ years experience",
-        "password": "demo123"  # This will be hashed
+        "password": "demo123",  # This will be hashed
     },
     {
-        "id": "demo-counselor-002", 
+        "id": "demo-counselor-002",
         "name": "Prof. Michael Wang",
-        "email": "demo.counselor2@example.com", 
+        "email": "demo.counselor2@example.com",
         "roles": ["counselor"],
         "description": "Vocational psychology professor and counselor",
-        "password": "demo123"
+        "password": "demo123",
     },
     {
         "id": "demo-admin-001",
@@ -105,7 +118,7 @@ DEMO_ACCOUNTS = [
         "email": "demo.admin@example.com",
         "roles": ["admin", "counselor"],
         "description": "System administrator with full access",
-        "password": "demo123"
+        "password": "demo123",
     },
     {
         "id": "demo-client-001",
@@ -113,8 +126,8 @@ DEMO_ACCOUNTS = [
         "email": "demo.client@example.com",
         "roles": ["client"],
         "description": "Demo client for testing client experience",
-        "password": "demo123"
-    }
+        "password": "demo123",
+    },
 ]
 
 
@@ -124,9 +137,9 @@ def get_demo_accounts_list():
         {
             "id": account["id"],
             "name": account["name"],
-            "email": account["email"], 
+            "email": account["email"],
             "roles": account["roles"],
-            "description": account["description"]
+            "description": account["description"],
         }
         for account in DEMO_ACCOUNTS
     ]
@@ -134,4 +147,6 @@ def get_demo_accounts_list():
 
 def find_demo_account_by_email(email: str) -> Optional[dict]:
     """Find demo account by email"""
-    return next((account for account in DEMO_ACCOUNTS if account["email"] == email), None)
+    return next(
+        (account for account in DEMO_ACCOUNTS if account["email"] == email), None
+    )

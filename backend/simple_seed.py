@@ -4,14 +4,17 @@ Simple Database Seeding Script
 簡化資料庫種子資料腳本
 """
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from sqlmodel import Session, select
+
+from app.core.auth import DEMO_ACCOUNTS, get_password_hash
 from app.core.database import engine
 from app.models.user import User
-from app.core.auth import get_password_hash, DEMO_ACCOUNTS
+
 
 def seed_demo_users():
     """創建demo用戶"""
@@ -21,19 +24,20 @@ def seed_demo_users():
             existing = session.exec(
                 select(User).where(User.email == demo_data["email"])
             ).first()
-            
+
             if not existing:
                 user = User(
                     email=demo_data["email"],
                     name=demo_data["name"],
                     hashed_password=get_password_hash(demo_data["password"]),
                     roles=demo_data["roles"],
-                    is_active=True
+                    is_active=True,
                 )
                 session.add(user)
-        
+
         session.commit()
         print("✅ Demo users seeded")
+
 
 if __name__ == "__main__":
     print("🚀 Seeding demo users...")

@@ -5,10 +5,8 @@ Test Game Sessions API - TDD approach
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.models.game_rule import GameRuleTemplate
-from app.models.game_state import GameSession, GameStatus
-from app.models.room import Room
 
 client = TestClient(app)
 

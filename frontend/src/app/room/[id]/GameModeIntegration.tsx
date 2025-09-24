@@ -331,11 +331,26 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   ];
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col relative">
+      {/* 測試模式開啟按鈕 - 在右上角 */}
+      {!testMode && (
+        <div className="absolute top-2 right-2 z-10">
+          <button
+            onClick={() => {
+              setTestMode(true);
+              setTestAreaCollapsed(false);
+            }}
+            className="px-2 py-1 text-xs border border-gray-300 rounded text-gray-600 dark:text-gray-400 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 shadow-sm"
+          >
+            測試模式
+          </button>
+        </div>
+      )}
+
       {/* 測試控制區 - 可收合 */}
       {testMode && (
         <div
-          className={`border-b border-gray-200 dark:border-gray-700 transition-all duration-300 ${testAreaCollapsed ? 'h-10' : ''}`}
+          className={`border-b border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-hidden ${testAreaCollapsed ? 'h-10' : 'h-auto'}`}
         >
           {/* 測試區標題列 */}
           <div className="flex justify-between items-center px-4 py-2 bg-gray-50 dark:bg-gray-900">
@@ -348,7 +363,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
               ) : (
                 <ChevronDown className="w-4 h-4" />
               )}
-              <span>測試模式</span>
+              <span>測試模式整合測試</span>
               <Badge className="ml-2" variant="outline">
                 ON
               </Badge>
@@ -361,39 +376,33 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
             </button>
           </div>
 
-          {/* 測試日誌 - 只在展開時顯示 */}
-          {!testAreaCollapsed && testResults.length > 0 && (
-            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900">
-              <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                測試日誌 ({testResults.length})
-              </div>
-              <div className="space-y-1 max-h-24 overflow-y-auto bg-white dark:bg-gray-800 rounded p-2 border border-gray-200 dark:border-gray-700">
-                {testResults.map((result, index) => (
-                  <div key={index} className="text-xs font-mono text-gray-700 dark:text-gray-300">
-                    {result}
+          {/* 測試內容區 - 只在展開時顯示 */}
+          {!testAreaCollapsed && (
+            <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                遊戲模式整合測試
+              </h2>
+              {testResults.length > 0 && (
+                <>
+                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    測試日誌 ({testResults.length})
                   </div>
-                ))}
-              </div>
+                  <div className="space-y-1 max-h-32 overflow-y-auto bg-white dark:bg-gray-800 rounded p-2 border border-gray-200 dark:border-gray-700">
+                    {testResults.map((result, index) => (
+                      <div
+                        key={index}
+                        className="text-xs font-mono text-gray-700 dark:text-gray-300"
+                      >
+                        {result}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
       )}
-
-      {/* 標題列 */}
-      <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">遊戲模式整合測試</h1>
-        {!testMode && (
-          <button
-            onClick={() => {
-              setTestMode(true);
-              setTestAreaCollapsed(false);
-            }}
-            className="px-3 py-1 text-sm border border-gray-400 rounded text-gray-700 dark:text-white dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            開啟測試模式
-          </button>
-        )}
-      </div>
 
       {/* 錯誤提示 */}
       {error && (

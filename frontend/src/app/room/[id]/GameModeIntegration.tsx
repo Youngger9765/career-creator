@@ -18,10 +18,10 @@ import TokenDisplay from '@/token-system/components/TokenDisplay';
 import { TokenManager, TokenAllocation } from '@/token-system/TokenManager';
 import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaNew';
 
-// 導入畫布元件
-import { PersonalityCanvas } from '@/components/consultation/PersonalityCanvas';
-import { AdvantageDisadvantageCanvas } from '@/components/consultation/AdvantageDisadvantageCanvas';
-import { ValueGridCanvas } from '@/components/consultation/ValueGridCanvas';
+// 導入模組化畫布元件
+import ThreeColumnCanvas from '@/components/game-canvases/ThreeColumnCanvas';
+import TwoZoneCanvas from '@/components/game-canvases/TwoZoneCanvas';
+import GridCanvas from '@/components/game-canvases/GridCanvas';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -229,73 +229,46 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     switch (canvasType) {
       case 'three_columns':
       case 'personality_analysis':
-        // PersonalityCanvas 需要特定的 props，暫時顯示佔位元素
         return (
-          <div className="h-full p-6">
-            <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-inner p-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">三欄分類畫布</h3>
-              <div className="grid grid-cols-3 gap-4 h-full">
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
-                  <p className="text-center text-gray-500 dark:text-gray-400">喜歡</p>
-                </div>
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
-                  <p className="text-center text-gray-500 dark:text-gray-400">普通</p>
-                </div>
-                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4">
-                  <p className="text-center text-gray-500 dark:text-gray-400">不喜歡</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ThreeColumnCanvas
+            cards={mainDeck?.cards || []}
+            onCardMove={(cardId, column) => {
+              console.log(`Card ${cardId} moved to ${column}`);
+              addTestResult(`🎯 卡片 ${cardId} 移至 ${column}`);
+            }}
+          />
         );
 
       case 'two_zones':
       case 'advantage_analysis':
-        // AdvantageDisadvantageCanvas 需要特定的 props，暫時顯示佔位元素
         return (
-          <div className="h-full p-6">
-            <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-inner p-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">優劣勢雙區畫布</h3>
-              <div className="grid grid-cols-2 gap-4 h-full">
-                <div className="border-2 border-dashed border-green-300 dark:border-green-600 rounded-lg p-4">
-                  <p className="text-center text-green-600 dark:text-green-400">優勢</p>
-                </div>
-                <div className="border-2 border-dashed border-red-300 dark:border-red-600 rounded-lg p-4">
-                  <p className="text-center text-red-600 dark:text-red-400">劣勢</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TwoZoneCanvas
+            cards={mainDeck?.cards || []}
+            onCardMove={(cardId, zone) => {
+              console.log(`Card ${cardId} moved to ${zone}`);
+              addTestResult(`🎯 卡片 ${cardId} 移至 ${zone}`);
+            }}
+            maxCardsPerZone={5}
+          />
         );
 
       case 'grid_3x3':
       case 'value_ranking':
-        // ValueGridCanvas 需要特定的 props，暫時顯示佔位元素
         return (
-          <div className="h-full p-6">
-            <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-inner p-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">3×3 九宮格畫布</h3>
-              <div className="grid grid-cols-3 gap-4 h-full">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <div
-                    key={num}
-                    className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center"
-                  >
-                    <span className="text-2xl text-gray-400">{num}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <GridCanvas
+            cards={mainDeck?.cards || []}
+            onCardMove={(cardId, position) => {
+              console.log(`Card ${cardId} moved to position (${position.row}, ${position.col})`);
+              addTestResult(`🎯 卡片 ${cardId} 移至位置 (${position.row}, ${position.col})`);
+            }}
+          />
         );
 
       default:
         return (
           <div className="h-full flex items-center justify-center">
             <div className="text-center space-y-4">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">
-                {canvasConfig?.name} 畫布
-              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-lg">{canvasConfig?.name} 畫布</p>
               <p className="text-sm text-gray-400 dark:text-gray-500">
                 畫布類型 ({canvasType}) 尚未實作
               </p>
@@ -356,7 +329,11 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       )}
 
       {/* 主要內容區 */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="flex-1 flex flex-col overflow-hidden"
+      >
         <TabsList className="grid w-full grid-cols-3 mx-4 mt-4">
           <TabsTrigger value="select">1. 選擇模式</TabsTrigger>
           <TabsTrigger value="configure" disabled={!selectedMode}>
@@ -411,7 +388,12 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                       {mainDeck.cards.slice(0, 10).map((card: any) => (
                         <div
                           key={card.id}
-                          className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-pointer"
+                          className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-move"
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData('cardId', card.id);
+                            addTestResult(`📋 開始拖曳卡片: ${card.title}`);
+                          }}
                         >
                           <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100 mb-1">
                             {card.title}
@@ -480,9 +462,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                     </div>
                   ) : (
                     /* 一般遊戲畫布 - 根據畫布類型渲染 */
-                    <div className="h-full">
-                      {renderCanvas()}
-                    </div>
+                    <div className="h-full">{renderCanvas()}</div>
                   )}
                 </div>
               </div>

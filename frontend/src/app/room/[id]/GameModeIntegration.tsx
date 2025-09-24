@@ -23,6 +23,7 @@ import ThreeColumnCanvas from '@/components/game-canvases/ThreeColumnCanvas';
 import TwoZoneCanvas from '@/components/game-canvases/TwoZoneCanvas';
 import GridCanvas from '@/components/game-canvases/GridCanvas';
 import CollectionCanvas from '@/components/game-canvases/CollectionCanvas';
+import GrowthPlanCanvas from '@/components/game-canvases/GrowthPlanCanvas';
 import CardItem from '@/components/game-canvases/CardItem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -322,6 +323,30 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                 });
                 addTestResult(`📤 取消收藏 ${cardId}`);
               }
+            }}
+          />
+        );
+
+      case 'three_zones':
+      case 'growth_planning':
+        return (
+          <GrowthPlanCanvas
+            cards={mainDeck?.cards || []}
+            onCardUse={(cardId) => {
+              setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
+              addTestResult(`➕ 使用卡片: ${cardId}`);
+            }}
+            onCardRemove={(cardId) => {
+              setUsedCards((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(cardId);
+                return newSet;
+              });
+              addTestResult(`➖ 移除卡片: ${cardId}`);
+            }}
+            onPlanCreate={(cardAId, cardBId, planText) => {
+              addTestResult(`📝 建立成長計畫: ${cardAId} + ${cardBId}`);
+              addTestResult(`📋 計畫內容: ${planText.substring(0, 50)}...`);
             }}
           />
         );

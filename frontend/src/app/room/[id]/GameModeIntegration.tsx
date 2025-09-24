@@ -71,6 +71,9 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   // 籌碼系統狀態（for 生活改造王）
   const [tokenAllocations, setTokenAllocations] = useState<TokenAllocation[]>([]);
   const [showTokenSystem, setShowTokenSystem] = useState(false);
+  
+  // 收藏家上限設定
+  const [collectionMaxCards, setCollectionMaxCards] = useState(15);
 
   // 測試模式
   const [testMode, setTestMode] = useState(false);
@@ -80,6 +83,9 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   // Tab 控制
   const [activeTab, setActiveTab] = useState('select');
+  
+  // 是否為房間擁有者 (暫時假設非訪客即為擁有者)
+  const isRoomOwner = !isVisitor;
 
   // 初始化服務
   useEffect(() => {
@@ -311,6 +317,8 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
         return (
           <CollectionCanvas
             cards={mainDeck?.cards || []}
+            maxCards={collectionMaxCards}
+            isRoomOwner={isRoomOwner}
             onCardCollect={(cardId, collected) => {
               if (collected) {
                 setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
@@ -323,6 +331,10 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                 });
                 addTestResult(`📤 取消收藏 ${cardId}`);
               }
+            }}
+            onMaxCardsChange={(newMax) => {
+              setCollectionMaxCards(newMax);
+              addTestResult(`🔧 收藏上限設為 ${newMax} 張`);
             }}
           />
         );

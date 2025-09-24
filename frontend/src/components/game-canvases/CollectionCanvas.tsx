@@ -10,13 +10,15 @@
 
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
-import { Briefcase, Star, X, AlertCircle } from 'lucide-react';
+import { Briefcase, Star, X, AlertCircle, Settings, Lock, Unlock } from 'lucide-react';
 import CardItem from './CardItem';
 
 interface CollectionCanvasProps {
   cards?: CardData[];
   onCardCollect?: (cardId: string, collected: boolean) => void;
   maxCards?: number;
+  onMaxCardsChange?: (newMax: number) => void;
+  isRoomOwner?: boolean;
   className?: string;
 }
 
@@ -24,11 +26,18 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   cards = [],
   onCardCollect,
   maxCards = 15,
+  onMaxCardsChange,
+  isRoomOwner = false,
   className = '',
 }) => {
   // 收藏的卡片ID列表
   const [collectedCardIds, setCollectedCardIds] = useState<string[]>([]);
   const [dragOverCanvas, setDragOverCanvas] = useState(false);
+  
+  // 上限設定狀態
+  const [isEditingLimit, setIsEditingLimit] = useState(false);
+  const [tempMaxCards, setTempMaxCards] = useState(maxCards);
+  const [isLimitLocked, setIsLimitLocked] = useState(false);
 
   // 處理拖放
   const handleDrop = (e: React.DragEvent) => {
@@ -73,12 +82,102 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
     .filter((card) => card !== undefined) as CardData[];
 
   const isAtLimit = collectedCardIds.length >= maxCards;
+  const hasCards = collectedCardIds.length > 0;
+  
+  // 當有卡片時自動鎖定上限
+  const effectivelyLocked = isLimitLocked || hasCards;
 
   return (
     <div className={`w-full h-full p-6 ${className}`}>
       <div className="h-full relative">
-        {/* 浮動計數器 - 右上角 */}
-        <div className="absolute top-2 right-2 z-20">
+        {/* 浮動計數器和設定 - 右上角 */}
+        <div className="absolute top-2 right-2 z-20 flex items-center space-x-2">
+          {/* 上限設定區域 (僅房間擁有者可見) */}
+          {isRoomOwner && (
+            <div className="flex items-center space-x-1">
+              {isEditingLimit ? (
+                <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 rounded-full px-2 py-1 border border-gray-200 dark:border-gray-700">
+                  <input
+                    type="number"
+                    value={tempMaxCards}
+                    onChange={(e) => setTempMaxCards(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
+                    className="w-12 text-xs text-center bg-transparent border-none outline-none"
+                    min="1"
+                    max="50"
+                  />
+                  <button
+                    onClick={() => {
+                      onMaxCardsChange?.(tempMaxCards);
+                      setIsEditingLimit(false);
+                    }}
+                    className="text-green-600 hover:text-green-700 p-0.5"
+                  >
+                    ✓
+                  </button>
+                  <button
+                    onClick={() => {
+                      setTempMaxCards(maxCards);
+                      setIsEditingLimit(false);
+                    }}
+                    className="text-red-600 hover:text-red-700 p-0.5"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (!effectivelyLocked) {
+                      setTempMaxCards(maxCards);
+                      setIsEditingLimit(true);
+                    }
+                  }}
+                  className={`p-1.5 rounded-full transition-colors ${
+                    effectivelyLocked 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  }`}
+                  disabled={effectivelyLocked}
+                  title={
+                    hasCards && !isLimitLocked
+                      ? '有卡片時無法調整上限'
+                      : isLimitLocked 
+                      ? '上限已鎖定' 
+                      : '設定上限'
+                  }
+                >
+                  <Settings className="w-3 h-3" />
+                </button>
+              )}
+              
+              {/* 鎖定/解鎖按鈕 */}
+              <button
+                onClick={() => {
+                  if (!hasCards) {
+                    setIsLimitLocked(!isLimitLocked);
+                  }
+                }}
+                className={`p-1.5 rounded-full transition-colors ${
+                  hasCards
+                    ? 'bg-yellow-500 text-white cursor-default'
+                    : isLimitLocked
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                    : 'bg-gray-500 hover:bg-gray-600 text-white'
+                }`}
+                title={
+                  hasCards
+                    ? '有卡片時自動鎖定'
+                    : isLimitLocked 
+                    ? '解除鎖定' 
+                    : '鎖定上限'
+                }
+              >
+                {effectivelyLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+              </button>
+            </div>
+          )}
+          
+          {/* 計數器 */}
           <div
             className={`
             px-3 py-1.5 rounded-full text-sm font-medium shadow-md
@@ -90,6 +189,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
           `}
           >
             {collectedCardIds.length} / {maxCards} 張
+            {effectivelyLocked && <Lock className="w-3 h-3 ml-1 inline" />}
           </div>
         </div>
 
@@ -116,6 +216,16 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
               </div>
               <p className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
                 至多可以放 {maxCards} 張職業卡
+                {isRoomOwner && !effectivelyLocked && (
+                  <span className="text-xs text-blue-600 dark:text-blue-400 block mt-1">
+                    (作為房間擁有者可調整上限)
+                  </span>
+                )}
+                {isRoomOwner && hasCards && !isLimitLocked && (
+                  <span className="text-xs text-yellow-600 dark:text-yellow-400 block mt-1">
+                    (有卡片時自動鎖定上限)
+                  </span>
+                )}
               </p>
               <p className="text-sm text-gray-400 dark:text-gray-500">
                 從左側拖曳卡片到此處開始收藏

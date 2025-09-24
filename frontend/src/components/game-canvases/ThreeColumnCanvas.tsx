@@ -9,7 +9,8 @@
 
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
-import { Heart, Meh, ThumbsDown } from 'lucide-react';
+import { Heart, Meh, ThumbsDown, X } from 'lucide-react';
+import CardItem from './CardItem';
 
 interface ThreeColumnCanvasProps {
   cards?: CardData[];
@@ -119,30 +120,41 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
               </div>
 
               {/* 卡片區域 */}
-              <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+              <div className="flex-1 p-2 overflow-y-auto">
                 {columnCards.length === 0 ? (
                   <div className="h-full flex items-center justify-center">
                     <p className="text-gray-400 dark:text-gray-600 text-sm">拖曳卡片到此處</p>
                   </div>
                 ) : (
-                  columnCards.map((cardId) => {
-                    const card = cards.find((c) => c.id === cardId);
-                    if (!card) return null;
+                  <div className="flex flex-wrap gap-2 justify-start">
+                    {columnCards.map((cardId) => {
+                      const card = cards.find((c) => c.id === cardId);
+                      if (!card) return null;
 
-                    return (
-                      <div
-                        key={cardId}
-                        className="p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-200 dark:border-gray-700"
-                      >
-                        <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                          {card.title}
-                        </h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                          {card.description}
-                        </p>
-                      </div>
-                    );
-                  })
+                      return (
+                        <div key={cardId} className="w-[85px]">
+                          <CardItem
+                            id={card.id}
+                            title={card.title}
+                            description=""
+                            category={card.category}
+                            showRemoveButton={true}
+                            isDraggable={false}
+                            onRemove={() => {
+                              // 移除卡片
+                              setColumns((prev) => ({
+                                ...prev,
+                                [column.id]: prev[column.id as keyof typeof prev].filter(
+                                  (id) => id !== cardId
+                                ),
+                              }));
+                              onCardMove?.(cardId, null as any);
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </div>

@@ -9,7 +9,8 @@
 
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
-import { TrendingUp, TrendingDown, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, AlertCircle, X } from 'lucide-react';
+import CardItem from './CardItem';
 
 interface TwoZoneCanvasProps {
   cards?: CardData[];
@@ -153,7 +154,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
               </div>
 
               {/* 卡片區域 */}
-              <div className="flex-1 p-4 overflow-y-auto">
+              <div className="flex-1 p-3 overflow-y-auto">
                 {zoneCards.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-center">
                     <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3">
@@ -165,35 +166,34 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid gap-3">
+                  <div className="flex flex-wrap gap-2 justify-start">
                     {zoneCards.map((cardId, index) => {
                       const card = cards.find((c) => c.id === cardId);
                       if (!card) return null;
 
                       return (
-                        <div
-                          key={cardId}
-                          className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
-                          draggable
-                          onDragStart={(e) => {
-                            e.dataTransfer.setData('cardId', cardId);
-                          }}
-                        >
-                          <div className="flex items-start space-x-3">
-                            <div className="flex-shrink-0 w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                              <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                                {index + 1}
-                              </span>
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                                {card.title}
-                              </h4>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                {card.description}
-                              </p>
-                            </div>
+                        <div key={cardId} className="relative w-[100px]">
+                          <div className="absolute -top-2 -right-1 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center z-10">
+                            <span className="text-[10px] font-bold">{index + 1}</span>
                           </div>
+                          <CardItem
+                            id={card.id}
+                            title={card.title}
+                            description=""
+                            category=""
+                            showRemoveButton={true}
+                            isDraggable={false}
+                            onRemove={() => {
+                              // 移除卡片
+                              setZones((prev) => ({
+                                ...prev,
+                                [zone.id]: prev[zone.id as keyof typeof prev].filter(
+                                  (id) => id !== cardId
+                                ),
+                              }));
+                              onCardMove?.(cardId, null as any);
+                            }}
+                          />
                         </div>
                       );
                     })}

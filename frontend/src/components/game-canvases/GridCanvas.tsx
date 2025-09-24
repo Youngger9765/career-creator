@@ -9,7 +9,8 @@
 
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
-import { Grid3x3, Star, Circle, Square } from 'lucide-react';
+import { Grid3x3, Star, Circle, Square, X } from 'lucide-react';
+import CardItem from './CardItem';
 
 interface GridCanvasProps {
   cards?: CardData[];
@@ -227,19 +228,26 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ cards = [], onCardMove, classNa
 
                     {/* 卡片內容 */}
                     {card ? (
-                      <div
-                        className="mt-6 bg-white dark:bg-gray-800 rounded-md p-3 shadow-sm border border-gray-200 dark:border-gray-700"
-                        draggable
-                        onDragStart={(e) => {
-                          e.dataTransfer.setData('cardId', card.id);
-                        }}
-                      >
-                        <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100 mb-1">
-                          {card.title}
-                        </h4>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
-                          {card.description}
-                        </p>
+                      <div className="mt-4 relative w-full h-full flex items-center justify-center">
+                        <div className="w-full max-w-[100px]">
+                          <CardItem
+                            id={card.id}
+                            title={card.title}
+                            description=""
+                            category=""
+                            showRemoveButton={true}
+                            isDraggable={false}
+                            onRemove={() => {
+                              // 移除卡片
+                              setGrid((prev) => {
+                                const newGrid = prev.map((r) => r.map((c) => ({ ...c })));
+                                newGrid[rowIndex][colIndex].cardId = null;
+                                return newGrid;
+                              });
+                              onCardMove?.(card.id, null as any);
+                            }}
+                          />
+                        </div>
                       </div>
                     ) : (
                       <div className="flex-1 flex items-center justify-center mt-6">

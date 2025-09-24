@@ -22,6 +22,7 @@ import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaN
 import ThreeColumnCanvas from '@/components/game-canvases/ThreeColumnCanvas';
 import TwoZoneCanvas from '@/components/game-canvases/TwoZoneCanvas';
 import GridCanvas from '@/components/game-canvases/GridCanvas';
+import CardItem from '@/components/game-canvases/CardItem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -60,6 +61,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   const [mainDeck, setMainDeck] = useState<any>(null);
   const [auxiliaryDeck, setAuxiliaryDeck] = useState<any>(null);
   const [canvasConfig, setCanvasConfig] = useState<any>(null);
+  const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
 
   // 籌碼系統狀態（for 生活改造王）
   const [tokenAllocations, setTokenAllocations] = useState<TokenAllocation[]>([]);
@@ -67,7 +69,9 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   // 測試模式
   const [testMode, setTestMode] = useState(false);
+  const [testPanelOpen, setTestPanelOpen] = useState(false);
   const [testResults, setTestResults] = useState<string[]>([]);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
 
   // Tab 控制
   const [activeTab, setActiveTab] = useState('select');
@@ -233,8 +237,19 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
           <ThreeColumnCanvas
             cards={mainDeck?.cards || []}
             onCardMove={(cardId, column) => {
-              console.log(`Card ${cardId} moved to ${column}`);
-              addTestResult(`🎯 卡片 ${cardId} 移至 ${column}`);
+              if (column === null) {
+                // 卡片被移除，回到左邊
+                setUsedCards((prev) => {
+                  const newSet = new Set(prev);
+                  newSet.delete(cardId);
+                  return newSet;
+                });
+                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
+              } else {
+                console.log(`Card ${cardId} moved to ${column}`);
+                addTestResult(`🎯 卡片 ${cardId} 移至 ${column}`);
+                setUsedCards((prev) => new Set([...prev, cardId]));
+              }
             }}
           />
         );
@@ -245,8 +260,19 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
           <TwoZoneCanvas
             cards={mainDeck?.cards || []}
             onCardMove={(cardId, zone) => {
-              console.log(`Card ${cardId} moved to ${zone}`);
-              addTestResult(`🎯 卡片 ${cardId} 移至 ${zone}`);
+              if (zone === null) {
+                // 卡片被移除，回到左邊
+                setUsedCards((prev) => {
+                  const newSet = new Set(prev);
+                  newSet.delete(cardId);
+                  return newSet;
+                });
+                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
+              } else {
+                console.log(`Card ${cardId} moved to ${zone}`);
+                addTestResult(`🎯 卡片 ${cardId} 移至 ${zone}`);
+                setUsedCards((prev) => new Set([...prev, cardId]));
+              }
             }}
             maxCardsPerZone={5}
           />
@@ -258,8 +284,19 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
           <GridCanvas
             cards={mainDeck?.cards || []}
             onCardMove={(cardId, position) => {
-              console.log(`Card ${cardId} moved to position (${position.row}, ${position.col})`);
-              addTestResult(`🎯 卡片 ${cardId} 移至位置 (${position.row}, ${position.col})`);
+              if (position === null) {
+                // 卡片被移除，回到左邊
+                setUsedCards((prev) => {
+                  const newSet = new Set(prev);
+                  newSet.delete(cardId);
+                  return newSet;
+                });
+                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
+              } else {
+                console.log(`Card ${cardId} moved to position (${position.row}, ${position.col})`);
+                addTestResult(`🎯 卡片 ${cardId} 移至位置 (${position.row}, ${position.col})`);
+                setUsedCards((prev) => new Set([...prev, cardId]));
+              }
             }}
           />
         );
@@ -292,184 +329,208 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      {/* 標題列 */}
-      <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">遊戲模式整合測試</h1>
-        <button
-          onClick={() => setTestMode(!testMode)}
-          className="px-3 py-1 text-sm border border-gray-400 rounded text-gray-700 dark:text-white dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
-          {testMode ? '關閉測試模式' : '開啟測試模式'}
-        </button>
+      {/* 可收合的標題列 */}
+      <div className={`transition-all duration-300 ${headerCollapsed ? 'h-12' : ''}`}>
+        <div className="flex justify-between items-center p-2 border-b border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => setHeaderCollapsed(!headerCollapsed)}
+            className="flex items-center space-x-2 text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <span className="text-sm">{headerCollapsed ? '▶' : '▼'}</span>
+            <span>遊戲模式整合測試</span>
+          </button>
+          {!headerCollapsed && (
+            <button
+              onClick={() => setTestMode(!testMode)}
+              className="px-3 py-1 text-sm border border-gray-400 rounded text-gray-700 dark:text-white dark:border-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              {testMode ? '關閉測試模式' : '開啟測試模式'}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* 錯誤提示 */}
-      {error && (
+      {/* 錯誤提示 - 只在展開時顯示 */}
+      {!headerCollapsed && error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      {/* 測試結果面板 */}
-      {testMode && testResults.length > 0 && (
-        <Card className="bg-gray-50 dark:bg-gray-900">
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-900 dark:text-gray-100">測試日誌</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1 max-h-40 overflow-y-auto">
-              {testResults.map((result, index) => (
-                <div key={index} className="text-xs font-mono text-gray-700 dark:text-gray-300">
-                  {result}
-                </div>
-              ))}
+      {/* 測試結果面板 - 可折疊，只在展開時顯示 */}
+      {!headerCollapsed && testMode && (
+        <Card className="bg-gray-50 dark:bg-gray-900 transition-all duration-200 mx-4 my-2">
+          <CardHeader
+            className="cursor-pointer py-2"
+            onClick={() => setTestPanelOpen(!testPanelOpen)}
+          >
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm text-gray-900 dark:text-gray-100">
+                測試日誌 ({testResults.length})
+              </CardTitle>
+              <button className="text-xs text-gray-500 dark:text-gray-400">
+                {testPanelOpen ? '收起 ▲' : '展開 ▼'}
+              </button>
             </div>
-          </CardContent>
+          </CardHeader>
+          {testPanelOpen && testResults.length > 0 && (
+            <CardContent className="py-2">
+              <div className="space-y-1 max-h-32 overflow-y-auto">
+                {testResults.map((result, index) => (
+                  <div key={index} className="text-xs font-mono text-gray-700 dark:text-gray-300">
+                    {result}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          )}
         </Card>
       )}
 
-      {/* 主要內容區 */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="flex-1 flex flex-col overflow-hidden"
-      >
-        <TabsList className="grid w-full grid-cols-3 mx-4 mt-4">
-          <TabsTrigger value="select">1. 選擇模式</TabsTrigger>
-          <TabsTrigger value="configure" disabled={!selectedMode}>
-            2. 選擇玩法
-          </TabsTrigger>
-          <TabsTrigger value="play" disabled={!selectedGameplay}>
-            3. 開始遊戲
-          </TabsTrigger>
-        </TabsList>
+      {/* 主要內容區 - 只在展開時顯示 */}
+      {!headerCollapsed && (
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex-1 flex flex-col overflow-hidden"
+        >
+          <TabsList className="grid w-full grid-cols-3 mx-4 mt-4">
+            <TabsTrigger value="select">1. 選擇模式</TabsTrigger>
+            <TabsTrigger value="configure" disabled={!selectedMode}>
+              2. 選擇玩法
+            </TabsTrigger>
+            <TabsTrigger value="play" disabled={!selectedGameplay}>
+              3. 開始遊戲
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Step 1: 選擇模式 */}
-        <TabsContent value="select" className="flex-1 p-4 overflow-auto">
-          <ModeSelector
-            currentMode={selectedMode}
-            onModeSelect={handleModeSelect}
-            disabled={isLoading}
-          />
-        </TabsContent>
-
-        {/* Step 2: 選擇玩法 */}
-        <TabsContent value="configure" className="flex-1 p-4 overflow-auto">
-          {selectedMode && (
-            <GameplaySelector
-              modeId={selectedMode}
-              currentGameplay={selectedGameplay}
-              onGameplaySelect={handleGameplaySelect}
+          {/* Step 1: 選擇模式 */}
+          <TabsContent value="select" className="flex-1 p-4 overflow-auto">
+            <ModeSelector
+              currentMode={selectedMode}
+              onModeSelect={handleModeSelect}
               disabled={isLoading}
             />
-          )}
-        </TabsContent>
+          </TabsContent>
 
-        {/* Step 3: 開始遊戲 - 左右分欄佈局 */}
-        <TabsContent value="play" className="flex-1 flex overflow-hidden">
-          {selectedGameplay && (
-            <div className="flex w-full h-full">
-              {/* 左側：牌卡區 */}
-              <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-                {/* 牌卡區標題 */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100">
-                    {mainDeck ? mainDeck.name : '牌卡區'}
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {mainDeck ? `${mainDeck.cards.length} 張牌卡` : '載入中...'}
-                  </p>
-                </div>
+          {/* Step 2: 選擇玩法 */}
+          <TabsContent value="configure" className="flex-1 p-4 overflow-auto">
+            {selectedMode && (
+              <GameplaySelector
+                modeId={selectedMode}
+                currentGameplay={selectedGameplay}
+                onGameplaySelect={handleGameplaySelect}
+                disabled={isLoading}
+              />
+            )}
+          </TabsContent>
 
-                {/* 牌卡列表 */}
-                <div className="flex-1 overflow-y-auto p-4">
-                  {mainDeck && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {mainDeck.cards.slice(0, 10).map((card: any) => (
-                        <div
-                          key={card.id}
-                          className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow cursor-move"
-                          draggable
-                          onDragStart={(e) => {
-                            e.dataTransfer.setData('cardId', card.id);
-                            addTestResult(`📋 開始拖曳卡片: ${card.title}`);
-                          }}
-                        >
-                          <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100 mb-1">
-                            {card.title}
-                          </h4>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
-                            {card.description}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+          {/* Step 3: 開始遊戲 - 左右分欄佈局 */}
+          <TabsContent value="play" className="flex-1 flex overflow-hidden">
+            {selectedGameplay && (
+              <div className="flex w-full h-full">
+                {/* 左側：牌卡區 */}
+                <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                  {/* 牌卡區標題 */}
+                  <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                    <h3 className="font-bold text-gray-900 dark:text-gray-100">
+                      {mainDeck ? mainDeck.name : '牌卡區'}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      {mainDeck ? `${mainDeck.cards.length} 張牌卡` : '載入中...'}
+                    </p>
+                  </div>
 
-              {/* 右側：遊戲畫布 */}
-              <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
-                {/* 遊戲資訊條 */}
-                <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-6 text-sm">
-                      <div>
-                        <span className="text-gray-500 dark:text-gray-400">模式：</span>
-                        <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
-                          {GameModeService.getMode(selectedMode)?.name}
-                        </span>
+                  {/* 牌卡列表 */}
+                  <div className="flex-1 overflow-y-auto p-4">
+                    {mainDeck && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {mainDeck.cards
+                          .slice(0, 10)
+                          .filter((card: any) => !usedCards.has(card.id)) // 直接過濾掉已使用的卡片
+                          .map((card: any) => (
+                            <CardItem
+                              key={card.id}
+                              id={card.id}
+                              title={card.title}
+                              description={card.description}
+                              category={card.category}
+                              isUsed={false}
+                              isDraggable={true}
+                              onDragStart={(e) => {
+                                e.dataTransfer.setData('cardId', card.id);
+                                addTestResult(`📋 開始拖曳卡片: ${card.title}`);
+                              }}
+                            />
+                          ))}
                       </div>
-                      <div>
-                        <span className="text-gray-500 dark:text-gray-400">玩法：</span>
-                        <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
-                          {GameModeService.getGameplay(selectedMode, selectedGameplay)?.name}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 dark:text-gray-400">畫布類型：</span>
-                        <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
-                          {canvasConfig?.name || '載入中'}
-                        </span>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
 
-                {/* 畫布區域 */}
-                <div className="flex-1 p-6 overflow-auto">
-                  {/* 生活改造王籌碼系統 */}
-                  {showTokenSystem ? (
-                    <div className="grid lg:grid-cols-2 gap-6">
-                      <TokenControls
-                        areas={lifeAreas}
-                        total={100}
-                        onChange={handleTokenChange}
-                        showSuggestions={true}
-                      />
-                      <div className="space-y-4">
-                        <TokenDisplay
-                          allocations={tokenAllocations}
-                          visualType="pie"
-                          title="能量分配圓餅圖"
-                        />
-                        <TokenDisplay
-                          allocations={tokenAllocations}
-                          visualType="progress"
-                          title="能量分配進度"
-                        />
+                {/* 右側：遊戲畫布 */}
+                <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
+                  {/* 遊戲資訊條 */}
+                  <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-6 text-sm">
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">模式：</span>
+                          <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
+                            {GameModeService.getMode(selectedMode)?.name}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">玩法：</span>
+                          <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
+                            {GameModeService.getGameplay(selectedMode, selectedGameplay)?.name}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 dark:text-gray-400">畫布類型：</span>
+                          <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
+                            {canvasConfig?.name || '載入中'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  ) : (
-                    /* 一般遊戲畫布 - 根據畫布類型渲染 */
-                    <div className="h-full">{renderCanvas()}</div>
-                  )}
+                  </div>
+
+                  {/* 畫布區域 */}
+                  <div className="flex-1 p-6 overflow-auto">
+                    {/* 生活改造王籌碼系統 */}
+                    {showTokenSystem ? (
+                      <div className="grid lg:grid-cols-2 gap-6">
+                        <TokenControls
+                          areas={lifeAreas}
+                          total={100}
+                          onChange={handleTokenChange}
+                          showSuggestions={true}
+                        />
+                        <div className="space-y-4">
+                          <TokenDisplay
+                            allocations={tokenAllocations}
+                            visualType="pie"
+                            title="能量分配圓餅圖"
+                          />
+                          <TokenDisplay
+                            allocations={tokenAllocations}
+                            visualType="progress"
+                            title="能量分配進度"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      /* 一般遊戲畫布 - 根據畫布類型渲染 */
+                      <div className="h-full">{renderCanvas()}</div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+            )}
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };

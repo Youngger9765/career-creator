@@ -132,7 +132,7 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
             {/* 卡片 A */}
             <div className="flex flex-col items-center">
               <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                卡片 A（優勢）
+                卡片 A
               </div>
               <div
                 className={`
@@ -185,7 +185,7 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
             {/* 卡片 B */}
             <div className="flex flex-col items-center">
               <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
-                卡片 B（劣勢）
+                卡片 B
               </div>
               <div
                 className={`

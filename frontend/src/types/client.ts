@@ -25,7 +25,7 @@ export interface Client {
     share_code: string;
     is_active: boolean;
     expires_at?: string;
-    session_count: number;
+    session_count?: number;
     created_at: string;
     last_activity?: string;
   }>;

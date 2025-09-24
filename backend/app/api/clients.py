@@ -60,7 +60,7 @@ async def get_my_clients(
     query = (
         select(Client)
         .join(CounselorClientRelationship)
-        .where(CounselorClientRelationship.counselor_id == current_user["user_id"])
+        .where(CounselorClientRelationship.counselor_id == str(current_user["user_id"]))
     )
 
     # Apply filters
@@ -69,7 +69,7 @@ async def get_my_clients(
 
     if search:
         search_filter = or_(
-            Client.name.ilike(f"%{search}%"), Client.email.ilike(f"%{search}%")
+            Client.name.ilike(f"%{search}%"), Client.email.ilike(f"%{search}%")  # type: ignore
         )
         query = query.where(search_filter)
 
@@ -106,6 +106,29 @@ async def get_my_clients(
             .order_by(ConsultationRecord.session_date.desc())
         ).first()
 
+        # Get rooms associated with this client
+        rooms = session.exec(
+            select(Room)
+            .join(RoomClient)
+            .where(RoomClient.client_id == client.id)
+            .order_by(Room.created_at.desc())
+        ).all()
+        
+        rooms_data = [
+            {
+                "id": str(room.id),
+                "name": room.name,
+                "description": room.description,
+                "share_code": room.share_code,
+                "is_active": room.is_active,
+                "expires_at": room.expires_at.isoformat() if room.expires_at else None,
+                "session_count": room.session_count or 0,
+                "created_at": room.created_at.isoformat(),
+                "last_activity": None  # TODO: Add from card events if needed
+            }
+            for room in rooms
+        ]
+
         response = ClientResponse(
             **client.dict(),
             active_rooms_count=active_rooms_count,
@@ -113,6 +136,7 @@ async def get_my_clients(
             last_consultation_date=(
                 last_consultation.session_date if last_consultation else None
             ),
+            rooms=rooms_data,
         )
         responses.append(response)
 
@@ -140,7 +164,7 @@ async def create_client(
         # Check if relationship already exists
         existing_rel = session.exec(
             select(CounselorClientRelationship).where(
-                CounselorClientRelationship.counselor_id == current_user["user_id"],
+                CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
                 CounselorClientRelationship.client_id == existing_client.id,
             )
         ).first()
@@ -153,7 +177,7 @@ async def create_client(
 
         # Create new relationship with existing client
         relationship = CounselorClientRelationship(
-            counselor_id=current_user["user_id"],
+            counselor_id=str(current_user["user_id"]),
             client_id=existing_client.id,
             relationship_type=RelationshipType.PRIMARY,
             status=RelationshipStatus.ACTIVE,
@@ -172,7 +196,7 @@ async def create_client(
 
         # Create relationship
         relationship = CounselorClientRelationship(
-            counselor_id=current_user["user_id"],
+            counselor_id=str(current_user["user_id"]),
             client_id=client.id,
             relationship_type=RelationshipType.PRIMARY,
             status=RelationshipStatus.ACTIVE,
@@ -202,7 +226,7 @@ async def get_client(
     # Check if user has relationship with this client
     relationship = session.exec(
         select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == current_user["user_id"],
+            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
             CounselorClientRelationship.client_id == client_id,
         )
     ).first()
@@ -266,7 +290,7 @@ async def update_client(
     # Check if user has relationship with this client
     relationship = session.exec(
         select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == current_user["user_id"],
+            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
             CounselorClientRelationship.client_id == client_id,
         )
     ).first()
@@ -339,7 +363,7 @@ async def archive_client(
     # Check if user has relationship with this client
     relationship = session.exec(
         select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == current_user["user_id"],
+            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
             CounselorClientRelationship.client_id == client_id,
             CounselorClientRelationship.relationship_type == RelationshipType.PRIMARY,
         )
@@ -377,7 +401,7 @@ async def get_client_rooms(
     # Check permission
     relationship = session.exec(
         select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == current_user["user_id"],
+            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
             CounselorClientRelationship.client_id == client_id,
         )
     ).first()
@@ -431,7 +455,7 @@ async def create_consultation_record(
     # Check permission
     relationship = session.exec(
         select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == current_user["user_id"],
+            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
             CounselorClientRelationship.client_id == client_id,
         )
     ).first()
@@ -443,7 +467,7 @@ async def create_consultation_record(
 
     # Create record
     record = ConsultationRecord(
-        **record_data.dict(), client_id=client_id, counselor_id=current_user["user_id"]
+        **record_data.dict(), client_id=client_id, counselor_id=str(current_user["user_id"])
     )
     session.add(record)
     session.commit()
@@ -469,7 +493,7 @@ async def get_consultation_records(
     # Check permission
     relationship = session.exec(
         select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == current_user["user_id"],
+            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
             CounselorClientRelationship.client_id == client_id,
         )
     ).first()
@@ -506,7 +530,7 @@ async def get_my_relationships(
     獲取當前諮商師的所有客戶關係
     """
     query = select(CounselorClientRelationship).where(
-        CounselorClientRelationship.counselor_id == current_user["user_id"]
+        CounselorClientRelationship.counselor_id == str(current_user["user_id"])
     )
 
     if status:
@@ -577,9 +601,9 @@ async def update_relationship(
     if not relationship:
         raise HTTPException(status_code=404, detail="Relationship not found")
 
-    if relationship.counselor_id != current_user[
+    if relationship.counselor_id != str(current_user[
         "user_id"
-    ] and not current_user.has_role("admin"):
+    ]) and not current_user.has_role("admin"):
         raise HTTPException(
             status_code=403, detail="You can only update your own relationships"
         )

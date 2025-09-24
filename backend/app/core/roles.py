@@ -2,37 +2,40 @@
 User roles and permissions
 用戶角色與權限定義
 """
+
 from enum import Enum
 from typing import List, Set
 
 
 class UserRole(str, Enum):
     """User role definitions"""
+
     COUNSELOR = "counselor"  # 諮詢師 - 主導諮詢、開房間
-    CLIENT = "client"        # 來談者/當事人 - 接受諮詢
-    OBSERVER = "observer"    # 觀察員 - 純觀摩，無操作權限
-    ADMIN = "admin"          # 管理員 - 系統管理權限
+    CLIENT = "client"  # 來談者/當事人 - 接受諮詢
+    OBSERVER = "observer"  # 觀察員 - 純觀摩，無操作權限
+    ADMIN = "admin"  # 管理員 - 系統管理權限
 
 
 class Permission(str, Enum):
     """Permission definitions"""
+
     # Room permissions
     CREATE_ROOM = "create_room"
     JOIN_ROOM = "join_room"
     DELETE_ROOM = "delete_room"
-    
+
     # Card permissions
     MOVE_CARD = "move_card"
     FLIP_CARD = "flip_card"
     ANNOTATE_CARD = "annotate_card"
-    
+
     # Chat permissions
     SEND_MESSAGE = "send_message"
     VIEW_CHAT = "view_chat"
-    
+
     # CRM permissions
     MANAGE_CLIENTS = "manage_clients"
-    
+
     # Admin permissions
     MANAGE_USERS = "manage_users"
     VIEW_ANALYTICS = "view_analytics"
@@ -75,7 +78,7 @@ ROLE_PERMISSIONS: dict[UserRole, Set[Permission]] = {
         Permission.MANAGE_USERS,
         Permission.VIEW_ANALYTICS,
         Permission.MANAGE_CLIENTS,
-    }
+    },
 }
 
 

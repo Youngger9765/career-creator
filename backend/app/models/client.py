@@ -2,7 +2,7 @@
 
 from datetime import date, datetime
 from enum import Enum
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
 from sqlalchemy import UniqueConstraint
@@ -95,8 +95,8 @@ class CounselorClientRelationship(SQLModel, table=True):
     )
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    counselor_id: UUID = Field(
-        foreign_key="users.id", index=True, description="Counselor user ID"
+    counselor_id: str = Field(
+        max_length=255, index=True, description="Counselor user ID (UUID or demo ID)"
     )
     client_id: UUID = Field(
         foreign_key="clients.id", index=True, description="Client ID"
@@ -116,7 +116,7 @@ class CounselorClientRelationship(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Relationships
-    counselor: "User" = Relationship(back_populates="client_relationships")
+    # Note: counselor relationship removed as counselor_id can be demo account (not in users table)
     client: Client = Relationship(back_populates="counselor_relationships")
 
 
@@ -152,8 +152,8 @@ class ConsultationRecord(SQLModel, table=True):
     client_id: UUID = Field(
         foreign_key="clients.id", index=True, description="Client ID"
     )
-    counselor_id: UUID = Field(
-        foreign_key="users.id", index=True, description="Counselor ID"
+    counselor_id: str = Field(
+        max_length=255, index=True, description="Counselor ID (UUID or demo ID)"
     )
     session_date: datetime = Field(description="Consultation session date and time")
     duration_minutes: Optional[int] = Field(
@@ -175,7 +175,7 @@ class ConsultationRecord(SQLModel, table=True):
     # Relationships
     room: "Room" = Relationship(back_populates="consultation_records")
     client: Client = Relationship(back_populates="consultation_records")
-    counselor: "User" = Relationship(back_populates="consultation_records")
+    # Note: counselor relationship removed as counselor_id can be demo account (not in users table)
 
 
 # Request/Response models
@@ -216,6 +216,9 @@ class ClientResponse(ClientBase):
     last_consultation_date: Optional[datetime] = Field(
         default=None, description="Last consultation date"
     )
+    rooms: Optional[List[Dict[str, Any]]] = Field(
+        default_factory=list, description="Rooms associated with this client"
+    )
 
 
 class CounselorClientRelationshipCreate(SQLModel):
@@ -230,7 +233,7 @@ class CounselorClientRelationshipResponse(SQLModel):
     """Counselor-client relationship response."""
 
     id: UUID
-    counselor_id: UUID
+    counselor_id: str
     client_id: UUID
     relationship_type: RelationshipType
     status: RelationshipStatus
@@ -261,7 +264,7 @@ class ConsultationRecordResponse(SQLModel):
     id: UUID
     room_id: UUID
     client_id: UUID
-    counselor_id: UUID
+    counselor_id: str
     session_date: datetime
     duration_minutes: Optional[int]
     topics: List[str]

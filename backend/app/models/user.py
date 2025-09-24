@@ -30,13 +30,7 @@ class User(UserBase, table=True):
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    # Relationships for CRM
-    client_relationships: List["CounselorClientRelationship"] = Relationship(
-        back_populates="counselor"
-    )
-    consultation_records: List["ConsultationRecord"] = Relationship(
-        back_populates="counselor"
-    )
+    # Note: CRM relationships removed as counselor_id can be demo account (not in users table)
 
     def has_role(self, role: str) -> bool:
         """Check if user has specific role"""

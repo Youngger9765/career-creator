@@ -277,7 +277,10 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
 
                   return (
                     <React.Fragment key={client.id}>
-                      <tr className="hover:bg-gray-50">
+                      <tr
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => hasRooms && toggleClientExpansion(client.id)}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-3">
                             {hasRooms && (
@@ -353,14 +356,18 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => setEditingClient(client)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingClient(client);
+                              }}
                               className="text-blue-600 hover:text-blue-800"
                               title="編輯"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 if (confirm(`確定要刪除客戶「${client.name}」嗎？`)) {
                                   // TODO: Implement delete
                                 }
@@ -458,6 +465,27 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       </div>
                                     </div>
                                   ))}
+
+                                {/* 創建諮詢室按鈕 */}
+                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                  <button
+                                    onClick={() => {
+                                      // 跳轉到創建房間頁面，帶入客戶資訊
+                                      const clientInfo = encodeURIComponent(
+                                        JSON.stringify({
+                                          client_id: client.id,
+                                          client_name: client.name,
+                                          client_email: client.email,
+                                        })
+                                      );
+                                      window.location.href = `/rooms/create?client=${clientInfo}`;
+                                    }}
+                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                    創建諮詢室
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </td>

@@ -201,12 +201,6 @@ export default function DashboardPage() {
               >
                 加入房間
               </Link>
-              <Link
-                href="/rooms"
-                className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                房間列表
-              </Link>
               <button
                 onClick={() => {
                   if (confirm('確定要登出嗎？')) {

@@ -24,6 +24,7 @@ import TwoZoneCanvas from '@/components/game-canvases/TwoZoneCanvas';
 import GridCanvas from '@/components/game-canvases/GridCanvas';
 import CollectionCanvas from '@/components/game-canvases/CollectionCanvas';
 import GrowthPlanCanvas from '@/components/game-canvases/GrowthPlanCanvas';
+import PositionBreakdownCanvas from '@/components/game-canvases/PositionBreakdownCanvas';
 import CardItem from '@/components/game-canvases/CardItem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -453,6 +454,25 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
             onPlanCreate={(cardAId, cardBId, planText) => {
               addTestResult(`📝 建立成長計畫: ${cardAId} + ${cardBId}`);
               addTestResult(`📋 計畫內容: ${planText.substring(0, 50)}...`);
+            }}
+          />
+        );
+
+      case 'position_breakdown':
+        return (
+          <PositionBreakdownCanvas
+            cards={mainDeck?.cards || []}
+            onCardUse={(cardId) => {
+              setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
+              addTestResult(`➕ 添加技能卡: ${cardId}`);
+            }}
+            onCardRemove={(cardId) => {
+              setUsedCards((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(cardId);
+                return newSet;
+              });
+              addTestResult(`➖ 移除技能卡: ${cardId}`);
             }}
           />
         );

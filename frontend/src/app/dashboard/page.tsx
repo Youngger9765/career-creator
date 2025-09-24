@@ -7,6 +7,7 @@ import { authAPI } from '../../lib/api/auth';
 import { roomsAPI } from '../../lib/api/rooms';
 import { cardEventsAPI } from '../../lib/api/card-events';
 import { Room, CardEvent } from '../../types/api';
+import { ClientManagement } from '../../components/clients/ClientManagement';
 import {
   Calendar,
   Users,
@@ -359,15 +360,7 @@ export default function DashboardPage() {
 
             {selectedTab === 'clients' && (
               <div className="space-y-6">
-                <div className="text-center py-12 text-gray-500">
-                  <p>客戶管理功能開發中...</p>
-                  <Link
-                    href="/dashboard/clients"
-                    className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    進入客戶管理頁面
-                  </Link>
-                </div>
+                <ClientManagement />
               </div>
             )}
 

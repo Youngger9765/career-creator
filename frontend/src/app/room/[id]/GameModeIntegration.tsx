@@ -22,6 +22,7 @@ import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaN
 import ThreeColumnCanvas from '@/components/game-canvases/ThreeColumnCanvas';
 import TwoZoneCanvas from '@/components/game-canvases/TwoZoneCanvas';
 import GridCanvas from '@/components/game-canvases/GridCanvas';
+import CollectionCanvas from '@/components/game-canvases/CollectionCanvas';
 import CardItem from '@/components/game-canvases/CardItem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -299,6 +300,27 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                 console.log(`Card ${cardId} moved to position (${position.row}, ${position.col})`);
                 addTestResult(`🎯 卡片 ${cardId} 移至位置 (${position.row}, ${position.col})`);
                 setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
+              }
+            }}
+          />
+        );
+
+      case 'collection_zone':
+      case 'career_collector':
+        return (
+          <CollectionCanvas
+            cards={mainDeck?.cards || []}
+            onCardCollect={(cardId, collected) => {
+              if (collected) {
+                setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
+                addTestResult(`⭐ 收藏卡片 ${cardId}`);
+              } else {
+                setUsedCards((prev) => {
+                  const newSet = new Set(prev);
+                  newSet.delete(cardId);
+                  return newSet;
+                });
+                addTestResult(`📤 取消收藏 ${cardId}`);
               }
             }}
           />

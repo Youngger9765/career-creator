@@ -115,7 +115,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       return (
         <div>
           <div className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
-            職能盤點卡 • 優勢區域 ({mainDeck.cards.length} 張)
+            職能盤點卡 ({mainDeck.cards.length} 張)
           </div>
           <div className="grid grid-cols-2 gap-3">
             {mainDeck.cards
@@ -144,7 +144,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       return (
         <div>
           <div className="text-xs text-orange-600 dark:text-orange-400 mb-2 font-medium">
-            策略行動卡 • 劣勢區域 ({actionCards.length} 張)
+            策略行動卡 ({actionCards.length} 張)
           </div>
           <div className="grid grid-cols-2 gap-3">
             {actionCards
@@ -626,7 +626,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                           : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                     >
-                      職能盤點卡 (A區)
+                      職能盤點卡
                     </button>
                     <button
                       onClick={() => setSelectedCardType('action')}
@@ -636,7 +636,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                           : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                       }`}
                     >
-                      策略行動卡 (B區)
+                      策略行動卡
                     </button>
                   </div>
                 </div>

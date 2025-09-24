@@ -60,6 +60,17 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
     const cardId = e.dataTransfer.getData('cardId');
     const currentMaxCards = zone === 'advantage' ? maxAdvantageCards : maxDisadvantageCards;
 
+    // 檢查卡片類型限制
+    const isActionCard = cardId.startsWith('action-');
+    const isSkillCard = !isActionCard;
+
+    // 職能盤點卡 (A區卡) 只能放到優勢區域
+    // 策略行動卡 (B區卡) 只能放到劣勢區域
+    if ((isSkillCard && zone === 'disadvantage') || (isActionCard && zone === 'advantage')) {
+      // 顯示錯誤提示 - 卡片類型不匹配
+      return;
+    }
+
     // 檢查是否超過限制
     if (zones[zone].length >= currentMaxCards && !zones[zone].includes(cardId)) {
       // 顯示提示訊息
@@ -104,8 +115,8 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   const zoneConfig = [
     {
       id: 'advantage',
-      title: '優勢',
-      subtitle: '我擅長的技能',
+      title: 'A區',
+      subtitle: '職能盤點卡',
       icon: TrendingUp,
       bgColor: 'bg-blue-50 dark:bg-blue-950',
       borderColor: 'border-blue-400 dark:border-blue-600',
@@ -115,8 +126,8 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
     },
     {
       id: 'disadvantage',
-      title: '劣勢',
-      subtitle: '需要加強的技能',
+      title: 'B區',
+      subtitle: '策略行動卡',
       icon: TrendingDown,
       bgColor: 'bg-orange-50 dark:bg-orange-950',
       borderColor: 'border-orange-400 dark:border-orange-600',

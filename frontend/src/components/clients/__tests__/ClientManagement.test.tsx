@@ -35,7 +35,7 @@ const mockClientWithRooms = {
       expires_at: '2025-10-01T19:22:36.288792',
       session_count: 1,
       created_at: '2025-09-24T19:22:36.288850',
-      last_activity: null,
+      last_activity: undefined,
     },
     {
       id: 'room-2',
@@ -46,7 +46,7 @@ const mockClientWithRooms = {
       expires_at: '2025-10-14T20:18:17.993306',
       session_count: 3,
       created_at: '2025-09-23T20:18:17.993352',
-      last_activity: null,
+      last_activity: undefined,
     },
   ],
 };

@@ -739,9 +739,7 @@ def seed_test_rooms():
             return
 
         # 檢查是否已存在測試諮詢室
-        existing_room = session.exec(
-            select(Room).where(Room.name == "測試諮詢室")
-        ).first()
+        existing_room = session.exec(select(Room).where(Room.name == "測試諮詢室")).first()
 
         if not existing_room:
             # 創建活躍的測試諮詢室
@@ -785,15 +783,28 @@ def seed_crm_data():
     print("🏢 Seeding CRM data with simplified model...")
 
     with Session(engine) as session:
-        # Use demo counselor IDs for clients
-        demo_counselor_ids = ["demo-counselor-001", "demo-counselor-002"]
+        # Get actual counselor UUIDs from database
+        counselor1 = session.exec(
+            select(User).where(User.email == "demo.counselor@example.com")
+        ).first()
+        counselor2 = session.exec(
+            select(User).where(User.email == "demo.counselor2@example.com")
+        ).first()
+
+        if not counselor1 or not counselor2:
+            print("❌ Demo counselors not found! Please run seed_demo_users() first.")
+            return
+
+        # Use actual counselor IDs (convert UUID to string)
+        counselor1_id = str(counselor1.id)
+        counselor2_id = str(counselor2.id)
 
         # 創建客戶資料 - 每個諮商師有獨立的客戶紀錄
         clients_data = [
             # Demo counselor 001's clients
             # 1. 沒有 email
             {
-                "counselor_id": "demo-counselor-001",
+                "counselor_id": counselor1_id,
                 "email": None,
                 "name": "張小美",
                 "phone": "0945-678-901",
@@ -804,7 +815,7 @@ def seed_crm_data():
             },
             # 2. 有 email, 已驗證
             {
-                "counselor_id": "demo-counselor-001",
+                "counselor_id": counselor1_id,
                 "email": "alice.chen@example.com",
                 "name": "陳雅琪 (Alice Chen)",
                 "phone": "0912-345-678",
@@ -816,7 +827,7 @@ def seed_crm_data():
             },
             # 3. 有 email, 未驗證
             {
-                "counselor_id": "demo-counselor-001",
+                "counselor_id": counselor1_id,
                 "email": "bob.wang@example.com",
                 "name": "王建明 (Bob Wang)",
                 "phone": "0923-456-789",
@@ -828,7 +839,7 @@ def seed_crm_data():
             },
             # Demo counselor 002's clients
             {
-                "counselor_id": "demo-counselor-002",
+                "counselor_id": counselor2_id,
                 "email": "carol.liu@example.com",
                 "name": "劉佳玲 (Carol Liu)",
                 "phone": "0934-567-890",
@@ -839,7 +850,7 @@ def seed_crm_data():
             },
             # Same email, different counselor - allowed in simplified model
             {
-                "counselor_id": "demo-counselor-002",
+                "counselor_id": counselor2_id,
                 "email": "alice.chen@example.com",
                 "name": "Alice C.",
                 "phone": "0912-345-678",
@@ -931,8 +942,8 @@ def seed_crm_data():
             },
         ]
 
-        # Use demo counselor IDs instead of UUID counselors for rooms
-        demo_counselor_ids = ["demo-counselor-001", "demo-counselor-002"]
+        # Use actual counselor IDs for rooms
+        demo_counselor_ids = [counselor1_id, counselor2_id]
 
         for client_idx, client in enumerate(clients[:3]):  # 為所有3個客戶創建諮詢室
             # 為每個客戶創建 2-3 個諮詢室
@@ -976,9 +987,7 @@ def seed_crm_data():
                     print(f"  ✅ Linked room to client: {client.name}")
 
                     # **特殊處理** - 為第一個客戶的第二個諮詢師也創建一個諮詢室
-                    if (
-                        client_idx == 0 and room_idx == 2
-                    ):  # 第一個客戶的第三個諮詢室類型
+                    if client_idx == 0 and room_idx == 2:  # 第一個客戶的第三個諮詢室類型
                         # 為第二個諮詢師創建相同類型的諮詢室
                         second_counselor_room_name = (
                             f"{client.name.split(' ')[0]} 的轉職{room_type['suffix']}"
@@ -1026,7 +1035,7 @@ def seed_crm_data():
                                 follow_up_date=date.today() + timedelta(days=14),
                             )
                             session.add(cross_record)
-                            print(f"  ✅ Created cross-counselor consultation record")
+                            print("  ✅ Created cross-counselor consultation record")
 
                     # 為每個諮詢室創建 1-3 個諮詢記錄
                     num_records = [3, 2, 1][room_idx] if room_idx < 3 else 1

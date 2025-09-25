@@ -34,7 +34,7 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
 
     // Validation
     if (!name.trim()) {
-      setError('房間名稱不能為空');
+      setError('諮詢室名稱不能為空');
       return;
     }
 
@@ -59,8 +59,8 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>編輯房間</DialogTitle>
-          <DialogDescription>修改房間的名稱和描述</DialogDescription>
+          <DialogTitle>編輯諮詢室</DialogTitle>
+          <DialogDescription>修改諮詢室的名稱和描述</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +69,7 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
               htmlFor="room-name"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              房間名稱 <span className="text-red-500">*</span>
+              諮詢室名稱 <span className="text-red-500">*</span>
             </label>
             <input
               id="room-name"
@@ -78,8 +78,8 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
               onChange={(e) => setName(e.target.value.slice(0, 100))}
               maxLength={100}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="房間名稱"
-              placeholder="輸入房間名稱"
+              aria-label="諮詢室名稱"
+              placeholder="輸入諮詢室名稱"
             />
             <p className="text-xs text-muted-foreground">{name.length}/100 字</p>
           </div>
@@ -89,7 +89,7 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
               htmlFor="room-description"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              房間描述
+              諮詢室描述
             </label>
             <textarea
               id="room-description"
@@ -98,8 +98,8 @@ export function EditRoomDialog({ room, open, onClose, onSuccess }: EditRoomDialo
               maxLength={500}
               rows={3}
               className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-              aria-label="房間描述"
-              placeholder="輸入房間描述（選填）"
+              aria-label="諮詢室描述"
+              placeholder="輸入諮詢室描述（選填）"
             />
             <p className="text-xs text-muted-foreground">{description.length}/500 字</p>
           </div>

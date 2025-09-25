@@ -1,6 +1,6 @@
 /**
  * Room Statistics hook for managing room statistics data
- * 房間統計資料管理 Hook
+ * 諮詢室統計資料管理 Hook
  */
 import { useState, useCallback, useEffect } from 'react';
 import { RoomStatistics } from '@/types/api';

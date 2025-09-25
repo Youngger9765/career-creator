@@ -29,6 +29,7 @@ import {
 import { EditRoomDialog } from '@/components/rooms/EditRoomDialog';
 import { DeleteRoomDialog } from '@/components/rooms/DeleteRoomDialog';
 import { RoomCard } from '@/components/rooms/RoomCard';
+import { RoomListTable } from '@/components/rooms/RoomListTable';
 import { useRoomExpiration } from '@/hooks/use-room-expiration';
 
 interface DashboardStats {
@@ -215,14 +216,14 @@ export default function DashboardPage() {
                 href="/rooms/create"
                 className="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
               >
-                <span className="hidden sm:inline">創建新房間</span>
+                <span className="hidden sm:inline">創建諮詢室</span>
                 <span className="sm:hidden">創建</span>
               </Link>
               <Link
                 href="/join"
                 className="px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
               >
-                <span className="hidden sm:inline">加入房間</span>
+                <span className="hidden sm:inline">加入諮詢室</span>
                 <span className="sm:hidden">加入</span>
               </Link>
               <button
@@ -247,53 +248,70 @@ export default function DashboardPage() {
           selectedTab === 'overview' ? 'block' : 'hidden sm:block'
         }`}
       >
-        <div className="flex flex-wrap gap-3 sm:grid sm:grid-cols-1 md:grid-cols-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-white rounded-lg shadow p-3 sm:p-6 flex items-center gap-3 sm:block min-w-0">
-            <div className="p-2 bg-blue-100 rounded-full flex-shrink-0 sm:p-3">
-              <Archive className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
-            </div>
-            <div className="min-w-0 sm:flex sm:items-center sm:justify-between sm:mt-3">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-600">總房間數</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.totalRooms}</p>
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
+          {/* Total Rooms Card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-blue-500"></div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-blue-50 rounded-xl">
+                  <Archive className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">總諮詢室數</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalRooms}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-3 sm:p-6 flex items-center gap-3 sm:block min-w-0">
-            <div className="p-2 bg-green-100 rounded-full flex-shrink-0 sm:p-3">
-              <Activity className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
-            </div>
-            <div className="min-w-0 sm:flex sm:items-center sm:justify-between sm:mt-3">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-600">活躍房間</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.activeRooms}</p>
+          {/* Active Rooms Card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-green-500"></div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-green-50 rounded-xl">
+                  <Activity className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">活躍諮詢室</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.activeRooms}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-3 sm:p-6 flex items-center gap-3 sm:block min-w-0">
-            <div className="p-2 bg-purple-100 rounded-full flex-shrink-0 sm:p-3">
-              <Users className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
-            </div>
-            <div className="min-w-0 sm:flex sm:items-center sm:justify-between sm:mt-3">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-600">總諮詢次數</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">{stats.totalSessions}</p>
+          {/* Total Consultations Card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-400 to-purple-500"></div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-purple-50 rounded-xl">
+                  <Users className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">總諮詢次數</p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.totalSessions}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-3 sm:p-6 flex items-center gap-3 sm:block min-w-0">
-            <div className="p-2 bg-orange-100 rounded-full flex-shrink-0 sm:p-3">
-              <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600" />
-            </div>
-            <div className="min-w-0 sm:flex sm:items-center sm:justify-between sm:mt-3">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-600">本週活動</p>
-                <p className="text-lg sm:text-2xl font-bold text-gray-900">
-                  {stats.recentEvents.length}
-                </p>
+          {/* Weekly Activity Card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-orange-500"></div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-orange-50 rounded-xl">
+                  <TrendingUp className="w-6 h-6 text-orange-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">本週活動</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {stats.recentEvents.length}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -390,189 +408,66 @@ export default function DashboardPage() {
 
             {selectedTab === 'active' && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900">活躍房間列表</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">活躍諮詢室列表</h3>
                   <Link
                     href="/rooms/create"
-                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
                   >
-                    新建房間
+                    新建諮詢室
                   </Link>
                 </div>
-
-                {activeRooms.length > 0 ? (
-                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            房間資訊
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            狀態
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            諮詢次數
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            建立時間
-                          </th>
-                          <th className="relative px-6 py-3">
-                            <span className="sr-only">操作</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {activeRooms.map((room) => (
-                          <tr key={room.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4">
-                              <div className="flex flex-col">
-                                <div className="text-sm font-medium text-gray-900">{room.name}</div>
-                                <div className="text-sm text-gray-500">#{room.share_code}</div>
-                                {room.description && (
-                                  <div className="text-xs text-gray-400 mt-1 max-w-xs truncate">
-                                    {room.description}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                活躍中
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900">
-                              {room.session_count || 0} 次
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {formatDate(room.created_at)}
-                            </td>
-                            <td className="px-6 py-4 text-right text-sm font-medium">
-                              <div className="flex items-center justify-end gap-2">
-                                <Link
-                                  href={`/room/${room.id}`}
-                                  className="inline-flex items-center px-3 py-1.5 border border-blue-300 text-blue-700 text-xs font-medium rounded-md hover:bg-blue-50 transition-colors"
-                                >
-                                  進入
-                                </Link>
-                                <button
-                                  onClick={() => setEditingRoom(room)}
-                                  className="inline-flex items-center px-3 py-1.5 border border-yellow-300 text-yellow-700 text-xs font-medium rounded-md hover:bg-yellow-50 transition-colors"
-                                >
-                                  編輯
-                                </button>
-                                <button
-                                  onClick={() => setDeletingRoom(room)}
-                                  className="inline-flex items-center px-3 py-1.5 border border-red-300 text-red-700 text-xs font-medium rounded-md hover:bg-red-50 transition-colors"
-                                >
-                                  刪除
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg">
-                    <Activity className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">沒有活躍的房間</h3>
-                    <p className="text-sm text-gray-500 mb-4">建立新的諮詢房間開始使用</p>
-                    <Link
-                      href="/rooms/create"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                      建立第一個房間
-                    </Link>
-                  </div>
-                )}
+                <RoomListTable
+                  rooms={activeRooms}
+                  emptyMessage="目前沒有活躍的諮詢室"
+                />
               </div>
             )}
 
             {selectedTab === 'history' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">歷史記錄</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">歷史記錄</h3>
+                <RoomListTable
+                  rooms={historyRooms}
+                  emptyMessage="目前沒有歷史記錄"
+                />
+              </div>
+            )}
+          </div>
+        </div>
 
-                {historyRooms.length > 0 ? (
-                  <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            房間資訊
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            狀態
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            諮詢次數
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            建立時間
-                          </th>
-                          <th className="relative px-6 py-3">
-                            <span className="sr-only">操作</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {historyRooms.map((room) => (
-                          <tr key={room.id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4">
-                              <div className="flex flex-col">
-                                <div className="text-sm font-medium text-gray-900">{room.name}</div>
-                                <div className="text-sm text-gray-500">#{room.share_code}</div>
-                                {room.description && (
-                                  <div className="text-xs text-gray-400 mt-1 max-w-xs truncate">
-                                    {room.description}
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                已過期
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-900">
-                              {room.session_count || 0} 次
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-500">
-                              {formatDate(room.created_at)}
-                            </td>
-                            <td className="px-6 py-4 text-right text-sm font-medium">
-                              <div className="flex items-center justify-end gap-2">
-                                <Link
-                                  href={`/room/${room.id}`}
-                                  className="inline-flex items-center px-3 py-1.5 border border-blue-300 text-blue-700 text-xs font-medium rounded-md hover:bg-blue-50 transition-colors"
-                                >
-                                  查看
-                                </Link>
-                                <button
-                                  onClick={() => setEditingRoom(room)}
-                                  className="inline-flex items-center px-3 py-1.5 border border-yellow-300 text-yellow-700 text-xs font-medium rounded-md hover:bg-yellow-50 transition-colors"
-                                >
-                                  編輯
-                                </button>
-                                <button
-                                  onClick={() => setDeletingRoom(room)}
-                                  className="inline-flex items-center px-3 py-1.5 border border-red-300 text-red-700 text-xs font-medium rounded-md hover:bg-red-50 transition-colors"
-                                >
-                                  刪除
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+        {/* Mobile Content - Only show active tab on mobile */}
+        <div className="sm:hidden bg-white rounded-lg shadow">
+          <div className="p-4">
+            {selectedTab === 'overview' && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">最近活動</h3>
+                {stats.recentEvents.length > 0 ? (
+                  <div className="space-y-3">
+                    {stats.recentEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div className="p-2 bg-blue-100 rounded-full">
+                          <Activity className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {event.event_type}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatDate(event.created_at)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg">
                     <Archive className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                     <h3 className="text-sm font-medium text-gray-900 mb-2">沒有歷史記錄</h3>
-                    <p className="text-sm text-gray-500">完成的諮詢房間會顯示在這裡</p>
+                    <p className="text-sm text-gray-500">完成的諮詢諮詢室會顯示在這裡</p>
                   </div>
                 )}
               </div>
@@ -642,7 +537,7 @@ export default function DashboardPage() {
 
             {selectedTab === 'active' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">活躍房間</h3>
+                <h3 className="text-lg font-semibold text-gray-900">活躍諮詢室</h3>
                 <div className="space-y-3">
                   {activeRooms.map((room) => (
                     <div key={room.id} className="border border-gray-200 rounded-lg p-3">
@@ -663,7 +558,7 @@ export default function DashboardPage() {
                     </div>
                   ))}
                   {activeRooms.length === 0 && (
-                    <p className="text-gray-500 text-center py-8">沒有活躍的房間</p>
+                    <p className="text-gray-500 text-center py-8">沒有活躍的諮詢室</p>
                   )}
                 </div>
               </div>
@@ -672,23 +567,10 @@ export default function DashboardPage() {
             {selectedTab === 'history' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">歷史記錄</h3>
-                <div className="space-y-3">
-                  {historyRooms.map((room) => (
-                    <div key={room.id} className="border border-gray-200 rounded-lg p-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">
-                            {room.name}
-                          </h4>
-                          <p className="text-xs text-gray-500">#{room.share_code}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {historyRooms.length === 0 && (
-                    <p className="text-gray-500 text-center py-8">沒有歷史記錄</p>
-                  )}
-                </div>
+                <RoomListTable
+                  rooms={historyRooms}
+                  emptyMessage="目前沒有歷史記錄"
+                />
               </div>
             )}
           </div>

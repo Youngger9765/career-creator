@@ -37,7 +37,7 @@ def create_game_session(
 ):
     """創建新的遊戲會話"""
 
-    # 獲取房間
+    # 獲取諮詢室
     room = db_session.get(Room, session_data.room_id)
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -121,7 +121,7 @@ def get_game_session(session_id: UUID, db_session: Session = Depends(get_session
 
 @router.get("/room/{room_id}/active", response_model=Optional[GameSessionResponse])
 def get_active_game_session(room_id: UUID, db_session: Session = Depends(get_session)):
-    """獲取房間的活躍遊戲會話"""
+    """獲取諮詢室的活躍遊戲會話"""
 
     game_session = db_session.exec(
         select(GameSession).where(

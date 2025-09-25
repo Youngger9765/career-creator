@@ -1,6 +1,6 @@
 """
 Visitor API endpoints
-訪客 API - 匿名用戶加入房間
+訪客 API - 匿名用戶加入諮詢室
 """
 
 from typing import List

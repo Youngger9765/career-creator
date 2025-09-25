@@ -87,7 +87,7 @@ export default function CreateRoomPage() {
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">請先登入</h1>
-          <p className="text-gray-600 mb-6">需要登入才能創建諮詢房間</p>
+          <p className="text-gray-600 mb-6">需要登入才能創建諮詢室</p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -104,7 +104,7 @@ export default function CreateRoomPage() {
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">權限不足</h1>
-          <p className="text-gray-600 mb-6">只有諮詢師才能創建房間</p>
+          <p className="text-gray-600 mb-6">只有諮詢師才能創建諮詢室</p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
@@ -163,7 +163,7 @@ export default function CreateRoomPage() {
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-lg w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">創建諮詢房間</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">創建諮詢室</h1>
           <p className="text-gray-600">設定您的職業諮詢會話</p>
         </div>
 
@@ -171,7 +171,7 @@ export default function CreateRoomPage() {
           {/* Room Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              房間名稱 <span className="text-red-500">*</span>
+              諮詢室名稱 <span className="text-red-500">*</span>
             </label>
             <input
               id="name"
@@ -183,13 +183,13 @@ export default function CreateRoomPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">房間名稱將顯示給所有參與者</p>
+            <p className="text-xs text-gray-500 mt-1">諮詢室名稱將顯示給所有參與者</p>
           </div>
 
           {/* Room Description */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              房間描述
+              諮詢室描述
             </label>
             <textarea
               id="description"
@@ -253,7 +253,7 @@ export default function CreateRoomPage() {
                 </div>
               )}
             </div>
-            <p className="text-xs text-gray-500 mt-1">將此房間關聯到特定客戶，方便管理諮詢記錄</p>
+            <p className="text-xs text-gray-500 mt-1">將此諮詢室關聯到特定客戶，方便管理諮詢記錄</p>
           </div>
 
           {/* Expiration Settings */}
@@ -262,7 +262,7 @@ export default function CreateRoomPage() {
               htmlFor="expirationDays"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              房間有效期限
+              諮詢室有效期限
             </label>
             <select
               id="expirationDays"
@@ -277,7 +277,7 @@ export default function CreateRoomPage() {
               <option value={30}>30 天</option>
             </select>
             <p className="text-xs text-gray-500 mt-1">
-              房間將在 {formData.expirationDays} 天後自動過期，過期後將無法進入
+              諮詢室將在 {formData.expirationDays} 天後自動過期，過期後將無法進入
             </p>
           </div>
 
@@ -299,7 +299,7 @@ export default function CreateRoomPage() {
 
           {/* Room Features */}
           <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-800 mb-2">房間功能特色</h3>
+            <h3 className="font-medium text-gray-800 mb-2">諮詢室功能特色</h3>
             <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
               <div className="flex items-center">
                 <span className="text-green-500 mr-2">✓</span>
@@ -340,7 +340,7 @@ export default function CreateRoomPage() {
               disabled={isLoading || !formData.name.trim()}
               className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
             >
-              {isLoading ? '創建中...' : '創建房間'}
+              {isLoading ? '創建中...' : '創建諮詢室'}
             </button>
           </div>
         </form>
@@ -348,7 +348,7 @@ export default function CreateRoomPage() {
         {/* Info */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="text-xs text-gray-500 text-center">
-            創建房間後，系統會自動生成分享碼供客戶加入
+            創建諮詢室後，系統會自動生成分享碼供客戶加入
           </div>
         </div>
       </div>

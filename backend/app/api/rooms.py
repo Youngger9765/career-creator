@@ -1,6 +1,6 @@
 """
 Room API endpoints
-房間管理 API
+諮詢室管理 API
 """
 
 from typing import List, Optional

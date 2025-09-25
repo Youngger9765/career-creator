@@ -49,6 +49,9 @@ export interface Room extends BaseEntity {
   session_count?: number;
   client_id?: string;
   client_name?: string;
+  primary_client_name?: string;
+  last_activity?: string;
+  counselor_name?: string;
 }
 
 export interface RoomCreate {

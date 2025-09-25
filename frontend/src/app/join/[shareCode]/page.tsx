@@ -31,7 +31,7 @@ export default function JoinByShareCodePage() {
         const roomData = await roomsAPI.getRoomByShareCode(shareCode.toUpperCase());
         setRoom(roomData);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '房間不存在或已關閉');
+        setError(err instanceof Error ? err.message : '諮詢室不存在或已關閉');
       } finally {
         setLoading(false);
       }
@@ -49,7 +49,7 @@ export default function JoinByShareCodePage() {
       await visitorJoin.joinRoomAndRedirect(room.share_code, visitorName.trim());
     } catch (error) {
       console.error('Failed to join as visitor:', error);
-      setError(error instanceof Error ? error.message : '加入房間失敗，請重試');
+      setError(error instanceof Error ? error.message : '加入諮詢室失敗，請重試');
     }
   };
 
@@ -62,7 +62,7 @@ export default function JoinByShareCodePage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">正在驗證房間...</p>
+          <p className="text-gray-600">正在驗證諮詢室...</p>
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ export default function JoinByShareCodePage() {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">無法加入房間</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">無法加入諮詢室</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <div className="space-y-3">
             <Link
@@ -114,7 +114,7 @@ export default function JoinByShareCodePage() {
         {/* Room Info Header */}
         <div className="bg-blue-600 text-white p-6">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-2">加入諮詢房間</h1>
+            <h1 className="text-2xl font-bold mb-2">加入諮詢室</h1>
             <div className="bg-blue-500 rounded-lg p-3">
               <div className="text-lg font-semibold">{room.name}</div>
               {room.description && (
@@ -130,7 +130,7 @@ export default function JoinByShareCodePage() {
             {/* Room Details */}
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex justify-between">
-                <span>房間代碼：</span>
+                <span>諮詢室代碼：</span>
                 <span className="font-mono font-bold text-blue-600">{room.share_code}</span>
               </div>
               <div className="flex justify-between">
@@ -192,11 +192,11 @@ export default function JoinByShareCodePage() {
                 disabled={visitorJoin.isLoading || !visitorName.trim() || !room.is_active}
                 className="w-full py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
               >
-                {visitorJoin.isLoading ? '正在加入...' : '加入諮詢房間'}
+                {visitorJoin.isLoading ? '正在加入...' : '加入諮詢室'}
               </button>
 
               {!room.is_active && (
-                <div className="text-center text-sm text-red-600">此房間已關閉，無法加入</div>
+                <div className="text-center text-sm text-red-600">此諮詢室已關閉，無法加入</div>
               )}
             </div>
           </form>

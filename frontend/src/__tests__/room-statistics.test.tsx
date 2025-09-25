@@ -221,7 +221,7 @@ describe('RoomStatisticsCard Component', () => {
       />
     );
 
-    expect(screen.getByText('房間統計')).toBeInTheDocument();
+    expect(screen.getByText('諮詢室統計')).toBeInTheDocument();
     expect(screen.getByText('15')).toBeInTheDocument(); // total_events
     expect(screen.getByText('3')).toBeInTheDocument(); // unique_visitors
     expect(screen.getByText('翻牌次數')).toBeInTheDocument();

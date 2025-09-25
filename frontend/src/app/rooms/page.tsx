@@ -68,16 +68,16 @@ export default function RoomsPage() {
   };
 
   const handleCloseRoom = async (roomId: string, roomName: string) => {
-    if (confirm(`確定要結束「${roomName}」嗎？房間將會關閉。`)) {
+    if (confirm(`確定要結束「${roomName}」嗎？諮詢室將會關閉。`)) {
       try {
         await roomsAPI.closeRoom(roomId);
-        alert('房間已結束');
+        alert('諮詢室已結束');
         // Reload rooms
         const myRooms = await roomsAPI.getMyRooms();
         setRooms(myRooms);
       } catch (error) {
         console.error('Failed to close room:', error);
-        alert('結束房間失敗，請重試');
+        alert('結束諮詢室失敗，請重試');
       }
     }
   };
@@ -115,7 +115,7 @@ export default function RoomsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">房間管理</h1>
+              <h1 className="text-2xl font-bold text-gray-900">諮詢室管理</h1>
               <p className="text-sm text-gray-600">歡迎回來，{user.full_name || user.email}</p>
             </div>
             <div className="flex items-center space-x-4">
@@ -129,7 +129,7 @@ export default function RoomsPage() {
                 href="/rooms/create"
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
-                + 創建新房間
+                + 創建諮詢室
               </Link>
               <button
                 onClick={handleLogout}
@@ -147,7 +147,7 @@ export default function RoomsPage() {
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="mt-2 text-gray-600">載入房間列表中...</p>
+            <p className="mt-2 text-gray-600">載入諮詢室列表中...</p>
           </div>
         ) : error ? (
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
@@ -176,13 +176,13 @@ export default function RoomsPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">還沒有創建任何房間</h3>
-            <p className="text-gray-600 mb-6">創建您的第一個諮詢房間來開始使用系統</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">還沒有創建任何諮詢室</h3>
+            <p className="text-gray-600 mb-6">創建您的第一個諮詢室來開始使用系統</p>
             <Link
               href="/rooms/create"
               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
-              創建第一個房間
+              創建第一個諮詢室
             </Link>
           </div>
         ) : (
@@ -233,7 +233,7 @@ export default function RoomsPage() {
                       href={`/room/${room.id}`}
                       className="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                     >
-                      進入房間
+                      進入諮詢室
                     </Link>
                     <button
                       onClick={() => copyShareLink(room.share_code)}
@@ -253,7 +253,7 @@ export default function RoomsPage() {
                       <button
                         onClick={() => setEditRoom(room)}
                         className="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-                        title="編輯房間"
+                        title="編輯諮詢室"
                       >
                         ✏️
                       </button>
@@ -262,7 +262,7 @@ export default function RoomsPage() {
                       <button
                         onClick={() => handleCloseRoom(room.id, room.name)}
                         className="px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
-                        title="結束房間"
+                        title="結束諮詢室"
                       >
                         結束
                       </button>
@@ -270,7 +270,7 @@ export default function RoomsPage() {
                     <button
                       onClick={() => setDeleteRoom(room)}
                       className="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
-                      title="刪除房間"
+                      title="刪除諮詢室"
                     >
                       🗑️
                     </button>

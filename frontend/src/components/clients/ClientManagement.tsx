@@ -20,8 +20,13 @@ import {
   ExternalLink,
   Clock,
   Home,
+  CheckCircle,
+  ShieldCheck,
+  Copy,
+  AlertCircle,
 } from 'lucide-react';
 import { ClientForm } from './ClientForm';
+import { RoomListTable } from '../rooms/RoomListTable';
 
 interface ClientManagementProps {
   className?: string;
@@ -53,10 +58,10 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     }
   };
 
-  const handleCreateClient = async (data: ClientCreate) => {
+  const handleCreateClient = async (data: ClientCreate | ClientUpdate) => {
     try {
       setSubmitLoading(true);
-      const newClient = await clientsAPI.createClient(data);
+      const newClient = await clientsAPI.createClient(data as ClientCreate);
       setClients((prev) => [newClient, ...prev]);
       setShowCreateForm(false);
     } catch (error) {
@@ -99,15 +104,28 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     }
   };
 
-  const filteredClients = clients.filter((client) => {
-    const matchesSearch =
-      client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const handleVerifyEmail = async (clientId: string, clientEmail: string) => {
+    alert(`未來功能：系統將寄送驗證信件到 ${clientEmail}\n\n客戶將收到驗證連結，點擊後即可完成 Email 驗證。\n\n此功能正在開發中，敬請期待！`);
+  };
 
-    const matchesStatus = selectedStatus === 'all' || client.status === selectedStatus;
+  const filteredClients = clients
+    .filter((client) => {
+      const matchesSearch =
+        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (client.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
-    return matchesSearch && matchesStatus;
-  });
+      const matchesStatus = selectedStatus === 'all' || client.status === selectedStatus;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // 封存的客戶排到最後
+      if (a.status === 'archived' && b.status !== 'archived') return 1;
+      if (a.status !== 'archived' && b.status === 'archived') return -1;
+
+      // 其他按建立時間排序（新的在前）
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('zh-TW', {
@@ -204,9 +222,53 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">客戶管理</h2>
-          <p className="text-sm text-gray-600">管理您的諮詢客戶資料</p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">客戶管理</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">管理您的諮詢客戶資料</p>
+          </div>
+          <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <button
+              onClick={() => setSelectedStatus('all')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                selectedStatus === 'all'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+            >
+              全部狀態
+            </button>
+            <button
+              onClick={() => setSelectedStatus('active')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                selectedStatus === 'active'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+            >
+              活躍
+            </button>
+            <button
+              onClick={() => setSelectedStatus('inactive')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                selectedStatus === 'inactive'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+            >
+              暫停
+            </button>
+            <button
+              onClick={() => setSelectedStatus('archived')}
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                selectedStatus === 'archived'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+            >
+              封存
+            </button>
+          </div>
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
@@ -217,108 +279,50 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="搜尋客戶姓名或 email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="all">全部狀態</option>
-          <option value="active">活躍</option>
-          <option value="inactive">暫停</option>
-          <option value="archived">封存</option>
-        </select>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">總客戶數</p>
-              <p className="text-2xl font-bold text-gray-900">{clients.length}</p>
-            </div>
-            <Users className="w-8 h-8 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">活躍客戶</p>
-              <p className="text-2xl font-bold text-green-600">
-                {clients.filter((c) => c.status === 'active').length}
-              </p>
-            </div>
-            <Activity className="w-8 h-8 text-green-600" />
-          </div>
-        </div>
-        <div className="bg-white border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">總諮詢次數</p>
-              <p className="text-2xl font-bold text-purple-600">
-                {clients.reduce((sum, client) => sum + (client.total_consultations || 0), 0)}
-              </p>
-            </div>
-            <MessageCircle className="w-8 h-8 text-purple-600" />
-          </div>
-        </div>
-        <div className="bg-white border rounded-lg p-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">活躍房間</p>
-              <p className="text-2xl font-bold text-orange-600">
-                {clients.reduce((sum, client) => sum + (client.active_rooms_count || 0), 0)}
-              </p>
-            </div>
-            <Activity className="w-8 h-8 text-orange-600" />
-          </div>
-        </div>
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+        <input
+          type="text"
+          placeholder="搜尋客戶姓名或 email..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-colors"
+        />
       </div>
 
       {/* Client List */}
-      <div className="bg-white border rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
         {filteredClients.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             {searchTerm || selectedStatus !== 'all' ? '沒有符合條件的客戶' : '尚未新增任何客戶'}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     客戶資訊
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     聯絡方式
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     狀態
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     諮詢統計
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     最後諮詢
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     操作
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredClients.map((client) => {
                   const isExpanded = expandedClients.has(client.id);
                   const hasRooms = client.rooms && client.rooms.length > 0;
@@ -326,16 +330,16 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                   return (
                     <React.Fragment key={client.id}>
                       <tr
-                        className="hover:bg-gray-50 cursor-pointer"
+                        className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                         onClick={() => hasRooms && toggleClientExpansion(client.id)}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-3">
+                        <td className="px-6 py-4">
+                          <div className="flex items-start gap-3">
                             {hasRooms && (
                               <button
                                 onClick={() => toggleClientExpansion(client.id)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors"
-                                title="展開/收合房間"
+                                className="text-gray-400 hover:text-gray-600 transition-colors mt-1"
+                                title="展開/收合諮詢室"
                               >
                                 {isExpanded ? (
                                   <ChevronDown className="w-4 h-4" />
@@ -345,39 +349,61 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                               </button>
                             )}
                             {!hasRooms && <div className="w-4" />}
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{client.name}</div>
+                            <div className="space-y-2">
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{client.name}</div>
                               {client.tags && client.tags.length > 0 && (
-                                <div className="mt-1 flex flex-wrap gap-1">
-                                  {client.tags.slice(0, 2).map((tag, index) => (
+                                <div className="flex flex-wrap gap-1">
+                                  {client.tags.map((tag, index) => (
                                     <span
                                       key={index}
-                                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                                      className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                                     >
                                       <Tag className="w-3 h-3 mr-1" />
                                       {tag}
                                     </span>
                                   ))}
-                                  {client.tags.length > 2 && (
-                                    <span className="text-xs text-gray-500">
-                                      +{client.tags.length - 2}
-                                    </span>
-                                  )}
                                 </div>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                           <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <Mail className="w-4 h-4 text-gray-400" />
-                              <span className="text-sm">{client.email}</span>
-                            </div>
+                            {client.email ? (
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <Mail className="w-4 h-4 text-gray-400" />
+                                  <span className="text-sm dark:text-gray-200">{client.email}</span>
+                                  {client.email_verified ? (
+                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                  ) : (
+                                    <AlertCircle className="w-4 h-4 text-amber-500" />
+                                  )}
+                                </div>
+                                {!client.email_verified && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleVerifyEmail(client.id, client.email!);
+                                    }}
+                                    className="flex items-center gap-1 px-2 py-1 text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-md hover:bg-amber-100 transition-colors"
+                                    title="驗證 Email"
+                                  >
+                                    <ShieldCheck className="w-3 h-3" />
+                                    驗證 Email
+                                  </button>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <Mail className="w-4 h-4 text-amber-400" />
+                                <span className="text-sm text-amber-600">無Email</span>
+                              </div>
+                            )}
                             {client.phone && (
                               <div className="flex items-center gap-2">
                                 <Phone className="w-4 h-4 text-gray-400" />
-                                <span className="text-sm">{client.phone}</span>
+                                <span className="text-sm dark:text-gray-200">{client.phone}</span>
                               </div>
                             )}
                           </div>
@@ -385,13 +411,13 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge(client.status)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                           <div className="space-y-1">
                             <div>總諮詢: {client.total_consultations || 0} 次</div>
-                            <div>活躍房間: {client.active_rooms_count || 0} 個</div>
+                            <div>活躍諮詢室: {client.active_rooms_count || 0} 個</div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                           {client.last_consultation_date ? (
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4" />
@@ -401,7 +427,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             '尚未進行諮詢'
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                           <div className="flex items-center gap-2">
                             <button
                               onClick={(e) => {
@@ -432,98 +458,46 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         <tr>
                           <td colSpan={6} className="px-6 py-0">
                             <div className="bg-gray-50 rounded-lg p-4 my-2">
-                              <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                <Home className="w-4 h-4" />
-                                諮詢房間 ({client.rooms!.length} 個)
-                              </h4>
-                              <div className="space-y-2">
-                                {client
-                                  .rooms!.sort(
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                                  <Home className="w-4 h-4" />
+                                  諮詢室 ({client.rooms!.length} 個)
+                                </h4>
+                                <button
+                                  onClick={() => {
+                                    // 跳轉到創建諮詢室頁面，帶入客戶資訊
+                                    const clientInfo = encodeURIComponent(
+                                      JSON.stringify({
+                                        client_id: client.id,
+                                        client_name: client.name,
+                                        client_email: client.email,
+                                      })
+                                    );
+                                    window.location.href = `/rooms/create?client=${clientInfo}`;
+                                  }}
+                                  className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                  title="創建諮詢室"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  創建諮詢室
+                                </button>
+                              </div>
+                              <div className="mt-3">
+                                <RoomListTable
+                                  rooms={client.rooms!.sort(
                                     (a, b) =>
                                       new Date(b.created_at).getTime() -
                                       new Date(a.created_at).getTime()
-                                  )
-                                  .map((room, index) => (
-                                    <div
-                                      key={room.id}
-                                      className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
-                                    >
-                                      {/* 時間軸點 */}
-                                      <div className="flex flex-col items-center">
-                                        <div
-                                          className={`w-3 h-3 rounded-full ${room.is_active ? 'bg-green-500' : 'bg-gray-400'} flex-shrink-0`}
-                                        />
-                                        {index < client.rooms!.length - 1 && (
-                                          <div className="w-px h-8 bg-gray-300 mt-1" />
-                                        )}
-                                      </div>
+                                  )}
+                                  showClient={false}
+                                  emptyMessage="尚無諮詢室"
+                                />
 
-                                      {/* 房間資訊 */}
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-start justify-between">
-                                          <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                              <h5 className="text-sm font-medium text-gray-900 truncate">
-                                                {room.name}
-                                              </h5>
-                                              {room.counselor_name && (
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
-                                                  {room.counselor_name}
-                                                </span>
-                                              )}
-                                            </div>
-                                            {room.description && (
-                                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
-                                                {room.description}
-                                              </p>
-                                            )}
-                                          </div>
-                                          <div className="ml-2 flex items-center gap-2 flex-shrink-0">
-                                            {getRoomStatusBadge(room.is_active, room.expires_at)}
-                                          </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between mt-2">
-                                          <div className="flex items-center gap-4 text-xs text-gray-500">
-                                            <div className="flex items-center gap-1">
-                                              <Clock className="w-3 h-3" />
-                                              {formatDate(room.created_at)}
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                              <MessageCircle className="w-3 h-3" />
-                                              {room.session_count} 次諮詢
-                                            </div>
-                                          </div>
-
-                                          <div className="flex gap-2">
-                                            <a
-                                              href={`/room/${room.id}`}
-                                              className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
-                                            >
-                                              <ExternalLink className="w-3 h-3" />
-                                              進入
-                                            </a>
-                                            <button
-                                              onClick={() => {
-                                                navigator.clipboard.writeText(room.share_code);
-                                                // TODO: Add toast notification
-                                              }}
-                                              className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-50 rounded hover:bg-gray-100 transition-colors"
-                                              title="複製分享碼"
-                                            >
-                                              #{room.share_code}
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  ))}
-
-                                {/* 創建諮詢室按鈕 */}
-                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                {/* 創建諮詢室按鈕 - 虛線框樣式 */}
+                                <div className="mt-4">
                                   <button
                                     onClick={() => {
-                                      // 跳轉到創建房間頁面，帶入客戶資訊
+                                      // 跳轉到創建諮詢室頁面，帶入客戶資訊
                                       const clientInfo = encodeURIComponent(
                                         JSON.stringify({
                                           client_id: client.id,
@@ -533,10 +507,10 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       );
                                       window.location.href = `/rooms/create?client=${clientInfo}`;
                                     }}
-                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-8 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                                   >
-                                    <Plus className="w-4 h-4" />
-                                    創建諮詢室
+                                    <Plus className="w-5 h-5" />
+                                    <span className="font-medium">創建諮詢室</span>
                                   </button>
                                 </div>
                               </div>

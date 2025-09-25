@@ -1,6 +1,6 @@
 /**
  * Visitor Join hook for managing visitor room entry
- * 訪客加入房間管理 Hook
+ * 訪客加入諮詢室管理 Hook
  */
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -73,12 +73,12 @@ export function useVisitorJoin() {
 
         // Check if room is active
         if (!room.is_active) {
-          throw new Error('房間已關閉，無法加入');
+          throw new Error('諮詢室已關閉，無法加入');
         }
 
         // Check if room is expired
         if (room.expires_at && new Date(room.expires_at) < new Date()) {
-          throw new Error('房間已過期，無法加入');
+          throw new Error('諮詢室已過期，無法加入');
         }
 
         // Create visitor
@@ -89,7 +89,7 @@ export function useVisitorJoin() {
 
         return visitor;
       } catch (err: any) {
-        const errorMessage = err.message || '加入房間失敗';
+        const errorMessage = err.message || '加入諮詢室失敗';
         setError(errorMessage);
         throw new Error(errorMessage);
       } finally {

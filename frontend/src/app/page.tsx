@@ -123,12 +123,12 @@ export default function HomePage() {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-gray-800 mb-2">訪客加入</h3>
-              <p className="text-sm text-gray-600 mb-4">使用分享碼或 QR Code 加入房間</p>
+              <p className="text-sm text-gray-600 mb-4">使用分享碼或 QR Code 加入諮詢室</p>
               <Link
                 href="/join"
                 className="block w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
               >
-                加入房間
+                加入諮詢室
               </Link>
             </div>
           </div>

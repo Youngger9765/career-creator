@@ -8,11 +8,6 @@ from .client import (
     ConsultationRecord,
     ConsultationRecordCreate,
     ConsultationRecordResponse,
-    CounselorClientRelationship,
-    CounselorClientRelationshipCreate,
-    CounselorClientRelationshipResponse,
-    RelationshipStatus,
-    RelationshipType,
     RoomClient,
 )
 from .game_rule import Card, CardDeck, GameRuleTemplate
@@ -41,11 +36,6 @@ __all__ = [
     "ClientUpdate",
     "ClientResponse",
     "ClientStatus",
-    "CounselorClientRelationship",
-    "CounselorClientRelationshipCreate",
-    "CounselorClientRelationshipResponse",
-    "RelationshipType",
-    "RelationshipStatus",
     "RoomClient",
     "ConsultationRecord",
     "ConsultationRecordCreate",

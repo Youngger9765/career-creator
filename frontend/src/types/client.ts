@@ -5,12 +5,16 @@
 
 export interface Client {
   id: string;
-  email: string;
+  counselor_id: string; // Each counselor has independent client records
+  email?: string; // Optional - can be added later
   name: string;
   phone?: string;
   notes?: string;
   tags: string[];
   status: 'active' | 'inactive' | 'archived';
+  email_verified: boolean;
+  verification_token?: string;
+  verified_at?: string;
   created_at: string;
   updated_at: string;
   // Statistics (may come from API separately)
@@ -22,6 +26,7 @@ export interface Client {
     id: string;
     name: string;
     description?: string;
+    counselor_id: string;
     share_code: string;
     is_active: boolean;
     expires_at?: string;
@@ -33,7 +38,7 @@ export interface Client {
 }
 
 export interface ClientCreate {
-  email: string;
+  email?: string; // Optional - can be added later
   name: string;
   phone?: string;
   notes?: string;
@@ -48,18 +53,10 @@ export interface ClientUpdate {
   status?: 'active' | 'inactive' | 'archived';
 }
 
-export interface CounselorClient {
-  id: string;
-  counselor_id: string;
+export interface ClientEmailBind {
   client_id: string;
-  relationship_type: 'primary' | 'secondary' | 'consultant';
-  created_at: string;
-  is_active: boolean;
-}
-
-export interface CounselorClientCreate {
-  client_id: string;
-  relationship_type?: 'primary' | 'secondary' | 'consultant';
+  email: string;
+  send_verification?: boolean;
 }
 
 export interface ConsultationRecord {
@@ -90,7 +87,5 @@ export interface RoomClient {
   id: string;
   room_id: string;
   client_id: string;
-  joined_at: string;
-  last_active?: string;
-  is_primary: boolean;
+  created_at: string;
 }

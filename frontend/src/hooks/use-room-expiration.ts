@@ -1,6 +1,6 @@
 /**
  * Room Expiration hook for managing room expiration logic
- * 房間過期邏輯管理 Hook
+ * 諮詢室過期邏輯管理 Hook
  */
 import { useCallback } from 'react';
 import { Room } from '@/types/api';

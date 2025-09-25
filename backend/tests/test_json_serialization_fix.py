@@ -120,7 +120,7 @@ class TestJSONSerializationFix:
         assert len(parsed["layout"]["drop_zones"]) == 2
 
     def test_create_room_with_new_game_rule(self):
-        """測試創建房間時自動創建遊戲規則（測試序列化修復）"""
+        """測試創建諮詢室時自動創建遊戲規則（測試序列化修復）"""
         # Login first
         login_response = client.post(
             "/api/auth/login",
@@ -137,7 +137,7 @@ class TestJSONSerializationFix:
             "/api/rooms/",
             headers=headers,
             json={
-                "name": "測試序列化房間",
+                "name": "測試序列化諮詢室",
                 "description": "測試 JSON 序列化修復",
                 "game_rule_slug": "skill_assessment",
             },
@@ -146,7 +146,7 @@ class TestJSONSerializationFix:
         # Should succeed without JSON serialization error
         assert response.status_code == 201
         data = response.json()
-        assert data["name"] == "測試序列化房間"
+        assert data["name"] == "測試序列化諮詢室"
         assert data["game_rule_id"] is not None
 
     def test_position_dataclass_serialization(self):

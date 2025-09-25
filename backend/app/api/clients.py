@@ -16,16 +16,13 @@ from app.core.roles import Permission, has_permission
 from app.models.client import (
     Client,
     ClientCreate,
+    ClientEmailBind,
     ClientResponse,
     ClientStatus,
     ClientUpdate,
     ConsultationRecord,
     ConsultationRecordCreate,
     ConsultationRecordResponse,
-    CounselorClientRelationship,
-    CounselorClientRelationshipResponse,
-    RelationshipStatus,
-    RelationshipType,
     RoomClient,
 )
 from app.models.room import Room
@@ -56,12 +53,8 @@ async def get_my_clients(
     """
     check_counselor_permission(current_user)
 
-    # Build base query - get clients through relationships
-    query = (
-        select(Client)
-        .join(CounselorClientRelationship)
-        .where(CounselorClientRelationship.counselor_id == str(current_user["user_id"]))
-    )
+    # Build base query - get clients directly by counselor_id
+    query = select(Client).where(Client.counselor_id == str(current_user["user_id"]))
 
     # Apply filters
     if status:
@@ -89,7 +82,7 @@ async def get_my_clients(
                     RoomClient.client_id == client.id,
                     Room.is_active,
                     Room.counselor_id
-                    == str(current_user["user_id"]),  # 只計算當前諮詢師的活躍房間
+                    == str(current_user["user_id"]),  # 只計算當前諮詢師的活躍諮詢室
                 )
             ).first()
             or 0
@@ -123,7 +116,7 @@ async def get_my_clients(
             .where(
                 RoomClient.client_id == client.id,
                 Room.counselor_id
-                == str(current_user["user_id"]),  # 只顯示當前諮詢師的房間
+                == str(current_user["user_id"]),  # 只顯示當前諮詢師的諮詢室
             )
             .order_by(Room.created_at.desc())
         ).all()
@@ -163,7 +156,18 @@ async def get_my_clients(
             )
 
         response = ClientResponse(
-            **client.dict(),
+            id=client.id,
+            email=client.email,
+            name=client.name,
+            phone=client.phone,
+            notes=client.notes,
+            tags=client.tags,
+            status=client.status,
+            counselor_id=client.counselor_id,
+            email_verified=client.email_verified,
+            verified_at=client.verified_at,
+            created_at=client.created_at,
+            updated_at=client.updated_at,
             active_rooms_count=active_rooms_count,
             total_consultations=total_consultations,
             last_consultation_date=(
@@ -183,64 +187,55 @@ async def create_client(
     current_user: dict = Depends(get_current_user_from_token),
 ) -> ClientResponse:
     """
-    Create a new client and establish relationship with counselor
-    創建新客戶並建立與諮商師的關係
+    Create a new client for the current counselor.
+    Each counselor has independent client records.
+    創建新客戶 - 每個諮商師有獨立的客戶記錄
     """
     check_counselor_permission(current_user)
 
-    # Check if client already exists
-    existing_client = session.exec(
-        select(Client).where(Client.email == client_data.email)
-    ).first()
-
-    if existing_client:
-        # Check if relationship already exists
-        existing_rel = session.exec(
-            select(CounselorClientRelationship).where(
-                CounselorClientRelationship.counselor_id
-                == str(current_user["user_id"]),
-                CounselorClientRelationship.client_id == existing_client.id,
+    # Check if this counselor already has a client with this email (if email provided)
+    if client_data.email:
+        existing_client = session.exec(
+            select(Client).where(
+                Client.counselor_id == str(current_user["user_id"]),
+                Client.email == client_data.email,
             )
         ).first()
 
-        if existing_rel:
+        if existing_client:
             raise HTTPException(
                 status_code=400,
-                detail="You already have a relationship with this client",
+                detail="You already have a client with this email address",
             )
 
-        # Create new relationship with existing client
-        relationship = CounselorClientRelationship(
-            counselor_id=str(current_user["user_id"]),
-            client_id=existing_client.id,
-            relationship_type=RelationshipType.PRIMARY,
-            status=RelationshipStatus.ACTIVE,
-            start_date=date.today(),
-        )
-        session.add(relationship)
-        session.commit()
+    # Create new client for this counselor
+    client = Client(
+        counselor_id=str(current_user["user_id"]),
+        email=client_data.email,
+        name=client_data.name,
+        phone=client_data.phone,
+        notes=client_data.notes,
+        tags=client_data.tags,
+        status=ClientStatus.ACTIVE,
+        email_verified=False,
+    )
+    session.add(client)
+    session.commit()
 
-        client = existing_client
-    else:
-        # Create new client
-        client = Client(**client_data.dict())
-        session.add(client)
-        session.commit()
-        session.refresh(client)
-
-        # Create relationship
-        relationship = CounselorClientRelationship(
-            counselor_id=str(current_user["user_id"]),
-            client_id=client.id,
-            relationship_type=RelationshipType.PRIMARY,
-            status=RelationshipStatus.ACTIVE,
-            start_date=date.today(),
-        )
-        session.add(relationship)
-        session.commit()
-
+    session.refresh(client)
     return ClientResponse(
-        **client.dict(),
+        id=client.id,
+        email=client.email,
+        name=client.name,
+        phone=client.phone,
+        notes=client.notes,
+        tags=client.tags,
+        status=client.status,
+        counselor_id=client.counselor_id,
+        email_verified=client.email_verified,
+        verified_at=client.verified_at,
+        created_at=client.created_at,
+        updated_at=client.updated_at,
         active_rooms_count=0,
         total_consultations=0,
         last_consultation_date=None,
@@ -257,23 +252,18 @@ async def get_client(
     Get a specific client's details
     獲取特定客戶的詳細資料
     """
-    # Check if user has relationship with this client
-    relationship = session.exec(
-        select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
-            CounselorClientRelationship.client_id == client_id,
-        )
-    ).first()
-
-    if not relationship and not current_user.has_role("admin"):
-        raise HTTPException(
-            status_code=403, detail="You don't have permission to view this client"
-        )
-
-    # Get client
+    # Get client and check ownership
     client = session.get(Client, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
+
+    # Check if this client belongs to the current counselor
+    if client.counselor_id != str(current_user["user_id"]) and not current_user.get(
+        "roles", []
+    ).count("admin"):
+        raise HTTPException(
+            status_code=403, detail="You don't have permission to view this client"
+        )
 
     # Get statistics
     active_rooms_count = (
@@ -301,7 +291,18 @@ async def get_client(
     ).first()
 
     return ClientResponse(
-        **client.dict(),
+        id=client.id,
+        email=client.email,
+        name=client.name,
+        phone=client.phone,
+        notes=client.notes,
+        tags=client.tags,
+        status=client.status,
+        counselor_id=client.counselor_id,
+        email_verified=client.email_verified,
+        verified_at=client.verified_at,
+        created_at=client.created_at,
+        updated_at=client.updated_at,
         active_rooms_count=active_rooms_count,
         total_consultations=total_consultations,
         last_consultation_date=(
@@ -321,23 +322,18 @@ async def update_client(
     Update client information
     更新客戶資料
     """
-    # Check if user has relationship with this client
-    relationship = session.exec(
-        select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
-            CounselorClientRelationship.client_id == client_id,
-        )
-    ).first()
-
-    if not relationship and not current_user.has_role("admin"):
-        raise HTTPException(
-            status_code=403, detail="You don't have permission to update this client"
-        )
-
-    # Get and update client
+    # Get and check client ownership
     client = session.get(Client, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
+
+    # Check if this client belongs to the current counselor
+    if client.counselor_id != str(current_user["user_id"]) and not current_user.get(
+        "roles", []
+    ).count("admin"):
+        raise HTTPException(
+            status_code=403, detail="You don't have permission to update this client"
+        )
 
     # Update fields
     update_data = client_update.dict(exclude_unset=True)
@@ -375,7 +371,136 @@ async def update_client(
     ).first()
 
     return ClientResponse(
-        **client.dict(),
+        id=client.id,
+        email=client.email,
+        name=client.name,
+        phone=client.phone,
+        notes=client.notes,
+        tags=client.tags,
+        status=client.status,
+        counselor_id=client.counselor_id,
+        email_verified=client.email_verified,
+        verified_at=client.verified_at,
+        created_at=client.created_at,
+        updated_at=client.updated_at,
+        active_rooms_count=active_rooms_count,
+        total_consultations=total_consultations,
+        last_consultation_date=(
+            last_consultation.session_date if last_consultation else None
+        ),
+    )
+
+
+@router.post("/{client_id}/bind-email", response_model=ClientResponse)
+async def bind_email_to_client(
+    client_id: UUID,
+    bind_data: ClientEmailBind,
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user_from_token),
+) -> ClientResponse:
+    """
+    Bind email to a client without email and optionally send verification
+    綁定 Email 到沒有email的客戶並可選發送驗證信
+    """
+    check_counselor_permission(current_user)
+
+    # Get client and check ownership
+    client = session.get(Client, client_id)
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+
+    # Check if this client belongs to the current counselor
+    if client.counselor_id != str(current_user["user_id"]):
+        raise HTTPException(
+            status_code=403, detail="You don't have permission to update this client"
+        )
+
+    # Check if client already has email
+    if client.email:
+        raise HTTPException(
+            status_code=400, detail="Client already has an email address"
+        )
+
+    # Check if this counselor already has a client with this email
+    existing_client = session.exec(
+        select(Client).where(
+            Client.counselor_id == str(current_user["user_id"]),
+            Client.email == bind_data.email,
+            Client.id != client_id,
+        )
+    ).first()
+
+    if existing_client:
+        raise HTTPException(
+            status_code=400,
+            detail="You already have another client with this email address",
+        )
+
+    # Update client with email
+    client.email = bind_data.email
+    client.email_verified = False
+
+    # Generate verification token if sending verification
+    if bind_data.send_verification:
+        import secrets
+
+        client.verification_token = secrets.token_urlsafe(32)
+        # TODO: Send verification email here
+
+    client.updated_at = datetime.utcnow()
+
+    session.add(client)
+    session.commit()
+    session.refresh(client)
+
+    # Get statistics for response
+    active_rooms_count = (
+        session.exec(
+            select(func.count(RoomClient.id))
+            .join(Room)
+            .where(
+                RoomClient.client_id == client.id,
+                Room.is_active,
+                Room.counselor_id == str(current_user["user_id"]),
+            )
+        ).first()
+        or 0
+    )
+
+    total_consultations = (
+        session.exec(
+            select(func.sum(Room.session_count))
+            .join(RoomClient)
+            .where(
+                RoomClient.client_id == client.id,
+                Room.counselor_id == str(current_user["user_id"]),
+            )
+        ).first()
+        or 0
+    )
+
+    last_consultation = session.exec(
+        select(ConsultationRecord)
+        .where(
+            ConsultationRecord.client_id == client.id,
+            ConsultationRecord.counselor_id == str(current_user["user_id"]),
+        )
+        .order_by(ConsultationRecord.session_date.desc())
+    ).first()
+
+    return ClientResponse(
+        id=client.id,
+        email=client.email,
+        name=client.name,
+        phone=client.phone,
+        notes=client.notes,
+        tags=client.tags,
+        status=client.status,
+        counselor_id=client.counselor_id,
+        email_verified=client.email_verified,
+        verified_at=client.verified_at,
+        created_at=client.created_at,
+        updated_at=client.updated_at,
         active_rooms_count=active_rooms_count,
         total_consultations=total_consultations,
         last_consultation_date=(
@@ -394,25 +519,19 @@ async def archive_client(
     Archive a client (soft delete)
     歸檔客戶（軟刪除）
     """
-    # Check if user has relationship with this client
-    relationship = session.exec(
-        select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
-            CounselorClientRelationship.client_id == client_id,
-            CounselorClientRelationship.relationship_type == RelationshipType.PRIMARY,
-        )
-    ).first()
-
-    if not relationship and not current_user.has_role("admin"):
-        raise HTTPException(
-            status_code=403,
-            detail="Only primary counselor or admin can archive a client",
-        )
-
-    # Get and archive client
+    # Get and check client ownership
     client = session.get(Client, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
+
+    # Check if this client belongs to the current counselor
+    if client.counselor_id != str(current_user["user_id"]) and not current_user.get(
+        "roles", []
+    ).count("admin"):
+        raise HTTPException(
+            status_code=403,
+            detail="Only the counselor or admin can archive a client",
+        )
 
     client.status = ClientStatus.ARCHIVED
     client.updated_at = datetime.utcnow()
@@ -430,17 +549,16 @@ async def get_client_rooms(
 ) -> List[dict]:
     """
     Get all rooms associated with a client
-    獲取客戶的所有相關房間
+    獲取客戶的所有相關諮詢室
     """
-    # Check permission
-    relationship = session.exec(
-        select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
-            CounselorClientRelationship.client_id == client_id,
-        )
-    ).first()
+    # Check client ownership
+    client = session.get(Client, client_id)
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
 
-    if not relationship and not current_user.has_role("admin"):
+    if client.counselor_id != str(current_user["user_id"]) and not current_user.get(
+        "roles", []
+    ).count("admin"):
         raise HTTPException(
             status_code=403,
             detail="You don't have permission to view this client's rooms",
@@ -481,22 +599,16 @@ async def create_consultation_record(
     Create a consultation record for a client
     為客戶創建諮詢記錄
     """
-    # Verify client exists
+    # Verify client exists and check ownership
     client = session.get(Client, client_id)
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
 
-    # Check permission
-    relationship = session.exec(
-        select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
-            CounselorClientRelationship.client_id == client_id,
-        )
-    ).first()
-
-    if not relationship:
+    # Check if this client belongs to the current counselor
+    if client.counselor_id != str(current_user["user_id"]):
         raise HTTPException(
-            status_code=403, detail="You don't have a relationship with this client"
+            status_code=403,
+            detail="You don't have permission to add records for this client",
         )
 
     # Create record
@@ -526,15 +638,14 @@ async def get_consultation_records(
     Get consultation records for a client
     獲取客戶的諮詢記錄
     """
-    # Check permission
-    relationship = session.exec(
-        select(CounselorClientRelationship).where(
-            CounselorClientRelationship.counselor_id == str(current_user["user_id"]),
-            CounselorClientRelationship.client_id == client_id,
-        )
-    ).first()
+    # Check client ownership
+    client = session.get(Client, client_id)
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
 
-    if not relationship and not current_user.has_role("admin"):
+    if client.counselor_id != str(current_user["user_id"]) and not current_user.get(
+        "roles", []
+    ).count("admin"):
         raise HTTPException(
             status_code=403,
             detail="You don't have permission to view this client's records",
@@ -550,108 +661,3 @@ async def get_consultation_records(
     ).all()
 
     return [ConsultationRecordResponse(**record.dict()) for record in records]
-
-
-# Counselor-Client Relationships endpoints
-
-
-@router.get("/relationships", response_model=List[CounselorClientRelationshipResponse])
-async def get_my_relationships(
-    session: Session = Depends(get_session),
-    current_user: dict = Depends(get_current_user_from_token),
-    status: Optional[RelationshipStatus] = Query(None),
-) -> List[CounselorClientRelationshipResponse]:
-    """
-    Get all client relationships for current counselor
-    獲取當前諮商師的所有客戶關係
-    """
-    query = select(CounselorClientRelationship).where(
-        CounselorClientRelationship.counselor_id == str(current_user["user_id"])
-    )
-
-    if status:
-        query = query.where(CounselorClientRelationship.status == status)
-
-    relationships = session.exec(query).all()
-
-    responses = []
-    for rel in relationships:
-        client = session.get(Client, rel.client_id)
-
-        # Get client statistics
-        active_rooms_count = (
-            session.exec(
-                select(func.count(RoomClient.id))
-                .join(Room)
-                .where(RoomClient.client_id == client.id, Room.is_active)
-            ).first()
-            or 0
-        )
-
-        total_consultations = (
-            session.exec(
-                select(func.count(ConsultationRecord.id)).where(
-                    ConsultationRecord.client_id == client.id
-                )
-            ).first()
-            or 0
-        )
-
-        last_consultation = session.exec(
-            select(ConsultationRecord)
-            .where(ConsultationRecord.client_id == client.id)
-            .order_by(ConsultationRecord.session_date.desc())
-        ).first()
-
-        client_response = ClientResponse(
-            **client.dict(),
-            active_rooms_count=active_rooms_count,
-            total_consultations=total_consultations,
-            last_consultation_date=(
-                last_consultation.session_date if last_consultation else None
-            ),
-        )
-
-        response = CounselorClientRelationshipResponse(
-            **rel.dict(), client=client_response
-        )
-        responses.append(response)
-
-    return responses
-
-
-@router.put("/relationships/{relationship_id}")
-async def update_relationship(
-    relationship_id: UUID,
-    status: RelationshipStatus,
-    notes: Optional[str] = None,
-    session: Session = Depends(get_session),
-    current_user: dict = Depends(get_current_user_from_token),
-) -> dict:
-    """
-    Update relationship status
-    更新關係狀態
-    """
-    relationship = session.get(CounselorClientRelationship, relationship_id)
-
-    if not relationship:
-        raise HTTPException(status_code=404, detail="Relationship not found")
-
-    if relationship.counselor_id != str(
-        current_user["user_id"]
-    ) and not current_user.has_role("admin"):
-        raise HTTPException(
-            status_code=403, detail="You can only update your own relationships"
-        )
-
-    relationship.status = status
-    if notes:
-        relationship.notes = notes
-    if status == RelationshipStatus.TERMINATED:
-        relationship.end_date = date.today()
-
-    relationship.updated_at = datetime.utcnow()
-    session.add(relationship)
-    session.commit()
-
-    return {"message": "Relationship updated successfully"}

@@ -25,7 +25,7 @@ class GameStatus(str, Enum):
 
 
 class GameSession(SQLModel, table=True):
-    """遊戲會話 - 追蹤一個房間的遊戲狀態"""
+    """遊戲會話 - 追蹤一個諮詢室的遊戲狀態"""
 
     __tablename__ = "game_sessions"
 

@@ -19,6 +19,8 @@ const mockClientWithRooms = {
   email: 'alice.chen@example.com',
   phone: '0912-345-678',
   status: 'active' as const,
+  counselor_id: 'counselor-001',
+  email_verified: true,
   tags: ['應屆畢業生', '資訊科技'],
   created_at: '2025-09-24T19:22:36.254848',
   updated_at: '2025-09-24T19:22:36.254850',
@@ -30,6 +32,7 @@ const mockClientWithRooms = {
       id: 'room-1',
       name: '陳雅琪 的職涯諮詢室',
       description: '職涯探索與規劃',
+      counselor_id: 'counselor-001',
       share_code: 'VDGH8M',
       is_active: true,
       expires_at: '2025-10-01T19:22:36.288792',
@@ -41,6 +44,7 @@ const mockClientWithRooms = {
       id: 'room-2',
       name: '陳雅琪 的技能盤點室',
       description: '個人能力評估',
+      counselor_id: 'counselor-001',
       share_code: 'U5ZIIR',
       is_active: false,
       expires_at: '2025-10-14T20:18:17.993306',
@@ -56,6 +60,8 @@ const mockClientWithoutRooms = {
   name: '王建明 (Bob Wang)',
   email: 'bob.wang@example.com',
   status: 'active' as const,
+  counselor_id: 'counselor-001',
+  email_verified: true,
   tags: [],
   created_at: '2025-09-24T19:22:36.259533',
   updated_at: '2025-09-24T19:22:36.259534',
@@ -80,7 +86,7 @@ describe('ClientManagement', () => {
       });
 
       // Should show chevron right (collapsed state)
-      const chevronRight = screen.getByTitle('展開/收合房間');
+      const chevronRight = screen.getByTitle('展開/收合諮詢室');
       expect(chevronRight).toBeInTheDocument();
 
       // Should show ChevronRight icon (not ChevronDown)
@@ -97,7 +103,7 @@ describe('ClientManagement', () => {
       });
 
       // Should not show chevron for clients with no rooms
-      expect(screen.queryByTitle('展開/收合房間')).not.toBeInTheDocument();
+      expect(screen.queryByTitle('展開/收合諮詢室')).not.toBeInTheDocument();
     });
 
     it('should expand client and show rooms in timeline when chevron is clicked', async () => {
@@ -110,15 +116,15 @@ describe('ClientManagement', () => {
       });
 
       // Initially rooms should not be visible
-      expect(screen.queryByText('諮詢房間 (2 個)')).not.toBeInTheDocument();
+      expect(screen.queryByText('諮詢諮詢室 (2 個)')).not.toBeInTheDocument();
       expect(screen.queryByText('陳雅琪 的職涯諮詢室')).not.toBeInTheDocument();
 
       // Click to expand
-      const chevronButton = screen.getByTitle('展開/收合房間');
+      const chevronButton = screen.getByTitle('展開/收合諮詢室');
       fireEvent.click(chevronButton);
 
       // Should now show expanded rooms
-      expect(screen.getByText('諮詢房間 (2 個)')).toBeInTheDocument();
+      expect(screen.getByText('諮詢諮詢室 (2 個)')).toBeInTheDocument();
       expect(screen.getByText('陳雅琪 的職涯諮詢室')).toBeInTheDocument();
       expect(screen.getByText('陳雅琪 的技能盤點室')).toBeInTheDocument();
     });
@@ -133,7 +139,7 @@ describe('ClientManagement', () => {
       });
 
       // Expand client
-      const chevronButton = screen.getByTitle('展開/收合房間');
+      const chevronButton = screen.getByTitle('展開/收合諮詢室');
       fireEvent.click(chevronButton);
 
       // Get all room elements
@@ -155,7 +161,7 @@ describe('ClientManagement', () => {
       });
 
       // Expand client
-      const chevronButton = screen.getByTitle('展開/收合房間');
+      const chevronButton = screen.getByTitle('展開/收合諮詢室');
       fireEvent.click(chevronButton);
 
       // Should show "進行中" for active room
@@ -175,11 +181,11 @@ describe('ClientManagement', () => {
       });
 
       // Expand client
-      const chevronButton = screen.getByTitle('展開/收合房間');
+      const chevronButton = screen.getByTitle('展開/收合諮詢室');
       fireEvent.click(chevronButton);
 
       // Should have timeline dots (one green for active, one gray for inactive)
-      const container = screen.getByText('諮詢房間 (2 個)').closest('div');
+      const container = screen.getByText('諮詢諮詢室 (2 個)').closest('div');
       const timelineDots = container?.querySelectorAll('.w-3.h-3.rounded-full');
 
       expect(timelineDots).toHaveLength(2);
@@ -197,7 +203,7 @@ describe('ClientManagement', () => {
       });
 
       // Expand client
-      const chevronButton = screen.getByTitle('展開/收合房間');
+      const chevronButton = screen.getByTitle('展開/收合諮詢室');
       fireEvent.click(chevronButton);
 
       // Should have "進入" buttons for each room
@@ -220,15 +226,15 @@ describe('ClientManagement', () => {
         expect(screen.getByText('陳雅琪 (Alice Chen)')).toBeInTheDocument();
       });
 
-      const chevronButton = screen.getByTitle('展開/收合房間');
+      const chevronButton = screen.getByTitle('展開/收合諮詢室');
 
       // Expand
       fireEvent.click(chevronButton);
-      expect(screen.getByText('諮詢房間 (2 個)')).toBeInTheDocument();
+      expect(screen.getByText('諮詢諮詢室 (2 個)')).toBeInTheDocument();
 
       // Collapse
       fireEvent.click(chevronButton);
-      expect(screen.queryByText('諮詢房間 (2 個)')).not.toBeInTheDocument();
+      expect(screen.queryByText('諮詢諮詢室 (2 個)')).not.toBeInTheDocument();
     });
   });
 });

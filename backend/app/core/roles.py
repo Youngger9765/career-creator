@@ -10,7 +10,7 @@ from typing import List, Set
 class UserRole(str, Enum):
     """User role definitions"""
 
-    COUNSELOR = "counselor"  # 諮詢師 - 主導諮詢、開房間
+    COUNSELOR = "counselor"  # 諮詢師 - 主導諮詢、開諮詢室
     CLIENT = "client"  # 來談者/當事人 - 接受諮詢
     OBSERVER = "observer"  # 觀察員 - 純觀摩，無操作權限
     ADMIN = "admin"  # 管理員 - 系統管理權限

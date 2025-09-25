@@ -31,8 +31,8 @@ vi.mock('@/lib/api/visitors', () => ({
 
 const mockRoom: Room = {
   id: 'room-123',
-  name: '職涯諮詢測試房間',
-  description: '測試用房間描述',
+  name: '職涯諮詢測試諮詢室',
+  description: '測試用諮詢室描述',
   counselor_id: 'counselor-123',
   share_code: 'ABC123',
   is_active: true,
@@ -114,7 +114,7 @@ describe('Visitor API Integration', () => {
     const { result } = renderHook(() => useVisitorJoin());
 
     await expect(result.current.validateAndJoinRoom('ABC123', '測試訪客')).rejects.toThrow(
-      '房間已關閉，無法加入'
+      '諮詢室已關閉，無法加入'
     );
   });
 
@@ -131,7 +131,7 @@ describe('Visitor API Integration', () => {
     const { result } = renderHook(() => useVisitorJoin());
 
     await expect(result.current.validateAndJoinRoom('ABC123', '測試訪客')).rejects.toThrow(
-      '房間已過期，無法加入'
+      '諮詢室已過期，無法加入'
     );
   });
 
@@ -238,11 +238,11 @@ describe('Join Room Flow Integration', () => {
     render(<JoinByShareCodePage />);
 
     await waitFor(() => {
-      expect(screen.getByText('職涯諮詢測試房間')).toBeInTheDocument();
+      expect(screen.getByText('職涯諮詢測試諮詢室')).toBeInTheDocument();
     });
 
     expect(screen.getByPlaceholderText('您的姓名或暱稱')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '加入諮詢房間' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '加入諮詢諮詢室' })).toBeInTheDocument();
   });
 
   it('should disable form when room is inactive', async () => {
@@ -256,11 +256,11 @@ describe('Join Room Flow Integration', () => {
     render(<JoinByShareCodePage />);
 
     await waitFor(() => {
-      expect(screen.getByText('此房間已關閉，無法加入')).toBeInTheDocument();
+      expect(screen.getByText('此諮詢室已關閉，無法加入')).toBeInTheDocument();
     });
 
     const nameInput = screen.getByPlaceholderText('您的姓名或暱稱');
-    const joinButton = screen.getByRole('button', { name: '加入諮詢房間' });
+    const joinButton = screen.getByRole('button', { name: '加入諮詢諮詢室' });
 
     expect(nameInput).toBeDisabled();
     expect(joinButton).toBeDisabled();
@@ -279,11 +279,11 @@ describe('Join Room Flow Integration', () => {
     render(<JoinByShareCodePage />);
 
     await waitFor(() => {
-      expect(screen.getByText('職涯諮詢測試房間')).toBeInTheDocument();
+      expect(screen.getByText('職涯諮詢測試諮詢室')).toBeInTheDocument();
     });
 
     const nameInput = screen.getByPlaceholderText('您的姓名或暱稱');
-    const joinButton = screen.getByRole('button', { name: '加入諮詢房間' });
+    const joinButton = screen.getByRole('button', { name: '加入諮詢諮詢室' });
 
     fireEvent.change(nameInput, { target: { value: '測試訪客' } });
     fireEvent.click(joinButton);

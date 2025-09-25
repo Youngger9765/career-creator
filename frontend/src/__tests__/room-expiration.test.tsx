@@ -12,7 +12,7 @@ const mockDate = new Date('2024-01-15T12:00:00Z');
 
 const createMockRoom = (overrides: Partial<Room> = {}): Room => ({
   id: 'room-123',
-  name: '測試房間',
+  name: '測試諮詢室',
   description: '測試描述',
   counselor_id: 'counselor-123',
   share_code: 'ABC123',
@@ -117,25 +117,25 @@ describe('Room Expiration Logic', () => {
     const rooms: Room[] = [
       createMockRoom({
         id: 'active-room',
-        name: '活躍房間',
+        name: '活躍諮詢室',
         is_active: true,
         expires_at: '2024-01-20T12:00:00Z',
       }),
       createMockRoom({
         id: 'expired-room',
-        name: '過期房間',
+        name: '過期諮詢室',
         is_active: true,
         expires_at: '2024-01-10T12:00:00Z',
       }),
       createMockRoom({
         id: 'closed-room',
-        name: '已關閉房間',
+        name: '已關閉諮詢室',
         is_active: false,
         expires_at: '2024-01-20T12:00:00Z',
       }),
       createMockRoom({
         id: 'no-expiry-room',
-        name: '永久房間',
+        name: '永久諮詢室',
         is_active: true,
         expires_at: undefined,
       }),

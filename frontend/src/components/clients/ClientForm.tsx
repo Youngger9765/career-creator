@@ -33,7 +33,7 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
     if (client) {
       setFormData({
         name: client.name,
-        email: client.email,
+        email: client.email || '',
         phone: client.phone || '',
         notes: client.notes || '',
         tags: client.tags || [],
@@ -45,16 +45,18 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name.trim() || !formData.email.trim()) {
-      alert('請填寫姓名和 Email');
+    if (!formData.name.trim()) {
+      alert('請填寫姓名');
       return;
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      alert('請輸入有效的 Email 地址');
-      return;
+    // Email is optional
+    if (formData.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        alert('請輸入有效的 Email 地址');
+        return;
+      }
     }
 
     const submitData = client
@@ -67,7 +69,7 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
         } as ClientUpdate)
       : ({
           name: formData.name,
-          email: formData.email,
+          email: formData.email || undefined,
           phone: formData.phone || undefined,
           notes: formData.notes || undefined,
           tags: formData.tags,
@@ -136,13 +138,14 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
             />
           </div>
 
-          {/* Email - disabled in edit mode */}
+
+          {/* Email - disabled in edit mode or if anonymous */}
           <div>
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              Email {!client && '*'}
+              Email (選填)
             </label>
             <input
               type="email"
@@ -150,11 +153,13 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
               value={formData.email}
               onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400"
-              placeholder="請輸入 Email 地址"
+              placeholder={'請輸入 Email 地址 (選填)'}
               disabled={!!client}
-              required={!client}
             />
-            {client && (
+            {client && !client.email && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">沒有 Email - 可稍後綁定</p>
+            )}
+            {client && client.email && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email 無法修改</p>
             )}
           </div>

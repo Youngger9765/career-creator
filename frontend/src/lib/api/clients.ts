@@ -8,8 +8,6 @@ import type {
   Client,
   ClientCreate,
   ClientUpdate,
-  CounselorClient,
-  CounselorClientCreate,
   ConsultationRecord,
   ConsultationRecordCreate,
 } from '@/types/client';
@@ -78,35 +76,6 @@ export const clientsAPI = {
     last_consultation_date: string | null;
   }> => {
     const response = await apiClient.get(`/api/clients/${clientId}/statistics`);
-    return response.data;
-  },
-};
-
-/**
- * Counselor-Client Relationships API
- */
-export const counselorClientsAPI = {
-  /**
-   * Create relationship
-   */
-  createRelationship: async (data: CounselorClientCreate): Promise<CounselorClient> => {
-    const response = await apiClient.post('/api/clients/counselor-relationships', data);
-    return response.data;
-  },
-
-  /**
-   * Get relationships
-   */
-  getRelationships: async (): Promise<CounselorClient[]> => {
-    const response = await apiClient.get('/api/clients/counselor-relationships');
-    return response.data;
-  },
-
-  /**
-   * Delete relationship
-   */
-  deleteRelationship: async (clientId: string): Promise<{ message: string }> => {
-    const response = await apiClient.delete(`/api/clients/counselor-relationships/${clientId}`);
     return response.data;
   },
 };

@@ -17,30 +17,14 @@ class ClientStatus(str, Enum):
     ARCHIVED = "archived"
 
 
-class RelationshipType(str, Enum):
-    """Counselor-client relationship types."""
-
-    PRIMARY = "primary"  # 主責諮商師
-    SECONDARY = "secondary"  # 協同諮商師
-    CONSULTANT = "consultant"  # 顧問
-
-
-class RelationshipStatus(str, Enum):
-    """Relationship status."""
-
-    ACTIVE = "active"
-    PAUSED = "paused"
-    TERMINATED = "terminated"
-
-
 class ClientBase(SQLModel):
     """Base client model."""
 
-    email: str = Field(
+    email: Optional[str] = Field(
+        default=None,
         index=True,
-        unique=True,
         max_length=255,
-        description="Client email (unique identifier)",
+        description="Client email (optional for anonymous clients)",
     )
     name: Optional[str] = Field(
         default=None, max_length=100, description="Client full name"
@@ -69,6 +53,23 @@ class Client(ClientBase, table=True):
     id: UUID = Field(
         default_factory=uuid4, primary_key=True, description="Client unique ID"
     )
+
+    # Simplified ownership model - each counselor has independent client records
+    counselor_id: str = Field(
+        max_length=255, index=True, description="Counselor who owns this client record"
+    )
+
+    # Email verification for customer portal access
+    email_verified: bool = Field(
+        default=False, description="Whether email has been verified"
+    )
+    verification_token: Optional[str] = Field(
+        default=None, max_length=255, description="Email verification token"
+    )
+    verified_at: Optional[datetime] = Field(
+        default=None, description="Email verification timestamp"
+    )
+
     created_at: datetime = Field(
         default_factory=datetime.utcnow, description="Creation timestamp"
     )
@@ -77,47 +78,10 @@ class Client(ClientBase, table=True):
     )
 
     # Relationships
-    counselor_relationships: List["CounselorClientRelationship"] = Relationship(
-        back_populates="client"
-    )
     room_associations: List["RoomClient"] = Relationship(back_populates="client")
     consultation_records: List["ConsultationRecord"] = Relationship(
         back_populates="client"
     )
-
-
-class CounselorClientRelationship(SQLModel, table=True):
-    """Many-to-many relationship between counselors and clients."""
-
-    __tablename__ = "counselor_client_relationships"
-    __table_args__ = (
-        UniqueConstraint("counselor_id", "client_id", name="unique_counselor_client"),
-    )
-
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
-    counselor_id: str = Field(
-        max_length=255, index=True, description="Counselor user ID (UUID or demo ID)"
-    )
-    client_id: UUID = Field(
-        foreign_key="clients.id", index=True, description="Client ID"
-    )
-    relationship_type: RelationshipType = Field(
-        default=RelationshipType.PRIMARY, description="Type of relationship"
-    )
-    status: RelationshipStatus = Field(
-        default=RelationshipStatus.ACTIVE, description="Relationship status"
-    )
-    start_date: date = Field(
-        default_factory=date.today, description="Relationship start date"
-    )
-    end_date: Optional[date] = Field(default=None, description="Relationship end date")
-    notes: Optional[str] = Field(default=None, description="Relationship notes")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-    # Relationships
-    # Note: counselor relationship removed as counselor_id can be demo account (not in users table)
-    client: Client = Relationship(back_populates="counselor_relationships")
 
 
 class RoomClient(SQLModel, table=True):
@@ -184,7 +148,9 @@ class ConsultationRecord(SQLModel, table=True):
 class ClientCreate(SQLModel):
     """Model for creating a new client."""
 
-    email: str = Field(max_length=255, description="Client email (required)")
+    email: Optional[str] = Field(
+        default=None, max_length=255, description="Client email (optional)"
+    )
     name: Optional[str] = Field(default=None, max_length=100)
     phone: Optional[str] = Field(default=None, max_length=50)
     notes: Optional[str] = Field(default=None)
@@ -201,10 +167,21 @@ class ClientUpdate(SQLModel):
     status: Optional[ClientStatus] = Field(default=None)
 
 
+class ClientEmailBind(SQLModel):
+    """Model for binding email to anonymous client."""
+
+    client_id: UUID = Field(description="Anonymous client ID to bind email to")
+    email: str = Field(max_length=255, description="Email to bind")
+    send_verification: bool = Field(default=True, description="Send verification email")
+
+
 class ClientResponse(ClientBase):
     """Client response model."""
 
     id: UUID
+    counselor_id: str
+    email_verified: bool
+    verified_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
     active_rooms_count: Optional[int] = Field(
@@ -219,30 +196,6 @@ class ClientResponse(ClientBase):
     rooms: Optional[List[Dict[str, Any]]] = Field(
         default_factory=list, description="Rooms associated with this client"
     )
-
-
-class CounselorClientRelationshipCreate(SQLModel):
-    """Model for creating counselor-client relationship."""
-
-    client_id: UUID
-    relationship_type: RelationshipType = Field(default=RelationshipType.PRIMARY)
-    notes: Optional[str] = Field(default=None)
-
-
-class CounselorClientRelationshipResponse(SQLModel):
-    """Counselor-client relationship response."""
-
-    id: UUID
-    counselor_id: str
-    client_id: UUID
-    relationship_type: RelationshipType
-    status: RelationshipStatus
-    start_date: date
-    end_date: Optional[date]
-    notes: Optional[str]
-    created_at: datetime
-    updated_at: datetime
-    client: ClientResponse  # Include client details
 
 
 class ConsultationRecordCreate(SQLModel):

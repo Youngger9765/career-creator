@@ -1,6 +1,6 @@
 /**
  * Rooms API
- * 房間相關 API
+ * 諮詢室相關 API
  */
 import { apiClient, handleApiError } from './client';
 

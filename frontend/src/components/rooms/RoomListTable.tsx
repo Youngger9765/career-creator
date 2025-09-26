@@ -3,15 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Room } from '@/types/api';
-import {
-  ExternalLink,
-  Calendar,
-  Clock,
-  Users,
-  MessageCircle,
-  Copy,
-  Home,
-} from 'lucide-react';
+import { ExternalLink, Calendar, Clock, Users, MessageCircle, Copy, Home } from 'lucide-react';
 
 interface RoomListTableProps {
   rooms: Room[];
@@ -22,7 +14,7 @@ interface RoomListTableProps {
 export function RoomListTable({
   rooms,
   showClient = true,
-  emptyMessage = '沒有諮詢室記錄'
+  emptyMessage = '沒有諮詢室記錄',
 }: RoomListTableProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -123,15 +115,11 @@ export function RoomListTable({
               {showClient && (
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
-                    {room.primary_client_name || (
-                      <span className="text-gray-400">無客戶</span>
-                    )}
+                    {room.primary_client_name || <span className="text-gray-400">無客戶</span>}
                   </div>
                 </td>
               )}
-              <td className="px-6 py-4 whitespace-nowrap">
-                {getStatusBadge(room)}
-              </td>
+              <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(room)}</td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center gap-1 text-sm text-gray-900">
                   <MessageCircle className="w-4 h-4 text-gray-400" />

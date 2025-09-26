@@ -138,7 +138,6 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
             />
           </div>
 
-
           {/* Email - disabled in edit mode or if anonymous */}
           <div>
             <label
@@ -157,7 +156,9 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
               disabled={!!client}
             />
             {client && !client.email && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">沒有 Email - 可稍後綁定</p>
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                沒有 Email - 可稍後綁定
+              </p>
             )}
             {client && client.email && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email 無法修改</p>

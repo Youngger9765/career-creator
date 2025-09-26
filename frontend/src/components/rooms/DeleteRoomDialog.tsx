@@ -57,7 +57,8 @@ export function DeleteRoomDialog({ room, open, onClose, onSuccess }: DeleteRoomD
           </DialogTitle>
           <DialogDescription className="space-y-3 pt-3">
             <span className="block">
-              確定要刪除諮詢室「<strong className="text-foreground font-semibold">{room.name}</strong>
+              確定要刪除諮詢室「
+              <strong className="text-foreground font-semibold">{room.name}</strong>
               」嗎？
             </span>
             {room.share_code && (

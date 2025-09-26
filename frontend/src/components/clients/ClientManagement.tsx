@@ -105,7 +105,9 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
   };
 
   const handleVerifyEmail = async (clientId: string, clientEmail: string) => {
-    alert(`未來功能：系統將寄送驗證信件到 ${clientEmail}\n\n客戶將收到驗證連結，點擊後即可完成 Email 驗證。\n\n此功能正在開發中，敬請期待！`);
+    alert(
+      `未來功能：系統將寄送驗證信件到 ${clientEmail}\n\n客戶將收到驗證連結，點擊後即可完成 Email 驗證。\n\n此功能正在開發中，敬請期待！`
+    );
   };
 
   const filteredClients = clients
@@ -331,26 +333,25 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                     <React.Fragment key={client.id}>
                       <tr
                         className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-                        onClick={() => hasRooms && toggleClientExpansion(client.id)}
+                        onClick={() => toggleClientExpansion(client.id)}
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-start gap-3">
-                            {hasRooms && (
-                              <button
-                                onClick={() => toggleClientExpansion(client.id)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors mt-1"
-                                title="展開/收合諮詢室"
-                              >
-                                {isExpanded ? (
-                                  <ChevronDown className="w-4 h-4" />
-                                ) : (
-                                  <ChevronRight className="w-4 h-4" />
-                                )}
-                              </button>
-                            )}
-                            {!hasRooms && <div className="w-4" />}
+                            <button
+                              onClick={() => toggleClientExpansion(client.id)}
+                              className="text-gray-400 hover:text-gray-600 transition-colors mt-1"
+                              title="展開/收合諮詢室"
+                            >
+                              {isExpanded ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
+                            </button>
                             <div className="space-y-2">
-                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{client.name}</div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                {client.name}
+                              </div>
                               {client.tags && client.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1">
                                   {client.tags.map((tag, index) => (
@@ -454,47 +455,16 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                       </tr>
 
                       {/* Expanded rooms section */}
-                      {isExpanded && hasRooms && (
+                      {isExpanded && (
                         <tr>
                           <td colSpan={6} className="px-6 py-0">
                             <div className="bg-gray-50 rounded-lg p-4 my-2">
                               <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                                   <Home className="w-4 h-4" />
-                                  諮詢室 ({client.rooms!.length} 個)
+                                  諮詢室 ({client.rooms?.length || 0} 個)
                                 </h4>
-                                <button
-                                  onClick={() => {
-                                    // 跳轉到創建諮詢室頁面，帶入客戶資訊
-                                    const clientInfo = encodeURIComponent(
-                                      JSON.stringify({
-                                        client_id: client.id,
-                                        client_name: client.name,
-                                        client_email: client.email,
-                                      })
-                                    );
-                                    window.location.href = `/rooms/create?client=${clientInfo}`;
-                                  }}
-                                  className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                                  title="創建諮詢室"
-                                >
-                                  <Plus className="w-3 h-3" />
-                                  創建諮詢室
-                                </button>
-                              </div>
-                              <div className="mt-3">
-                                <RoomListTable
-                                  rooms={client.rooms!.sort(
-                                    (a, b) =>
-                                      new Date(b.created_at).getTime() -
-                                      new Date(a.created_at).getTime()
-                                  )}
-                                  showClient={false}
-                                  emptyMessage="尚無諮詢室"
-                                />
-
-                                {/* 創建諮詢室按鈕 - 虛線框樣式 */}
-                                <div className="mt-4">
+                                {hasRooms && (
                                   <button
                                     onClick={() => {
                                       // 跳轉到創建諮詢室頁面，帶入客戶資訊
@@ -507,12 +477,71 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       );
                                       window.location.href = `/rooms/create?client=${clientInfo}`;
                                     }}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-8 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                    className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                    title="創建諮詢室"
                                   >
-                                    <Plus className="w-5 h-5" />
-                                    <span className="font-medium">創建諮詢室</span>
+                                    <Plus className="w-3 h-3" />
+                                    創建諮詢室
                                   </button>
-                                </div>
+                                )}
+                              </div>
+                              <div className="mt-3">
+                                {hasRooms ? (
+                                  <>
+                                    <RoomListTable
+                                      rooms={client.rooms!.sort(
+                                        (a, b) =>
+                                          new Date(b.created_at).getTime() -
+                                          new Date(a.created_at).getTime()
+                                      )}
+                                      showClient={false}
+                                      emptyMessage="尚無諮詢室"
+                                    />
+
+                                    {/* 創建諮詢室按鈕 - 虛線框樣式 */}
+                                    <div className="mt-4">
+                                      <button
+                                        onClick={() => {
+                                          // 跳轉到創建諮詢室頁面，帶入客戶資訊
+                                          const clientInfo = encodeURIComponent(
+                                            JSON.stringify({
+                                              client_id: client.id,
+                                              client_name: client.name,
+                                              client_email: client.email,
+                                            })
+                                          );
+                                          window.location.href = `/rooms/create?client=${clientInfo}`;
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-8 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                      >
+                                        <Plus className="w-5 h-5" />
+                                        <span className="font-medium">創建諮詢室</span>
+                                      </button>
+                                    </div>
+                                  </>
+                                ) : (
+                                  /* 沒有房間時顯示創建按鈕 */
+                                  <div className="text-center py-8">
+                                    <p className="text-gray-500 mb-4">尚未創建任何諮詢室</p>
+                                    <button
+                                      onClick={() => {
+                                        // 跳轉到創建諮詢室頁面，帶入客戶資訊
+                                        const clientInfo = encodeURIComponent(
+                                          JSON.stringify({
+                                            client_id: client.id,
+                                            client_name: client.name,
+                                            client_email: client.email,
+                                          })
+                                        );
+                                        window.location.href = `/rooms/create?client=${clientInfo}`;
+                                      }}
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                      <Plus className="w-5 h-5" />
+                                      <span className="font-medium">創建第一個諮詢室</span>
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </td>

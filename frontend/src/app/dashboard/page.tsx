@@ -308,9 +308,7 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 mb-1">本週活動</p>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {stats.recentEvents.length}
-                  </p>
+                  <p className="text-3xl font-bold text-gray-900">{stats.recentEvents.length}</p>
                 </div>
               </div>
             </div>
@@ -417,20 +415,14 @@ export default function DashboardPage() {
                     新建諮詢室
                   </Link>
                 </div>
-                <RoomListTable
-                  rooms={activeRooms}
-                  emptyMessage="目前沒有活躍的諮詢室"
-                />
+                <RoomListTable rooms={activeRooms} emptyMessage="目前沒有活躍的諮詢室" />
               </div>
             )}
 
             {selectedTab === 'history' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">歷史記錄</h3>
-                <RoomListTable
-                  rooms={historyRooms}
-                  emptyMessage="目前沒有歷史記錄"
-                />
+                <RoomListTable rooms={historyRooms} emptyMessage="目前沒有歷史記錄" />
               </div>
             )}
           </div>
@@ -456,9 +448,7 @@ export default function DashboardPage() {
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {event.event_type}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {formatDate(event.created_at)}
-                          </p>
+                          <p className="text-xs text-gray-500">{formatDate(event.created_at)}</p>
                         </div>
                       </div>
                     ))}
@@ -567,10 +557,7 @@ export default function DashboardPage() {
             {selectedTab === 'history' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">歷史記錄</h3>
-                <RoomListTable
-                  rooms={historyRooms}
-                  emptyMessage="目前沒有歷史記錄"
-                />
+                <RoomListTable rooms={historyRooms} emptyMessage="目前沒有歷史記錄" />
               </div>
             )}
           </div>

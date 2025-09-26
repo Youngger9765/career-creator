@@ -457,11 +457,11 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                       {/* Expanded rooms section */}
                       {isExpanded && (
                         <tr>
-                          <td colSpan={6} className="px-6 py-0">
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-2">
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="text-sm font-semibold text-blue-900 flex items-center gap-2">
-                                  <Home className="w-4 h-4 text-blue-600" />
+                          <td colSpan={6} className="px-0 pb-2">
+                            <div className="ml-12 mr-6 border-l-2 border-gray-200 pl-6">
+                              <div className="flex items-center justify-between mb-3 pt-2">
+                                <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                                  <Home className="w-4 h-4 text-gray-500" />
                                   諮詢室 ({client.rooms?.length || 0} 個)
                                 </h4>
                                 {hasRooms && (
@@ -477,7 +477,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       );
                                       window.location.href = `/rooms/create?client=${clientInfo}`;
                                     }}
-                                    className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                    className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
                                     title="創建諮詢室"
                                   >
                                     <Plus className="w-3 h-3" />
@@ -485,7 +485,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                   </button>
                                 )}
                               </div>
-                              <div className="mt-3">
+                              <div className="">
                                 {hasRooms ? (
                                   <>
                                     <RoomListTable
@@ -512,7 +512,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                           );
                                           window.location.href = `/rooms/create?client=${clientInfo}`;
                                         }}
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-8 border-2 border-dashed border-blue-300 rounded-lg text-blue-600 hover:border-blue-400 hover:text-blue-700 hover:bg-blue-100 transition-colors"
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-5 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors"
                                       >
                                         <Plus className="w-5 h-5" />
                                         <span className="font-medium">創建諮詢室</span>
@@ -521,8 +521,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                   </>
                                 ) : (
                                   /* 沒有房間時顯示創建按鈕 */
-                                  <div className="text-center py-8">
-                                    <p className="text-gray-500 mb-4">尚未創建任何諮詢室</p>
+                                  <div className="text-center py-6">
+                                    <p className="text-gray-400 text-sm mb-3">尚未創建任何諮詢室</p>
                                     <button
                                       onClick={() => {
                                         // 跳轉到創建諮詢室頁面，帶入客戶資訊

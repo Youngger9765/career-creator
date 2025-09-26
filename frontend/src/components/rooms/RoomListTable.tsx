@@ -70,39 +70,28 @@ export function RoomListTable({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-blue-200 overflow-hidden">
-      <table className="min-w-full divide-y divide-blue-200">
-        <thead className="bg-blue-50">
+    <div className="">
+      <table className="min-w-full">
+        <thead className="border-b border-gray-200">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
-              諮詢室資訊
-            </th>
+            <th className="px-2 py-2 text-left text-xs font-normal text-gray-600">諮詢室資訊</th>
             {showClient && (
-              <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
-                客戶
-              </th>
+              <th className="px-2 py-2 text-left text-xs font-normal text-gray-600">客戶</th>
             )}
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
-              狀態
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
-              諮詢次數
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
-              剩餘時間
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
-              建立時間
-            </th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-blue-700 uppercase tracking-wider">
-              操作
-            </th>
+            <th className="px-2 py-2 text-left text-xs font-normal text-gray-600">狀態</th>
+            <th className="px-2 py-2 text-left text-xs font-normal text-gray-600">諮詢次數</th>
+            <th className="px-2 py-2 text-left text-xs font-normal text-gray-600">剩餘時間</th>
+            <th className="px-2 py-2 text-left text-xs font-normal text-gray-600">建立時間</th>
+            <th className="px-2 py-2 text-right text-xs font-normal text-gray-600">操作</th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-blue-100">
+        <tbody className="">
           {rooms.map((room) => (
-            <tr key={room.id} className="hover:bg-blue-50 transition-colors">
-              <td className="px-6 py-4">
+            <tr
+              key={room.id}
+              className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <td className="px-2 py-3">
                 <div className="flex items-center">
                   <div>
                     <div className="text-sm font-medium text-gray-900">{room.name}</div>
@@ -113,46 +102,46 @@ export function RoomListTable({
                 </div>
               </td>
               {showClient && (
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-2 py-3 whitespace-nowrap">
                   <div className="text-sm text-gray-900">
                     {room.primary_client_name || <span className="text-gray-400">無客戶</span>}
                   </div>
                 </td>
               )}
-              <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(room)}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="px-2 py-3 whitespace-nowrap">{getStatusBadge(room)}</td>
+              <td className="px-2 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-1 text-sm text-gray-900">
                   <MessageCircle className="w-4 h-4 text-gray-400" />
                   {room.session_count || 0} 次
                 </div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="px-2 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-1 text-sm text-gray-900">
                   <Clock className="w-4 h-4 text-gray-400" />
                   {getDaysRemaining(room.expires_at || null)}
                 </div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className="px-2 py-3 whitespace-nowrap">
                 <div className="flex items-center gap-1 text-sm text-gray-500">
                   <Calendar className="w-4 h-4 text-gray-400" />
                   {formatDate(room.created_at)}
                 </div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right">
+              <td className="px-2 py-3 whitespace-nowrap text-right">
                 <div className="flex items-center justify-end gap-2">
                   <Link
                     href={`/room/${room.id}`}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 transition-colors"
                   >
-                    <ExternalLink className="w-4 h-4" />
+                    <ExternalLink className="w-3 h-3" />
                     進入諮詢室
                   </Link>
                   <button
                     onClick={(e) => copyShareCode(room.share_code, e)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-all duration-200 border border-blue-200"
+                    className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
                     title="複製分享碼"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-3 h-3" />
                     <span className="font-mono">#{room.share_code}</span>
                   </button>
                 </div>

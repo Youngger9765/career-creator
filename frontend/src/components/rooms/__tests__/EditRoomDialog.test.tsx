@@ -44,9 +44,9 @@ describe('EditRoomDialog', () => {
         />
       );
 
-      expect(screen.getByText('編輯房間')).toBeInTheDocument();
-      expect(screen.getByLabelText('房間名稱')).toHaveValue('Original Room Name');
-      expect(screen.getByLabelText('房間描述')).toHaveValue('Original description');
+      expect(screen.getByText('編輯諮詢室')).toBeInTheDocument();
+      expect(screen.getByLabelText('諮詢室名稱')).toHaveValue('Original Room Name');
+      expect(screen.getByLabelText('諮詢室描述')).toHaveValue('Original description');
     });
 
     it('should not render dialog when open is false', () => {
@@ -74,7 +74,7 @@ describe('EditRoomDialog', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('房間名稱');
+      const nameInput = screen.getByLabelText('諮詢室名稱');
       const submitButton = screen.getByText('儲存變更');
 
       // Clear the name field
@@ -83,7 +83,7 @@ describe('EditRoomDialog', () => {
 
       // Should show validation error
       await waitFor(() => {
-        expect(screen.getByText('房間名稱不能為空')).toBeInTheDocument();
+        expect(screen.getByText('諮詢室名稱不能為空')).toBeInTheDocument();
       });
 
       // Should not call API
@@ -100,7 +100,7 @@ describe('EditRoomDialog', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('房間名稱');
+      const nameInput = screen.getByLabelText('諮詢室名稱');
       const longName = 'a'.repeat(150);
 
       fireEvent.change(nameInput, { target: { value: longName } });
@@ -118,7 +118,7 @@ describe('EditRoomDialog', () => {
         />
       );
 
-      const descInput = screen.getByLabelText('房間描述');
+      const descInput = screen.getByLabelText('諮詢室描述');
       const longDesc = 'b'.repeat(600);
 
       fireEvent.change(descInput, { target: { value: longDesc } });
@@ -144,8 +144,8 @@ describe('EditRoomDialog', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('房間名稱');
-      const descInput = screen.getByLabelText('房間描述');
+      const nameInput = screen.getByLabelText('諮詢室名稱');
+      const descInput = screen.getByLabelText('諮詢室描述');
       const submitButton = screen.getByText('儲存變更');
 
       fireEvent.change(nameInput, { target: { value: 'Updated Room Name' } });
@@ -179,7 +179,7 @@ describe('EditRoomDialog', () => {
         />
       );
 
-      const nameInput = screen.getByLabelText('房間名稱');
+      const nameInput = screen.getByLabelText('諮詢室名稱');
       const submitButton = screen.getByText('儲存變更');
 
       fireEvent.change(nameInput, { target: { value: 'New Name' } });
@@ -285,7 +285,7 @@ describe('EditRoomDialog', () => {
         />
       );
 
-      const descInput = screen.getByLabelText('房間描述');
+      const descInput = screen.getByLabelText('諮詢室描述');
       expect(descInput).toHaveValue('');
     });
 

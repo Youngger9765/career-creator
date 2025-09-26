@@ -1,6 +1,6 @@
 /**
  * Game Session hook for managing room game state persistence
- * 遊戲會話管理 Hook - 負責房間遊戲狀態持久化
+ * 遊戲會話管理 Hook - 負責諮詢室遊戲狀態持久化
  */
 import { useState, useCallback, useEffect } from 'react';
 import { gameSessionsAPI, GameSession, GameStatus, GameAction } from '@/lib/api/game-sessions';

@@ -66,7 +66,7 @@ class UserFactory:
 
 
 class RoomFactory:
-    """房間工廠"""
+    """諮詢室工廠"""
 
     @staticmethod
     def create(
@@ -75,7 +75,7 @@ class RoomFactory:
         name: Optional[str] = None,
         **kwargs: Any,
     ) -> Room:
-        """創建測試房間"""
+        """創建測試諮詢室"""
         if counselor is None:
             counselor = UserFactory.create_counselor(session)
 
@@ -103,7 +103,7 @@ class RoomFactory:
 
     @staticmethod
     def create_expired(session: Session, **kwargs: Any) -> Room:
-        """創建已過期的房間"""
+        """創建已過期的諮詢室"""
         kwargs["is_active"] = False
         return RoomFactory.create(session, **kwargs)
 
@@ -220,7 +220,7 @@ class TestDataBuilder:
         return self
 
     def with_room(self, **kwargs: Any) -> "TestDataBuilder":
-        """添加房間"""
+        """添加諮詢室"""
         if self.counselor is None:
             self.with_counselor()
         self.room = RoomFactory.create(self.session, counselor=self.counselor, **kwargs)
@@ -232,7 +232,7 @@ class TestDataBuilder:
             self.with_room()
         for i in range(count):
             visitor = VisitorFactory.create(
-                self.session, room=self.room, name=f"Visitor {i+1}", **kwargs
+                self.session, room=self.room, name=f"Visitor {i + 1}", **kwargs
             )
             self.visitors.append(visitor)
         return self

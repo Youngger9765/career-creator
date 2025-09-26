@@ -1,6 +1,6 @@
 """
 Test room deletion functionality
-測試房間刪除功能
+測試諮詢室刪除功能
 """
 
 from uuid import uuid4
@@ -59,10 +59,10 @@ def create_test_user(session: Session, email: str, roles: list) -> User:
 
 
 class TestRoomDeletion:
-    """房間刪除功能測試"""
+    """諮詢室刪除功能測試"""
 
     def test_delete_room_soft_delete(self, session: Session, client: TestClient):
-        """測試房間軟刪除功能"""
+        """測試諮詢室軟刪除功能"""
         # Create test user and room
         user = create_test_user(session, "counselor@test.com", ["counselor"])
 
@@ -92,7 +92,7 @@ class TestRoomDeletion:
         assert room.is_active is False  # But marked as inactive
 
     def test_list_rooms_excludes_deleted(self, session: Session, client: TestClient):
-        """測試房間列表不包含已刪除的房間"""
+        """測試諮詢室列表不包含已刪除的諮詢室"""
         # Create test user
         user = create_test_user(session, "counselor@test.com", ["counselor"])
 
@@ -139,7 +139,7 @@ class TestRoomDeletion:
         assert to_delete_room_id not in room_ids
 
     def test_delete_nonexistent_room(self, session: Session, client: TestClient):
-        """測試刪除不存在的房間"""
+        """測試刪除不存在的諮詢室"""
         user = create_test_user(session, "counselor@test.com", ["counselor"])
 
         # Try to delete non-existent room
@@ -153,7 +153,7 @@ class TestRoomDeletion:
     def test_delete_other_user_room_unauthorized(
         self, session: Session, client: TestClient
     ):
-        """測試刪除其他用戶的房間（應該被拒絕）"""
+        """測試刪除其他用戶的諮詢室（應該被拒絕）"""
         # Create two users
         user1 = create_test_user(session, "counselor1@test.com", ["counselor"])
         user2 = create_test_user(session, "counselor2@test.com", ["counselor"])

@@ -45,7 +45,7 @@ export default function QRCodeModal({ room, isOpen, onClose }: QRCodeModalProps)
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">分享房間</h2>
+            <h2 className="text-xl font-semibold text-gray-900">分享諮詢室</h2>
             <p className="text-sm text-gray-600 mt-1">{room.name}</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -79,15 +79,15 @@ export default function QRCodeModal({ room, isOpen, onClose }: QRCodeModalProps)
                 <p className="text-red-600 text-sm">QR Code 載入失敗</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mt-3">掃描 QR Code 快速加入房間</p>
+            <p className="text-sm text-gray-600 mt-3">掃描 QR Code 快速加入諮詢室</p>
           </div>
 
           {/* Room Info */}
           <div className="bg-blue-50 rounded-lg p-4">
-            <h3 className="font-medium text-blue-900 mb-2">房間資訊</h3>
+            <h3 className="font-medium text-blue-900 mb-2">諮詢室資訊</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-blue-700">房間名稱：</span>
+                <span className="text-blue-700">諮詢室名稱：</span>
                 <span className="text-blue-900 font-medium">{room.name}</span>
               </div>
               <div className="flex justify-between">

@@ -1,6 +1,6 @@
 /**
  * useRoomParticipants Hook
- * 房間參與者 Hook - 追蹤房間內的參與者
+ * 諮詢室參與者 Hook - 追蹤諮詢室內的參與者
  */
 import { useState, useEffect, useCallback } from 'react';
 import { cardEventsAPI } from '@/lib/api/card-events';

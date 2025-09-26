@@ -1,6 +1,6 @@
 /**
  * Room Expiration hook for managing room expiration logic
- * 房間過期邏輯管理 Hook
+ * 諮詢室過期邏輯管理 Hook
  */
 import { useCallback } from 'react';
 import { Room } from '@/types/api';
@@ -10,6 +10,7 @@ interface RoomStatus {
   isExpired: boolean;
   isClosed: boolean;
   isExpiring?: boolean;
+  status: 'active' | 'expired' | 'closed' | 'expiring';
   label: string;
   color: string;
 }
@@ -29,6 +30,7 @@ export function useRoomExpiration() {
           isActive: false,
           isExpired: false,
           isClosed: true,
+          status: 'closed',
           label: '已停用',
           color: 'bg-gray-100 text-gray-800',
         };
@@ -45,6 +47,7 @@ export function useRoomExpiration() {
             isActive: false,
             isExpired: true,
             isClosed: false,
+            status: 'expired',
             label: '已過期',
             color: 'bg-red-100 text-red-800',
           };
@@ -58,6 +61,7 @@ export function useRoomExpiration() {
             isExpired: false,
             isClosed: false,
             isExpiring: true,
+            status: 'expiring',
             label: '即將過期',
             color: 'bg-yellow-100 text-yellow-800',
           };
@@ -69,6 +73,7 @@ export function useRoomExpiration() {
         isActive: true,
         isExpired: false,
         isClosed: false,
+        status: 'active',
         label: '有效期內',
         color: 'bg-green-100 text-green-800',
       };

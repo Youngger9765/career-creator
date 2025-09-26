@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useRoomStore } from '@/stores/room-store';
 import { useAuthStore } from '@/stores/auth-store';
+import { clientsAPI } from '@/lib/api/clients';
+import type { Client } from '@/types/client';
 import Link from 'next/link';
 
 export default function CreateRoomPage() {
@@ -38,11 +40,64 @@ export default function CreateRoomPage() {
     setCheckingAuth(false);
   }, [isAuthenticated]);
 
+  // Load clients when component mounts and user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && user?.roles?.includes('counselor')) {
+      loadClients();
+
+      // Check if client info is passed in URL
+      const params = new URLSearchParams(window.location.search);
+      const clientParam = params.get('client');
+      if (clientParam) {
+        try {
+          const clientInfo = JSON.parse(decodeURIComponent(clientParam));
+          if (clientInfo.client_id) {
+            // Format date as YYYY-MM-DD
+            const today = new Date();
+            const dateStr = today
+              .toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              })
+              .replace(/\//g, '-');
+
+            setFormData((prev) => ({
+              ...prev,
+              clientId: clientInfo.client_id,
+              name: `${clientInfo.client_name} 的諮詢室-${dateStr}`,
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to parse client info:', error);
+        }
+      }
+    }
+  }, [isAuthenticated, user]);
+
+  const loadClients = async () => {
+    try {
+      setLoadingClients(true);
+      const clientsData = await clientsAPI.getMyClients();
+      setClients(clientsData);
+    } catch (error) {
+      console.error('Failed to load clients:', error);
+    } finally {
+      setLoadingClients(false);
+    }
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     expirationDays: 7, // Default 7 days
+    clientId: '', // Selected client ID
+    clientEmail: '', // New client email
+    clientName: '', // New client name
+    clientPhone: '', // New client phone
   });
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loadingClients, setLoadingClients] = useState(false);
 
   if (checkingAuth) {
     return (
@@ -60,7 +115,7 @@ export default function CreateRoomPage() {
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">請先登入</h1>
-          <p className="text-gray-600 mb-6">需要登入才能創建諮詢房間</p>
+          <p className="text-gray-600 mb-6">需要登入才能創建諮詢室</p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -77,7 +132,7 @@ export default function CreateRoomPage() {
       <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">權限不足</h1>
-          <p className="text-gray-600 mb-6">只有諮詢師才能創建房間</p>
+          <p className="text-gray-600 mb-6">只有諮詢師才能創建諮詢室</p>
           <Link
             href="/"
             className="inline-block px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
@@ -100,10 +155,22 @@ export default function CreateRoomPage() {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + formData.expirationDays);
 
+      // Create new client if needed
+      let clientId = formData.clientId;
+      if (formData.clientId === 'new' && formData.clientEmail) {
+        const newClient = await clientsAPI.createClient({
+          email: formData.clientEmail,
+          name: formData.clientName || formData.clientEmail,
+          phone: formData.clientPhone,
+        });
+        clientId = newClient.id;
+      }
+
       const room = await createRoom({
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
         expires_at: expiresAt.toISOString(),
+        client_id: clientId && clientId !== '' ? clientId : undefined,
       });
 
       // Redirect to the new room
@@ -124,7 +191,7 @@ export default function CreateRoomPage() {
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-lg w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">創建諮詢房間</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">創建諮詢室</h1>
           <p className="text-gray-600">設定您的職業諮詢會話</p>
         </div>
 
@@ -132,7 +199,7 @@ export default function CreateRoomPage() {
           {/* Room Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              房間名稱 <span className="text-red-500">*</span>
+              諮詢室名稱 <span className="text-red-500">*</span>
             </label>
             <input
               id="name"
@@ -144,13 +211,13 @@ export default function CreateRoomPage() {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-400"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">房間名稱將顯示給所有參與者</p>
+            <p className="text-xs text-gray-500 mt-1">諮詢室名稱將顯示給所有參與者</p>
           </div>
 
           {/* Room Description */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-              房間描述
+              諮詢室描述
             </label>
             <textarea
               id="description"
@@ -166,13 +233,64 @@ export default function CreateRoomPage() {
             </p>
           </div>
 
+          {/* Client Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">關聯客戶</label>
+            <div className="space-y-3">
+              <select
+                value={formData.clientId}
+                onChange={(e) => handleInputChange('clientId', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                disabled={loadingClients}
+              >
+                <option value="">
+                  {loadingClients ? '載入客戶列表中...' : '選擇既有客戶或新增客戶'}
+                </option>
+                <option value="new">+ 新增客戶</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name} ({client.email})
+                  </option>
+                ))}
+              </select>
+
+              {formData.clientId === 'new' && (
+                <div className="p-4 bg-gray-50 rounded-lg space-y-3">
+                  <input
+                    type="email"
+                    placeholder="客戶 Email *"
+                    value={formData.clientEmail}
+                    onChange={(e) => handleInputChange('clientEmail', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required={formData.clientId === 'new'}
+                  />
+                  <input
+                    type="text"
+                    placeholder="客戶姓名"
+                    value={formData.clientName}
+                    onChange={(e) => handleInputChange('clientName', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <input
+                    type="tel"
+                    placeholder="客戶電話 (選填)"
+                    value={formData.clientPhone}
+                    onChange={(e) => handleInputChange('clientPhone', e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">將此諮詢室關聯到特定客戶，方便管理諮詢記錄</p>
+          </div>
+
           {/* Expiration Settings */}
           <div>
             <label
               htmlFor="expirationDays"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              房間有效期限
+              諮詢室有效期限
             </label>
             <select
               id="expirationDays"
@@ -187,7 +305,7 @@ export default function CreateRoomPage() {
               <option value={30}>30 天</option>
             </select>
             <p className="text-xs text-gray-500 mt-1">
-              房間將在 {formData.expirationDays} 天後自動過期，過期後將無法進入
+              諮詢室將在 {formData.expirationDays} 天後自動過期，過期後將無法進入
             </p>
           </div>
 
@@ -209,7 +327,7 @@ export default function CreateRoomPage() {
 
           {/* Room Features */}
           <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-medium text-gray-800 mb-2">房間功能特色</h3>
+            <h3 className="font-medium text-gray-800 mb-2">諮詢室功能特色</h3>
             <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
               <div className="flex items-center">
                 <span className="text-green-500 mr-2">✓</span>
@@ -250,7 +368,7 @@ export default function CreateRoomPage() {
               disabled={isLoading || !formData.name.trim()}
               className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
             >
-              {isLoading ? '創建中...' : '創建房間'}
+              {isLoading ? '創建中...' : '創建諮詢室'}
             </button>
           </div>
         </form>
@@ -258,7 +376,7 @@ export default function CreateRoomPage() {
         {/* Info */}
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="text-xs text-gray-500 text-center">
-            創建房間後，系統會自動生成分享碼供客戶加入
+            創建諮詢室後，系統會自動生成分享碼供客戶加入
           </div>
         </div>
       </div>

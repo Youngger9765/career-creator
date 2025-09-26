@@ -1,6 +1,6 @@
 /**
  * Room Statistics Card Component
- * 房間統計資料卡片元件
+ * 諮詢室統計資料卡片元件
  */
 'use client';
 
@@ -30,7 +30,7 @@ export function RoomStatisticsCard({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            房間統計
+            諮詢室統計
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -50,7 +50,7 @@ export function RoomStatisticsCard({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            房間統計
+            諮詢室統計
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -72,7 +72,7 @@ export function RoomStatisticsCard({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <BarChart3 className="h-5 w-5" />
-            房間統計
+            諮詢室統計
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -119,7 +119,7 @@ export function RoomStatisticsCard({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <BarChart3 className="h-5 w-5" />
-          房間統計
+          諮詢室統計
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">

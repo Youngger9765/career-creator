@@ -44,8 +44,8 @@ describe('DeleteRoomDialog', () => {
         />
       );
 
-      expect(screen.getByText('確認刪除房間')).toBeInTheDocument();
-      expect(screen.getByText(/確定要刪除房間「Test Room」嗎？/)).toBeInTheDocument();
+      expect(screen.getByText('確認刪除諮詢室')).toBeInTheDocument();
+      expect(screen.getByText(/確定要刪除諮詢室「Test Room」嗎？/)).toBeInTheDocument();
       expect(screen.getByText('此操作無法復原')).toBeInTheDocument();
     });
 
@@ -236,7 +236,7 @@ describe('DeleteRoomDialog', () => {
         />
       );
 
-      expect(screen.getByText(/確定要刪除房間「Test Room」嗎？/)).toBeInTheDocument();
+      expect(screen.getByText(/確定要刪除諮詢室「Test Room」嗎？/)).toBeInTheDocument();
     });
 
     it('should handle inactive room', () => {

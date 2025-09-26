@@ -1,6 +1,6 @@
 /**
  * Room Card Component with Statistics
- * 房間卡片元件包含統計資料
+ * 諮詢室卡片元件包含統計資料
  */
 'use client';
 
@@ -59,13 +59,13 @@ export function RoomCard({
   const getStatusDescription = (label: string) => {
     switch (label) {
       case '有效期內':
-        return '房間在有效期限內，可正常使用';
+        return '諮詢室在有效期限內，可正常使用';
       case '即將過期':
-        return '房間將在24小時內過期，請儘快使用';
+        return '諮詢室將在24小時內過期，請儘快使用';
       case '已過期':
-        return '房間已超過有效期限，無法進入';
+        return '諮詢室已超過有效期限，無法進入';
       case '已停用':
-        return '房間已被手動停用，無法進入';
+        return '諮詢室已被手動停用，無法進入';
       default:
         return '';
     }
@@ -115,47 +115,55 @@ export function RoomCard({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mb-3">
+          <div className="space-y-3 mb-3">
+            {/* Main Enter Button - Prominent and Elegant */}
             <Link
               href={`/room/${room.id}`}
-              className="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+              className="block w-full text-center px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium text-base rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             >
-              進入
+              進入諮詢室
             </Link>
-            <button
-              onClick={() => onEdit(room)}
-              className="p-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-              title="編輯房間"
-            >
-              <Edit2 className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onDelete(room)}
-              className="p-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
-              title="刪除房間"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-            {room.is_active && (
+
+            {/* Secondary Actions */}
+            <div className="flex gap-2">
               <button
-                onClick={async () => {
-                  if (confirm(`確定要結束「${room.name}」嗎？`)) {
-                    try {
-                      await roomsAPI.closeRoom(room.id);
-                      alert('房間已結束');
-                      window.location.reload();
-                    } catch (error) {
-                      console.error('Failed to close room:', error);
-                      alert('結束房間失敗');
-                    }
-                  }
-                }}
-                className="px-3 py-2 bg-orange-600 text-white text-sm rounded-md hover:bg-orange-700 transition-colors"
-                title="結束房間"
+                onClick={() => onEdit(room)}
+                className="flex-1 px-3 py-2 bg-gray-50 text-gray-700 text-sm rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
+                title="編輯諮詢室"
               >
-                結束
+                <Edit2 className="w-4 h-4 inline mr-1" />
+                編輯
               </button>
-            )}
+              {room.is_active && (
+                <button
+                  onClick={async () => {
+                    if (confirm(`確定要結束「${room.name}」嗎？`)) {
+                      try {
+                        await roomsAPI.closeRoom(room.id);
+                        alert('諮詢室已結束');
+                        window.location.reload();
+                      } catch (error) {
+                        console.error('Failed to close room:', error);
+                        alert('結束諮詢室失敗');
+                      }
+                    }
+                  }}
+                  className="flex-1 px-3 py-2 bg-orange-50 text-orange-600 text-sm rounded-lg hover:bg-orange-100 transition-colors border border-orange-200"
+                  title="結束諮詢室"
+                >
+                  <Clock className="w-4 h-4 inline mr-1" />
+                  結束
+                </button>
+              )}
+              <button
+                onClick={() => onDelete(room)}
+                className="flex-1 px-3 py-2 bg-red-50 text-red-600 text-sm rounded-lg hover:bg-red-100 transition-colors border border-red-200"
+                title="刪除諮詢室"
+              >
+                <Trash2 className="w-4 h-4 inline mr-1" />
+                刪除
+              </button>
+            </div>
           </div>
 
           {/* Statistics Toggle */}

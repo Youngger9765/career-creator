@@ -4,12 +4,13 @@ Database Seeding System
 """
 
 import uuid
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 from sqlmodel import Session, select
 
 from app.core.auth import DEMO_ACCOUNTS, get_password_hash
 from app.core.database import engine
+from app.models.client import Client, ClientStatus, ConsultationRecord, RoomClient
 from app.models.game_rule import Card, CardDeck, GameRuleTemplate
 from app.models.room import Room
 from app.models.user import User
@@ -697,7 +698,7 @@ def seed_test_users():
                 id=uuid.uuid4(),
                 email="counselor@example.com",
                 name="王諮詢師",
-                hashed_password=get_password_hash("test1234"),
+                hashed_password=get_password_hash("password123"),
                 roles=["counselor"],
                 is_active=True,
                 created_at=datetime.utcnow(),
@@ -726,7 +727,7 @@ def seed_test_users():
 
 
 def seed_test_rooms():
-    """創建測試房間（開發環境用）"""
+    """創建測試諮詢室（開發環境用）"""
     with Session(engine) as session:
         # 獲取測試用戶
         test_user = session.exec(
@@ -737,17 +738,17 @@ def seed_test_rooms():
             print("⚠️ Test user not found, skipping test rooms")
             return
 
-        # 檢查是否已存在測試房間
+        # 檢查是否已存在測試諮詢室
         existing_room = session.exec(
-            select(Room).where(Room.name == "測試諮詢房間")
+            select(Room).where(Room.name == "測試諮詢室")
         ).first()
 
         if not existing_room:
-            # 創建活躍的測試房間
+            # 創建活躍的測試諮詢室
             test_room = Room(
                 id=uuid.uuid4(),
-                name="測試諮詢房間",
-                description="這是一個測試用的諮詢房間",
+                name="測試諮詢室",
+                description="這是一個測試用的諮詢室",
                 counselor_id=test_user.id,
                 status="active",
                 share_code="TEST123",
@@ -756,17 +757,17 @@ def seed_test_rooms():
             )
             session.add(test_room)
 
-        # 檢查是否已存在過期房間
+        # 檢查是否已存在過期諮詢室
         existing_expired_room = session.exec(
-            select(Room).where(Room.name == "已過期的房間")
+            select(Room).where(Room.name == "已過期的諮詢室")
         ).first()
 
         if not existing_expired_room:
-            # 創建過期的測試房間
+            # 創建過期的測試諮詢室
             expired_room = Room(
                 id=uuid.uuid4(),
-                name="已過期的房間",
-                description="這個房間已經過期了",
+                name="已過期的諮詢室",
+                description="這個諮詢室已經過期了",
                 counselor_id=test_user.id,
                 status="expired",
                 share_code="EXPIRED1",
@@ -779,6 +780,309 @@ def seed_test_rooms():
         print("✅ Test rooms seeded")
 
 
+def seed_crm_data():
+    """創建CRM系統種子資料 - 簡化版客戶資料"""
+    print("🏢 Seeding CRM data with simplified model...")
+
+    with Session(engine) as session:
+        # Get actual counselor UUIDs from database
+        counselor1 = session.exec(
+            select(User).where(User.email == "demo.counselor@example.com")
+        ).first()
+        counselor2 = session.exec(
+            select(User).where(User.email == "demo.counselor2@example.com")
+        ).first()
+
+        if not counselor1 or not counselor2:
+            print("❌ Demo counselors not found! Please run seed_demo_users() first.")
+            return
+
+        # Use actual counselor IDs (convert UUID to string)
+        counselor1_id = str(counselor1.id)
+        counselor2_id = str(counselor2.id)
+
+        # 創建客戶資料 - 每個諮商師有獨立的客戶紀錄
+        clients_data = [
+            # Demo counselor 001's clients
+            # 1. 沒有 email
+            {
+                "counselor_id": counselor1_id,
+                "email": None,
+                "name": "張小美",
+                "phone": "0945-678-901",
+                "notes": "初次諮詢，尚未提供 Email",
+                "tags": ["初次諮詢", "無Email"],
+                "status": ClientStatus.ACTIVE,
+                "email_verified": False,
+            },
+            # 2. 有 email, 已驗證
+            {
+                "counselor_id": counselor1_id,
+                "email": "alice.chen@example.com",
+                "name": "陳雅琪 (Alice Chen)",
+                "phone": "0912-345-678",
+                "notes": "大學應屆畢業生，主修資訊工程，對職涯方向感到迷茫",
+                "tags": ["應屆畢業生", "資訊科技", "已驗證Email"],
+                "status": ClientStatus.ACTIVE,
+                "email_verified": True,
+                "verified_at": datetime.utcnow() - timedelta(days=20),
+            },
+            # 3. 有 email, 未驗證
+            {
+                "counselor_id": counselor1_id,
+                "email": "bob.wang@example.com",
+                "name": "王建明 (Bob Wang)",
+                "phone": "0923-456-789",
+                "notes": "工作5年，考慮轉職到不同產業",
+                "tags": ["在職人士", "轉職", "未驗證Email"],
+                "status": ClientStatus.ACTIVE,
+                "email_verified": False,
+                "verification_token": "test_token_123",
+            },
+            # Demo counselor 002's clients
+            {
+                "counselor_id": counselor2_id,
+                "email": "carol.liu@example.com",
+                "name": "劉佳玲 (Carol Liu)",
+                "phone": "0934-567-890",
+                "notes": "剛從國外回來，尋求本地職場建議",
+                "tags": ["海歸", "重新就業", "跨文化適應"],
+                "status": ClientStatus.ACTIVE,
+                "email_verified": False,
+            },
+            # Different email for counselor2
+            {
+                "counselor_id": counselor2_id,
+                "email": "diana.wu@example.com",
+                "name": "Diana Wu",
+                "phone": "0945-678-901",
+                "notes": "新創公司職涯發展諮詢",
+                "tags": ["新創", "職涯發展"],
+                "status": ClientStatus.ACTIVE,
+                "email_verified": True,
+                "verified_at": datetime.utcnow() - timedelta(days=10),
+            },
+        ]
+
+        clients = []
+        for client_data in clients_data:
+            # Check for existing client with same counselor_id and email/name
+            if client_data["email"]:
+                existing_client = session.exec(
+                    select(Client).where(
+                        Client.counselor_id == client_data["counselor_id"],
+                        Client.email == client_data["email"],
+                    )
+                ).first()
+            else:
+                existing_client = session.exec(
+                    select(Client).where(
+                        Client.counselor_id == client_data["counselor_id"],
+                        Client.name == client_data["name"],
+                        Client.email.is_(None),
+                    )
+                ).first()
+
+            if not existing_client:
+                client = Client(**client_data)
+                session.add(client)
+                clients.append(client)
+                client_type = "No-email" if not client_data["email"] else "Regular"
+                print(
+                    f"  ✅ Created {client_type} client: {client_data['name']} "
+                    f"for {client_data['counselor_id']}"
+                )
+            else:
+                clients.append(existing_client)
+
+        session.commit()
+
+        # No more relationships needed - counselor_id is directly on Client now
+
+        # 獲取遊戲規則和卡組
+        career_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_career")
+        ).first()
+        value_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_values")
+        ).first()
+        skill_rule = session.exec(
+            select(GameRuleTemplate).where(GameRuleTemplate.slug == "basic_skills")
+        ).first()
+
+        career_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "職業探索卡組")
+        ).first()
+        value_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "價值觀卡組")
+        ).first()
+        skill_deck = session.exec(
+            select(CardDeck).where(CardDeck.name == "技能卡組")
+        ).first()
+
+        # 為每個客戶創建多個諮詢室和諮詢記錄
+        room_types = [
+            {
+                "suffix": "職涯諮詢室",
+                "desc": "職涯探索與規劃",
+                "topics": ["職涯探索", "技能評估"],
+                "game_rule": career_rule,
+                "deck": career_deck,
+            },
+            {
+                "suffix": "價值觀討論室",
+                "desc": "價值觀澄清與討論",
+                "topics": ["價值觀探索", "人生目標設定"],
+                "game_rule": value_rule,
+                "deck": value_deck,
+            },
+            {
+                "suffix": "技能盤點室",
+                "desc": "個人能力評估",
+                "topics": ["技能盤點", "能力發展"],
+                "game_rule": skill_rule,
+                "deck": skill_deck,
+            },
+        ]
+
+        # Use actual counselor IDs for rooms
+        demo_counselor_ids = [counselor1_id, counselor2_id]
+
+        for client_idx, client in enumerate(clients[:3]):  # 為所有3個客戶創建諮詢室
+            # 為每個客戶創建 2-3 個諮詢室
+            num_rooms = 3 if client_idx < 2 else 2
+            for room_idx in range(num_rooms):
+                room_type = room_types[room_idx % len(room_types)]
+                room_name = f"{client.name.split(' ')[0]} 的{room_type['suffix']}"
+
+                existing_room = session.exec(
+                    select(Room).where(Room.name == room_name)
+                ).first()
+
+                if not existing_room:
+                    # Use demo counselor IDs instead of actual User IDs
+                    demo_counselor_id = demo_counselor_ids[
+                        client_idx % len(demo_counselor_ids)
+                    ]
+
+                    # 根據諮詢室類型設置不同的到期時間
+                    expire_days = [30, 25, 20][room_idx] if room_idx < 3 else 15
+                    is_active = room_idx < 2  # 前兩個諮詢室保持活躍
+
+                    room = Room(
+                        name=room_name,
+                        description=f"為 {client.name} 提供的{room_type['desc']}服務",
+                        counselor_id=demo_counselor_id,
+                        is_active=is_active,
+                        expires_at=datetime.utcnow() + timedelta(days=expire_days),
+                        session_count=room_idx + 1,
+                    )
+                    session.add(room)
+                    session.commit()
+                    session.refresh(room)
+                    print(
+                        f"  ✅ Created room: {room_name} for counselor {demo_counselor_id}"
+                    )
+
+                    # 關聯諮詢室與客戶
+                    room_client = RoomClient(room_id=room.id, client_id=client.id)
+                    session.add(room_client)
+                    print(f"  ✅ Linked room to client: {client.name}")
+
+                    # **特殊處理** - 為第一個客戶的第二個諮詢師也創建一個諮詢室
+                    if (
+                        client_idx == 0 and room_idx == 2
+                    ):  # 第一個客戶的第三個諮詢室類型
+                        # 為第二個諮詢師創建相同類型的諮詢室
+                        second_counselor_room_name = (
+                            f"{client.name.split(' ')[0]} 的轉職{room_type['suffix']}"
+                        )
+
+                        existing_second_room = session.exec(
+                            select(Room).where(Room.name == second_counselor_room_name)
+                        ).first()
+
+                        if not existing_second_room:
+                            second_room = Room(
+                                name=second_counselor_room_name,
+                                description=f"為 {client.name} 提供的轉職輔導{room_type['desc']}服務",
+                                counselor_id=demo_counselor_ids[1],  # 第二個諮詢師
+                                is_active=True,
+                                expires_at=datetime.utcnow() + timedelta(days=35),
+                                session_count=1,
+                            )
+                            session.add(second_room)
+                            session.commit()
+                            session.refresh(second_room)
+                            print(
+                                f"  ✅ Created cross-counselor room: {second_counselor_room_name} for counselor {demo_counselor_ids[1]}"
+                            )
+
+                            # 關聯諮詢室與客戶
+                            room_client_cross = RoomClient(
+                                room_id=second_room.id, client_id=client.id
+                            )
+                            session.add(room_client_cross)
+                            print(
+                                f"  ✅ Linked cross-counselor room to client: {client.name}"
+                            )
+
+                            # 為這個諮詢室創建諮詢記錄
+                            cross_record = ConsultationRecord(
+                                room_id=second_room.id,
+                                client_id=client.id,
+                                counselor_id=demo_counselor_ids[1],
+                                session_date=datetime.utcnow() - timedelta(days=10),
+                                duration_minutes=60,
+                                topics=["轉職輔導", "第二意見"],
+                                notes="第二諮詢師的轉職專業輔導會議。提供不同角度的職涯建議。",
+                                follow_up_required=True,
+                                follow_up_date=date.today() + timedelta(days=14),
+                            )
+                            session.add(cross_record)
+                            print("  ✅ Created cross-counselor consultation record")
+
+                    # 為每個諮詢室創建 1-3 個諮詢記錄
+                    num_records = [3, 2, 1][room_idx] if room_idx < 3 else 1
+                    for record_idx in range(num_records):
+                        days_ago = 3 + room_idx * 7 + record_idx * 3  # 分散在不同時間
+                        session_date = datetime.utcnow() - timedelta(days=days_ago)
+
+                        record = ConsultationRecord(
+                            room_id=room.id,
+                            client_id=client.id,
+                            counselor_id=demo_counselor_id,
+                            session_date=session_date,
+                            duration_minutes=45
+                            + room_idx * 15
+                            + record_idx * 5,  # 不同時長
+                            topics=(
+                                room_type["topics"] + [f"進度檢討 #{record_idx + 1}"]
+                                if record_idx > 0
+                                else room_type["topics"]
+                            ),
+                            notes=f"第 {record_idx + 1} 次{room_type['desc']}會議記錄。討論了相關主題，客戶表現積極。",
+                            follow_up_required=(client_idx + room_idx + record_idx) % 2
+                            == 0,
+                            follow_up_date=(
+                                date.today() + timedelta(days=7 + record_idx * 3)
+                                if (client_idx + room_idx + record_idx) % 2 == 0
+                                else None
+                            ),
+                        )
+                        session.add(record)
+
+                    print(
+                        f"  ✅ Created {num_records} consultation record(s) for {client.name} in {room.name}"
+                    )
+
+        session.commit()
+
+    # No more demo relationships needed - counselor_id is directly on Client now
+
+    print("✅ CRM data seeded successfully")
+
+
 def run_all_seeds(include_test_data=False):
     """執行所有種子資料"""
     print("🌱 Starting database seeding...")
@@ -788,6 +1092,7 @@ def run_all_seeds(include_test_data=False):
         seed_career_cards()
         seed_value_cards()
         seed_skill_cards()
+        seed_crm_data()  # 新增CRM種子資料
 
         if include_test_data:
             print("\n🧪 Including test data...")
@@ -812,11 +1117,11 @@ def run_test_seeds():
         print("🎉 Test seeds completed successfully!")
         print("\n📋 Test accounts created:")
         print("- Email: test@example.com, Password: demo123")
-        print("- Email: counselor@example.com, Password: test1234")
+        print("- Email: counselor@example.com, Password: password123")
         print("- Email: admin@example.com, Password: admin123")
         print("\n🏠 Test rooms created:")
-        print("- 測試諮詢房間 (Share code: TEST123)")
-        print("- 已過期的房間 (Share code: EXPIRED1)")
+        print("- 測試諮詢室 (Share code: TEST123)")
+        print("- 已過期的諮詢室 (Share code: EXPIRED1)")
 
     except Exception as e:
         print(f"❌ Test seeding failed: {e}")

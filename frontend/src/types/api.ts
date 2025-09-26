@@ -47,11 +47,19 @@ export interface Room extends BaseEntity {
   is_active: boolean;
   expires_at?: string;
   session_count?: number;
+  client_id?: string;
+  client_name?: string;
+  primary_client_name?: string;
+  last_activity?: string;
+  counselor_name?: string;
 }
 
 export interface RoomCreate {
   name: string;
   description?: string;
+  client_id?: string;
+  expires_at?: string;
+  game_rule_slug?: string;
 }
 
 export interface RoomStatistics {

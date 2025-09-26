@@ -72,7 +72,7 @@ class GameState:
             zones["disadvantage"] = ZoneState("disadvantage")
         elif rule_id == "value_navigation":
             for i in range(9):
-                zones[f"rank_{i+1}"] = ZoneState(f"rank_{i+1}")
+                zones[f"rank_{i + 1}"] = ZoneState(f"rank_{i + 1}")
         elif rule_id == "career_personality":
             zones["like"] = ZoneState("like")
             zones["neutral"] = ZoneState("neutral")

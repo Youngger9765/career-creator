@@ -36,9 +36,53 @@ def get_demo_accounts():
 def login(login_data: LoginRequest, session: Session = Depends(get_session)):
     """Login with email and password (supports demo accounts)"""
 
-    # First check if it's a demo account
-    demo_account = find_demo_account_by_email(login_data.email)
+    # First check regular database users
+    statement = select(User).where(User.email == login_data.email)
+    user = session.exec(statement).first()
 
+    # If user exists in database, use database user (even for demo accounts)
+    if user:
+        # Verify password (for demo accounts, allow both hashed and plain "demo123")
+        is_valid_password = verify_password(login_data.password, user.hashed_password)
+        if not is_valid_password and login_data.password == "demo123":
+            # For demo accounts, also allow plain "demo123" password
+            demo_account = find_demo_account_by_email(login_data.email)
+            is_valid_password = demo_account is not None
+
+        if not is_valid_password:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+            )
+
+        # Create access token using database user UUID
+        access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+        access_token = create_access_token(
+            data={"sub": str(user.id), "email": user.email, "roles": user.roles},
+            expires_delta=access_token_expires,
+        )
+
+        return LoginResponse(
+            access_token=access_token,
+            token_type="bearer",
+            user={
+                "id": str(user.id),
+                "name": user.name,
+                "email": user.email,
+                "roles": user.roles,
+                "is_active": user.is_active,
+                "created_at": user.created_at.isoformat(),
+            },
+        )
+
+    # Fallback to demo account if not found in database
+    demo_account = find_demo_account_by_email(login_data.email)
     if demo_account and login_data.password == "demo123":
         # Demo account login
         access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
@@ -64,40 +108,11 @@ def login(login_data: LoginRequest, session: Session = Depends(get_session)):
             },
         )
 
-    # Check regular database users
-    statement = select(User).where(User.email == login_data.email)
-    user = session.exec(statement).first()
-
-    if not user or not verify_password(login_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
-        )
-
-    # Create access token
-    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-    access_token = create_access_token(
-        data={"sub": str(user.id), "email": user.email, "roles": user.roles},
-        expires_delta=access_token_expires,
-    )
-
-    return LoginResponse(
-        access_token=access_token,
-        token_type="bearer",
-        user={
-            "id": str(user.id),
-            "name": user.name,
-            "email": user.email,
-            "roles": user.roles,
-            "is_active": user.is_active,
-            "created_at": user.created_at.isoformat(),
-        },
+    # No valid user found
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Incorrect email or password",
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
 
@@ -150,7 +165,7 @@ def initialize_demo_accounts(session: Session = Depends(get_session)):
             user = User(
                 email=demo_data["email"],
                 name=demo_data["name"],
-                hashed_password=get_password_hash(demo_data["password"]),
+                hashed_password=get_password_hash(str(demo_data["password"])),
                 roles=demo_data["roles"],
                 is_active=True,
             )

@@ -70,7 +70,7 @@ class TestWithFactories:
         assert len(visitors) == 2
         assert len(test_data["events"]) == 4  # 預設創建4個事件
 
-        # 測試諮詢師可以查看房間
+        # 測試諮詢師可以查看諮詢室
         headers = create_auth_headers(counselor)
         response = client.get(f"/api/rooms/{room.id}", headers=headers)
         assert response.status_code == 200
@@ -83,12 +83,12 @@ class TestWithFactories:
         assert len(events) == 4
 
     def test_room_expiration(self, session: Session):
-        """測試房間過期 - 使用 RoomFactory"""
-        # 創建活躍房間
+        """測試諮詢室過期 - 使用 RoomFactory"""
+        # 創建活躍諮詢室
         active_room = RoomFactory.create(session)
         assert active_room.is_active is True
 
-        # 創建過期房間
+        # 創建過期諮詢室
         expired_room = RoomFactory.create_expired(session)
         assert expired_room.is_active is False
 
@@ -127,19 +127,19 @@ class TestWithFactories:
         assert len(events) >= 4
 
     def test_multiple_rooms_scenario(self, session: Session):
-        """測試多房間場景 - 展示 Factory 的靈活性"""
-        # 一個諮詢師創建多個房間
+        """測試多諮詢室場景 - 展示 Factory 的靈活性"""
+        # 一個諮詢師創建多個諮詢室
         counselor = UserFactory.create_counselor(session, name="資深諮詢師")
 
         rooms = [
-            RoomFactory.create(session, counselor, name=f"諮詢室 {i+1}")
+            RoomFactory.create(session, counselor, name=f"諮詢室 {i + 1}")
             for i in range(3)
         ]
 
-        # 每個房間有不同數量的訪客
+        # 每個諮詢室有不同數量的訪客
         for i, room in enumerate(rooms):
-            for j in range(i + 1):  # 第一個房間1個訪客，第二個2個，依此類推
-                VisitorFactory.create(session, room, name=f"房間{i+1}訪客{j+1}")
+            for j in range(i + 1):  # 第一個諮詢室1個訪客，第二個2個，依此類推
+                VisitorFactory.create(session, room, name=f"諮詢室{i + 1}訪客{j + 1}")
 
         # 驗證
         assert len(rooms) == 3

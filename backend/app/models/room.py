@@ -1,10 +1,13 @@
 import secrets
 import string
-from datetime import datetime, timedelta
-from typing import Optional
+from datetime import datetime
+from typing import TYPE_CHECKING, List, Optional
 from uuid import UUID, uuid4
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from app.models.client import ConsultationRecord, RoomClient
 
 
 def generate_share_code() -> str:
@@ -40,6 +43,18 @@ class Room(RoomBase, table=True):
     )
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    expires_at: Optional[datetime] = Field(
+        default=None, description="Room expiration date"
+    )
+    session_count: int = Field(
+        default=0, description="Number of sessions held in this room"
+    )
+
+    # Relationships for CRM
+    client_associations: List["RoomClient"] = Relationship(back_populates="room")
+    consultation_records: List["ConsultationRecord"] = Relationship(
+        back_populates="room"
+    )
 
 
 class RoomCreate(RoomBase):
@@ -47,6 +62,10 @@ class RoomCreate(RoomBase):
 
     game_rule_slug: Optional[str] = Field(
         default="skill_assessment", description="遊戲規則標識符"
+    )
+    client_id: Optional[UUID] = Field(default=None, description="Associated client ID")
+    expires_at: Optional[datetime] = Field(
+        default=None, description="Room expiration date"
     )
 
 
@@ -58,3 +77,7 @@ class RoomResponse(RoomBase):
     share_code: str
     is_active: bool
     created_at: datetime
+    expires_at: Optional[datetime] = None
+    session_count: int = 0
+    client_name: Optional[str] = None  # Associated client name
+    counselor_name: Optional[str] = None  # Associated counselor name

@@ -1,6 +1,6 @@
 """
 Visitor model for anonymous users joining rooms
-訪客模型 - 匿名用戶加入房間
+訪客模型 - 匿名用戶加入諮詢室
 """
 
 from datetime import datetime

@@ -1,6 +1,6 @@
 /**
  * ParticipantList Component
- * 參與者列表組件 - 顯示房間內的參與者
+ * 參與者列表組件 - 顯示諮詢室內的參與者
  */
 import React from 'react';
 import { Users, Crown, User } from 'lucide-react';

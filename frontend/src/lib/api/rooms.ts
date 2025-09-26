@@ -1,6 +1,6 @@
 /**
  * Rooms API
- * 房間相關 API
+ * 諮詢室相關 API
  */
 import { apiClient, handleApiError } from './client';
 
@@ -20,6 +20,8 @@ export interface CreateRoomData {
   name: string;
   description?: string;
   expires_at?: string;
+  client_id?: string;
+  game_rule_slug?: string;
 }
 
 export interface RoomStatistics {
@@ -43,13 +45,14 @@ class RoomsAPI {
   }
 
   /**
-   * Get all active rooms for current counselor
+   * Get all rooms for current counselor (active and inactive)
    */
-  async getMyRooms(): Promise<Room[]> {
+  async getMyRooms(includeInactive = true): Promise<Room[]> {
     try {
-      const response = await apiClient.get<Room[]>('/api/rooms/');
-      // Extra protection: filter out inactive rooms on frontend too
-      return response.data.filter((room) => room.is_active);
+      const response = await apiClient.get<Room[]>('/api/rooms/', {
+        params: { include_inactive: includeInactive },
+      });
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

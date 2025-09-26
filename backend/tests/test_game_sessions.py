@@ -5,10 +5,8 @@ Test Game Sessions API - TDD approach
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.models.game_rule import GameRuleTemplate
-from app.models.game_state import GameSession, GameStatus
-from app.models.room import Room
 
 client = TestClient(app)
 
@@ -61,7 +59,7 @@ class TestGameSessionCreation:
         assert "zones" in data["game_state"]
 
     def test_cannot_create_duplicate_session(self, auth_headers, test_room):
-        """測試不能為同一房間創建重複的遊戲會話"""
+        """測試不能為同一諮詢室創建重複的遊戲會話"""
         # Create first session
         response1 = client.post(
             "/api/game-sessions/",
@@ -120,7 +118,7 @@ class TestGameSessionRetrieval:
         assert data["room_id"] == test_room["id"]
 
     def test_get_active_session_for_room(self, auth_headers, test_room):
-        """測試獲取房間的活躍遊戲會話"""
+        """測試獲取諮詢室的活躍遊戲會話"""
         # Create session
         create_response = client.post(
             "/api/game-sessions/",

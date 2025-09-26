@@ -67,7 +67,7 @@ class TestGameRuleConfig:
 
         # 檢查每個位置都只能放1張牌
         for i in range(9):
-            zone = config.layout.get_zone(f"rank_{i+1}")
+            zone = config.layout.get_zone(f"rank_{i + 1}")
             assert zone is not None
             assert zone.max_cards == 1
 
@@ -202,8 +202,8 @@ class TestGameIntegration:
     """整合測試 (Application + Configuration + Engine)"""
 
     def test_create_room_with_game_rule(self, session: Session):
-        """創建房間並指定遊戲規則"""
-        # 期望行為：創建房間時可選擇遊戲規則
+        """創建諮詢室並指定遊戲規則"""
+        # 期望行為：創建諮詢室時可選擇遊戲規則
         from app.models.game_rule import GameRuleTemplate
         from app.models.room import Room
 
@@ -228,7 +228,7 @@ class TestGameIntegration:
         session.add(skill_assessment_rule)
         session.commit()
 
-        # 創建房間並指定遊戲規則
+        # 創建諮詢室並指定遊戲規則
         room = Room(
             name="Test Room",
             description="Test room with game rule",
@@ -238,7 +238,7 @@ class TestGameIntegration:
         session.add(room)
         session.commit()
 
-        # 驗證房間有正確的遊戲規則
+        # 驗證諮詢室有正確的遊戲規則
         assert room.game_rule_id == skill_assessment_rule.id
 
     def test_complete_skill_assessment_flow(self, session: Session):

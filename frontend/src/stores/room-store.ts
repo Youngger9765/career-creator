@@ -1,6 +1,6 @@
 /**
  * Room state management using Zustand
- * 房間狀態管理
+ * 諮詢室狀態管理
  */
 import { create } from 'zustand';
 import { Room, CreateRoomData } from '@/lib/api/rooms';

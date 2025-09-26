@@ -90,7 +90,7 @@ export default function RoomPage() {
   // 取得認證狀態
   const { user, isAuthenticated } = useAuthStore();
 
-  // 取得房間狀態
+  // 取得諮詢室狀態
   const { currentRoom, isLoading: roomLoading, error: roomError, joinRoom } = useRoomStore();
 
   // 檢查是否為諮詢師
@@ -161,14 +161,14 @@ export default function RoomPage() {
     }, 100);
   }, [isVisitor, router, isAuthenticated]);
 
-  // 加入房間
+  // 加入諮詢室
   useEffect(() => {
     if (!isReady) return;
 
-    // 呼叫加入房間 API
+    // 呼叫加入諮詢室 API
     joinRoom(roomId).catch((error) => {
       console.error('Failed to join room:', error);
-      setErrorMessage('無法加入房間');
+      setErrorMessage('無法加入諮詢室');
     });
   }, [isReady, roomId, joinRoom]);
 
@@ -184,13 +184,13 @@ export default function RoomPage() {
     );
   }
 
-  // 顯示加入房間中
+  // 顯示加入諮詢室中
   if (roomLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">正在加入房間...</p>
+          <p className="text-gray-600">正在加入諮詢室...</p>
         </div>
       </div>
     );
@@ -345,7 +345,7 @@ export default function RoomPage() {
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-gray-600">載入房間資訊中...</p>
+            <p className="text-gray-600">載入諮詢室資訊中...</p>
           </div>
         )}
       </div>

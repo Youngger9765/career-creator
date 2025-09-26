@@ -145,8 +145,8 @@ class GameRuleConfig:
             col = i % 3
             drop_zones.append(
                 DropZoneConfig(
-                    id=f"rank_{i+1}",
-                    name=f"第{i+1}名",
+                    id=f"rank_{i + 1}",
+                    name=f"第{i + 1}名",
                     position=Position(x=60 + col * 20, y=20 + row * 20),
                     max_cards=1,
                     show_counter=False,
@@ -162,7 +162,7 @@ class GameRuleConfig:
                 drop_zones=drop_zones,
             ),
             constraints=ConstraintConfig(
-                max_per_zone={f"rank_{i+1}": 1 for i in range(9)},
+                max_per_zone={f"rank_{i + 1}": 1 for i in range(9)},
                 min_per_zone={},
                 total_limit=9,
                 unique_positions=True,

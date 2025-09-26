@@ -1,6 +1,6 @@
 """
 Room API endpoints
-房間管理 API
+諮詢室管理 API
 """
 
 from typing import List, Optional
@@ -12,6 +12,7 @@ from sqlmodel import Session, select
 from app.core.auth import DEMO_ACCOUNTS, get_current_user_from_token
 from app.core.database import get_session
 from app.core.roles import Permission, has_permission
+from app.models.client import Client, RoomClient
 from app.models.room import Room, RoomCreate, RoomResponse
 from app.models.user import User
 
@@ -143,11 +144,23 @@ def create_room(
         description=room_data.description,
         counselor_id=current_user["id"],
         game_rule_id=game_rule_id,
+        expires_at=room_data.expires_at,
     )
 
     session.add(room)
     session.commit()
     session.refresh(room)
+
+    # Link room to client if client_id provided
+    if room_data.client_id:
+        from app.models.client import Client, RoomClient
+
+        # Verify client exists
+        client = session.get(Client, room_data.client_id)
+        if client:
+            room_client = RoomClient(room_id=room.id, client_id=room_data.client_id)
+            session.add(room_client)
+            session.commit()
 
     return room
 
@@ -178,13 +191,46 @@ def get_room_by_share_code(share_code: str, session: Session = Depends(get_sessi
 def list_user_rooms(
     session: Session = Depends(get_session),
     current_user: dict = Depends(get_current_user_info),
+    include_inactive: Optional[bool] = False,
 ):
-    """List active rooms where user is counselor"""
+    """List rooms where user is counselor, optionally include inactive rooms"""
 
-    statement = select(Room).where(
-        Room.counselor_id == current_user["id"], Room.is_active.is_(True)
+    # Get all rooms (active and inactive) with client information
+    statement = (
+        select(Room, Client.name.label("client_name"))
+        .select_from(Room)
+        .outerjoin(RoomClient, Room.id == RoomClient.room_id)
+        .outerjoin(Client, RoomClient.client_id == Client.id)
+        .where(Room.counselor_id == current_user["id"])
     )
-    rooms = session.exec(statement).all()
+
+    # Filter by active status if requested
+    if not include_inactive:
+        statement = statement.where(Room.is_active)
+
+    results = session.exec(statement).all()
+
+    # Convert to response format
+    rooms = []
+    for room, client_name in results:
+        room_dict = room.model_dump()
+        if client_name:
+            room_dict["client_name"] = client_name
+
+        # Add counselor name for display
+        if room.counselor_id.startswith("demo-"):
+            # Handle demo accounts
+            demo_account = next(
+                (acc for acc in DEMO_ACCOUNTS if acc["id"] == room.counselor_id), None
+            )
+            room_dict["counselor_name"] = (
+                demo_account["name"] if demo_account else room.counselor_id
+            )
+        else:
+            # Handle regular users - could extend this with User lookup if needed
+            room_dict["counselor_name"] = "諮詢師"
+
+        rooms.append(room_dict)
 
     return rooms
 

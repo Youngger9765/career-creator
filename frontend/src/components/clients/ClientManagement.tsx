@@ -338,15 +338,18 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         <td className="px-6 py-4">
                           <div className="flex items-start gap-3">
                             <button
-                              onClick={() => toggleClientExpansion(client.id)}
-                              className="text-gray-400 hover:text-gray-600 transition-colors mt-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleClientExpansion(client.id);
+                              }}
+                              className="flex items-center justify-center w-5 h-5 rounded hover:bg-gray-200 transition-colors mt-1"
                               title="展開/收合諮詢室"
                             >
-                              {isExpanded ? (
-                                <ChevronDown className="w-4 h-4" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4" />
-                              )}
+                              <div
+                                className={`w-0 h-0 border-l-[5px] border-l-gray-600 border-y-[3px] border-y-transparent transform transition-transform ${
+                                  isExpanded ? 'rotate-90' : ''
+                                }`}
+                              />
                             </button>
                             <div className="space-y-2">
                               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -476,7 +479,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       );
                                       window.location.href = `/rooms/create?client=${clientInfo}`;
                                     }}
-                                    className="flex items-center gap-1 px-3 py-1 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                                    className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-200 hover:border-blue-600 rounded transition-colors"
                                     title="創建諮詢室"
                                   >
                                     <Plus className="w-3 h-3" />

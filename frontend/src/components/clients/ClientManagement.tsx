@@ -439,42 +439,44 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                           )}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                          <div className="max-w-xs truncate" title={client.notes || ''}>
-                            {client.notes || <span className="text-gray-400">-</span>}
+                          <div className="max-w-xs" title={client.notes || ''}>
+                            <p className="line-clamp-2 whitespace-pre-wrap break-words">
+                              {client.notes || <span className="text-gray-400">-</span>}
+                            </p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                          <div className="flex items-center gap-2">
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="flex flex-col gap-1">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setViewingClient(client);
                                 setIsEditMode(false);
                               }}
-                              className="text-gray-600 hover:text-gray-800"
+                              className="flex items-center justify-center p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
                               title="檢視"
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-5 h-5" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setEditingClient(client);
                               }}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="flex items-center justify-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                               title="編輯"
                             >
-                              <Edit2 className="w-4 h-4" />
+                              <Edit2 className="w-5 h-5" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClient(client.id, client.name);
                               }}
-                              className="text-red-600 hover:text-red-800"
+                              className="flex items-center justify-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                               title="刪除"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
                         </td>

@@ -52,10 +52,20 @@ export default function CreateRoomPage() {
         try {
           const clientInfo = JSON.parse(decodeURIComponent(clientParam));
           if (clientInfo.client_id) {
+            // Format date as YYYY-MM-DD
+            const today = new Date();
+            const dateStr = today
+              .toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+              })
+              .replace(/\//g, '-');
+
             setFormData((prev) => ({
               ...prev,
               clientId: clientInfo.client_id,
-              name: `${clientInfo.client_name} 的諮詢室`,
+              name: `${clientInfo.client_name} 的諮詢室-${dateStr}`,
             }));
           }
         } catch (error) {

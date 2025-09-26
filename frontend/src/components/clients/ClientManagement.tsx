@@ -489,7 +489,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                           );
                                           window.location.href = `/rooms/create?client=${clientInfo}`;
                                         }}
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-5 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors"
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-5 border-2 border-dashed border-gray-200 rounded-lg text-gray-500 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 hover:text-gray-600 transition-colors"
                                       >
                                         <Plus className="w-5 h-5" />
                                         <span className="font-medium">創建諮詢室</span>

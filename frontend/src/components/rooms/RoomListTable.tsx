@@ -72,7 +72,7 @@ export function RoomListTable({
   return (
     <div className="">
       <table className="min-w-full">
-        <thead className="border-b border-gray-200">
+        <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
             <th className="px-2 py-2 text-left text-xs font-normal text-gray-600">諮詢室資訊</th>
             {showClient && (

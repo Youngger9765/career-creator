@@ -324,6 +324,9 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                     最後諮詢
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    備註
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     操作
                   </th>
                 </tr>
@@ -435,6 +438,11 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             '尚未進行諮詢'
                           )}
                         </td>
+                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="max-w-xs truncate" title={client.notes || ''}>
+                            {client.notes || <span className="text-gray-400">-</span>}
+                          </div>
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                           <div className="flex items-center gap-2">
                             <button
@@ -475,7 +483,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                       {/* Expanded rooms section */}
                       {isExpanded && (
                         <tr>
-                          <td colSpan={6} className="px-0 pb-2">
+                          <td colSpan={7} className="px-0 pb-2">
                             <div className="ml-12 mr-6 border-l-2 border-gray-200 pl-6">
                               <div className="">
                                 {hasRooms ? (

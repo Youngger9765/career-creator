@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ClientCreate, ClientUpdate, Client } from '@/types/client';
-import { X, Tag, Plus } from 'lucide-react';
+import { X, Tag, Plus, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface ClientFormProps {
   client?: Client; // If provided, it's edit mode
@@ -63,7 +63,11 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
       ? ({
           name: formData.name,
           email:
-            !client.email || !client.email.includes('@') ? formData.email || undefined : undefined,
+            !client.email ||
+            !client.email.includes('@') ||
+            (client.email.includes('@') && !client.email.includes('verified'))
+              ? formData.email || undefined
+              : undefined,
           phone: formData.phone || undefined,
           notes: formData.notes || undefined,
           tags: formData.tags,
@@ -140,7 +144,7 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
             />
           </div>
 
-          {/* Email - editable when not bound */}
+          {/* Email - with verification status */}
           <div>
             <label
               htmlFor="email"
@@ -148,22 +152,72 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
             >
               Email (選填)
             </label>
-            <input
-              type="email"
-              id="email"
-              value={formData.email}
-              onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400"
-              placeholder={'請輸入 Email 地址 (選填)'}
-              disabled={!!(client && client.email && client.email.includes('@'))}
-            />
-            {client && !client.email && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                尚未綁定 Email - 可填寫新的 Email 地址
-              </p>
-            )}
-            {client && client.email && client.email.includes('@') && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email 已綁定無法修改</p>
+            <div className="relative">
+              <input
+                type="email"
+                id="email"
+                value={formData.email}
+                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 ${
+                  client?.email && client.email.includes('@') && client.email.includes('verified')
+                    ? 'border-green-300 dark:border-green-600 pr-10'
+                    : client?.email && client.email.includes('@')
+                      ? 'border-yellow-300 dark:border-yellow-600 pr-10'
+                      : 'border-gray-300 dark:border-gray-600'
+                }`}
+                placeholder={'請輸入 Email 地址 (選填)'}
+                disabled={
+                  !!(
+                    client?.email &&
+                    client.email.includes('@') &&
+                    client.email.includes('verified')
+                  )
+                }
+              />
+
+              {/* Verification status icon */}
+              {client?.email && client.email.includes('@') && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {client.email.includes('verified') ? (
+                    <CheckCircle className="w-5 h-5 text-green-500" />
+                  ) : (
+                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Status messages and verify button */}
+            {client && (
+              <div className="mt-1 flex items-center justify-between">
+                {!client.email ? (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">尚未設定 Email</p>
+                ) : client.email.includes('@') && client.email.includes('verified') ? (
+                  <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Email 已驗證無法修改
+                  </p>
+                ) : client.email.includes('@') ? (
+                  <>
+                    <p className="text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      Email 尚未驗證
+                    </p>
+                    <button
+                      type="button"
+                      className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                      onClick={() => {
+                        // TODO: Implement email verification
+                        alert('發送驗證郵件功能尚未實作');
+                      }}
+                    >
+                      發送驗證
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">可填寫 Email 地址</p>
+                )}
+              </div>
             )}
           </div>
 

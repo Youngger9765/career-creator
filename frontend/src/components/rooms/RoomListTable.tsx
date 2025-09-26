@@ -70,38 +70,38 @@ export function RoomListTable({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+    <div className="bg-white rounded-lg shadow-sm border border-blue-200 overflow-hidden">
+      <table className="min-w-full divide-y divide-blue-200">
+        <thead className="bg-blue-50">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
               諮詢室資訊
             </th>
             {showClient && (
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
                 客戶
               </th>
             )}
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
               狀態
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
               諮詢次數
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
               剩餘時間
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
               建立時間
             </th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-6 py-3 text-right text-xs font-medium text-blue-700 uppercase tracking-wider">
               操作
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-white divide-y divide-blue-100">
           {rooms.map((room) => (
-            <tr key={room.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={room.id} className="hover:bg-blue-50 transition-colors">
               <td className="px-6 py-4">
                 <div className="flex items-center">
                   <div>
@@ -142,14 +142,14 @@ export function RoomListTable({
                 <div className="flex items-center justify-end gap-2">
                   <Link
                     href={`/room/${room.id}`}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md"
                   >
                     <ExternalLink className="w-4 h-4" />
                     進入諮詢室
                   </Link>
                   <button
                     onClick={(e) => copyShareCode(room.share_code, e)}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 border border-gray-200"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-all duration-200 border border-blue-200"
                     title="複製分享碼"
                   >
                     <Copy className="w-4 h-4" />

@@ -462,11 +462,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         <tr>
                           <td colSpan={6} className="px-0 pb-2">
                             <div className="ml-12 mr-6 border-l-2 border-gray-200 pl-6">
-                              <div className="flex items-center justify-between mb-3 pt-2">
-                                <h4 className="text-sm font-medium text-gray-700">
-                                  諮詢室 ({client.rooms?.length || 0} 個)
-                                </h4>
-                                {hasRooms && (
+                              {hasRooms && (
+                                <div className="flex items-center justify-end mb-3 pt-2">
                                   <button
                                     onClick={() => {
                                       // 跳轉到創建諮詢室頁面，帶入客戶資訊
@@ -485,8 +482,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                     <Plus className="w-3 h-3" />
                                     創建諮詢室
                                   </button>
-                                )}
-                              </div>
+                                </div>
+                              )}
                               <div className="">
                                 {hasRooms ? (
                                   <>

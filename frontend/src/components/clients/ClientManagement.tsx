@@ -305,28 +305,28 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full table-fixed">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[20%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     客戶資訊
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[20%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     聯絡方式
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[8%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     狀態
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[12%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     諮詢統計
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[12%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     最後諮詢
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[18%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     備註
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[10%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     操作
                   </th>
                 </tr>
@@ -342,7 +342,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
                         onClick={() => toggleClientExpansion(client.id)}
                       >
-                        <td className="px-6 py-4">
+                        <td className="px-4 py-4">
                           <div className="flex items-start gap-3">
                             <button
                               onClick={(e) => {
@@ -419,16 +419,14 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge(client.status)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-3 py-4">{getStatusBadge(client.status)}</td>
+                        <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
                           <div className="space-y-1">
                             <div>總諮詢: {client.total_consultations || 0} 次</div>
                             <div>活躍諮詢室: {client.active_rooms_count || 0} 個</div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                           {client.last_consultation_date ? (
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4" />
@@ -438,22 +436,22 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             '尚未進行諮詢'
                           )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                          <div className="max-w-xs" title={client.notes || ''}>
-                            <p className="line-clamp-2 whitespace-pre-wrap break-words">
+                        <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="w-full" title={client.notes || ''}>
+                            <p className="line-clamp-3 whitespace-pre-wrap break-words">
                               {client.notes || <span className="text-gray-400">-</span>}
                             </p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                          <div className="flex flex-col gap-1">
+                        <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                          <div className="flex flex-col items-center gap-1">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setViewingClient(client);
                                 setIsEditMode(false);
                               }}
-                              className="flex items-center justify-center p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
                               title="檢視"
                             >
                               <Eye className="w-5 h-5" />
@@ -463,7 +461,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                 e.stopPropagation();
                                 setEditingClient(client);
                               }}
-                              className="flex items-center justify-center p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                              className="flex items-center justify-center w-8 h-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                               title="編輯"
                             >
                               <Edit2 className="w-5 h-5" />
@@ -473,7 +471,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                 e.stopPropagation();
                                 handleDeleteClient(client.id, client.name);
                               }}
-                              className="flex items-center justify-center p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                              className="flex items-center justify-center w-8 h-8 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                               title="刪除"
                             >
                               <Trash2 className="w-5 h-5" />

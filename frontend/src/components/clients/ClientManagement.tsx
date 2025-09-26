@@ -24,6 +24,8 @@ import {
   ShieldCheck,
   Copy,
   AlertCircle,
+  Eye,
+  X,
 } from 'lucide-react';
 import { ClientForm } from './ClientForm';
 import { RoomListTable } from '../rooms/RoomListTable';
@@ -39,6 +41,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [viewingClient, setViewingClient] = useState<Client | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
   const [submitLoading, setSubmitLoading] = useState(false);
 
@@ -436,6 +440,17 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
+                                setViewingClient(client);
+                                setIsEditMode(false);
+                              }}
+                              className="text-gray-600 hover:text-gray-800"
+                              title="檢視"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setEditingClient(client);
                               }}
                               className="text-blue-600 hover:text-blue-800"
@@ -550,6 +565,140 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
           onClose={() => setEditingClient(null)}
           loading={submitLoading}
         />
+      )}
+
+      {/* View/Edit Client Modal */}
+      {viewingClient && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            {!isEditMode ? (
+              <>
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    客戶資訊
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setIsEditMode(true)}
+                      className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                    >
+                      切換到編輯模式
+                    </button>
+                    <button
+                      onClick={() => {
+                        setViewingClient(null);
+                        setIsEditMode(false);
+                      }}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* View Mode Content */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">姓名</label>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{viewingClient.name}</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Email</label>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      {viewingClient.email || <span className="text-gray-400">尚未設定</span>}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">電話</label>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      {viewingClient.phone || <span className="text-gray-400">尚未設定</span>}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">狀態</label>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        viewingClient.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : viewingClient.status === 'inactive'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      {viewingClient.status === 'active'
+                        ? '活躍'
+                        : viewingClient.status === 'inactive'
+                          ? '暫停'
+                          : '封存'}
+                    </span>
+                  </div>
+
+                  {viewingClient.tags && viewingClient.tags.length > 0 && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">標籤</label>
+                      <div className="flex flex-wrap gap-1">
+                        {viewingClient.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full"
+                          >
+                            <Tag className="w-3 h-3 mr-1" />
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {viewingClient.notes && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">備註</label>
+                      <p className="text-sm text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                        {viewingClient.notes}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                        總諮詢次數
+                      </label>
+                      <p className="text-sm text-gray-900 dark:text-gray-100">
+                        {viewingClient.total_consultations || 0} 次
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                        活躍諮詢室
+                      </label>
+                      <p className="text-sm text-gray-900 dark:text-gray-100">
+                        {viewingClient.rooms?.length || 0} 個
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <ClientForm
+                client={viewingClient}
+                onSubmit={async (data) => {
+                  await handleUpdateClient(viewingClient.id, data as ClientUpdate);
+                  setIsEditMode(false);
+                  setViewingClient(null);
+                }}
+                onClose={() => {
+                  setIsEditMode(false);
+                  setViewingClient(null);
+                }}
+                loading={submitLoading}
+              />
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -92,7 +92,8 @@ export function RoomListTable({
               className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
             >
               <td className="px-2 py-3">
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
+                  <Home className="w-4 h-4 text-gray-400 flex-shrink-0" />
                   <div>
                     <div className="text-sm font-medium text-gray-900">{room.name}</div>
                     {room.description && (

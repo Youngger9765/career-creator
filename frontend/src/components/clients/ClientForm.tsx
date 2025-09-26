@@ -62,6 +62,8 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
     const submitData = client
       ? ({
           name: formData.name,
+          email:
+            !client.email || !client.email.includes('@') ? formData.email || undefined : undefined,
           phone: formData.phone || undefined,
           notes: formData.notes || undefined,
           tags: formData.tags,
@@ -138,7 +140,7 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
             />
           </div>
 
-          {/* Email - disabled in edit mode or if anonymous */}
+          {/* Email - editable when not bound */}
           <div>
             <label
               htmlFor="email"
@@ -153,15 +155,15 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
               onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400"
               placeholder={'請輸入 Email 地址 (選填)'}
-              disabled={!!client}
+              disabled={!!(client && client.email && client.email.includes('@'))}
             />
             {client && !client.email && (
               <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                沒有 Email - 可稍後綁定
+                尚未綁定 Email - 可填寫新的 Email 地址
               </p>
             )}
-            {client && client.email && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email 無法修改</p>
+            {client && client.email && client.email.includes('@') && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email 已綁定無法修改</p>
             )}
           </div>
 

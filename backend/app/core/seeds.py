@@ -850,14 +850,14 @@ def seed_crm_data():
                 "status": ClientStatus.ACTIVE,
                 "email_verified": False,
             },
-            # Same email, different counselor - allowed in simplified model
+            # Different email for counselor2
             {
                 "counselor_id": counselor2_id,
-                "email": "alice.chen@example.com",
-                "name": "Alice C.",
-                "phone": "0912-345-678",
-                "notes": "轉職輔導 - 第二意見諮詢",
-                "tags": ["轉職", "第二意見"],
+                "email": "diana.wu@example.com",
+                "name": "Diana Wu",
+                "phone": "0945-678-901",
+                "notes": "新創公司職涯發展諮詢",
+                "tags": ["新創", "職涯發展"],
                 "status": ClientStatus.ACTIVE,
                 "email_verified": True,
                 "verified_at": datetime.utcnow() - timedelta(days=10),
@@ -889,7 +889,8 @@ def seed_crm_data():
                 clients.append(client)
                 client_type = "No-email" if not client_data["email"] else "Regular"
                 print(
-                    f"  ✅ Created {client_type} client: {client_data['name']} for {client_data['counselor_id']}"
+                    f"  ✅ Created {client_type} client: {client_data['name']} "
+                    f"for {client_data['counselor_id']}"
                 )
             else:
                 clients.append(existing_client)

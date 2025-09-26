@@ -14,9 +14,10 @@ export interface GameModeConfig {
     auxiliaryCards?: boolean; // 是否使用輔助卡
     timer?: boolean; // 是否有計時器
     notes?: boolean; // 是否可以加註記
+    fileUpload?: boolean; // 是否支援文件上傳
   };
   layout: {
-    type: 'zones' | 'grid' | 'columns';
+    type: 'zones' | 'grid' | 'columns' | 'canvas';
     config?: any; // 特定佈局的配置
   };
 }
@@ -73,6 +74,23 @@ export const GAME_MODES: GameModeConfig[] = [
       type: 'columns',
       config: {
         columns: ['like', 'neutral', 'dislike'],
+      },
+    },
+  },
+  {
+    id: 'job-decomposition',
+    name: '職位拆解',
+    description: '將職位需求與個人職能進行對照分析',
+    supportedDecks: ['職能盤點卡'],
+    features: {
+      notes: true,
+      fileUpload: true, // 支援上傳職位說明文件
+    },
+    layout: {
+      type: 'canvas',
+      config: {
+        canvasType: 'free', // 自由畫布
+        splitView: true, // 分割視圖（左邊卡片，右邊文件）
       },
     },
   },

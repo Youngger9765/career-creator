@@ -24,7 +24,7 @@ import TwoZoneCanvas from '@/components/game-canvases/TwoZoneCanvas';
 import GridCanvas from '@/components/game-canvases/GridCanvas';
 import CollectionCanvas from '@/components/game-canvases/CollectionCanvas';
 import GrowthPlanCanvas from '@/components/game-canvases/GrowthPlanCanvas';
-import PositionBreakdownCanvas from '@/components/game-canvases/PositionBreakdownCanvas';
+import JobDecompositionCanvas from '@/components/game-canvases/JobDecompositionCanvas';
 import CardItem from '@/components/game-canvases/CardItem';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -72,14 +72,14 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   // 籌碼系統狀態（for 生活改造王）
   const [tokenAllocations, setTokenAllocations] = useState<TokenAllocation[]>([]);
   const [showTokenSystem, setShowTokenSystem] = useState(false);
-  
+
   // 收藏家上限設定
   const [collectionMaxCards, setCollectionMaxCards] = useState(15);
-  
+
   // 優劣勢分析上限設定
   const [advantageMaxCards, setAdvantageMaxCards] = useState(5);
   const [disadvantageMaxCards, setDisadvantageMaxCards] = useState(5);
-  
+
   // 卡片類型選擇 (成長計畫模式需要)
   const [selectedCardType, setSelectedCardType] = useState<'skill' | 'action'>('skill');
 
@@ -91,13 +91,18 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   // Tab 控制
   const [activeTab, setActiveTab] = useState('select');
-  
+
   // 是否為房間擁有者 (暫時假設非訪客即為擁有者)
   const isRoomOwner = !isVisitor;
 
   // 策略行動卡模擬數據 (成長計畫模式需要)
   const actionCards = [
-    { id: 'action-1', title: '制定學習計劃', description: '建立系統性的學習方案', category: '學習策略' },
+    {
+      id: 'action-1',
+      title: '制定學習計劃',
+      description: '建立系統性的學習方案',
+      category: '學習策略',
+    },
     { id: 'action-2', title: '尋找導師', description: '找到合適的指導者', category: '人際網絡' },
     { id: 'action-3', title: '參與專案', description: '通過實踐提升能力', category: '實戰經驗' },
     { id: 'action-4', title: '加入社群', description: '建立專業人脈', category: '人際網絡' },
@@ -112,7 +117,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     if (selectedCardType === 'skill') {
       // 顯示職能盤點卡 (A區)
       if (!mainDeck) return <div className="text-gray-500 dark:text-gray-400">載入中...</div>;
-      
+
       return (
         <div>
           <div className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
@@ -296,7 +301,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       career_collector: { type: 'collection_zone', name: '收藏區' },
       advantage_analysis: { type: 'two_zones', name: '雙區' },
       growth_planning: { type: 'three_zones', name: '三區成長' },
-      position_breakdown: { type: 'free_canvas', name: '自由畫布' },
+      position_breakdown: { type: 'job_decomposition', name: '職位拆解畫布' },
       value_ranking: { type: 'grid_3x3', name: '3×3九宮格' },
       life_redesign: { type: 'value_gauge', name: '量表畫布' },
     };
@@ -458,22 +463,31 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
           />
         );
 
+      case 'job_decomposition':
       case 'position_breakdown':
         return (
-          <PositionBreakdownCanvas
+          <JobDecompositionCanvas
             cards={mainDeck?.cards || []}
-            onCardUse={(cardId) => {
-              setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-              addTestResult(`➕ 添加技能卡: ${cardId}`);
+            onCardMove={(cardId, zone) => {
+              if (zone === null) {
+                // 卡片被移除，回到左邊
+                setUsedCards((prev) => {
+                  const newSet = new Set(prev);
+                  newSet.delete(cardId);
+                  return newSet;
+                });
+                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
+              } else {
+                console.log(`Card ${cardId} moved to ${zone}`);
+                addTestResult(`🎯 卡片 ${cardId} 移至職能分析區`);
+                setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
+              }
             }}
-            onCardRemove={(cardId) => {
-              setUsedCards((prev) => {
-                const newSet = new Set(prev);
-                newSet.delete(cardId);
-                return newSet;
-              });
-              addTestResult(`➖ 移除技能卡: ${cardId}`);
+            onFileUpload={(file) => {
+              addTestResult(`📎 上傳文件: ${file.name} (${file.type})`);
             }}
+            maxCards={10}
+            isRoomOwner={isRoomOwner}
           />
         );
 
@@ -665,9 +679,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                     </div>
 
                     {/* 牌卡列表 */}
-                    <div className="flex-1 overflow-y-auto p-4">
-                      {renderCardList()}
-                    </div>
+                    <div className="flex-1 overflow-y-auto p-4">{renderCardList()}</div>
                   </>
                 ) : (
                   /* 其他模式：只顯示職能盤點卡 */

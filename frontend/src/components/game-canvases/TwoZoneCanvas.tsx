@@ -44,7 +44,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   });
 
   const [dragOverZone, setDragOverZone] = useState<string | null>(null);
-  
+
   // 上限設定狀態
   const [isEditingAdvantageLimit, setIsEditingAdvantageLimit] = useState(false);
   const [isEditingDisadvantageLimit, setIsEditingDisadvantageLimit] = useState(false);
@@ -60,7 +60,11 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   } | null>(null);
   const [isDraggingInternal, setIsDraggingInternal] = useState(false);
 
-  const handleDrop = (e: React.DragEvent, zone: 'advantage' | 'disadvantage', insertIndex?: number) => {
+  const handleDrop = (
+    e: React.DragEvent,
+    zone: 'advantage' | 'disadvantage',
+    insertIndex?: number
+  ) => {
     e.preventDefault();
     setDragOverZone(null);
     setDragOverPosition(null);
@@ -73,8 +77,11 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
 
     // TwoZoneCanvas 只處理職能盤點卡，可以放到任一區域
 
-    // 檢查是否超過限制（除非是同區域內移動）
-    if (zones[zone].length >= currentMaxCards && !zones[zone].includes(cardId)) {
+    // 檢查是否已經存在該卡片
+    const cardExists = zones.advantage.includes(cardId) || zones.disadvantage.includes(cardId);
+
+    // 檢查是否超過限制（除非是卡片已存在於其他區域）
+    if (zones[zone].length >= currentMaxCards && !cardExists) {
       // 顯示提示訊息
       return;
     }
@@ -82,7 +89,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
     // 更新本地狀態
     setZones((prev) => {
       const newZones = { ...prev };
-      
+
       // 從所有區域移除卡片
       newZones.advantage = newZones.advantage.filter((id) => id !== cardId);
       newZones.disadvantage = newZones.disadvantage.filter((id) => id !== cardId);
@@ -91,21 +98,20 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
       if (insertIndex !== undefined && sourceZone) {
         // 內部重新排序
         const targetArray = [...newZones[zone as keyof typeof newZones]];
-        
+
         // 如果是同一區域內移動，調整插入位置
         let adjustedIndex = insertIndex;
         if (sourceZone === zone && sourceIndex !== -1 && sourceIndex < insertIndex) {
           adjustedIndex = Math.max(0, insertIndex - 1);
         }
-        
+
         // 插入到指定位置
         targetArray.splice(adjustedIndex, 0, cardId);
         newZones[zone] = targetArray;
       } else {
         // 外部拖入，添加到末尾
-        if (newZones[zone].length < currentMaxCards) {
-          newZones[zone] = [...newZones[zone], cardId];
-        }
+        // 不需要再次檢查限制，因為上面已經檢查過了
+        newZones[zone] = [...newZones[zone], cardId];
       }
 
       return newZones;
@@ -125,12 +131,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   };
 
   // 內部卡片開始拖放
-  const handleCardDragStart = (
-    e: React.DragEvent,
-    cardId: string,
-    zone: string,
-    index: number
-  ) => {
+  const handleCardDragStart = (e: React.DragEvent, cardId: string, zone: string, index: number) => {
     setIsDraggingInternal(true);
     e.dataTransfer.setData('cardId', cardId);
     e.dataTransfer.setData('sourceZone', zone);
@@ -174,16 +175,23 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
         {zoneConfig.map((zone) => {
           const Icon = zone.icon;
           const zoneCards = zones[zone.id as keyof typeof zones];
-          const currentMaxCards = zone.id === 'advantage' ? maxAdvantageCards : maxDisadvantageCards;
+          const currentMaxCards =
+            zone.id === 'advantage' ? maxAdvantageCards : maxDisadvantageCards;
           const isOverLimit = zoneCards.length >= currentMaxCards;
           const isDraggingOver = dragOverZone === zone.id;
-          
+
           // 獲取當前區域的設定狀態
           const hasCards = zone.id === 'advantage' ? hasAdvantageCards : hasDisadvantageCards;
-          const isEditingLimit = zone.id === 'advantage' ? isEditingAdvantageLimit : isEditingDisadvantageLimit;
-          const tempMaxCards = zone.id === 'advantage' ? tempMaxAdvantageCards : tempMaxDisadvantageCards;
-          const isLimitLocked = zone.id === 'advantage' ? isAdvantageLimitLocked : isDisadvantageLimitLocked;
-          const effectivelyLocked = zone.id === 'advantage' ? effectivelyAdvantageLockedLocked : effectivelyDisadvantageLockedLocked;
+          const isEditingLimit =
+            zone.id === 'advantage' ? isEditingAdvantageLimit : isEditingDisadvantageLimit;
+          const tempMaxCards =
+            zone.id === 'advantage' ? tempMaxAdvantageCards : tempMaxDisadvantageCards;
+          const isLimitLocked =
+            zone.id === 'advantage' ? isAdvantageLimitLocked : isDisadvantageLimitLocked;
+          const effectivelyLocked =
+            zone.id === 'advantage'
+              ? effectivelyAdvantageLockedLocked
+              : effectivelyDisadvantageLockedLocked;
 
           return (
             <div
@@ -220,7 +228,10 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                               type="number"
                               value={tempMaxCards}
                               onChange={(e) => {
-                                const newValue = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
+                                const newValue = Math.max(
+                                  1,
+                                  Math.min(10, parseInt(e.target.value) || 1)
+                                );
                                 if (zone.id === 'advantage') {
                                   setTempMaxAdvantageCards(newValue);
                                 } else {
@@ -275,7 +286,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                                 }
                               }}
                               className={`p-1 rounded text-xs ${
-                                effectivelyLocked 
+                                effectivelyLocked
                                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                   : 'bg-blue-500 hover:bg-blue-600 text-white'
                               }`}
@@ -283,7 +294,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                             >
                               <Settings className="w-3 h-3" />
                             </button>
-                            
+
                             <button
                               onClick={() => {
                                 if (!hasCards) {
@@ -298,11 +309,15 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                                 hasCards
                                   ? 'bg-yellow-500 text-white cursor-default'
                                   : isLimitLocked
-                                  ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                                  : 'bg-gray-500 hover:bg-gray-600 text-white'
+                                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                                    : 'bg-gray-500 hover:bg-gray-600 text-white'
                               }`}
                             >
-                              {effectivelyLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                              {effectivelyLocked ? (
+                                <Lock className="w-3 h-3" />
+                              ) : (
+                                <Unlock className="w-3 h-3" />
+                              )}
                             </button>
                           </>
                         )}
@@ -319,7 +334,9 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                       }
                     `}
                     >
-                      <span>{zoneCards.length} / {currentMaxCards}</span>
+                      <span>
+                        {zoneCards.length} / {currentMaxCards}
+                      </span>
                       {effectivelyLocked && <Lock className="w-3 h-3 ml-1" />}
                     </span>
                     {isOverLimit && <AlertCircle className="w-4 h-4 text-red-500" />}
@@ -336,7 +353,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                     </div>
                     <p className="text-gray-500 dark:text-gray-400 font-medium">拖曳卡片到此處</p>
                     <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">
-                      最多可放 {maxCardsPerZone} 張卡片
+                      最多可放 {currentMaxCards} 張卡片
                     </p>
                   </div>
                 ) : (
@@ -344,7 +361,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                     {zoneCards.map((cardId, index) => {
                       const card = cards.find((c) => c.id === cardId);
                       if (!card) return null;
-                      
+
                       // 檢查是否應該顯示插入線
                       const showInsertLineBefore =
                         dragOverPosition?.zone === zone.id && dragOverPosition?.index === index;
@@ -358,7 +375,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                           {showInsertLineBefore && (
                             <div className="w-0.5 h-20 bg-blue-500 animate-pulse" />
                           )}
-                          <div 
+                          <div
                             className="relative w-[100px]"
                             draggable
                             onDragStart={(e) => handleCardDragStart(e, cardId, zone.id, index)}
@@ -376,11 +393,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
                               const rect = e.currentTarget.getBoundingClientRect();
                               const x = e.clientX - rect.left;
                               const insertIndex = x < rect.width / 2 ? index : index + 1;
-                              handleDrop(
-                                e,
-                                zone.id as 'advantage' | 'disadvantage',
-                                insertIndex
-                              );
+                              handleDrop(e, zone.id as 'advantage' | 'disadvantage', insertIndex);
                             }}
                           >
                             <div className="absolute -top-2 -right-1 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center z-10">

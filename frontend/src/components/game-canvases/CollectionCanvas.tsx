@@ -33,7 +33,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   // 收藏的卡片ID列表
   const [collectedCardIds, setCollectedCardIds] = useState<string[]>([]);
   const [dragOverCanvas, setDragOverCanvas] = useState(false);
-  
+
   // 上限設定狀態
   const [isEditingLimit, setIsEditingLimit] = useState(false);
   const [tempMaxCards, setTempMaxCards] = useState(maxCards);
@@ -83,7 +83,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
 
   const isAtLimit = collectedCardIds.length >= maxCards;
   const hasCards = collectedCardIds.length > 0;
-  
+
   // 當有卡片時自動鎖定上限
   const effectivelyLocked = isLimitLocked || hasCards;
 
@@ -100,7 +100,9 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
                   <input
                     type="number"
                     value={tempMaxCards}
-                    onChange={(e) => setTempMaxCards(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
+                    onChange={(e) =>
+                      setTempMaxCards(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))
+                    }
                     className="w-12 text-xs text-center bg-transparent border-none outline-none"
                     min="1"
                     max="50"
@@ -133,7 +135,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
                     }
                   }}
                   className={`p-1.5 rounded-full transition-colors ${
-                    effectivelyLocked 
+                    effectivelyLocked
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-blue-500 hover:bg-blue-600 text-white'
                   }`}
@@ -141,15 +143,15 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
                   title={
                     hasCards && !isLimitLocked
                       ? '有卡片時無法調整上限'
-                      : isLimitLocked 
-                      ? '上限已鎖定' 
-                      : '設定上限'
+                      : isLimitLocked
+                        ? '上限已鎖定'
+                        : '設定上限'
                   }
                 >
                   <Settings className="w-3 h-3" />
                 </button>
               )}
-              
+
               {/* 鎖定/解鎖按鈕 */}
               <button
                 onClick={() => {
@@ -161,22 +163,16 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
                   hasCards
                     ? 'bg-yellow-500 text-white cursor-default'
                     : isLimitLocked
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                    : 'bg-gray-500 hover:bg-gray-600 text-white'
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                      : 'bg-gray-500 hover:bg-gray-600 text-white'
                 }`}
-                title={
-                  hasCards
-                    ? '有卡片時自動鎖定'
-                    : isLimitLocked 
-                    ? '解除鎖定' 
-                    : '鎖定上限'
-                }
+                title={hasCards ? '有卡片時自動鎖定' : isLimitLocked ? '解除鎖定' : '鎖定上限'}
               >
                 {effectivelyLocked ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
               </button>
             </div>
           )}
-          
+
           {/* 計數器 */}
           <div
             className={`

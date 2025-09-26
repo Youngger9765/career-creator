@@ -460,8 +460,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                           <td colSpan={6} className="px-0 pb-2">
                             <div className="ml-12 mr-6 border-l-2 border-gray-200 pl-6">
                               <div className="flex items-center justify-between mb-3 pt-2">
-                                <h4 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                                  <Home className="w-4 h-4 text-gray-500" />
+                                <h4 className="text-sm font-medium text-gray-700">
                                   諮詢室 ({client.rooms?.length || 0} 個)
                                 </h4>
                                 {hasRooms && (

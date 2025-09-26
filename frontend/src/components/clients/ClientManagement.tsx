@@ -342,11 +342,11 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                 e.stopPropagation();
                                 toggleClientExpansion(client.id);
                               }}
-                              className="flex items-center justify-center w-5 h-5 rounded hover:bg-gray-200 transition-colors mt-1"
+                              className="flex items-center justify-center w-7 h-7 rounded hover:bg-gray-200 transition-colors mt-0.5"
                               title="展開/收合諮詢室"
                             >
                               <div
-                                className={`w-0 h-0 border-l-[5px] border-l-gray-600 border-y-[3px] border-y-transparent transform transition-transform ${
+                                className={`w-0 h-0 border-l-[8px] border-l-gray-600 border-y-[5px] border-y-transparent transform transition-transform ${
                                   isExpanded ? 'rotate-90' : ''
                                 }`}
                               />

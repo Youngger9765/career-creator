@@ -496,27 +496,6 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       showClient={false}
                                       emptyMessage="尚無諮詢室"
                                     />
-
-                                    {/* 創建諮詢室按鈕 - 虛線框樣式 */}
-                                    <div className="mt-4">
-                                      <button
-                                        onClick={() => {
-                                          // 跳轉到創建諮詢室頁面，帶入客戶資訊
-                                          const clientInfo = encodeURIComponent(
-                                            JSON.stringify({
-                                              client_id: client.id,
-                                              client_name: client.name,
-                                              client_email: client.email,
-                                            })
-                                          );
-                                          window.location.href = `/rooms/create?client=${clientInfo}`;
-                                        }}
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-5 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors"
-                                      >
-                                        <Plus className="w-5 h-5" />
-                                        <span className="font-medium">創建諮詢室</span>
-                                      </button>
-                                    </div>
                                   </>
                                 ) : (
                                   /* 沒有房間時顯示創建按鈕 */

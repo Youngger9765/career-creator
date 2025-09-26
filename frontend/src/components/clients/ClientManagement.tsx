@@ -308,25 +308,25 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
             <table className="w-full table-fixed">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="w-[20%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[18%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     客戶資訊
                   </th>
-                  <th className="w-[20%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[25%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     聯絡方式
                   </th>
-                  <th className="w-[8%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[7%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     狀態
                   </th>
-                  <th className="w-[12%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[11%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     諮詢統計
                   </th>
-                  <th className="w-[12%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[11%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     最後諮詢
                   </th>
                   <th className="w-[18%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     備註
                   </th>
-                  <th className="w-[10%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[10%] px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     操作
                   </th>
                 </tr>
@@ -378,17 +378,22 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                           <div className="space-y-1">
                             {client.email ? (
                               <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                  <Mail className="w-4 h-4 text-gray-400" />
-                                  <span className="text-sm dark:text-gray-200">{client.email}</span>
+                                  <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                  <span
+                                    className="text-sm dark:text-gray-200 truncate"
+                                    title={client.email}
+                                  >
+                                    {client.email}
+                                  </span>
                                   {client.email_verified ? (
-                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                    <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                                   ) : (
-                                    <AlertCircle className="w-4 h-4 text-amber-500" />
+                                    <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
                                   )}
                                 </div>
                                 {!client.email_verified && (
@@ -413,7 +418,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             )}
                             {client.phone && (
                               <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-gray-400" />
+                                <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                 <span className="text-sm dark:text-gray-200">{client.phone}</span>
                               </div>
                             )}
@@ -451,30 +456,30 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                 setViewingClient(client);
                                 setIsEditMode(false);
                               }}
-                              className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="flex items-center justify-center w-6 h-6 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
                               title="檢視"
                             >
-                              <Eye className="w-5 h-5" />
+                              <Eye className="w-4 h-4" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setEditingClient(client);
                               }}
-                              className="flex items-center justify-center w-8 h-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                              className="flex items-center justify-center w-6 h-6 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                               title="編輯"
                             >
-                              <Edit2 className="w-5 h-5" />
+                              <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleDeleteClient(client.id, client.name);
                               }}
-                              className="flex items-center justify-center w-8 h-8 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                              className="flex items-center justify-center w-6 h-6 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                               title="刪除"
                             >
-                              <Trash2 className="w-5 h-5" />
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>

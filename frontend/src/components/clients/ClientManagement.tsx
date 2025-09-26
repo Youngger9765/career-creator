@@ -462,28 +462,6 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         <tr>
                           <td colSpan={6} className="px-0 pb-2">
                             <div className="ml-12 mr-6 border-l-2 border-gray-200 pl-6">
-                              {hasRooms && (
-                                <div className="flex items-center justify-end mb-3 pt-2">
-                                  <button
-                                    onClick={() => {
-                                      // 跳轉到創建諮詢室頁面，帶入客戶資訊
-                                      const clientInfo = encodeURIComponent(
-                                        JSON.stringify({
-                                          client_id: client.id,
-                                          client_name: client.name,
-                                          client_email: client.email,
-                                        })
-                                      );
-                                      window.location.href = `/rooms/create?client=${clientInfo}`;
-                                    }}
-                                    className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-200 hover:border-blue-600 rounded transition-colors"
-                                    title="創建諮詢室"
-                                  >
-                                    <Plus className="w-3 h-3" />
-                                    創建諮詢室
-                                  </button>
-                                </div>
-                              )}
                               <div className="">
                                 {hasRooms ? (
                                   <>
@@ -496,6 +474,27 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       showClient={false}
                                       emptyMessage="尚無諮詢室"
                                     />
+
+                                    {/* 創建諮詢室按鈕 - 虛線框樣式 */}
+                                    <div className="mt-4">
+                                      <button
+                                        onClick={() => {
+                                          // 跳轉到創建諮詢室頁面，帶入客戶資訊
+                                          const clientInfo = encodeURIComponent(
+                                            JSON.stringify({
+                                              client_id: client.id,
+                                              client_name: client.name,
+                                              client_email: client.email,
+                                            })
+                                          );
+                                          window.location.href = `/rooms/create?client=${clientInfo}`;
+                                        }}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-5 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors"
+                                      >
+                                        <Plus className="w-5 h-5" />
+                                        <span className="font-medium">創建諮詢室</span>
+                                      </button>
+                                    </div>
                                   </>
                                 ) : (
                                   /* 沒有房間時顯示創建按鈕 */

@@ -138,7 +138,7 @@ export function RoomListTable({
                   </Link>
                   <button
                     onClick={(e) => copyShareCode(room.share_code, e)}
-                    className="inline-flex items-center gap-1 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded transition-colors"
                     title="複製分享碼"
                   >
                     <Copy className="w-3 h-3" />

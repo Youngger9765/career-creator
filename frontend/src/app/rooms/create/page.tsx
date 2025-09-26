@@ -44,6 +44,24 @@ export default function CreateRoomPage() {
   useEffect(() => {
     if (isAuthenticated && user?.roles?.includes('counselor')) {
       loadClients();
+
+      // Check if client info is passed in URL
+      const params = new URLSearchParams(window.location.search);
+      const clientParam = params.get('client');
+      if (clientParam) {
+        try {
+          const clientInfo = JSON.parse(decodeURIComponent(clientParam));
+          if (clientInfo.client_id) {
+            setFormData((prev) => ({
+              ...prev,
+              clientId: clientInfo.client_id,
+              name: `${clientInfo.client_name} 的諮詢室`,
+            }));
+          }
+        } catch (error) {
+          console.error('Failed to parse client info:', error);
+        }
+      }
     }
   }, [isAuthenticated, user]);
 

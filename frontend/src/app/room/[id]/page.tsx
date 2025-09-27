@@ -243,8 +243,6 @@ export default function RoomPage() {
               </button>
             )}
 
-
-
             {/* 參與者列表 */}
             <ParticipantList
               participants={participants as any}

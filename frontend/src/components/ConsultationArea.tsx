@@ -13,14 +13,12 @@ import {
 import { Card } from './Card';
 import { CardDeck } from './CardDeck';
 import { CardNotesModal } from './CardNotesModal';
-import { GameDropZones } from './GameDropZones';
 import { GameToken } from './GameToken';
 import { DraggableCardPreview } from './DraggableCardPreview';
 import { DroppableGameArea } from './DroppableGameArea';
 import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
 import { CardEventType } from '@/lib/api/card-events';
 import { useCardSync } from '@/hooks/use-card-sync';
-import { useGameSessionStore } from '@/stores/game-session-store';
 import { GameStatus } from '@/lib/api/game-sessions';
 
 interface ConsultationAreaProps {

@@ -101,8 +101,8 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   };
 
   return (
-    <div className={`w-full h-full ${className}`}>
-      <div className="h-full grid grid-cols-3 gap-4 p-4">
+    <div className={`w-full h-full overflow-y-auto ${className}`}>
+      <div className="min-h-full grid grid-cols-3 gap-4 p-4">
         {/* 喜歡欄位 */}
         <DropZone
           id="like-column"
@@ -113,7 +113,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           icon={Heart}
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxLike} 張卡片`}
-          className="h-full"
+          className="min-h-96"
           headerClassName="bg-green-100 dark:bg-green-900/30"
           dragOverColor="border-green-500 bg-green-100 dark:bg-green-900/30"
           cardWidth="135px" // 1.5x of default 90px
@@ -141,7 +141,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           icon={Meh}
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxNeutral} 張卡片`}
-          className="h-full"
+          className="min-h-96"
           headerClassName="bg-gray-100 dark:bg-gray-800"
           dragOverColor="border-gray-500 bg-gray-100 dark:bg-gray-800"
           cardWidth="135px" // 1.5x of default 90px
@@ -169,7 +169,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           icon={ThumbsDown}
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxDislike} 張卡片`}
-          className="h-full"
+          className="min-h-96"
           headerClassName="bg-red-100 dark:bg-red-900/30"
           dragOverColor="border-red-500 bg-red-100 dark:bg-red-900/30"
           cardWidth="135px" // 1.5x of default 90px

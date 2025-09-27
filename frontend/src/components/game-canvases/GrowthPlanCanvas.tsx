@@ -81,8 +81,8 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
   const actionCards = cards.filter((card) => card.id.startsWith('action_'));
 
   return (
-    <div className={`w-full h-full p-6 ${className}`}>
-      <div className="h-full flex flex-col space-y-6 overflow-y-auto">
+    <div className={`w-full h-full overflow-y-auto p-6 ${className}`}>
+      <div className="min-h-full flex flex-col space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
             {/* 技能卡 A區 */}

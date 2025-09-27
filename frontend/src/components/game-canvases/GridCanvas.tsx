@@ -125,8 +125,8 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ cards = [], onCardMove, classNa
   };
 
   return (
-    <div className={`w-full h-full p-6 ${className}`}>
-      <div className="h-full flex flex-col space-y-4">
+    <div className={`w-full h-full overflow-y-auto p-6 ${className}`}>
+      <div className="min-h-full flex flex-col space-y-4">
         {/* 前三名區域 */}
         <div className="grid grid-cols-3 gap-4 h-80">
           {zones

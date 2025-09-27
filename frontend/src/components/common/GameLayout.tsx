@@ -68,7 +68,7 @@ const GameLayout: React.FC<GameLayoutProps> = ({
         )}
 
         {/* 右側畫布區 */}
-        <div className={`flex-1 ${canvasClassName}`}>{canvas}</div>
+        <div className={`flex-1 overflow-hidden ${canvasClassName}`}>{canvas}</div>
       </div>
     </div>
   );

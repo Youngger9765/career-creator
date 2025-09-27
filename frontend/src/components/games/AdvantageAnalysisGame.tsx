@@ -86,7 +86,7 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
   return (
     <GameLayout
       infoBar={{
-        mode: '技能評估',
+        mode: '職能盤點卡',
         gameplay: '優劣勢分析',
         canvas: '雙區域畫布',
         deckName: mainDeck?.name || '職能盤點卡',

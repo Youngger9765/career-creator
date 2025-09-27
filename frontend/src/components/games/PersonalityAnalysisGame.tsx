@@ -89,7 +89,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
   return (
     <GameLayout
       infoBar={{
-        mode: '職涯探索',
+        mode: '職游旅人',
         gameplay: '六大性格分析',
         canvas: '三欄分類畫布',
         deckName: mainDeck?.name || '職游旅人卡',

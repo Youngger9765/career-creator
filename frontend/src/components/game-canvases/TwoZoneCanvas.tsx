@@ -114,8 +114,8 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   };
 
   return (
-    <div className={`w-full h-full overflow-hidden ${className}`}>
-      <div className="h-full grid grid-cols-2 gap-4 p-4">
+    <div className={`w-full h-full overflow-y-auto ${className}`}>
+      <div className="min-h-full grid grid-cols-2 gap-4 p-4">
         {/* 優勢區域 */}
         <DropZone
           id="advantage-zone"
@@ -127,9 +127,11 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
           icon={TrendingUp}
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxAdvantage} 張卡片`}
-          className="h-full"
+          className="min-h-96"
           headerClassName="bg-green-100 dark:bg-green-900/30"
           dragOverColor="border-green-500 bg-green-100 dark:bg-green-900/30"
+          cardWidth="135px"  // 1.5x of default 90px
+          cardHeight="240px" // 1.5x of default 160px
           showCardNumbers={true}
           showRemoveButton={true}
           allowReorder={true}
@@ -154,9 +156,11 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
           icon={TrendingDown}
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxDisadvantage} 張卡片`}
-          className="h-full"
+          className="min-h-96"
           headerClassName="bg-red-100 dark:bg-red-900/30"
           dragOverColor="border-red-500 bg-red-100 dark:bg-red-900/30"
+          cardWidth="135px"  // 1.5x of default 90px
+          cardHeight="240px" // 1.5x of default 160px
           showCardNumbers={true}
           showRemoveButton={true}
           allowReorder={true}

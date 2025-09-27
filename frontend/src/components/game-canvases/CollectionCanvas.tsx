@@ -76,8 +76,8 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   const hasCards = collectedCardIds.length > 0;
 
   return (
-    <div className={`w-full h-full overflow-hidden ${className}`}>
-      <div className="h-full">
+    <div className={`w-full h-full overflow-y-auto ${className}`}>
+      <div className="min-h-full">
         <DropZone
           id="collection-zone"
           cards={cards}
@@ -88,9 +88,11 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
           icon={Star}
           emptyMessage="拖曳卡片到此處開始收藏"
           emptySubMessage={`最多可收藏 ${maxCards} 張職業卡`}
-          className="h-full"
+          className="min-h-96"
           headerClassName="bg-purple-100 dark:bg-purple-900/30"
           dragOverColor="border-purple-500 bg-purple-100 dark:bg-purple-900/30"
+          cardWidth="135px"  // 1.5x of default 90px
+          cardHeight="240px" // 1.5x of default 160px
           showCardNumbers={false}
           showRemoveButton={true}
           allowReorder={true}

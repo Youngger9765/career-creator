@@ -72,7 +72,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   return (
     <GameLayout
       infoBar={{
-        mode: '成長規劃',
+        mode: '職能盤點',
         gameplay: '成長計畫',
         canvas: 'AB 畫布',
         deckName: skillDeck?.name || '職能盤點卡',

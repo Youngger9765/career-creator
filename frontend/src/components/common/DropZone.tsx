@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, LucideIcon, Edit2, Lock, Unlock, Save, X } from 'lucide-react';
+import { AlertCircle, LucideIcon, Edit2, Lock, Unlock, Save, X, RotateCw } from 'lucide-react';
 
 // 簡化的卡片介面
 interface CardData {
@@ -26,6 +26,10 @@ export interface DropZoneProps {
   placedCardIds: string[];
   maxCards?: number;
 
+  // 卡片驗證
+  allowedCardTypes?: string[]; // 允許的卡片類型，根據 cardId 前綴判斷
+  cardTypeValidator?: (cardId: string) => boolean; // 自定義卡片類型驗證器
+
   // UI 配置
   title?: string;
   subtitle?: string;
@@ -38,6 +42,10 @@ export interface DropZoneProps {
   headerClassName?: string;
   contentClassName?: string;
   dragOverColor?: string;
+
+  // 卡片尺寸配置
+  cardWidth?: string | number; // 預設 '90px'
+  cardHeight?: string | number; // 預設 '160px'
 
   // 功能開關
   showCardNumbers?: boolean;
@@ -67,6 +75,8 @@ const DropZone: React.FC<DropZoneProps> = ({
   cards,
   placedCardIds,
   maxCards = 5,
+  allowedCardTypes,
+  cardTypeValidator,
   title,
   subtitle,
   icon: Icon,
@@ -76,6 +86,8 @@ const DropZone: React.FC<DropZoneProps> = ({
   headerClassName = '',
   contentClassName = '',
   dragOverColor = 'border-blue-500 bg-blue-50 dark:bg-blue-900/20',
+  cardWidth = '90px',
+  cardHeight = '160px',
   showCardNumbers = true,
   showRemoveButton = true,
   allowReorder = true,
@@ -96,6 +108,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   const [isEditingLimit, setIsEditingLimit] = useState(false);
   const [tempMaxCards, setTempMaxCards] = useState(maxCards);
   const [localLocked, setLocalLocked] = useState(isLocked);
+  const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
 
   // 同步外部 isLocked 狀態
   useEffect(() => {
@@ -112,6 +125,22 @@ const DropZone: React.FC<DropZoneProps> = ({
   // 當有卡片時自動鎖定，或手動鎖定
   const effectivelyLocked = localLocked || hasCards;
 
+  // 卡片類型驗證函數
+  const isCardTypeAllowed = (cardId: string): boolean => {
+    // 如果有自定義驗證器，優先使用
+    if (cardTypeValidator) {
+      return cardTypeValidator(cardId);
+    }
+
+    // 如果沒有指定允許的卡片類型，則允許所有類型
+    if (!allowedCardTypes || allowedCardTypes.length === 0) {
+      return true;
+    }
+
+    // 檢查卡片ID是否符合允許的類型前綴
+    return allowedCardTypes.some((type) => cardId.startsWith(type));
+  };
+
   const handleDrop = (e: React.DragEvent, insertIndex?: number) => {
     e.preventDefault();
     e.stopPropagation();
@@ -120,6 +149,11 @@ const DropZone: React.FC<DropZoneProps> = ({
 
     const cardId = e.dataTransfer.getData('cardId');
     if (!cardId) return;
+
+    // 檢查卡片類型是否允許
+    if (!isCardTypeAllowed(cardId)) {
+      return; // 靜默拒絕，不顯示任何提示
+    }
 
     const sourceIndex = parseInt(e.dataTransfer.getData('sourceIndex') || '-1');
     const sourceZone = e.dataTransfer.getData('sourceZone');
@@ -182,76 +216,172 @@ const DropZone: React.FC<DropZoneProps> = ({
 
   const isOverLimit = placedCardIds.length >= maxCards;
 
+  // 根據卡片ID決定背景色
+  const getCardBackground = (cardId: string) => {
+    if (cardId.startsWith('skill_')) {
+      return 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700';
+    } else if (cardId.startsWith('action_')) {
+      return 'bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-orange-200 dark:border-orange-700';
+    } else if (cardId.startsWith('value_')) {
+      return 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700';
+    } else if (cardId.startsWith('career_')) {
+      return 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200 dark:border-purple-700';
+    }
+    return 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600';
+  };
+
+  // 根據卡片ID決定分類標籤顏色
+  const getCategoryColor = (cardId: string) => {
+    if (cardId.startsWith('skill_')) {
+      return 'text-blue-600 dark:text-blue-400';
+    } else if (cardId.startsWith('action_')) {
+      return 'text-orange-600 dark:text-orange-400';
+    } else if (cardId.startsWith('value_')) {
+      return 'text-green-600 dark:text-green-400';
+    } else if (cardId.startsWith('career_')) {
+      return 'text-purple-600 dark:text-purple-400';
+    }
+    return 'text-gray-600 dark:text-gray-400';
+  };
+
+  // 翻轉卡片
+  const toggleCardFlip = (cardId: string) => {
+    setFlippedCards((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(cardId)) {
+        newSet.delete(cardId);
+      } else {
+        newSet.add(cardId);
+      }
+      return newSet;
+    });
+  };
+
   // 預設卡片渲染 - 直立長方形樣式
-  const defaultRenderCard = (card: CardData, index: number) => (
-    <div
-      key={card.id}
-      className="relative w-[100px]"
-      draggable={allowReorder}
-      onDragStart={(e) => allowReorder && handleCardDragStart(e, card.id, index)}
-      onDragOver={(e) => {
-        if (!allowReorder) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const insertIndex = x < rect.width / 2 ? index : index + 1;
-        setDragOverIndex(insertIndex);
-      }}
-      onDrop={(e) => {
-        if (!allowReorder) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const insertIndex = x < rect.width / 2 ? index : index + 1;
-        handleDrop(e, insertIndex);
-      }}
-    >
-      {/* 插入線 */}
-      {allowReorder && dragOverIndex === index && (
-        <div className="absolute left-0 top-0 w-0.5 h-full bg-blue-500 animate-pulse -ml-1" />
-      )}
+  const defaultRenderCard = (card: CardData, index: number) => {
+    const isFlipped = flippedCards.has(card.id);
 
-      {/* 卡片編號 */}
-      {showCardNumbers && (
-        <div className="absolute -top-2 -left-1 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center z-10">
-          <span className="text-[10px] font-bold">{index + 1}</span>
-        </div>
-      )}
+    return (
+      <div
+        key={card.id}
+        className="relative"
+        style={{ width: typeof cardWidth === 'number' ? `${cardWidth}px` : cardWidth }}
+        draggable={allowReorder}
+        onDragStart={(e) => allowReorder && handleCardDragStart(e, card.id, index)}
+        onDragOver={(e) => {
+          if (!allowReorder) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const insertIndex = x < rect.width / 2 ? index : index + 1;
+          setDragOverIndex(insertIndex);
+        }}
+        onDrop={(e) => {
+          if (!allowReorder) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const insertIndex = x < rect.width / 2 ? index : index + 1;
+          handleDrop(e, insertIndex);
+        }}
+      >
+        {/* 插入線 */}
+        {allowReorder && dragOverIndex === index && (
+          <div className="absolute left-0 top-0 w-0.5 h-full bg-blue-500 animate-pulse -ml-1" />
+        )}
 
-      {/* 移除按鈕 */}
-      {showRemoveButton && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onCardRemove?.(card.id);
-          }}
-          className="absolute -top-2 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm"
-          title="移除卡片"
-        >
-          ×
-        </button>
-      )}
-
-      {/* 卡片內容 - 直立長方形 */}
-      <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-2 shadow-sm hover:shadow-md transition-shadow cursor-move h-[140px] flex flex-col">
-        <div className="text-xs font-medium text-gray-900 dark:text-gray-100 text-center break-words flex-1 flex items-center justify-center px-1">
-          {card.title}
-        </div>
-        {card.description && (
-          <div className="text-[10px] text-gray-600 dark:text-gray-400 mt-1 line-clamp-2 text-center">
-            {card.description}
+        {/* 卡片編號 */}
+        {showCardNumbers && (
+          <div className="absolute -top-2 -left-1 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center z-10">
+            <span className="text-[10px] font-bold">{index + 1}</span>
           </div>
         )}
-      </div>
 
-      {/* 最後一張卡片後的插入線 */}
-      {allowReorder && dragOverIndex === index + 1 && index === placedCardIds.length - 1 && (
-        <div className="absolute right-0 top-0 w-0.5 h-full bg-blue-500 animate-pulse -mr-1" />
-      )}
-    </div>
-  );
+        {/* 移除按鈕 */}
+        {showRemoveButton && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onCardRemove?.(card.id);
+            }}
+            className="absolute -top-2 -right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 shadow-sm"
+            title="移除卡片"
+          >
+            ×
+          </button>
+        )}
+
+        {/* 卡片內容 - 直立長方形 */}
+        <div
+          className={`${getCardBackground(card.id)} border rounded-lg shadow-sm hover:shadow-lg transition-all cursor-move flex flex-col relative`}
+          style={{ height: typeof cardHeight === 'number' ? `${cardHeight}px` : cardHeight }}
+        >
+          {/* 卡片正面/背面內容 */}
+          <div className="p-3 pb-12 flex flex-col h-full relative">
+            {/* 翻面按鈕 - 在卡片內容底部 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleCardFlip(card.id);
+              }}
+              className="absolute bottom-2 left-3 right-3 px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white dark:hover:bg-gray-700 transition-colors z-20 border border-gray-200 dark:border-gray-600 shadow-sm"
+              title="翻轉卡片"
+            >
+              <RotateCw className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+              <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">翻轉</span>
+            </button>
+            {!isFlipped ? (
+              // 正面
+              <>
+                {/* 分類標籤 */}
+                {card.category && (
+                  <div
+                    className={`text-[10px] font-semibold uppercase tracking-wider ${getCategoryColor(card.id)} mb-2`}
+                  >
+                    {card.category}
+                  </div>
+                )}
+                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-center break-words flex-1 flex items-center justify-center px-1">
+                  {card.title}
+                </div>
+                {card.description && (
+                  <div className="text-[11px] text-gray-600 dark:text-gray-300 mt-2 line-clamp-3 text-center">
+                    {card.description}
+                  </div>
+                )}
+              </>
+            ) : (
+              // 背面 - 顯示更詳細的說明或其他內容
+              <div className="flex flex-col h-full">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 text-center">
+                  詳細說明
+                </div>
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="text-xs text-gray-700 dark:text-gray-300 text-center leading-relaxed px-2">
+                    {card.description || card.title}
+                  </div>
+                  {card.category && (
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 text-center">
+                        分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 最後一張卡片後的插入線 */}
+        {allowReorder && dragOverIndex === index + 1 && index === placedCardIds.length - 1 && (
+          <div className="absolute right-0 top-0 w-0.5 h-full bg-blue-500 animate-pulse -mr-1" />
+        )}
+      </div>
+    );
+  };
 
   // 預設空狀態渲染
   const defaultRenderEmpty = () => (

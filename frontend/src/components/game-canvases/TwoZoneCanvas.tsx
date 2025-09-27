@@ -22,6 +22,8 @@ interface Card {
 
 interface TwoZoneCanvasProps {
   cards?: Card[];
+  advantageCardIds?: string[];
+  disadvantageCardIds?: string[];
   onCardMove?: (cardId: string, zone: 'advantage' | 'disadvantage' | null) => void;
   maxCardsPerZone?: number;
   maxAdvantageCards?: number;
@@ -34,6 +36,8 @@ interface TwoZoneCanvasProps {
 
 const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   cards = [],
+  advantageCardIds,
+  disadvantageCardIds,
   onCardMove,
   maxCardsPerZone = 5,
   maxAdvantageCards = 5,
@@ -43,12 +47,25 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   isRoomOwner = false,
   className = '',
 }) => {
-  const [advantageCards, setAdvantageCards] = useState<string[]>([]);
-  const [disadvantageCards, setDisadvantageCards] = useState<string[]>([]);
+  const [advantageCards, setAdvantageCards] = useState<string[]>(advantageCardIds || []);
+  const [disadvantageCards, setDisadvantageCards] = useState<string[]>(disadvantageCardIds || []);
   const [advantageLocked, setAdvantageLocked] = useState(false);
   const [disadvantageLocked, setDisadvantageLocked] = useState(false);
   const [localMaxAdvantage, setLocalMaxAdvantage] = useState(maxAdvantageCards);
   const [localMaxDisadvantage, setLocalMaxDisadvantage] = useState(maxDisadvantageCards);
+
+  // 同步外部狀態
+  React.useEffect(() => {
+    if (advantageCardIds !== undefined) {
+      setAdvantageCards(advantageCardIds);
+    }
+  }, [advantageCardIds]);
+
+  React.useEffect(() => {
+    if (disadvantageCardIds !== undefined) {
+      setDisadvantageCards(disadvantageCardIds);
+    }
+  }, [disadvantageCardIds]);
 
   const handleAdvantageAdd = (cardId: string) => {
     // 如果卡片在劣勢區，先移除
@@ -97,8 +114,8 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   };
 
   return (
-    <div className={`w-full h-full p-4 ${className}`}>
-      <div className="h-full grid grid-cols-2 gap-6">
+    <div className={`w-full h-full overflow-hidden ${className}`}>
+      <div className="h-full grid grid-cols-2 gap-4 p-4">
         {/* 優勢區域 */}
         <DropZone
           id="advantage-zone"

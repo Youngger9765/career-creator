@@ -1,0 +1,251 @@
+{
+  "deck": {
+    "id": "action_cards_24",
+    "name": "策略行動卡",
+    "description": "24張行動策略卡片，用於制定個人成長計畫",
+    "type": "auxiliary",
+    "version": "1.0.0"
+  },
+  "cards": [
+    {
+      "id": "action_001",
+      "title": "線上課程學習",
+      "description": "參與線上課程平台系統性學習新技能",
+      "category": "learning",
+      "duration": "3-6個月",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["電腦", "網路", "時間規劃"]
+    },
+    {
+      "id": "action_002",
+      "title": "實習或志工體驗",
+      "description": "透過實習或志工工作獲得實際工作經驗",
+      "category": "experience",
+      "duration": "3-12個月",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["履歷準備", "面試技巧", "時間安排"]
+    },
+    {
+      "id": "action_003",
+      "title": "建立個人作品集",
+      "description": "創建展示個人技能和成果的作品集",
+      "category": "showcase",
+      "duration": "1-3個月",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["設計工具", "內容整理", "網站架設"]
+    },
+    {
+      "id": "action_004",
+      "title": "參加專業證照考試",
+      "description": "考取相關領域的專業證照提升競爭力",
+      "category": "certification",
+      "duration": "2-6個月",
+      "difficulty": "中等",
+      "cost": "中等",
+      "resources": ["考試費用", "教材", "時間規劃"]
+    },
+    {
+      "id": "action_005",
+      "title": "參與開源專案",
+      "description": "貢獻開源專案累積實戰經驗和人脈",
+      "category": "experience",
+      "duration": "持續進行",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["技術能力", "協作工具", "時間投入"]
+    },
+    {
+      "id": "action_006",
+      "title": "建立專業人脈網絡",
+      "description": "參加相關活動建立業界人脈關係",
+      "category": "networking",
+      "duration": "持續進行",
+      "difficulty": "中等",
+      "cost": "中等",
+      "resources": ["社交技巧", "活動費用", "時間安排"]
+    },
+    {
+      "id": "action_007",
+      "title": "撰寫技術部落格",
+      "description": "定期撰寫專業文章分享知識和經驗",
+      "category": "showcase",
+      "duration": "持續進行",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["寫作能力", "技術知識", "平台經營"]
+    },
+    {
+      "id": "action_008",
+      "title": "尋找導師指導",
+      "description": "找到經驗豐富的導師提供職涯建議",
+      "category": "mentoring",
+      "duration": "6-12個月",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["人脈關係", "溝通技巧", "學習態度"]
+    },
+    {
+      "id": "action_009",
+      "title": "參加工作坊或研習",
+      "description": "參與短期密集訓練提升特定技能",
+      "category": "learning",
+      "duration": "1-7天",
+      "difficulty": "簡單",
+      "cost": "中等",
+      "resources": ["報名費用", "交通住宿", "時間安排"]
+    },
+    {
+      "id": "action_010",
+      "title": "建立學習小組",
+      "description": "與同儕組成學習小組相互督促成長",
+      "category": "collaboration",
+      "duration": "3-12個月",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["組織能力", "溝通協調", "定期聚會"]
+    },
+    {
+      "id": "action_011",
+      "title": "制定詳細時間規劃",
+      "description": "設定明確目標和時程表管理學習進度",
+      "category": "planning",
+      "duration": "持續進行",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["規劃工具", "時間管理", "自律能力"]
+    },
+    {
+      "id": "action_012",
+      "title": "尋求專業諮詢",
+      "description": "諮詢職涯顧問獲得專業發展建議",
+      "category": "consultation",
+      "duration": "1-3個月",
+      "difficulty": "簡單",
+      "cost": "中等",
+      "resources": ["諮詢費用", "問題整理", "開放心態"]
+    },
+    {
+      "id": "action_013",
+      "title": "參加競賽或挑戰",
+      "description": "透過競賽檢驗能力並獲得成就感",
+      "category": "challenge",
+      "duration": "1-6個月",
+      "difficulty": "困難",
+      "cost": "低",
+      "resources": ["專業技能", "團隊合作", "抗壓能力"]
+    },
+    {
+      "id": "action_014",
+      "title": "跨領域學習探索",
+      "description": "學習不同領域知識拓展視野",
+      "category": "exploration",
+      "duration": "3-12個月",
+      "difficulty": "中等",
+      "cost": "中等",
+      "resources": ["學習資源", "時間投入", "好奇心"]
+    },
+    {
+      "id": "action_015",
+      "title": "定期自我評估",
+      "description": "定期檢視學習成果調整發展方向",
+      "category": "assessment",
+      "duration": "持續進行",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["評估工具", "反思能力", "誠實態度"]
+    },
+    {
+      "id": "action_016",
+      "title": "建立個人品牌",
+      "description": "透過各種管道建立專業形象和知名度",
+      "category": "branding",
+      "duration": "6-24個月",
+      "difficulty": "困難",
+      "cost": "中等",
+      "resources": ["行銷概念", "內容創作", "社群經營"]
+    },
+    {
+      "id": "action_017",
+      "title": "參與社群活動",
+      "description": "加入專業社群參與討論和活動",
+      "category": "networking",
+      "duration": "持續進行",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["社交能力", "活動參與", "分享精神"]
+    },
+    {
+      "id": "action_018",
+      "title": "尋找實戰機會",
+      "description": "主動爭取能夠應用所學的實務機會",
+      "category": "practice",
+      "duration": "3-12個月",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["主動積極", "溝通能力", "學習態度"]
+    },
+    {
+      "id": "action_019",
+      "title": "建立學習筆記系統",
+      "description": "建立有效的知識管理和複習系統",
+      "category": "organization",
+      "duration": "1個月",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["筆記工具", "整理能力", "習慣養成"]
+    },
+    {
+      "id": "action_020",
+      "title": "設定階段性目標",
+      "description": "將長期目標分解為可執行的短期目標",
+      "category": "planning",
+      "duration": "持續進行",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["目標設定", "時間管理", "執行力"]
+    },
+    {
+      "id": "action_021",
+      "title": "尋找學習夥伴",
+      "description": "找到志同道合的學習夥伴相互激勵",
+      "category": "collaboration",
+      "duration": "3-12個月",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["社交能力", "共同目標", "互助精神"]
+    },
+    {
+      "id": "action_022",
+      "title": "建立反饋機制",
+      "description": "建立獲得他人建議和意見的管道",
+      "category": "feedback",
+      "duration": "持續進行",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["開放心態", "人際關係", "改進意願"]
+    },
+    {
+      "id": "action_023",
+      "title": "制定應急計畫",
+      "description": "準備備案計畫應對可能的挫折或變化",
+      "category": "planning",
+      "duration": "1-2個月",
+      "difficulty": "中等",
+      "cost": "低",
+      "resources": ["風險評估", "靈活思維", "問題解決"]
+    },
+    {
+      "id": "action_024",
+      "title": "慶祝里程碑成就",
+      "description": "設定並慶祝重要的學習成果和進步",
+      "category": "motivation",
+      "duration": "持續進行",
+      "difficulty": "簡單",
+      "cost": "低",
+      "resources": ["自我獎勵", "成就感", "正向思維"]
+    }
+  ]
+}

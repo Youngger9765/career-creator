@@ -3,110 +3,124 @@
  *
  * 用於價值導航卡的價值觀排序玩法
  * 提供3個上方格子和1個下方大格子
+ * 1-3名只能放一張卡片，其他區域可設定張數（預設7張）
  */
 
 'use client';
 
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
-import { Star, Circle, Square, X, Grid3x3 } from 'lucide-react';
-import CardItem from '../game-cards/CardItem';
+import { Trophy, Medal, Award, Square } from 'lucide-react';
+import DropZone from '../common/DropZone';
 
 interface GridCanvasProps {
   cards?: CardData[];
-  onCardMove?: (cardId: string, position: { row: number; col: number }) => void;
+  onCardMove?: (cardId: string, position: { row: number; col: number } | null) => void;
   className?: string;
 }
 
-interface GridCell {
+interface GridZone {
   id: string;
-  cardId: string | null;
-  cardIds?: string[]; // For bottom area to support multiple cards
-  label: string;
-  type: 'top' | 'bottom';
+  title: string;
+  placedCardIds: string[];
+  maxCards: number;
+  icon: any;
+  type: 'rank' | 'others';
+  rank?: number;
 }
 
 const GridCanvas: React.FC<GridCanvasProps> = ({ cards = [], onCardMove, className = '' }) => {
-  // 初始化3+1格局
-  const initializeCells = (): GridCell[] => {
-    return [
-      { id: 'top1', cardId: null, label: '第一名', type: 'top' },
-      { id: 'top2', cardId: null, label: '第二名', type: 'top' },
-      { id: 'top3', cardId: null, label: '第三名', type: 'top' },
-      { id: 'others', cardId: null, cardIds: [], label: '其他', type: 'bottom' },
-    ];
-  };
+  // 初始化區域狀態
+  const [zones, setZones] = useState<GridZone[]>([
+    {
+      id: 'rank1',
+      title: '第一名',
+      placedCardIds: [],
+      maxCards: 1,
+      icon: Trophy,
+      type: 'rank',
+      rank: 1,
+    },
+    {
+      id: 'rank2',
+      title: '第二名',
+      placedCardIds: [],
+      maxCards: 1,
+      icon: Medal,
+      type: 'rank',
+      rank: 2,
+    },
+    {
+      id: 'rank3',
+      title: '第三名',
+      placedCardIds: [],
+      maxCards: 1,
+      icon: Award,
+      type: 'rank',
+      rank: 3,
+    },
+    { id: 'others', title: '其他', placedCardIds: [], maxCards: 7, icon: Square, type: 'others' },
+  ]);
 
-  const [cells, setCells] = useState<GridCell[]>(initializeCells());
-  const [dragOverCell, setDragOverCell] = useState<string | null>(null);
+  // 處理卡片添加
+  const handleCardAdd = (zoneId: string, cardId: string) => {
+    // 先從所有區域移除該卡片（避免重複）
+    setZones((prev) =>
+      prev.map((zone) => ({
+        ...zone,
+        placedCardIds: zone.placedCardIds.filter((id) => id !== cardId),
+      }))
+    );
 
-  // 處理拖放
-  const handleDrop = (e: React.DragEvent, cellId: string) => {
-    e.preventDefault();
-    setDragOverCell(null);
-
-    const cardId = e.dataTransfer.getData('cardId');
-
-    // 檢查卡片是否已在其他格子中
-    const cardExists = cells.some((cell) => {
-      if (cell.type === 'top') {
-        return cell.cardId === cardId;
-      } else {
-        return cell.cardIds?.includes(cardId);
-      }
-    });
-
-    if (cardExists) {
-      return; // 卡片已存在，不允許重複放置
-    }
-
-    setCells((prev) => {
-      return prev.map((cell) => {
-        if (cell.id === cellId) {
-          // 如果是「其他」區域，可以有多張卡片（最多6張）
-          if (cell.type === 'bottom') {
-            const currentCards = cell.cardIds || [];
-            if (currentCards.length >= 6) {
-              return cell; // 已達到上限
-            }
-            return { ...cell, cardIds: [...currentCards, cardId] };
-          }
-          // 如果目標格子已有卡片，不允許覆蓋
-          if (cell.cardId) {
-            return cell;
-          }
-          return { ...cell, cardId };
+    // 添加到目標區域
+    setZones((prev) =>
+      prev.map((zone) => {
+        if (zone.id === zoneId) {
+          return {
+            ...zone,
+            placedCardIds: [...zone.placedCardIds, cardId],
+          };
         }
-        return cell;
-      });
-    });
+        return zone;
+      })
+    );
 
-    const cellIndex = cells.findIndex((c) => c.id === cellId);
-    if (cellIndex !== -1) {
-      onCardMove?.(cardId, { row: 0, col: cellIndex });
+    // 通知父組件
+    const zoneIndex = zones.findIndex((z) => z.id === zoneId);
+    if (zoneIndex !== -1) {
+      onCardMove?.(cardId, { row: 0, col: zoneIndex });
     }
   };
 
-  const handleDragOver = (e: React.DragEvent, cellId: string) => {
-    e.preventDefault();
-    setDragOverCell(cellId);
+  // 處理卡片移除
+  const handleCardRemove = (zoneId: string, cardId: string) => {
+    setZones((prev) =>
+      prev.map((zone) => {
+        if (zone.id === zoneId) {
+          return {
+            ...zone,
+            placedCardIds: zone.placedCardIds.filter((id) => id !== cardId),
+          };
+        }
+        return zone;
+      })
+    );
+
+    // 通知父組件卡片被移除
+    onCardMove?.(cardId, null);
   };
 
-  const handleDragLeave = () => {
-    setDragOverCell(null);
-  };
-
-  const getCellStyle = (cell: GridCell) => {
-    const isDraggingOver = dragOverCell === cell.id;
-
-    if (cell.type === 'top') {
-      const baseStyle = 'bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700';
-      const dragOverStyle = 'bg-blue-100 dark:bg-blue-900 border-blue-500';
-      return isDraggingOver ? `${dragOverStyle} border-2` : `${baseStyle} border-2`;
-    } else {
-      const baseStyle = 'bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700';
-      const dragOverStyle = 'bg-green-100 dark:bg-green-900 border-green-500';
-      return isDraggingOver ? `${dragOverStyle} border-2` : `${baseStyle} border-2`;
+  // 處理最大卡片數變更（僅其他區域可變更）
+  const handleMaxCardsChange = (zoneId: string, newMax: number) => {
+    if (zoneId === 'others') {
+      setZones((prev) =>
+        prev.map((zone) => {
+          if (zone.id === zoneId) {
+            return { ...zone, maxCards: newMax };
+          }
+          return zone;
+        })
+      );
     }
   };
 
@@ -114,147 +128,68 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ cards = [], onCardMove, classNa
     <div className={`w-full h-full p-6 ${className}`}>
       <div className="h-full flex flex-col space-y-4">
         {/* 前三名區域 */}
-        <div className="grid grid-cols-3 gap-4">
-          {cells
-            .filter((cell) => cell.type === 'top')
-            .map((cell) => {
-              const card = cards.find((c) => c.id === cell.cardId);
-              return (
-                <div
-                  key={cell.id}
-                  className={`
-                  relative h-48 rounded-lg p-4 transition-all duration-200
-                  ${getCellStyle(cell)}
-                  ${cell.cardId ? 'shadow-md' : 'border-dashed'}
-                `}
-                  onDrop={(e) => handleDrop(e, cell.id)}
-                  onDragOver={(e) => handleDragOver(e, cell.id)}
-                  onDragLeave={handleDragLeave}
-                >
-                  {/* 位置標籤 */}
-                  <div className="absolute top-3 left-3">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {cell.label}
-                    </span>
-                  </div>
-
-                  {/* 卡片內容 */}
-                  {card ? (
-                    <div className="mt-8 h-full flex items-center justify-center">
-                      <button
-                        onClick={() => {
-                          setCells((prev) =>
-                            prev.map((c) => (c.id === cell.id ? { ...c, cardId: null } : c))
-                          );
-                        }}
-                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md z-10"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                      <div className="text-center">
-                        <div className="text-base font-medium text-gray-800 dark:text-gray-200">
-                          {card.title}
-                        </div>
-                        {card.description && (
-                          <div className="text-xs text-gray-600 dark:text-gray-400 mt-2 line-clamp-3">
-                            {card.description}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="h-full flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-2">
-                          <Star className="w-6 h-6 text-gray-400 dark:text-gray-600" />
-                        </div>
-                        <p className="text-xs text-gray-400 dark:text-gray-600">拖曳卡片到此</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+        <div className="grid grid-cols-3 gap-4 h-80">
+          {zones
+            .filter((zone) => zone.type === 'rank')
+            .map((zone) => (
+              <DropZone
+                key={zone.id}
+                id={zone.id}
+                cards={cards}
+                placedCardIds={zone.placedCardIds}
+                maxCards={zone.maxCards}
+                title={zone.title}
+                icon={zone.icon}
+                emptyMessage="拖曳卡片到此"
+                emptySubMessage="只能放置一張卡片"
+                showCardNumbers={false}
+                showRemoveButton={true}
+                allowReorder={false}
+                showCounter={false}
+                isEditable={false}
+                cardWidth="150px" // 增大卡片寬度
+                cardHeight="210px" // 增大卡片高度
+                onCardAdd={(cardId) => handleCardAdd(zone.id, cardId)}
+                onCardRemove={(cardId) => handleCardRemove(zone.id, cardId)}
+                dragOverColor={`border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20`}
+                className="h-full"
+                headerClassName="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20"
+                contentClassName="flex items-center justify-center"
+              />
+            ))}
         </div>
 
         {/* 其他區域 */}
         <div className="flex-1">
-          {cells
-            .filter((cell) => cell.type === 'bottom')
-            .map((cell) => {
-              const cellCards = (cell.cardIds || [])
-                .map((id) => cards.find((c) => c.id === id))
-                .filter(Boolean) as CardData[];
-              return (
-                <div
-                  key={cell.id}
-                  className={`
-                  relative h-full rounded-lg p-4 transition-all duration-200
-                  ${getCellStyle(cell)}
-                  ${cellCards.length > 0 ? 'shadow-md' : 'border-dashed'}
-                `}
-                  onDrop={(e) => handleDrop(e, cell.id)}
-                  onDragOver={(e) => handleDragOver(e, cell.id)}
-                  onDragLeave={handleDragLeave}
-                >
-                  {/* 位置標籤 */}
-                  <div className="absolute top-3 left-3">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {cell.label} ({cellCards.length}/6)
-                    </span>
-                  </div>
-
-                  {/* 卡片內容 - 支持多張卡片 */}
-                  {cellCards.length > 0 ? (
-                    <div className="mt-8 flex flex-wrap gap-3">
-                      {cellCards.map((card, index) => (
-                        <div key={card.id} className="relative">
-                          <button
-                            onClick={() => {
-                              setCells((prev) =>
-                                prev.map((c) => {
-                                  if (c.id === cell.id) {
-                                    return {
-                                      ...c,
-                                      cardIds: c.cardIds?.filter((id) => id !== card.id) || [],
-                                    };
-                                  }
-                                  return c;
-                                })
-                              );
-                            }}
-                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md z-10"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                          <div className="bg-white dark:bg-gray-800 rounded-lg p-3 shadow-sm border border-gray-200 dark:border-gray-700 min-w-[150px]">
-                            <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                              {card.title}
-                            </div>
-                            {card.description && (
-                              <div className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                                {card.description}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="h-full flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-2">
-                          <Square className="w-8 h-8 text-gray-400 dark:text-gray-600" />
-                        </div>
-                        <p className="text-sm text-gray-400 dark:text-gray-600">
-                          拖曳其他卡片到此區域（最多6張）
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          {zones
+            .filter((zone) => zone.type === 'others')
+            .map((zone) => (
+              <DropZone
+                key={zone.id}
+                id={zone.id}
+                cards={cards}
+                placedCardIds={zone.placedCardIds}
+                maxCards={zone.maxCards}
+                title={zone.title}
+                subtitle={`可放置多張卡片（預設 ${zone.maxCards} 張）`}
+                icon={zone.icon}
+                emptyMessage="拖曳其他卡片到此區域"
+                emptySubMessage={`最多可放置 ${zone.maxCards} 張卡片`}
+                showCardNumbers={true}
+                showRemoveButton={true}
+                allowReorder={true}
+                showCounter={true}
+                isEditable={true}
+                cardWidth="120px" // 增大卡片寬度
+                cardHeight="180px" // 增大卡片高度
+                onCardAdd={(cardId) => handleCardAdd(zone.id, cardId)}
+                onCardRemove={(cardId) => handleCardRemove(zone.id, cardId)}
+                onMaxCardsChange={(newMax) => handleMaxCardsChange(zone.id, newMax)}
+                dragOverColor={`border-green-500 bg-green-50 dark:bg-green-900/20`}
+                className="h-full"
+                headerClassName="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20"
+              />
+            ))}
         </div>
       </div>
     </div>

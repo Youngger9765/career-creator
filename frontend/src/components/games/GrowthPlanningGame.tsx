@@ -10,9 +10,7 @@
 import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GrowthPlanCanvas from '../game-canvases/GrowthPlanCanvas';
-import CardItem from '../game-cards/CardItem';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import GameInfoBar from '../game-info/GameInfoBar';
+import GameLayout from '../common/GameLayout';
 
 interface GrowthPlanningGameProps {
   roomId: string;
@@ -30,14 +28,13 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   const [skillDeck, setSkillDeck] = useState<any>(null);
   const [actionDeck, setActionDeck] = useState<any>(null);
   const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
-  const [selectedCardType, setSelectedCardType] = useState<'skill' | 'action'>('skill');
 
   // 載入牌組
   useEffect(() => {
     const getDecks = async () => {
       const cardLoader = CardLoaderService;
-      const skills = await cardLoader.getDeck('skill');
-      const actions = await cardLoader.getDeck('auxiliary_action');
+      const skills = await cardLoader.getDeck('skill_cards_52');
+      const actions = await cardLoader.getDeck('action_cards_24');
       setSkillDeck(skills);
       setActionDeck(actions);
     };
@@ -73,81 +70,45 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   const allCards = [...(skillDeck?.cards || []), ...(actionDeck?.cards || [])];
 
   return (
-    <div className="h-full flex flex-col">
-      {/* 遊戲資訊欄 */}
-      <GameInfoBar
-        mode="成長規劃"
-        gameplay="成長計畫"
-        canvas="三階段畫布"
-        deckName={skillDeck?.name || '職能盤點卡'}
-        totalCards={(skillDeck?.cards?.length || 0) + (actionDeck?.cards?.length || 0)}
-        availableCards={availableSkillCards.length + availableActionCards.length}
-      />
-
-      {/* 主要遊戲區域 */}
-      <div className="flex-1 flex">
-        {/* 左側卡片區 */}
-        <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
-          <Tabs
-            value={selectedCardType}
-            onValueChange={(v) => setSelectedCardType(v as 'skill' | 'action')}
-          >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="skill">技能卡</TabsTrigger>
-              <TabsTrigger value="action">行動卡</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="skill" className="mt-3">
-              <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
-                技能卡 ({availableSkillCards.length})
-              </h3>
-              <div className="space-y-2">
-                {availableSkillCards.map((card: any) => (
-                  <div key={card.id} className="cursor-move">
-                    <CardItem
-                      id={card.id}
-                      title={card.title}
-                      description={card.description}
-                      category={card.category}
-                      isDraggable={true}
-                    />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="action" className="mt-3">
-              <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
-                行動卡 ({availableActionCards.length})
-              </h3>
-              <div className="space-y-2">
-                {availableActionCards.map((card: any) => (
-                  <div key={card.id} className="cursor-move">
-                    <CardItem
-                      id={card.id}
-                      title={card.title}
-                      description={card.description}
-                      category={card.category}
-                      isDraggable={true}
-                    />
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
-
-        {/* 右側畫布區 */}
-        <div className="flex-1">
-          <GrowthPlanCanvas
-            cards={allCards}
-            onCardUse={handleCardUse}
-            onCardRemove={handleCardRemove}
-            onPlanCreate={handlePlanCreate}
-          />
-        </div>
-      </div>
-    </div>
+    <GameLayout
+      infoBar={{
+        mode: '成長規劃',
+        gameplay: '成長計畫',
+        canvas: 'AB 畫布',
+        deckName: skillDeck?.name || '職能盤點卡',
+        totalCards: (skillDeck?.cards?.length || 0) + (actionDeck?.cards?.length || 0),
+        availableCards: availableSkillCards.length + availableActionCards.length,
+      }}
+      sidebar={{
+        type: 'tabbed',
+        decks: [
+          {
+            id: 'skill',
+            label: '技能卡',
+            cards: availableSkillCards,
+            color: 'blue',
+            type: 'skill',
+          },
+          {
+            id: 'action',
+            label: '行動卡',
+            cards: availableActionCards,
+            color: 'orange',
+            type: 'action',
+          },
+        ],
+        width: 'w-96',
+        columns: 2,
+      }}
+      canvas={
+        <GrowthPlanCanvas
+          cards={allCards}
+          onCardUse={handleCardUse}
+          onCardRemove={handleCardRemove}
+          onPlanCreate={handlePlanCreate}
+        />
+      }
+    />
   );
 };
 

@@ -205,8 +205,8 @@ export default function RoomPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
-      {/* 頂部標題欄 */}
-      <div className="bg-white shadow-sm border-b">
+      {/* 頂部標題欄 - Fixed position */}
+      <div className="sticky top-0 z-50 bg-white shadow-sm border-b">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-6">
             <button onClick={() => router.push('/')} className="text-gray-600 hover:text-gray-800">

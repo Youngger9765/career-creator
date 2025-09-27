@@ -101,8 +101,8 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   };
 
   return (
-    <div className={`w-full h-full p-4 ${className}`}>
-      <div className="h-full grid grid-cols-3 gap-4">
+    <div className={`w-full h-full ${className}`}>
+      <div className="h-full grid grid-cols-3 gap-4 p-4">
         {/* 喜歡欄位 */}
         <DropZone
           id="like-column"
@@ -116,6 +116,8 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           className="h-full"
           headerClassName="bg-green-100 dark:bg-green-900/30"
           dragOverColor="border-green-500 bg-green-100 dark:bg-green-900/30"
+          cardWidth="135px" // 1.5x of default 90px
+          cardHeight="240px" // 1.5x of default 160px
           showCardNumbers={false}
           showRemoveButton={true}
           allowReorder={true}
@@ -142,6 +144,8 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           className="h-full"
           headerClassName="bg-gray-100 dark:bg-gray-800"
           dragOverColor="border-gray-500 bg-gray-100 dark:bg-gray-800"
+          cardWidth="135px" // 1.5x of default 90px
+          cardHeight="240px" // 1.5x of default 160px
           showCardNumbers={false}
           showRemoveButton={true}
           allowReorder={true}
@@ -168,6 +172,8 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           className="h-full"
           headerClassName="bg-red-100 dark:bg-red-900/30"
           dragOverColor="border-red-500 bg-red-100 dark:bg-red-900/30"
+          cardWidth="135px" // 1.5x of default 90px
+          cardHeight="240px" // 1.5x of default 160px
           showCardNumbers={false}
           showRemoveButton={true}
           allowReorder={true}

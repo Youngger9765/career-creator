@@ -10,9 +10,8 @@
 import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import TwoZoneCanvas from '../game-canvases/TwoZoneCanvas';
-import CardItem from '../game-cards/CardItem';
+import GameLayout from '../common/GameLayout';
 import { useGameState } from '@/stores/game-state-store';
-import GameInfoBar from '../game-info/GameInfoBar';
 
 interface AdvantageAnalysisGameProps {
   roomId: string;
@@ -85,53 +84,43 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
 
   return (
-    <div className="h-full flex flex-col">
-      {/* 遊戲資訊欄 */}
-      <GameInfoBar
-        mode="技能評估"
-        gameplay="優劣勢分析"
-        canvas="雙區域畫布"
-        deckName={mainDeck?.name || '職能盤點卡'}
-        totalCards={mainDeck?.cards?.length || 0}
-        availableCards={availableCards.length}
-      />
-
-      {/* 主要遊戲區域 */}
-      <div className="flex-1 flex">
-        {/* 左側卡片區 */}
-        <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
-          <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
-            職能盤點卡 ({availableCards.length})
-          </h3>
-          <div className="space-y-2">
-            {availableCards.map((card: any) => (
-              <div key={card.id} className="cursor-move">
-                <CardItem
-                  id={card.id}
-                  title={card.title}
-                  description={card.description}
-                  category={card.category}
-                  isDraggable={true}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 右側畫布區 */}
-        <div className="flex-1">
-          <TwoZoneCanvas
-            cards={mainDeck?.cards || []}
-            isRoomOwner={isRoomOwner}
-            maxAdvantageCards={maxAdvantageCards}
-            maxDisadvantageCards={maxDisadvantageCards}
-            onMaxAdvantageCardsChange={setMaxAdvantageCards}
-            onMaxDisadvantageCardsChange={setMaxDisadvantageCards}
-            onCardMove={handleCardMove}
-          />
-        </div>
-      </div>
-    </div>
+    <GameLayout
+      infoBar={{
+        mode: '技能評估',
+        gameplay: '優劣勢分析',
+        canvas: '雙區域畫布',
+        deckName: mainDeck?.name || '職能盤點卡',
+        totalCards: mainDeck?.cards?.length || 0,
+        availableCards: availableCards.length,
+      }}
+      sidebar={{
+        type: 'single',
+        decks: [
+          {
+            id: 'skill',
+            label: '職能盤點卡',
+            cards: availableCards,
+            color: 'blue',
+            type: 'skill',
+          },
+        ],
+        width: 'w-96',
+        columns: 2,
+      }}
+      canvas={
+        <TwoZoneCanvas
+          cards={mainDeck?.cards || []}
+          advantageCardIds={state.cardPlacements.advantageCards || []}
+          disadvantageCardIds={state.cardPlacements.disadvantageCards || []}
+          isRoomOwner={isRoomOwner}
+          maxAdvantageCards={maxAdvantageCards}
+          maxDisadvantageCards={maxDisadvantageCards}
+          onMaxAdvantageCardsChange={setMaxAdvantageCards}
+          onMaxDisadvantageCardsChange={setMaxDisadvantageCards}
+          onCardMove={handleCardMove}
+        />
+      }
+    />
   );
 };
 

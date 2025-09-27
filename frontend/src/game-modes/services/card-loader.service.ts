@@ -10,6 +10,7 @@ import riasecCards from '../data/cards/riasec-cards.json';
 import careerCards from '../data/cards/career-cards.json';
 import skillCards from '../data/cards/skill-cards.json';
 import valueCards from '../data/cards/value-cards.json';
+import actionCards from '../data/cards/action-cards.json';
 
 export interface Card {
   id: string;
@@ -62,6 +63,12 @@ export class CardLoaderService {
       ...valueCards.deck,
       type: valueCards.deck.type as 'main',
       cards: valueCards.cards,
+    } as CardDeck);
+
+    this.cache.set('action_cards_24', {
+      ...actionCards.deck,
+      type: actionCards.deck.type as 'auxiliary',
+      cards: actionCards.cards,
     } as CardDeck);
 
     this.initialized = true;
@@ -246,6 +253,7 @@ export class CardLoaderService {
       case 'position_breakdown':
         return {
           main: (await this.getDeck('skill_cards_52')) || undefined,
+          auxiliary: (await this.getDeck('action_cards_24')) || undefined,
         };
 
       case 'value_ranking':

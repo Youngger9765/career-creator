@@ -15,6 +15,7 @@ import CardItem from '../game-cards/CardItem';
 
 interface CollectionCanvasProps {
   cards?: CardData[];
+  collectedCardIds?: string[];
   onCardCollect?: (cardId: string, collected: boolean) => void;
   maxCards?: number;
   onMaxCardsChange?: (newMax: number) => void;
@@ -24,15 +25,25 @@ interface CollectionCanvasProps {
 
 const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   cards = [],
+  collectedCardIds: externalCollectedCardIds,
   onCardCollect,
   maxCards = 15,
   onMaxCardsChange,
   isRoomOwner = false,
   className = '',
 }) => {
-  // 收藏的卡片ID列表
-  const [collectedCardIds, setCollectedCardIds] = useState<string[]>([]);
+  // 收藏的卡片ID列表 - 優先使用外部狀態
+  const [collectedCardIds, setCollectedCardIds] = useState<string[]>(
+    externalCollectedCardIds || []
+  );
   const [dragOverCanvas, setDragOverCanvas] = useState(false);
+
+  // 同步外部狀態
+  React.useEffect(() => {
+    if (externalCollectedCardIds) {
+      setCollectedCardIds(externalCollectedCardIds);
+    }
+  }, [externalCollectedCardIds]);
 
   // 上限設定狀態
   const [isEditingLimit, setIsEditingLimit] = useState(false);
@@ -88,8 +99,8 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   const effectivelyLocked = isLimitLocked || hasCards;
 
   return (
-    <div className={`w-full h-full p-6 ${className}`}>
-      <div className="h-full relative">
+    <div className={`w-full h-full ${className}`}>
+      <div className="h-full p-4 relative">
         {/* 浮動計數器和設定 - 右上角 */}
         <div className="absolute top-2 right-2 z-20 flex items-center space-x-2">
           {/* 上限設定區域 (僅房間擁有者可見) */}
@@ -206,7 +217,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
         >
           {collectedCards.length === 0 ? (
             // 空狀態
-            <div className="h-full flex flex-col items-center justify-center">
+            <div className="h-full flex flex-col items-center justify-center p-6">
               <div className="w-32 h-32 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
                 <Star className="w-16 h-16 text-gray-400 dark:text-gray-600" />
               </div>
@@ -229,10 +240,12 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
             </div>
           ) : (
             // 已收藏的卡片
-            <div className="p-6 h-full overflow-auto">
+            <div className="h-full overflow-y-auto p-6">
               <div
-                className="grid grid-cols-2 gap-3"
-                style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}
+                className="grid gap-3"
+                style={{
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                }}
               >
                 {collectedCards.map((card) => (
                   <div key={card.id} className="relative">

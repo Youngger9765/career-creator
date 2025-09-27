@@ -10,8 +10,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameModeService } from '@/game-modes/services/mode.service';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
-import ModeSelector from '@/game-modes/components/ModeSelector';
-import GameplaySelector from '@/game-modes/components/GameplaySelector';
+import CombinedGameSelector from '@/game-modes/components/CombinedGameSelector';
 
 // 導入獨立的遊戲組件
 import PersonalityAnalysisGame from '@/components/games/PersonalityAnalysisGame';
@@ -26,7 +25,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface GameModeIntegrationProps {
@@ -51,7 +49,6 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   // 模式和玩法選擇
   const [selectedMode, setSelectedMode] = useState<string>('');
   const [selectedGameplay, setSelectedGameplay] = useState<string>(currentGameplay || '');
-  const [activeTab, setActiveTab] = useState<string>('mode');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -68,12 +65,11 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     setTestResults((prev) => [...prev, `[${timestamp}] ${message}`]);
   }, []);
 
-  // 選擇模式
-  const handleModeSelect = (modeId: string) => {
+  // 選擇遊戲（模式 + 玩法）
+  const handleGameSelect = (modeId: string, gameplayId: string) => {
     setSelectedMode(modeId);
-    setSelectedGameplay(''); // 重置玩法選擇
-    setActiveTab('gameplay'); // 自動切換到玩法選擇 Tab
-    addTestResult(`✅ 選擇模式: ${modeId}`);
+    setSelectedGameplay(gameplayId);
+    addTestResult(`✅ 選擇遊戲: ${modeId} - ${gameplayId}`);
   };
 
   // Sync with parent state
@@ -249,36 +245,15 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       {/* 主要內容區域 */}
       <div className="flex-1 p-6 overflow-hidden">
         <div className="h-full flex flex-col gap-6">
-          {/* 模式和玩法選擇器 */}
-          {(!selectedMode || !selectedGameplay) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>選擇遊戲模式</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="mb-4">
-                    <TabsTrigger value="mode">1. 選擇模式</TabsTrigger>
-                    <TabsTrigger value="gameplay" disabled={!selectedMode}>
-                      2. 選擇玩法
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="mode" className="space-y-4">
-                    <ModeSelector onModeSelect={handleModeSelect} />
-                  </TabsContent>
-
-                  <TabsContent value="gameplay" className="space-y-4">
-                    {selectedMode && (
-                      <GameplaySelector
-                        modeId={selectedMode}
-                        onGameplaySelect={handleGameplaySelect}
-                      />
-                    )}
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+          {/* 模式和玩法選擇器 - 顯示所有組合 */}
+          {!selectedGameplay && (
+            <div className="h-full overflow-y-auto">
+              <CombinedGameSelector
+                onGameSelect={handleGameSelect}
+                currentMode={selectedMode}
+                currentGameplay={selectedGameplay}
+              />
+            </div>
           )}
 
           {/* 錯誤顯示 */}

@@ -92,7 +92,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
         mode: '職游旅人',
         gameplay: '六大性格分析',
         canvas: '三欄分類畫布',
-        deckName: mainDeck?.name || '職游旅人卡',
+        deckName: mainDeck?.name || '六大性格卡',
         totalCards: mainDeck?.cards?.length || 0,
         availableCards: availableCards.length,
       }}

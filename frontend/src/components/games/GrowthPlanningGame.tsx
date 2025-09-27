@@ -75,7 +75,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         mode: '職能盤點',
         gameplay: '成長計畫',
         canvas: 'AB 畫布',
-        deckName: skillDeck?.name || '職能盤點卡',
+        deckName: skillDeck?.name || '職能卡、行動卡',
         totalCards: (skillDeck?.cards?.length || 0) + (actionDeck?.cards?.length || 0),
         availableCards: availableSkillCards.length + availableActionCards.length,
       }}

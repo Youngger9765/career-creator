@@ -148,12 +148,12 @@ repos:
         args: [--fix]
         exclude: ^frontend/node_modules/
 
-  # Dockerfile linting
-  - repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
-    hooks:
-      - id: hadolint-docker
-        files: Dockerfile$
+  # Dockerfile linting - REMOVED (too slow for development)
+  # - repo: https://github.com/hadolint/hadolint
+  #   rev: v2.12.0
+  #   hooks:
+  #     - id: hadolint-docker
+  #       files: Dockerfile$
 
   # Quick check for obvious hardcoded secrets
   - repo: local

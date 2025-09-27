@@ -8,7 +8,7 @@
 import { GameRule } from '../types';
 
 export class RuleFactory {
-  private static rules: Map<string, GameRule> = new Map([
+  private static rules = new Map<string, GameRule>([
     // 技能評估規則（優劣勢分析）
     [
       'skill_assessment',
@@ -32,7 +32,7 @@ export class RuleFactory {
           max_per_zone: {
             advantage: 5,
             disadvantage: 5,
-          },
+          } as Record<string, number>,
           total_limit: 10,
         },
       },
@@ -93,7 +93,8 @@ export class RuleFactory {
           max_per_zone: {
             like: 20,
             dislike: 20,
-          },
+            neutral: 999, // Large number for effectively unlimited
+          } as Record<string, number>,
         },
       },
     ],

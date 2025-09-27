@@ -336,6 +336,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
         return (
           <ThreeColumnCanvas
             cards={mainDeck?.cards || []}
+            isRoomOwner={isRoomOwner}
             onCardMove={(cardId, column) => {
               if (column === null) {
                 // 卡片被移除，回到左邊
@@ -359,6 +360,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
         return (
           <TwoZoneCanvas
             cards={mainDeck?.cards || []}
+            isRoomOwner={isRoomOwner}
             onCardMove={(cardId, zone) => {
               if (zone === null) {
                 // 卡片被移除，回到左邊
@@ -385,7 +387,6 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
               setDisadvantageMaxCards(newMax);
               addTestResult(`⚙️ 劣勢區域上限調整為: ${newMax}`);
             }}
-            isRoomOwner={isRoomOwner}
           />
         );
 

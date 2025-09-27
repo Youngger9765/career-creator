@@ -100,11 +100,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={
-            showPercentage
-              ? ({ value, percentage }) => `${value} (${percentage.toFixed(0)}%)`
-              : false
-          }
+          label={showPercentage ? ({ value }: any) => `${value}` : false}
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"

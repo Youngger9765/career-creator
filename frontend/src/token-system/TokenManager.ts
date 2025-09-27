@@ -221,7 +221,7 @@ export class TokenManager {
     }
 
     // 檢查每個區域的約束
-    for (const [area, amount] of this.allocations) {
+    for (const [area, amount] of Array.from(this.allocations)) {
       if (this.constraints.minPerArea && amount < this.constraints.minPerArea) {
         return false;
       }
@@ -283,7 +283,7 @@ export class TokenManager {
     });
 
     // 驗證並應用分配
-    for (const [area, amount] of allocations) {
+    for (const [area, amount] of Array.from(allocations)) {
       if (this.constraints.minPerArea && amount < this.constraints.minPerArea) {
         return false;
       }

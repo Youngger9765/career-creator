@@ -255,9 +255,7 @@ const GameplaySelector: React.FC<GameplaySelectorProps> = ({
                       {gameplay.name}
                     </span>
                     {gameplay.id === 'life_redesign' && (
-                      <Badge size="sm" className={getGameplayBadgeColor(gameplay.id)}>
-                        特色
-                      </Badge>
+                      <Badge className={getGameplayBadgeColor(gameplay.id)}>特色</Badge>
                     )}
                   </div>
                   {gameplay.description && (

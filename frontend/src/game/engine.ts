@@ -84,7 +84,7 @@ export class GameEngine {
     }
 
     // 檢查卡片是否已存在於其他區域
-    for (const [zoneId, z] of state.zones) {
+    for (const [zoneId, z] of Array.from(state.zones)) {
       if (z.cards.includes(action.card_id)) {
         return false;
       }

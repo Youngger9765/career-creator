@@ -89,9 +89,9 @@ describe('GameMode Basic Integration - TDD Phase 1', () => {
       expect(valueRule).toBeDefined();
       expect(personalityRule).toBeDefined();
 
-      expect(skillRule.name).toBe('skill_assessment');
-      expect(valueRule.name).toBe('value_ranking');
-      expect(personalityRule.name).toBe('personality_assessment');
+      expect(skillRule?.name).toBe('skill_assessment');
+      expect(valueRule?.name).toBe('value_ranking');
+      expect(personalityRule?.name).toBe('personality_assessment');
     });
 
     it('should allow GameEngine to work with legacy rule_id', () => {

@@ -42,23 +42,27 @@ export class CardLoaderService {
     // 載入所有牌組到快取
     this.cache.set('riasec_explanation', {
       ...riasecCards.deck,
+      type: riasecCards.deck.type as 'explanation',
       cards: riasecCards.cards,
-    });
+    } as CardDeck);
 
     this.cache.set('career_cards_100', {
       ...careerCards.deck,
+      type: careerCards.deck.type as 'main',
       cards: careerCards.cards,
-    });
+    } as CardDeck);
 
     this.cache.set('skill_cards_52', {
       ...skillCards.deck,
+      type: skillCards.deck.type as 'main',
       cards: skillCards.cards,
-    });
+    } as CardDeck);
 
     this.cache.set('value_cards_36', {
       ...valueCards.deck,
+      type: valueCards.deck.type as 'main',
       cards: valueCards.cards,
-    });
+    } as CardDeck);
 
     this.initialized = true;
   }

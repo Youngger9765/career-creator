@@ -588,7 +588,7 @@ const DropZone: React.FC<DropZoneProps> = ({
           )}
 
       {/* 內容區域 */}
-      <div className={`flex-1 overflow-y-auto p-3 ${contentClassName}`}>
+      <div className={`flex-1 min-h-0 overflow-y-auto p-3 ${contentClassName}`}>
         {placedCardIds.length === 0 ? (
           renderEmpty ? (
             renderEmpty()

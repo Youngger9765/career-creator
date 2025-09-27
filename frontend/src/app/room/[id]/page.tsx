@@ -204,7 +204,7 @@ export default function RoomPage() {
   console.log('Will be read-only:', !isCounselor && !isVisitor);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+    <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col overflow-hidden">
       {/* 頂部標題欄 - Fixed position */}
       <div className="sticky top-0 z-50 bg-white shadow-sm border-b">
         <div className="flex items-center justify-between px-6 py-4">
@@ -337,7 +337,7 @@ export default function RoomPage() {
       </div>
 
       {/* 主要內容區 */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {showNewArchitecture ? (
           <GameModeIntegration
             roomId={roomId}

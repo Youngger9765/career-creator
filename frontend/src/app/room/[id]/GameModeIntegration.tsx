@@ -24,8 +24,6 @@ import LifeTransformationGame from '@/components/games/LifeTransformationGame';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface GameModeIntegrationProps {
   roomId: string;
@@ -52,24 +50,12 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 測試模式狀態
-  const [testMode, setTestMode] = useState(false);
-  const [testResults, setTestResults] = useState<string[]>([]);
-  const [testAreaCollapsed, setTestAreaCollapsed] = useState(false);
-
   const isRoomOwner = !isVisitor;
-
-  // 新增測試結果
-  const addTestResult = useCallback((message: string) => {
-    const timestamp = new Date().toLocaleTimeString('zh-TW');
-    setTestResults((prev) => [...prev, `[${timestamp}] ${message}`]);
-  }, []);
 
   // 選擇遊戲（模式 + 玩法）
   const handleGameSelect = (modeId: string, gameplayId: string) => {
     setSelectedMode(modeId);
     setSelectedGameplay(gameplayId);
-    addTestResult(`✅ 選擇遊戲: ${modeId} - ${gameplayId}`);
   };
 
   // Sync with parent state
@@ -92,10 +78,8 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
     try {
       setSelectedGameplay(gameplayId);
-      addTestResult(`✅ 選擇玩法: ${gameplayId}`);
     } catch (err) {
       setError(`載入玩法失敗: ${err}`);
-      addTestResult(`❌ 載入失敗: ${err}`);
     } finally {
       setIsLoading(false);
     }
@@ -151,100 +135,9 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   return (
     <div className="h-full flex flex-col relative">
-      {/* 測試模式開啟按鈕 - 在右上角 */}
-      {!testMode && (
-        <div className="absolute top-2 right-2 z-10">
-          <button
-            onClick={() => {
-              setTestMode(true);
-              setTestAreaCollapsed(false);
-              addTestResult('🚀 測試模式已開啟');
-            }}
-            className="px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-          >
-            開啟測試模式
-          </button>
-        </div>
-      )}
-
-      {/* 測試面板 */}
-      {testMode && (
-        <div
-          className={`bg-purple-50 dark:bg-purple-950/20 border-b border-purple-200 dark:border-purple-800 transition-all duration-300 ${
-            testAreaCollapsed ? 'h-10' : ''
-          }`}
-        >
-          {/* 摺疊控制 */}
-          <div
-            className="flex items-center justify-between p-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30"
-            onClick={() => setTestAreaCollapsed(!testAreaCollapsed)}
-          >
-            <div className="flex items-center gap-2">
-              {testAreaCollapsed ? (
-                <ChevronRight className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-              <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                測試面板
-              </span>
-              <Badge variant="secondary" className="text-xs">
-                {testResults.length} 個事件
-              </Badge>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setTestMode(false);
-                addTestResult('👋 測試模式已關閉');
-              }}
-              className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-            >
-              關閉測試
-            </button>
-          </div>
-
-          {/* 測試結果區域 */}
-          {!testAreaCollapsed && (
-            <div className="p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white dark:bg-gray-900 rounded p-3">
-                  <h4 className="text-sm font-medium mb-2">當前狀態</h4>
-                  <div className="space-y-1 text-xs">
-                    <div>模式: {selectedMode || '未選擇'}</div>
-                    <div>玩法: {selectedGameplay || '未選擇'}</div>
-                    <div>房間: {roomId}</div>
-                    <div>身份: {isRoomOwner ? '房主' : '訪客'}</div>
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-900 rounded p-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-sm font-medium">事件記錄</h4>
-                    <button
-                      onClick={() => setTestResults([])}
-                      className="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400"
-                    >
-                      清除
-                    </button>
-                  </div>
-                  <div className="space-y-0.5 text-xs max-h-24 overflow-y-auto">
-                    {testResults.slice(-5).map((result, idx) => (
-                      <div key={idx} className="text-gray-600 dark:text-gray-400">
-                        {result}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* 主要內容區域 */}
-      <div className="flex-1 p-6 overflow-hidden">
-        <div className="h-full flex flex-col gap-6">
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full flex flex-col">
           {/* 模式和玩法選擇器 - 顯示所有組合 */}
           {!selectedGameplay && (
             <div className="h-full overflow-y-auto">

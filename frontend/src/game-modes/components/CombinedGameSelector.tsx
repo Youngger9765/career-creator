@@ -154,6 +154,15 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
     {} as Record<string, { modeName: string; options: GameOption[] }>
   );
 
+  // 將選項按模式分組到三列
+  const modeOrder = ['career_traveler', 'skill_inventory', 'value_navigation'];
+  const orderedGroups = modeOrder
+    .map((modeId) => ({
+      modeId,
+      group: groupedOptions[modeId],
+    }))
+    .filter((item) => item.group);
+
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="text-center">
@@ -161,81 +170,98 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">選擇適合的諮詢工具和玩法</p>
       </div>
 
-      {/* 分組顯示 */}
-      {Object.entries(groupedOptions).map(([modeId, group]) => (
-        <div key={modeId} className="space-y-2">
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 px-1">
-            {group.modeName}
-          </h3>
+      {/* 三欄式分組顯示 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {orderedGroups.map(({ modeId, group }) => (
+          <div key={modeId} className="space-y-3">
+            {/* 模式標題 */}
+            <div className="text-center">
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                {group.modeName}
+              </h3>
+              <div
+                className={`h-1 w-20 mx-auto bg-gradient-to-r rounded-full ${getModeGradient(modeId)}`}
+              />
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
-            {group.options.map((option) => {
-              const isSelected = selectedOption === option.id;
-              const isHovered = hoveredOption === option.id;
+            {/* 該模式下的玩法卡片 */}
+            <div className="space-y-2">
+              {group.options.map((option) => {
+                const isSelected = selectedOption === option.id;
+                const isHovered = hoveredOption === option.id;
 
-              return (
-                <Card
-                  key={option.id}
-                  className={`
-                    relative cursor-pointer transition-all duration-200
-                    ${isSelected ? 'ring-2 ring-offset-1 ring-blue-500 shadow-md' : ''}
-                    ${isHovered ? 'transform -translate-y-0.5 shadow-sm' : ''}
-                    ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}
-                  `}
-                  onMouseEnter={() => setHoveredOption(option.id)}
-                  onMouseLeave={() => setHoveredOption(null)}
-                  onClick={() => handleOptionSelect(option)}
-                >
-                  {/* 頂部彩色條 */}
-                  <div className={`h-1 w-full bg-gradient-to-r rounded-t-lg ${option.gradient}`} />
+                return (
+                  <Card
+                    key={option.id}
+                    className={`
+                      relative cursor-pointer transition-all duration-200
+                      ${isSelected ? 'ring-2 ring-offset-1 ring-blue-500 shadow-md' : ''}
+                      ${isHovered ? 'transform -translate-y-0.5 shadow-sm' : ''}
+                      ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}
+                    `}
+                    onMouseEnter={() => setHoveredOption(option.id)}
+                    onMouseLeave={() => setHoveredOption(null)}
+                    onClick={() => handleOptionSelect(option)}
+                  >
+                    {/* 左側彩色條 */}
+                    <div
+                      className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b rounded-l-lg ${option.gradient}`}
+                    />
 
-                  <CardHeader className="pb-2 pt-3 px-3">
-                    <div className="flex items-start justify-between mb-1">
-                      <div className={`p-1.5 rounded-md text-white ${option.color}`}>
-                        {React.cloneElement(option.icon as React.ReactElement, {
-                          className: 'w-4 h-4',
-                        })}
+                    <CardHeader className="pb-2 pt-3 px-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={`p-1.5 rounded-md text-white ${option.color}`}>
+                            {React.cloneElement(option.icon as React.ReactElement, {
+                              className: 'w-4 h-4',
+                            })}
+                          </div>
+                          <CardTitle className="text-sm font-medium">
+                            {option.gameplayName}
+                          </CardTitle>
+                        </div>
+                        {isSelected && (
+                          <Badge
+                            variant="default"
+                            className="bg-blue-500 text-[10px] px-1.5 py-0.5"
+                          >
+                            選中
+                          </Badge>
+                        )}
                       </div>
-                      {isSelected && (
-                        <Badge variant="default" className="bg-blue-500 text-[10px] px-1 py-0">
-                          選中
-                        </Badge>
-                      )}
-                    </div>
+                    </CardHeader>
 
-                    <CardTitle className="text-sm font-medium">{option.gameplayName}</CardTitle>
-                  </CardHeader>
+                    <CardContent className="pt-0 px-4 pb-3">
+                      <CardDescription className="text-xs leading-relaxed line-clamp-2 mb-3">
+                        {option.description}
+                      </CardDescription>
 
-                  <CardContent className="pt-0 px-3 pb-3">
-                    <CardDescription className="text-[10px] leading-relaxed line-clamp-2 min-h-[2rem] mb-2">
-                      {option.description}
-                    </CardDescription>
-
-                    <Button
-                      className={`
-                        w-full text-[10px] h-6
-                        ${
-                          isSelected
-                            ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300'
-                        }
-                      `}
-                      disabled={disabled}
-                      variant={isSelected ? 'default' : 'outline'}
-                      size="sm"
-                    >
-                      {isSelected ? '已選擇' : '選擇'}
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      <Button
+                        className={`
+                          w-full text-xs h-7
+                          ${
+                            isSelected
+                              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300'
+                          }
+                        `}
+                        disabled={disabled}
+                        variant={isSelected ? 'default' : 'outline'}
+                        size="sm"
+                      >
+                        {isSelected ? '已選擇' : '選擇此玩法'}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       {/* 行動裝置快速選擇 */}
-      <div className="block md:hidden space-y-2 pt-4">
+      <div className="block lg:hidden space-y-2 pt-4 border-t">
         <p className="text-sm text-gray-600 dark:text-gray-400 px-1 mb-2">快速選擇：</p>
         <div className="space-y-2">
           {gameOptions.map((option) => (

@@ -10,7 +10,7 @@
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
 import { Plus, X, FileText } from 'lucide-react';
-import CardItem from './CardItem';
+import CardItem from '../game-cards/CardItem';
 import { Textarea } from '@/components/ui/textarea';
 
 interface GrowthPlanCanvasProps {

@@ -10,7 +10,8 @@
 import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GridCanvas from '../game-canvases/GridCanvas';
-import CardItem from '../game-canvases/CardItem';
+import CardItem from '../game-cards/CardItem';
+import GameInfoBar from '../game-info/GameInfoBar';
 
 interface ValueRankingGameProps {
   roomId: string;
@@ -23,7 +24,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
   roomId,
   isRoomOwner,
   mode = 'value',
-  deckType = 'value',
+  deckType = 'value_cards_36',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
   const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
@@ -57,30 +58,43 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
 
   return (
-    <div className="h-full flex">
-      {/* 左側卡片區 */}
-      <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
-        <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
-          價值導航卡 ({availableCards.length})
-        </h3>
-        <div className="space-y-2">
-          {availableCards.map((card: any) => (
-            <div key={card.id} className="cursor-move">
-              <CardItem
-                id={card.id}
-                title={card.title}
-                description={card.description}
-                category={card.category}
-                isDraggable={true}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="h-full flex flex-col">
+      {/* 遊戲資訊欄 */}
+      <GameInfoBar
+        mode="價值導航"
+        gameplay="價值觀排序"
+        canvas="3x3網格畫布"
+        deckName={mainDeck?.name || '價值導航卡'}
+        totalCards={mainDeck?.cards?.length || 0}
+        availableCards={availableCards.length}
+      />
 
-      {/* 右側畫布區 */}
-      <div className="flex-1">
-        <GridCanvas cards={mainDeck?.cards || []} onCardMove={handleCardMove} />
+      {/* 主要遊戲區域 */}
+      <div className="flex-1 flex">
+        {/* 左側卡片區 */}
+        <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+          <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
+            價值導航卡 ({availableCards.length})
+          </h3>
+          <div className="space-y-2">
+            {availableCards.map((card: any) => (
+              <div key={card.id} className="cursor-move">
+                <CardItem
+                  id={card.id}
+                  title={card.title}
+                  description={card.description}
+                  category={card.category}
+                  isDraggable={true}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 右側畫布區 */}
+        <div className="flex-1">
+          <GridCanvas cards={mainDeck?.cards || []} onCardMove={handleCardMove} />
+        </div>
       </div>
     </div>
   );

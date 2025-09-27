@@ -11,7 +11,7 @@
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
 import { Briefcase, Star, X, AlertCircle, Settings, Lock, Unlock } from 'lucide-react';
-import CardItem from './CardItem';
+import CardItem from '../game-cards/CardItem';
 
 interface CollectionCanvasProps {
   cards?: CardData[];

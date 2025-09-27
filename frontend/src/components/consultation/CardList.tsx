@@ -30,6 +30,7 @@ export function CardList({
 
   // Determine deck color based on deck type
   const getDeckColor = () => {
+    if (!title) return 'bg-gray-600';
     if (title.includes('職游旅人卡')) return 'bg-teal-600';
     if (title.includes('職能盤點卡')) return 'bg-blue-600';
     if (title.includes('價值導航卡')) return 'bg-purple-600';

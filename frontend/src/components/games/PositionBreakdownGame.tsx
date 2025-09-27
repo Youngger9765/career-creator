@@ -10,8 +10,8 @@
 import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import JobDecompositionCanvas from '../game-canvases/JobDecompositionCanvas';
-import CardItem from '../game-canvases/CardItem';
-
+import CardItem from '../game-cards/CardItem';
+import GameInfoBar from '../game-info/GameInfoBar';
 interface PositionBreakdownGameProps {
   roomId: string;
   isRoomOwner: boolean;
@@ -23,7 +23,7 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
   roomId,
   isRoomOwner,
   mode = 'skill',
-  deckType = 'skill',
+  deckType = 'skill_cards_52',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
   const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
@@ -64,36 +64,49 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
 
   return (
-    <div className="h-full flex">
-      {/* 左側卡片區 */}
-      <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
-        <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
-          職能盤點卡 ({availableCards.length})
-        </h3>
-        <div className="space-y-2">
-          {availableCards.map((card: any) => (
-            <div key={card.id} className="cursor-move">
-              <CardItem
-                id={card.id}
-                title={card.title}
-                description={card.description}
-                category={card.category}
-                isDraggable={true}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="h-full flex flex-col">
+      {/* 遊戲資訊欄 */}
+      <GameInfoBar
+        mode="職位分析"
+        gameplay="職位拆解"
+        canvas="職位分析畫布"
+        deckName={mainDeck?.name || '職能盤點卡'}
+        totalCards={mainDeck?.cards?.length || 0}
+        availableCards={availableCards.length}
+      />
 
-      {/* 右側畫布區 */}
-      <div className="flex-1">
-        <JobDecompositionCanvas
-          cards={mainDeck?.cards || []}
-          maxCards={maxCards}
-          isRoomOwner={isRoomOwner}
-          onCardMove={handleCardMove}
-          onFileUpload={handleFileUpload}
-        />
+      {/* 主要遊戲區域 */}
+      <div className="flex-1 flex">
+        {/* 左側卡片區 */}
+        <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+          <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
+            職能盤點卡 ({availableCards.length})
+          </h3>
+          <div className="space-y-2">
+            {availableCards.map((card: any) => (
+              <div key={card.id} className="cursor-move">
+                <CardItem
+                  id={card.id}
+                  title={card.title}
+                  description={card.description}
+                  category={card.category}
+                  isDraggable={true}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 右側畫布區 */}
+        <div className="flex-1">
+          <JobDecompositionCanvas
+            cards={mainDeck?.cards || []}
+            maxCards={maxCards}
+            isRoomOwner={isRoomOwner}
+            onCardMove={handleCardMove}
+            onFileUpload={handleFileUpload}
+          />
+        </div>
       </div>
     </div>
   );

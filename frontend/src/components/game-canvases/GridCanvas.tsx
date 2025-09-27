@@ -10,7 +10,7 @@
 import React, { useState } from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
 import { Star, Circle, Square, X, Grid3x3 } from 'lucide-react';
-import CardItem from './CardItem';
+import CardItem from '../game-cards/CardItem';
 
 interface GridCanvasProps {
   cards?: CardData[];

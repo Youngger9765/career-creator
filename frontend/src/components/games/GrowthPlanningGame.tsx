@@ -10,8 +10,9 @@
 import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GrowthPlanCanvas from '../game-canvases/GrowthPlanCanvas';
-import CardItem from '../game-canvases/CardItem';
+import CardItem from '../game-cards/CardItem';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import GameInfoBar from '../game-info/GameInfoBar';
 
 interface GrowthPlanningGameProps {
   roomId: string;
@@ -24,7 +25,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   roomId,
   isRoomOwner,
   mode = 'skill',
-  deckType = 'skill',
+  deckType = 'skill_cards_52',
 }) => {
   const [skillDeck, setSkillDeck] = useState<any>(null);
   const [actionDeck, setActionDeck] = useState<any>(null);
@@ -72,66 +73,79 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   const allCards = [...(skillDeck?.cards || []), ...(actionDeck?.cards || [])];
 
   return (
-    <div className="h-full flex">
-      {/* 左側卡片區 */}
-      <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
-        <Tabs
-          value={selectedCardType}
-          onValueChange={(v) => setSelectedCardType(v as 'skill' | 'action')}
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="skill">技能卡</TabsTrigger>
-            <TabsTrigger value="action">行動卡</TabsTrigger>
-          </TabsList>
+    <div className="h-full flex flex-col">
+      {/* 遊戲資訊欄 */}
+      <GameInfoBar
+        mode="成長規劃"
+        gameplay="成長計畫"
+        canvas="三階段畫布"
+        deckName={skillDeck?.name || '職能盤點卡'}
+        totalCards={(skillDeck?.cards?.length || 0) + (actionDeck?.cards?.length || 0)}
+        availableCards={availableSkillCards.length + availableActionCards.length}
+      />
 
-          <TabsContent value="skill" className="mt-3">
-            <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
-              技能卡 ({availableSkillCards.length})
-            </h3>
-            <div className="space-y-2">
-              {availableSkillCards.map((card: any) => (
-                <div key={card.id} className="cursor-move">
-                  <CardItem
-                    id={card.id}
-                    title={card.title}
-                    description={card.description}
-                    category={card.category}
-                    isDraggable={true}
-                  />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
+      {/* 主要遊戲區域 */}
+      <div className="flex-1 flex">
+        {/* 左側卡片區 */}
+        <div className="w-64 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+          <Tabs
+            value={selectedCardType}
+            onValueChange={(v) => setSelectedCardType(v as 'skill' | 'action')}
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="skill">技能卡</TabsTrigger>
+              <TabsTrigger value="action">行動卡</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="action" className="mt-3">
-            <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
-              行動卡 ({availableActionCards.length})
-            </h3>
-            <div className="space-y-2">
-              {availableActionCards.map((card: any) => (
-                <div key={card.id} className="cursor-move">
-                  <CardItem
-                    id={card.id}
-                    title={card.title}
-                    description={card.description}
-                    category={card.category}
-                    isDraggable={true}
-                  />
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+            <TabsContent value="skill" className="mt-3">
+              <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
+                技能卡 ({availableSkillCards.length})
+              </h3>
+              <div className="space-y-2">
+                {availableSkillCards.map((card: any) => (
+                  <div key={card.id} className="cursor-move">
+                    <CardItem
+                      id={card.id}
+                      title={card.title}
+                      description={card.description}
+                      category={card.category}
+                      isDraggable={true}
+                    />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
 
-      {/* 右側畫布區 */}
-      <div className="flex-1">
-        <GrowthPlanCanvas
-          cards={allCards}
-          onCardUse={handleCardUse}
-          onCardRemove={handleCardRemove}
-          onPlanCreate={handlePlanCreate}
-        />
+            <TabsContent value="action" className="mt-3">
+              <h3 className="text-sm font-semibold mb-3 text-gray-700 dark:text-gray-300">
+                行動卡 ({availableActionCards.length})
+              </h3>
+              <div className="space-y-2">
+                {availableActionCards.map((card: any) => (
+                  <div key={card.id} className="cursor-move">
+                    <CardItem
+                      id={card.id}
+                      title={card.title}
+                      description={card.description}
+                      category={card.category}
+                      isDraggable={true}
+                    />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* 右側畫布區 */}
+        <div className="flex-1">
+          <GrowthPlanCanvas
+            cards={allCards}
+            onCardUse={handleCardUse}
+            onCardRemove={handleCardRemove}
+            onPlanCreate={handlePlanCreate}
+          />
+        </div>
       </div>
     </div>
   );

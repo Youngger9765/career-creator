@@ -37,7 +37,8 @@ export default function RoomPage() {
   const [selectedGameRule, setSelectedGameRule] = useState('六大性格分析');
 
   // 測試新架構整合
-  const [showNewArchitecture, setShowNewArchitecture] = useState(false);
+  const [showNewArchitecture, setShowNewArchitecture] = useState(true);
+  const [currentGameplay, setCurrentGameplay] = useState<string>('');
 
   // 當 gameSession 載入後，更新本地狀態
   useEffect(() => {
@@ -225,6 +226,24 @@ export default function RoomPage() {
               </div>
             )}
 
+            {/* 切換遊戲模式按鈕 - 僅在已選擇遊戲時顯示 */}
+            {showNewArchitecture && currentGameplay && (
+              <button
+                onClick={() => setCurrentGameplay('')}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+                切換遊戲模式
+              </button>
+            )}
+
             {/* 新架構測試開關 */}
             <button
               onClick={() => setShowNewArchitecture(!showNewArchitecture)}
@@ -324,6 +343,8 @@ export default function RoomPage() {
             roomId={roomId}
             isVisitor={isVisitor}
             counselorId={isCounselor ? user?.id : undefined}
+            onGameplayChange={setCurrentGameplay}
+            currentGameplay={currentGameplay}
             onStateChange={(state) => {
               console.log('[Room] Game state changed:', state);
               // 可以在這裡更新 gameSession 或其他狀態

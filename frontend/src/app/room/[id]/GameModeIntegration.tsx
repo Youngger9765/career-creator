@@ -1,8 +1,8 @@
 /**
- * GameModeIntegration - 遊戲模式整合元件
+ * GameModeIntegration - 遊戲模式整合元件 (更新版)
  *
- * 整合新的三模式架構到房間頁面
- * 測試完整的選擇流程和渲染正確性
+ * 使用獨立的遊戲組件，每個遊戲有自己的狀態管理
+ * 透過 GameStateStore 實現狀態隔離和持久化
  */
 
 'use client';
@@ -10,44 +10,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { GameModeService } from '@/game-modes/services/mode.service';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
-import { LegacyGameAdapter } from '@/game-modes/adapters/legacy-adapter';
 import ModeSelector from '@/game-modes/components/ModeSelector';
 import GameplaySelector from '@/game-modes/components/GameplaySelector';
-import TokenControls from '@/token-system/components/TokenControls';
-import TokenDisplay from '@/token-system/components/TokenDisplay';
-import { TokenManager, TokenAllocation } from '@/token-system/TokenManager';
-import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaNew';
 
-// 導入模組化畫布元件
-import ThreeColumnCanvas from '@/components/game-canvases/ThreeColumnCanvas';
-import TwoZoneCanvas from '@/components/game-canvases/TwoZoneCanvas';
-import GridCanvas from '@/components/game-canvases/GridCanvas';
-import CollectionCanvas from '@/components/game-canvases/CollectionCanvas';
-import GrowthPlanCanvas from '@/components/game-canvases/GrowthPlanCanvas';
-import JobDecompositionCanvas from '@/components/game-canvases/JobDecompositionCanvas';
-import CardItem from '@/components/game-canvases/CardItem';
+// 導入獨立的遊戲組件
+import PersonalityAnalysisGame from '@/components/games/PersonalityAnalysisGame';
+import AdvantageAnalysisGame from '@/components/games/AdvantageAnalysisGame';
+import ValueRankingGame from '@/components/games/ValueRankingGame';
+import CareerCollectorGame from '@/components/games/CareerCollectorGame';
+import GrowthPlanningGame from '@/components/games/GrowthPlanningGame';
+import PositionBreakdownGame from '@/components/games/PositionBreakdownGame';
+import LifeTransformationGame from '@/components/games/LifeTransformationGame';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Home,
-  Heart,
-  Briefcase,
-  DollarSign,
-  Users,
-  BookOpen,
-  Gamepad2,
-  TrendingUp,
-  ChevronDown,
-  ChevronRight,
-} from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface GameModeIntegrationProps {
   roomId: string;
   isVisitor?: boolean;
   counselorId?: string;
+  visitorId?: string;
+  onGameplayChange?: (gameplay: string) => void;
+  currentGameplay?: string;
   onStateChange?: (state: any) => void;
 }
 
@@ -55,468 +43,115 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   roomId,
   isVisitor = false,
   counselorId,
+  visitorId,
+  onGameplayChange,
+  currentGameplay,
   onStateChange,
 }) => {
-  // 模式和玩法狀態
+  // 模式和玩法選擇
   const [selectedMode, setSelectedMode] = useState<string>('');
-  const [selectedGameplay, setSelectedGameplay] = useState<string>('');
+  const [selectedGameplay, setSelectedGameplay] = useState<string>(currentGameplay || '');
+  const [activeTab, setActiveTab] = useState<string>('mode');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 牌卡和畫布資料
-  const [mainDeck, setMainDeck] = useState<any>(null);
-  const [auxiliaryDeck, setAuxiliaryDeck] = useState<any>(null);
-  const [canvasConfig, setCanvasConfig] = useState<any>(null);
-  const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
-
-  // 籌碼系統狀態（for 生活改造王）
-  const [tokenAllocations, setTokenAllocations] = useState<TokenAllocation[]>([]);
-  const [showTokenSystem, setShowTokenSystem] = useState(false);
-
-  // 收藏家上限設定
-  const [collectionMaxCards, setCollectionMaxCards] = useState(15);
-
-  // 優劣勢分析上限設定
-  const [advantageMaxCards, setAdvantageMaxCards] = useState(5);
-  const [disadvantageMaxCards, setDisadvantageMaxCards] = useState(5);
-
-  // 卡片類型選擇 (成長計畫模式需要)
-  const [selectedCardType, setSelectedCardType] = useState<'skill' | 'action'>('skill');
-
-  // 測試模式
+  // 測試模式狀態
   const [testMode, setTestMode] = useState(false);
-  const [testPanelOpen, setTestPanelOpen] = useState(false);
   const [testResults, setTestResults] = useState<string[]>([]);
   const [testAreaCollapsed, setTestAreaCollapsed] = useState(false);
 
-  // Tab 控制
-  const [activeTab, setActiveTab] = useState('select');
-
-  // 是否為房間擁有者 (暫時假設非訪客即為擁有者)
   const isRoomOwner = !isVisitor;
 
-  // 策略行動卡模擬數據 (成長計畫模式需要)
-  const actionCards = [
-    {
-      id: 'action-1',
-      title: '制定學習計劃',
-      description: '建立系統性的學習方案',
-      category: '學習策略',
-    },
-    { id: 'action-2', title: '尋找導師', description: '找到合適的指導者', category: '人際網絡' },
-    { id: 'action-3', title: '參與專案', description: '通過實踐提升能力', category: '實戰經驗' },
-    { id: 'action-4', title: '加入社群', description: '建立專業人脈', category: '人際網絡' },
-    { id: 'action-5', title: '取得認證', description: '獲得相關專業證書', category: '資格認證' },
-    { id: 'action-6', title: '練習表達', description: '提升溝通表達能力', category: '軟技能' },
-    { id: 'action-7', title: '建立作品集', description: '展示個人成果', category: '個人品牌' },
-    { id: 'action-8', title: '參加工作坊', description: '學習新技術或方法', category: '學習策略' },
-  ];
-
-  // 渲染卡片列表 (成長計畫模式使用)
-  const renderCardList = () => {
-    if (selectedCardType === 'skill') {
-      // 顯示職能盤點卡 (A區)
-      if (!mainDeck) return <div className="text-gray-500 dark:text-gray-400">載入中...</div>;
-
-      return (
-        <div>
-          <div className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
-            職能盤點卡 • A區 ({mainDeck.cards.length} 張)
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {mainDeck.cards
-              .slice(0, 10)
-              .filter((card: any) => !usedCards.has(card.id))
-              .map((card: any) => (
-                <CardItem
-                  key={card.id}
-                  id={card.id}
-                  title={card.title}
-                  description={card.description}
-                  category={card.category}
-                  isUsed={false}
-                  isDraggable={true}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('cardId', card.id);
-                    addTestResult(`📋 開始拖曳職能卡: ${card.title}`);
-                  }}
-                />
-              ))}
-          </div>
-        </div>
-      );
-    } else {
-      // 顯示策略行動卡 (B區)
-      return (
-        <div>
-          <div className="text-xs text-orange-600 dark:text-orange-400 mb-2 font-medium">
-            策略行動卡 • B區 ({actionCards.length} 張)
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {actionCards
-              .filter((card) => !usedCards.has(card.id))
-              .map((card) => (
-                <CardItem
-                  key={card.id}
-                  id={card.id}
-                  title={card.title}
-                  description={card.description}
-                  category={card.category}
-                  isUsed={false}
-                  isDraggable={true}
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData('cardId', card.id);
-                    addTestResult(`📋 開始拖曳策略卡: ${card.title}`);
-                  }}
-                />
-              ))}
-          </div>
-        </div>
-      );
-    }
-  };
-
-  // 初始化服務
-  useEffect(() => {
-    const init = async () => {
-      try {
-        await CardLoaderService.initialize();
-        addTestResult('✅ CardLoaderService 初始化成功');
-      } catch (error) {
-        addTestResult(`❌ CardLoaderService 初始化失敗: ${error}`);
-      }
-    };
-    init();
+  // 新增測試結果
+  const addTestResult = useCallback((message: string) => {
+    const timestamp = new Date().toLocaleTimeString('zh-TW');
+    setTestResults((prev) => [...prev, `[${timestamp}] ${message}`]);
   }, []);
 
-  const addTestResult = (message: string) => {
-    if (testMode) {
-      setTestResults((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
+  // 選擇模式
+  const handleModeSelect = (modeId: string) => {
+    setSelectedMode(modeId);
+    setSelectedGameplay(''); // 重置玩法選擇
+    setActiveTab('gameplay'); // 自動切換到玩法選擇 Tab
+    addTestResult(`✅ 選擇模式: ${modeId}`);
+  };
+
+  // Sync with parent state
+  useEffect(() => {
+    if (currentGameplay !== undefined) {
+      setSelectedGameplay(currentGameplay);
     }
-    console.log('[GameModeIntegration]', message);
+  }, [currentGameplay]);
+
+  useEffect(() => {
+    if (onGameplayChange) {
+      onGameplayChange(selectedGameplay);
+    }
+  }, [selectedGameplay, onGameplayChange]);
+
+  // 選擇玩法
+  const handleGameplaySelect = async (gameplayId: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      setSelectedGameplay(gameplayId);
+      addTestResult(`✅ 選擇玩法: ${gameplayId}`);
+    } catch (err) {
+      setError(`載入玩法失敗: ${err}`);
+      addTestResult(`❌ 載入失敗: ${err}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // 處理模式選擇
-  const handleModeSelect = useCallback(
-    async (modeId: string) => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        addTestResult(`📍 選擇模式: ${modeId}`);
-        setSelectedMode(modeId);
-
-        // 重置玩法選擇
-        setSelectedGameplay('');
-        setShowTokenSystem(false);
-
-        // 取得模式資訊
-        const mode = GameModeService.getMode(modeId);
-        if (mode) {
-          addTestResult(`✅ 模式載入成功: ${mode.name}, 包含 ${mode.gameplays.length} 種玩法`);
-
-          // 自動前進到玩法選擇
-          setActiveTab('configure');
-          addTestResult('➡️ 自動前進到：選擇玩法');
-        } else {
-          throw new Error(`找不到模式: ${modeId}`);
-        }
-      } catch (err: any) {
-        setError(err.message);
-        addTestResult(`❌ 模式選擇錯誤: ${err.message}`);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [testMode]
-  );
-
-  // 處理玩法選擇
-  const handleGameplaySelect = useCallback(
-    async (gameplayId: string) => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        addTestResult(`📍 選擇玩法: ${gameplayId}`);
-        setSelectedGameplay(gameplayId);
-
-        // 載入對應的牌組
-        const decks = await CardLoaderService.getDecksForGameplay(gameplayId);
-        addTestResult(
-          `✅ 載入牌組: 主牌組=${decks.main?.cards.length || 0}張, 輔助牌組=${decks.auxiliary?.cards.length || 0}張`
-        );
-
-        setMainDeck(decks.main);
-        setAuxiliaryDeck(decks.auxiliary);
-
-        // 載入畫布配置
-        const canvasConfigData = await loadCanvasConfig(gameplayId);
-        setCanvasConfig(canvasConfigData);
-        addTestResult(`✅ 載入畫布配置: ${canvasConfigData?.type || 'unknown'}`);
-
-        // 檢查是否需要籌碼系統
-        if (gameplayId === 'life_redesign') {
-          setShowTokenSystem(true);
-          addTestResult('✅ 啟動籌碼系統 (生活改造王)');
-        } else {
-          setShowTokenSystem(false);
-        }
-
-        // 使用 LegacyAdapter 創建遊戲狀態
-        const gameState = LegacyGameAdapter.startGameWithMode(selectedMode, gameplayId);
-        addTestResult(
-          `✅ 遊戲狀態初始化: rule_id=${gameState.rule_id}, zones=${gameState.zones.size}`
-        );
-
-        // 通知父元件
-        if (onStateChange) {
-          onStateChange({
-            mode: selectedMode,
-            gameplay: gameplayId,
-            gameState,
-            decks,
-            canvas: canvasConfigData,
-          });
-        }
-
-        // 自動前進到開始遊戲
-        setActiveTab('play');
-        addTestResult('➡️ 自動前進到：開始遊戲');
-      } catch (err: any) {
-        setError(err.message);
-        addTestResult(`❌ 玩法選擇錯誤: ${err.message}`);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [selectedMode, testMode, onStateChange]
-  );
-
-  // 載入畫布配置
-  const loadCanvasConfig = async (gameplayId: string): Promise<any> => {
-    // 這裡應該從 canvas-configs.json 載入，暫時返回模擬資料
-    const canvasMap: Record<string, any> = {
-      personality_analysis: { type: 'three_columns', name: '三欄分類' },
-      career_collector: { type: 'collection_zone', name: '收藏區' },
-      advantage_analysis: { type: 'two_zones', name: '雙區' },
-      growth_planning: { type: 'three_zones', name: '三區成長' },
-      position_breakdown: { type: 'job_decomposition', name: '職位拆解畫布' },
-      value_ranking: { type: 'grid_3x3', name: '3×3九宮格' },
-      life_redesign: { type: 'value_gauge', name: '量表畫布' },
-    };
-
-    return canvasMap[gameplayId] || { type: 'default', name: '預設畫布' };
-  };
-
-  // 處理籌碼變更
-  const handleTokenChange = (allocations: TokenAllocation[]) => {
-    setTokenAllocations(allocations);
-    addTestResult(`🎯 籌碼更新: ${allocations.map((a) => `${a.area}:${a.amount}`).join(', ')}`);
-  };
-
-  // 根據畫布類型渲染對應的畫布元件
-  const renderCanvas = () => {
-    if (!canvasConfig || !mainDeck) {
+  // 根據玩法渲染對應的遊戲組件
+  const renderGame = () => {
+    if (!selectedGameplay) {
       return (
         <div className="h-full flex items-center justify-center">
           <div className="text-center">
-            <p className="text-gray-500 dark:text-gray-400">載入畫布中...</p>
+            <p className="text-gray-500 dark:text-gray-400">請選擇遊戲模式</p>
           </div>
         </div>
       );
     }
 
-    // 根據畫布類型或玩法來決定渲染哪個畫布
-    const canvasType = canvasConfig.type || selectedGameplay;
-
-    switch (canvasType) {
-      case 'three_columns':
+    // 根據玩法來決定渲染哪個遊戲組件
+    switch (selectedGameplay) {
       case 'personality_analysis':
-        return (
-          <ThreeColumnCanvas
-            cards={mainDeck?.cards || []}
-            isRoomOwner={isRoomOwner}
-            onCardMove={(cardId, column) => {
-              if (column === null) {
-                // 卡片被移除，回到左邊
-                setUsedCards((prev) => {
-                  const newSet = new Set(prev);
-                  newSet.delete(cardId);
-                  return newSet;
-                });
-                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
-              } else {
-                console.log(`Card ${cardId} moved to ${column}`);
-                addTestResult(`🎯 卡片 ${cardId} 移至 ${column}`);
-                setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-              }
-            }}
-          />
-        );
+        return <PersonalityAnalysisGame roomId={roomId} isRoomOwner={isRoomOwner} />;
 
-      case 'two_zones':
       case 'advantage_analysis':
-        return (
-          <TwoZoneCanvas
-            cards={mainDeck?.cards || []}
-            isRoomOwner={isRoomOwner}
-            onCardMove={(cardId, zone) => {
-              if (zone === null) {
-                // 卡片被移除，回到左邊
-                setUsedCards((prev) => {
-                  const newSet = new Set(prev);
-                  newSet.delete(cardId);
-                  return newSet;
-                });
-                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
-              } else {
-                console.log(`Card ${cardId} moved to ${zone}`);
-                addTestResult(`🎯 卡片 ${cardId} 移至 ${zone}`);
-                setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-              }
-            }}
-            maxCardsPerZone={5}
-            maxAdvantageCards={advantageMaxCards}
-            maxDisadvantageCards={disadvantageMaxCards}
-            onMaxAdvantageCardsChange={(newMax) => {
-              setAdvantageMaxCards(newMax);
-              addTestResult(`⚙️ 優勢區域上限調整為: ${newMax}`);
-            }}
-            onMaxDisadvantageCardsChange={(newMax) => {
-              setDisadvantageMaxCards(newMax);
-              addTestResult(`⚙️ 劣勢區域上限調整為: ${newMax}`);
-            }}
-          />
-        );
+        return <AdvantageAnalysisGame roomId={roomId} isRoomOwner={isRoomOwner} />;
 
-      case 'grid_3x3':
       case 'value_ranking':
-        return (
-          <GridCanvas
-            cards={mainDeck?.cards || []}
-            onCardMove={(cardId, position) => {
-              if (position === null) {
-                // 卡片被移除，回到左邊
-                setUsedCards((prev) => {
-                  const newSet = new Set(prev);
-                  newSet.delete(cardId);
-                  return newSet;
-                });
-                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
-              } else {
-                console.log(`Card ${cardId} moved to position (${position.row}, ${position.col})`);
-                addTestResult(`🎯 卡片 ${cardId} 移至位置 (${position.row}, ${position.col})`);
-                setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-              }
-            }}
-          />
-        );
+        return <ValueRankingGame roomId={roomId} isRoomOwner={isRoomOwner} />;
 
-      case 'collection_zone':
       case 'career_collector':
-        return (
-          <CollectionCanvas
-            cards={mainDeck?.cards || []}
-            maxCards={collectionMaxCards}
-            isRoomOwner={isRoomOwner}
-            onCardCollect={(cardId, collected) => {
-              if (collected) {
-                setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-                addTestResult(`⭐ 收藏卡片 ${cardId}`);
-              } else {
-                setUsedCards((prev) => {
-                  const newSet = new Set(prev);
-                  newSet.delete(cardId);
-                  return newSet;
-                });
-                addTestResult(`📤 取消收藏 ${cardId}`);
-              }
-            }}
-            onMaxCardsChange={(newMax) => {
-              setCollectionMaxCards(newMax);
-              addTestResult(`🔧 收藏上限設為 ${newMax} 張`);
-            }}
-          />
-        );
+        return <CareerCollectorGame roomId={roomId} isRoomOwner={isRoomOwner} />;
 
-      case 'three_zones':
       case 'growth_planning':
-        return (
-          <GrowthPlanCanvas
-            cards={[...(mainDeck?.cards || []), ...actionCards]}
-            onCardUse={(cardId) => {
-              setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-              addTestResult(`➕ 使用卡片: ${cardId}`);
-            }}
-            onCardRemove={(cardId) => {
-              setUsedCards((prev) => {
-                const newSet = new Set(prev);
-                newSet.delete(cardId);
-                return newSet;
-              });
-              addTestResult(`➖ 移除卡片: ${cardId}`);
-            }}
-            onPlanCreate={(cardAId, cardBId, planText) => {
-              addTestResult(`📝 建立成長計畫: ${cardAId} + ${cardBId}`);
-              addTestResult(`📋 計畫內容: ${planText.substring(0, 50)}...`);
-            }}
-          />
-        );
+        return <GrowthPlanningGame roomId={roomId} isRoomOwner={isRoomOwner} />;
 
-      case 'job_decomposition':
       case 'position_breakdown':
-        return (
-          <JobDecompositionCanvas
-            cards={mainDeck?.cards || []}
-            onCardMove={(cardId, zone) => {
-              if (zone === null) {
-                // 卡片被移除，回到左邊
-                setUsedCards((prev) => {
-                  const newSet = new Set(prev);
-                  newSet.delete(cardId);
-                  return newSet;
-                });
-                addTestResult(`↔️ 卡片 ${cardId} 移回左邊`);
-              } else {
-                console.log(`Card ${cardId} moved to ${zone}`);
-                addTestResult(`🎯 卡片 ${cardId} 移至職能分析區`);
-                setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-              }
-            }}
-            onFileUpload={(file) => {
-              addTestResult(`📎 上傳文件: ${file.name} (${file.type})`);
-            }}
-            maxCards={10}
-            isRoomOwner={isRoomOwner}
-          />
-        );
+        return <PositionBreakdownGame roomId={roomId} isRoomOwner={isRoomOwner} />;
+
+      case 'life_redesign':
+        return <LifeTransformationGame roomId={roomId} isRoomOwner={isRoomOwner} />;
 
       default:
         return (
           <div className="h-full flex items-center justify-center">
             <div className="text-center space-y-4">
-              <p className="text-gray-500 dark:text-gray-400 text-lg">{canvasConfig?.name} 畫布</p>
-              <p className="text-sm text-gray-400 dark:text-gray-500">
-                畫布類型 ({canvasType}) 尚未實作
+              <p className="text-gray-500 dark:text-gray-400 text-lg">
+                玩法 ({selectedGameplay}) 尚未實作
               </p>
             </div>
           </div>
         );
     }
   };
-
-  // 生活改造王的區域配置
-  const lifeAreas = [
-    { id: 'family', name: '家庭', icon: React.createElement(Home) },
-    { id: 'love', name: '愛情', icon: React.createElement(Heart) },
-    { id: 'career', name: '事業', icon: React.createElement(Briefcase) },
-    { id: 'wealth', name: '財富', icon: React.createElement(DollarSign) },
-    { id: 'friends', name: '友誼', icon: React.createElement(Users) },
-    { id: 'growth', name: '成長', icon: React.createElement(BookOpen) },
-    { id: 'leisure', name: '休閒', icon: React.createElement(Gamepad2) },
-    { id: 'health', name: '健康', icon: React.createElement(TrendingUp) },
-  ];
 
   return (
     <div className="h-full flex flex-col relative">
@@ -527,259 +162,147 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
             onClick={() => {
               setTestMode(true);
               setTestAreaCollapsed(false);
+              addTestResult('🚀 測試模式已開啟');
             }}
-            className="px-2 py-1 text-xs border border-gray-300 rounded text-gray-600 dark:text-gray-400 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 shadow-sm"
+            className="px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
           >
-            測試模式
+            開啟測試模式
           </button>
         </div>
       )}
 
-      {/* 測試控制區 - 可收合 */}
+      {/* 測試面板 */}
       {testMode && (
         <div
-          className={`border-b border-gray-200 dark:border-gray-700 transition-all duration-300 overflow-hidden ${testAreaCollapsed ? 'h-10' : 'h-auto'}`}
+          className={`bg-purple-50 dark:bg-purple-950/20 border-b border-purple-200 dark:border-purple-800 transition-all duration-300 ${
+            testAreaCollapsed ? 'h-10' : ''
+          }`}
         >
-          {/* 測試區標題列 */}
-          <div className="flex justify-between items-center px-4 py-2 bg-gray-50 dark:bg-gray-900">
-            <button
-              onClick={() => setTestAreaCollapsed(!testAreaCollapsed)}
-              className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
-            >
+          {/* 摺疊控制 */}
+          <div
+            className="flex items-center justify-between p-2 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30"
+            onClick={() => setTestAreaCollapsed(!testAreaCollapsed)}
+          >
+            <div className="flex items-center gap-2">
               {testAreaCollapsed ? (
                 <ChevronRight className="w-4 h-4" />
               ) : (
                 <ChevronDown className="w-4 h-4" />
               )}
-              <span>測試模式整合測試</span>
-              <Badge className="ml-2" variant="outline">
-                ON
+              <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                測試面板
+              </span>
+              <Badge variant="secondary" className="text-xs">
+                {testResults.length} 個事件
               </Badge>
-            </button>
+            </div>
             <button
-              onClick={() => setTestMode(false)}
-              className="text-xs px-2 py-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                setTestMode(false);
+                addTestResult('👋 測試模式已關閉');
+              }}
+              className="px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
             >
               關閉測試
             </button>
           </div>
 
-          {/* 測試內容區 - 只在展開時顯示 */}
+          {/* 測試結果區域 */}
           {!testAreaCollapsed && (
-            <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                遊戲模式整合測試
-              </h2>
-              {testResults.length > 0 && (
-                <>
-                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                    測試日誌 ({testResults.length})
+            <div className="p-4 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white dark:bg-gray-900 rounded p-3">
+                  <h4 className="text-sm font-medium mb-2">當前狀態</h4>
+                  <div className="space-y-1 text-xs">
+                    <div>模式: {selectedMode || '未選擇'}</div>
+                    <div>玩法: {selectedGameplay || '未選擇'}</div>
+                    <div>房間: {roomId}</div>
+                    <div>身份: {isRoomOwner ? '房主' : '訪客'}</div>
                   </div>
-                  <div className="space-y-1 max-h-32 overflow-y-auto bg-white dark:bg-gray-800 rounded p-2 border border-gray-200 dark:border-gray-700">
-                    {testResults.map((result, index) => (
-                      <div
-                        key={index}
-                        className="text-xs font-mono text-gray-700 dark:text-gray-300"
-                      >
+                </div>
+
+                <div className="bg-white dark:bg-gray-900 rounded p-3">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="text-sm font-medium">事件記錄</h4>
+                    <button
+                      onClick={() => setTestResults([])}
+                      className="text-xs text-purple-600 hover:text-purple-700 dark:text-purple-400"
+                    >
+                      清除
+                    </button>
+                  </div>
+                  <div className="space-y-0.5 text-xs max-h-24 overflow-y-auto">
+                    {testResults.slice(-5).map((result, idx) => (
+                      <div key={idx} className="text-gray-600 dark:text-gray-400">
                         {result}
                       </div>
                     ))}
                   </div>
-                </>
-              )}
+                </div>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* 錯誤提示 */}
-      {error && (
-        <Alert variant="destructive" className="mx-4 mt-2">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {/* 主要內容區域 */}
+      <div className="flex-1 p-6 overflow-hidden">
+        <div className="h-full flex flex-col gap-6">
+          {/* 模式和玩法選擇器 */}
+          {(!selectedMode || !selectedGameplay) && (
+            <Card>
+              <CardHeader>
+                <CardTitle>選擇遊戲模式</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="mode">1. 選擇模式</TabsTrigger>
+                    <TabsTrigger value="gameplay" disabled={!selectedMode}>
+                      2. 選擇玩法
+                    </TabsTrigger>
+                  </TabsList>
 
-      {/* 主要內容區 - 始終顯示 */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="flex-1 flex flex-col overflow-hidden"
-      >
-        <TabsList className="grid w-full grid-cols-3 mx-4 mt-4">
-          <TabsTrigger value="select">1. 選擇模式</TabsTrigger>
-          <TabsTrigger value="configure" disabled={!selectedMode}>
-            2. 選擇玩法
-          </TabsTrigger>
-          <TabsTrigger value="play" disabled={!selectedGameplay}>
-            3. 開始遊戲
-          </TabsTrigger>
-        </TabsList>
+                  <TabsContent value="mode" className="space-y-4">
+                    <ModeSelector onModeSelect={handleModeSelect} />
+                  </TabsContent>
 
-        {/* Step 1: 選擇模式 */}
-        <TabsContent value="select" className="flex-1 p-4 overflow-auto">
-          <ModeSelector
-            currentMode={selectedMode}
-            onModeSelect={handleModeSelect}
-            disabled={isLoading}
-          />
-        </TabsContent>
-
-        {/* Step 2: 選擇玩法 */}
-        <TabsContent value="configure" className="flex-1 p-4 overflow-auto">
-          {selectedMode && (
-            <GameplaySelector
-              modeId={selectedMode}
-              currentGameplay={selectedGameplay}
-              onGameplaySelect={handleGameplaySelect}
-              disabled={isLoading}
-            />
-          )}
-        </TabsContent>
-
-        {/* Step 3: 開始遊戲 - 左右分欄佈局 */}
-        <TabsContent value="play" className="flex-1 flex overflow-hidden">
-          {selectedGameplay && (
-            <div className="flex w-full h-full">
-              {/* 左側：牌卡區 */}
-              <div className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
-                {/* 牌卡區標題 */}
-                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="font-bold text-gray-900 dark:text-gray-100">牌卡區</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    選擇要使用的卡片類型
-                  </p>
-                </div>
-
-                {/* 根據遊戲模式顯示不同內容 */}
-                {selectedGameplay === 'growth_planning' ? (
-                  <>
-                    {/* 成長計畫模式：顯示 Tab 切換 */}
-                    <div className="border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex">
-                        <button
-                          onClick={() => setSelectedCardType('skill')}
-                          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                            selectedCardType === 'skill'
-                              ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
-                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                          }`}
-                        >
-                          職能盤點卡
-                        </button>
-                        <button
-                          onClick={() => setSelectedCardType('action')}
-                          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                            selectedCardType === 'action'
-                              ? 'bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400 border-b-2 border-orange-600'
-                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                          }`}
-                        >
-                          策略行動卡
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* 牌卡列表 */}
-                    <div className="flex-1 overflow-y-auto p-4">{renderCardList()}</div>
-                  </>
-                ) : (
-                  /* 其他模式：只顯示職能盤點卡 */
-                  <div className="flex-1 overflow-y-auto p-4">
-                    {mainDeck ? (
-                      <div>
-                        <div className="text-xs text-blue-600 dark:text-blue-400 mb-2 font-medium">
-                          職能盤點卡 ({mainDeck.cards.length} 張)
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          {mainDeck.cards
-                            .slice(0, 10)
-                            .filter((card: any) => !usedCards.has(card.id))
-                            .map((card: any) => (
-                              <CardItem
-                                key={card.id}
-                                id={card.id}
-                                title={card.title}
-                                description={card.description}
-                                category={card.category}
-                                isUsed={false}
-                                isDraggable={true}
-                                onDragStart={(e) => {
-                                  e.dataTransfer.setData('cardId', card.id);
-                                  addTestResult(`📋 開始拖曳職能卡: ${card.title}`);
-                                }}
-                              />
-                            ))}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-gray-500 dark:text-gray-400">載入中...</div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* 右側：遊戲畫布 */}
-              <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
-                {/* 遊戲資訊條 */}
-                <div className="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-6 text-sm">
-                      <div>
-                        <span className="text-gray-500 dark:text-gray-400">模式：</span>
-                        <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
-                          {GameModeService.getMode(selectedMode)?.name}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 dark:text-gray-400">玩法：</span>
-                        <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
-                          {GameModeService.getGameplay(selectedMode, selectedGameplay)?.name}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500 dark:text-gray-400">畫布類型：</span>
-                        <span className="font-medium ml-2 text-gray-900 dark:text-gray-100">
-                          {canvasConfig?.name || '載入中'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 畫布區域 */}
-                <div className="flex-1 p-6 overflow-auto">
-                  {/* 生活改造王籌碼系統 */}
-                  {showTokenSystem ? (
-                    <div className="grid lg:grid-cols-2 gap-6">
-                      <TokenControls
-                        areas={lifeAreas}
-                        total={100}
-                        onChange={handleTokenChange}
-                        showSuggestions={true}
+                  <TabsContent value="gameplay" className="space-y-4">
+                    {selectedMode && (
+                      <GameplaySelector
+                        modeId={selectedMode}
+                        onGameplaySelect={handleGameplaySelect}
                       />
-                      <div className="space-y-4">
-                        <TokenDisplay
-                          allocations={tokenAllocations}
-                          visualType="pie"
-                          title="能量分配圓餅圖"
-                        />
-                        <TokenDisplay
-                          allocations={tokenAllocations}
-                          visualType="progress"
-                          title="能量分配進度"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    /* 一般遊戲畫布 - 根據畫布類型渲染 */
-                    <div className="h-full">{renderCanvas()}</div>
-                  )}
-                </div>
-              </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 錯誤顯示 */}
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* 載入中顯示 */}
+          {isLoading && (
+            <div className="flex justify-center items-center h-32">
+              <div className="text-gray-500 dark:text-gray-400">載入中...</div>
             </div>
           )}
-        </TabsContent>
-      </Tabs>
+
+          {/* 遊戲區域 */}
+          {selectedGameplay && !isLoading && (
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full">{renderGame()}</div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

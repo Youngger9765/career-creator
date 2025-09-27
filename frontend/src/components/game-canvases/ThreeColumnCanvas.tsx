@@ -26,6 +26,11 @@ interface ThreeColumnCanvasProps {
   maxCardsPerColumn?: number;
   isRoomOwner?: boolean;
   className?: string;
+  cardPlacements?: {
+    likeCards?: string[];
+    neutralCards?: string[];
+    dislikeCards?: string[];
+  };
 }
 
 const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
@@ -34,10 +39,12 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   maxCardsPerColumn = 10,
   isRoomOwner = false,
   className = '',
+  cardPlacements,
 }) => {
-  const [likeCards, setLikeCards] = useState<string[]>([]);
-  const [neutralCards, setNeutralCards] = useState<string[]>([]);
-  const [dislikeCards, setDislikeCards] = useState<string[]>([]);
+  // 使用外部狀態，如果沒有則使用本地狀態
+  const likeCards = cardPlacements?.likeCards || [];
+  const neutralCards = cardPlacements?.neutralCards || [];
+  const dislikeCards = cardPlacements?.dislikeCards || [];
   const [likeLocked, setLikeLocked] = useState(true); // 預設鎖定
   const [neutralLocked, setNeutralLocked] = useState(true); // 預設鎖定
   const [dislikeLocked, setDislikeLocked] = useState(true); // 預設鎖定
@@ -46,66 +53,39 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   const [localMaxDislike, setLocalMaxDislike] = useState(maxCardsPerColumn);
 
   const handleLikeAdd = (cardId: string) => {
-    // 如果卡片在其他欄位，先移除
-    if (neutralCards.includes(cardId)) {
-      setNeutralCards((prev) => prev.filter((id) => id !== cardId));
-    }
-    if (dislikeCards.includes(cardId)) {
-      setDislikeCards((prev) => prev.filter((id) => id !== cardId));
-    }
-    setLikeCards((prev) => [...prev, cardId]);
     onCardMove?.(cardId, 'like');
   };
 
   const handleLikeRemove = (cardId: string) => {
-    setLikeCards((prev) => prev.filter((id) => id !== cardId));
     onCardMove?.(cardId, null);
   };
 
   const handleLikeReorder = (newCardIds: string[]) => {
-    setLikeCards(newCardIds);
+    // 排序功能暫時不實作
   };
 
   const handleNeutralAdd = (cardId: string) => {
-    // 如果卡片在其他欄位，先移除
-    if (likeCards.includes(cardId)) {
-      setLikeCards((prev) => prev.filter((id) => id !== cardId));
-    }
-    if (dislikeCards.includes(cardId)) {
-      setDislikeCards((prev) => prev.filter((id) => id !== cardId));
-    }
-    setNeutralCards((prev) => [...prev, cardId]);
     onCardMove?.(cardId, 'neutral');
   };
 
   const handleNeutralRemove = (cardId: string) => {
-    setNeutralCards((prev) => prev.filter((id) => id !== cardId));
     onCardMove?.(cardId, null);
   };
 
   const handleNeutralReorder = (newCardIds: string[]) => {
-    setNeutralCards(newCardIds);
+    // 排序功能暫時不實作
   };
 
   const handleDislikeAdd = (cardId: string) => {
-    // 如果卡片在其他欄位，先移除
-    if (likeCards.includes(cardId)) {
-      setLikeCards((prev) => prev.filter((id) => id !== cardId));
-    }
-    if (neutralCards.includes(cardId)) {
-      setNeutralCards((prev) => prev.filter((id) => id !== cardId));
-    }
-    setDislikeCards((prev) => [...prev, cardId]);
     onCardMove?.(cardId, 'dislike');
   };
 
   const handleDislikeRemove = (cardId: string) => {
-    setDislikeCards((prev) => prev.filter((id) => id !== cardId));
     onCardMove?.(cardId, null);
   };
 
   const handleDislikeReorder = (newCardIds: string[]) => {
-    setDislikeCards(newCardIds);
+    // 排序功能暫時不實作
   };
 
   const handleLikeMaxChange = (newMax: number) => {

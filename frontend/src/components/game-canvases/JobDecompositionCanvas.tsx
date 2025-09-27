@@ -61,7 +61,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
   return (
     <div className={`w-full h-full flex ${className}`}>
       {/* 左側 - 職能卡片拖放區域 */}
-      <div className="flex-1 p-4 min-w-0">
+      <div className="w-1/2 p-4 min-w-0">
         <DropZone
           id="job-decomposition-zone"
           cards={cards}
@@ -92,7 +92,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
       </div>
 
       {/* 右側 - PDF上傳區域 */}
-      <div className="w-96 p-4 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
+      <div className="w-1/2 p-4 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700">
         <PDFUploader
           title="職位說明文件"
           subtitle="上傳 JD 或職位需求文件"

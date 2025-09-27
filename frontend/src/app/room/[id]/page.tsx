@@ -5,7 +5,6 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRoomStore } from '@/stores/room-store';
 import { useGameSession } from '@/hooks/use-game-session';
-import { ConsultationAreaNew } from '@/components/consultation/ConsultationAreaNew';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
 import { VisitorGuidance } from '@/components/visitor/VisitorGuidance';
 import { ParticipantList } from '@/components/room/ParticipantList';
@@ -69,9 +68,9 @@ export default function RoomPage() {
 
     // 獲取遊戲模式映射
     const gameModeMapping: Record<string, string> = {
-      六大性格分析: 'career_personality',
+      六大性格分析: 'personality_assessment',
       優劣勢分析: 'skill_assessment',
-      價值觀排序: 'value_navigation',
+      價值觀排序: 'value_ranking',
     };
 
     const gameMode = gameModeMapping[newGameRule] || 'career_personality';
@@ -244,67 +243,7 @@ export default function RoomPage() {
               </button>
             )}
 
-            {/* 新架構測試開關 */}
-            <button
-              onClick={() => setShowNewArchitecture(!showNewArchitecture)}
-              className="px-3 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm font-medium"
-            >
-              {showNewArchitecture ? '切換到舊架構' : '測試新架構'}
-            </button>
 
-            {/* 牌卡選擇和玩法選擇 */}
-            {!showNewArchitecture && (
-              <div className="flex items-center space-x-4">
-                <div className="flex flex-col">
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1">牌組模式</label>
-                  <select
-                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={selectedDeck}
-                    onChange={(e) => handleDeckChange(e.target.value)}
-                  >
-                    <option value="職游旅人卡">職游旅人卡</option>
-                    <option value="職能盤點卡">職能盤點卡</option>
-                    <option value="價值導航卡">價值導航卡</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col">
-                  <label className="text-xs text-gray-500 dark:text-gray-400 mb-1">玩法選擇</label>
-                  <select
-                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={selectedGameRule}
-                    onChange={(e) => {
-                      const newGameRule = e.target.value;
-                      // 獲取遊戲模式映射
-                      const gameModeMapping: Record<string, string> = {
-                        六大性格分析: 'career_personality',
-                        優劣勢分析: 'skill_assessment',
-                        價值觀排序: 'value_navigation',
-                      };
-                      const gameMode = gameModeMapping[newGameRule] || 'career_personality';
-
-                      // 更新本地狀態
-                      setSelectedGameRule(newGameRule);
-
-                      // 更新 game session
-                      gameSession.updateGameMode(selectedDeck, newGameRule, gameMode);
-                    }}
-                  >
-                    {getAvailableGameRules(selectedDeck).map((rule) => (
-                      <option key={rule} value={rule}>
-                        {rule === '六大性格分析'
-                          ? '性格分類'
-                          : rule === '價值觀排序'
-                            ? '價值排序'
-                            : rule === '優劣勢分析'
-                              ? '優劣分析'
-                              : rule}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
 
             {/* 參與者列表 */}
             <ParticipantList
@@ -338,37 +277,17 @@ export default function RoomPage() {
 
       {/* 主要內容區 */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {showNewArchitecture ? (
-          <GameModeIntegration
-            roomId={roomId}
-            isVisitor={isVisitor}
-            counselorId={isCounselor ? user?.id : undefined}
-            onGameplayChange={setCurrentGameplay}
-            currentGameplay={currentGameplay}
-            onStateChange={(state) => {
-              console.log('[Room] Game state changed:', state);
-              // 可以在這裡更新 gameSession 或其他狀態
-            }}
-          />
-        ) : currentRoom ? (
-          <ConsultationAreaNew
-            roomId={roomId}
-            isHost={isCounselor || false}
-            gameMode={selectedGameRule as any}
-            selectedDeck={selectedDeck as any}
-            gameSession={{
-              updateCardPosition: gameSession.updateCardPosition,
-              toggleCardFlip: gameSession.toggleCardFlip,
-              getCardPosition: gameSession.getCardPosition,
-              isCardFlipped: gameSession.isCardFlipped,
-              resetGameState: gameSession.resetGameState,
-            }}
-          />
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <p className="text-gray-600">載入諮詢室資訊中...</p>
-          </div>
-        )}
+        <GameModeIntegration
+          roomId={roomId}
+          isVisitor={isVisitor}
+          counselorId={isCounselor ? user?.id : undefined}
+          onGameplayChange={setCurrentGameplay}
+          currentGameplay={currentGameplay}
+          onStateChange={(state) => {
+            console.log('[Room] Game state changed:', state);
+            // 可以在這裡更新 gameSession 或其他狀態
+          }}
+        />
       </div>
 
       {(errorMessage || roomError) && (

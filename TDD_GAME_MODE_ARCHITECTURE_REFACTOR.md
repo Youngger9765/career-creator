@@ -1,797 +1,162 @@
-# TDD重構計畫：三大模式架構升級
+# 遊戲狀態管理重構計畫
 
-Test-Driven Development Refactoring Plan for Three Game Modes Architecture
+## 🎯 現況與問題
 
-## 📋 重構概述
+### 已完成項目 ✅
 
-**目標**：從現有的單一規則引擎升級為支援「模式→玩法→配置」的三層架構
+- 3個遊戲模式、7個遊戲玩法組件
+- 194張牌卡資料（RIASEC、職業、技能、價值）
+- DropZone 組件（減少 63% 重複代碼）
+- 獨立遊戲組件於 `components/games/`
 
-**現狀分析**：
+### 核心問題 ⚠️
 
-```text
-目前架構：GameEngine + RuleFactory + 3個固定規則
-目標架構：Mode → Gameplay → Configuration (Cards + Canvas + Props)
-```
+1. **狀態汙染**：不同遊戲共用 `usedCards`，導致牌卡互相影響
+2. **狀態遺失**：切換遊戲後無法恢復先前狀態
+3. **無持久化**：重新載入頁面狀態消失
 
-## 🎯 TDD原則（基於Kent Beck方法論）
+## 🏗️ 系統架構
 
-### 核心流程
-
-1. **列出預期行為** - 在編碼前列出所有變體
-2. **紅綠重構循環** - Red → Green → Refactor
-3. **一次一個測試** - 專注單一測試直到通過
-4. **測試作為提示** - 測試描述精確需求給AI
-
-## 📝 預期行為清單 (Expected Behaviors)
-
-### 1. 模式選擇系統 (Mode Selection)
-
-**基本情況**：
-
-- [ ] 用戶能選擇三大模式之一（職游旅人/職能盤點/價值導航）
-- [ ] 每個模式有唯一ID和名稱
-- [ ] 選擇模式後自動顯示可用玩法
-
-**邊緣情況**：
-
-- [ ] 無效模式ID回傳錯誤
-- [ ] 模式切換時清空當前狀態
-- [ ] 模式資料缺失時的fallback
-
-**現有行為保護**：
-
-- [ ] 現有三個規則仍能正常運作
-- [ ] 向後兼容舊的rule_id
-
-### 2. 玩法配置系統 (Gameplay Configuration)
-
-**基本情況**：
-
-- [ ] 每個模式包含2-3個玩法選項
-- [ ] 選擇玩法自動配置牌卡組
-- [ ] 選擇玩法自動配置畫布類型
-- [ ] 選擇玩法自動配置道具（如籌碼）
-
-**邊緣情況**：
-
-- [ ] 玩法配置檔缺失
-- [ ] 牌卡資料不完整
-- [ ] 畫布類型不匹配
-
-**現有行為保護**：
-
-- [ ] 優劣勢分析仍為2區5張限制
-- [ ] 價值觀排序仍為3x3格子
-- [ ] 六大性格仍為3欄分類
-
-### 3. 籌碼系統 (Token/Props System)
-
-**基本情況**：
-
-- [ ] 生活改造王有100點籌碼
-- [ ] 籌碼可在不同區域間分配
-- [ ] 總和必須等於100
-- [ ] 視覺化顯示籌碼數量
-
-**邊緣情況**：
-
-- [ ] 分配超過100點時警告
-- [ ] 負數籌碼處理
-- [ ] 籌碼重置功能
-- [ ] 籌碼分配的即時同步
-
-**互動邏輯**：
-
-- [ ] 點擊+/-按鈕調整籌碼
-- [ ] 拖曳籌碼在區域間轉移
-- [ ] 即時顯示剩餘籌碼
-- [ ] 自動平衡機制（可選）
-
-## 🧪 測試優先開發步驟
-
-### Phase 1: Mode System Tests (模式系統測試)
-
-```typescript
-// 1. 測試檔案：mode-system.test.ts
-describe('GameModeSystem', () => {
-  // RED: 寫失敗測試
-  it('should return three available modes', () => {
-    const modes = GameModeService.getAllModes();
-    expect(modes).toHaveLength(3);
-    expect(modes[0].id).toBe('career_traveler');
-    expect(modes[1].id).toBe('skill_inventory');
-    expect(modes[2].id).toBe('value_navigation');
-  });
-
-  it('should return gameplays for a specific mode', () => {
-    const gameplays = GameModeService.getGameplays('career_traveler');
-    expect(gameplays).toHaveLength(2);
-    expect(gameplays[0].id).toBe('personality_analysis');
-    expect(gameplays[1].id).toBe('career_collector');
-  });
-
-  it('should auto-configure canvas for selected gameplay', () => {
-    const config = GameModeService.getGameplayConfig(
-      'career_traveler',
-      'personality_analysis'
-    );
-    expect(config.canvas.type).toBe('three_columns');
-    expect(config.canvas.columns).toEqual(['like', 'neutral', 'dislike']);
-  });
-
-  // GREEN: 實作最簡單的通過方案
-  // REFACTOR: 優化程式碼結構
-});
-```
-
-### Phase 2: Gameplay Configuration Tests (玩法配置測試)
-
-```typescript
-// 2. 測試檔案：gameplay-config.test.ts
-describe('GameplayConfiguration', () => {
-  it('should load correct cards for personality analysis', () => {
-    const config = GameplayConfig.load('personality_analysis');
-    expect(config.cards.explanation).toHaveLength(6); // RIASEC
-    expect(config.cards.main).toHaveLength(100); // 職業卡
-  });
-
-  it('should configure grid canvas for value ranking', () => {
-    const config = GameplayConfig.load('value_ranking');
-    expect(config.canvas.type).toBe('grid');
-    expect(config.canvas.rows).toBe(3);
-    expect(config.canvas.cols).toBe(3);
-  });
-
-  it('should include token system for life redesign', () => {
-    const config = GameplayConfig.load('life_redesign');
-    expect(config.props.tokens).toBeDefined();
-    expect(config.props.tokens.total).toBe(100);
-    expect(config.props.tokens.distributable).toBe(true);
-  });
-});
-```
-
-### Phase 3: Token System Tests (籌碼系統測試)
-
-```typescript
-// 3. 測試檔案：token-system.test.ts
-describe('TokenSystem', () => {
-  it('should initialize with 100 tokens', () => {
-    const tokenSystem = new TokenSystem(100);
-    expect(tokenSystem.getTotal()).toBe(100);
-    expect(tokenSystem.getRemaining()).toBe(100);
-  });
-
-  it('should distribute tokens to different areas', () => {
-    const tokenSystem = new TokenSystem(100);
-    tokenSystem.allocate('health', 30);
-    tokenSystem.allocate('career', 50);
-
-    expect(tokenSystem.getRemaining()).toBe(20);
-    expect(tokenSystem.getAllocation('health')).toBe(30);
-  });
-
-  it('should prevent over-allocation', () => {
-    const tokenSystem = new TokenSystem(100);
-    tokenSystem.allocate('health', 60);
-
-    expect(() => {
-      tokenSystem.allocate('career', 50);
-    }).toThrow('Insufficient tokens');
-  });
-
-  it('should support token transfer between areas', () => {
-    const tokenSystem = new TokenSystem(100);
-    tokenSystem.allocate('health', 40);
-    tokenSystem.allocate('career', 30);
-
-    tokenSystem.transfer('health', 'career', 10);
-
-    expect(tokenSystem.getAllocation('health')).toBe(30);
-    expect(tokenSystem.getAllocation('career')).toBe(40);
-  });
-});
-```
-
-## 📂 檔案結構規劃
+### 現有架構（問題）
 
 ```text
-/frontend/src
-├── /game-modes                 # 新增：模式系統
-│   ├── /types
-│   │   ├── mode.types.ts      # 模式類型定義
-│   │   └── gameplay.types.ts  # 玩法類型定義
-│   ├── /services
-│   │   ├── mode.service.ts    # 模式服務
-│   │   └── config.service.ts  # 配置服務
-│   ├── /configs               # 配置檔案
-│   │   ├── career-traveler.json
-│   │   ├── skill-inventory.json
-│   │   └── value-navigation.json
-│   └── /components
-│       ├── ModeSelector.tsx
-│       └── GameplaySelector.tsx
-│
-├── /token-system              # 新增：籌碼系統
-│   ├── TokenManager.ts
-│   ├── TokenDisplay.tsx
-│   └── TokenControls.tsx
-│
-└── /game                      # 現有：遊戲引擎
-    ├── engine.ts              # 需重構：支援新架構
-    └── rules/                 # 保留：向後兼容
-
-/backend
-├── /seeds                     # 新增：種子資料
-│   ├── game_modes.sql         # 模式基礎資料
-│   ├── gameplays.sql          # 玩法配置資料
-│   ├── card_decks.sql         # 牌組資料
-│   └── canvas_configs.sql     # 畫布配置資料
-└── /alembic/seeds             # 資料庫遷移種子
-    └── seed_game_content.py   # 執行種子資料腳本
+GameModeIntegration
+  ├── usedCards (共用 ❌)
+  └── 7個遊戲組件 → 全部讀取同一個 usedCards
 ```
 
-## 🌱 種子資料建立 (Seed Data)
+### 目標架構（解決）
 
-### Database Seed Structure
+```text
+GameStateStore (Zustand)
+  ├── Key: "roomId:personality" → GameState
+  ├── Key: "roomId:advantage" → GameState
+  └── Key: "roomId:career" → GameState
 
-```sql
--- 1. game_modes table
-CREATE TABLE game_modes (
-    id VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    icon VARCHAR(255),
-    sort_order INTEGER,
-    is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- 2. gameplays table
-CREATE TABLE gameplays (
-    id VARCHAR(50) PRIMARY KEY,
-    mode_id VARCHAR(50) REFERENCES game_modes(id),
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    canvas_type VARCHAR(50) NOT NULL,
-    has_tokens BOOLEAN DEFAULT false,
-    token_config JSONB,
-    card_config JSONB,
-    sort_order INTEGER,
-    is_active BOOLEAN DEFAULT true
-);
-
--- 3. card_decks table
-CREATE TABLE card_decks (
-    id VARCHAR(50) PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    deck_type VARCHAR(50), -- main, auxiliary, explanation
-    total_cards INTEGER,
-    cards_data JSONB, -- 儲存所有卡片資料
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- 4. canvas_configs table
-CREATE TABLE canvas_configs (
-    id VARCHAR(50) PRIMARY KEY,
-    canvas_type VARCHAR(50) NOT NULL, -- grid, columns, zones
-    layout_config JSONB,
-    constraints JSONB,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+每個遊戲獨立讀寫自己的狀態
 ```
 
-### Seed Data Examples
+## 📋 實作計畫
 
-#### 1. 模式種子資料 (game_modes.sql)
+### Phase 1: 純前端方案（立即）
 
-```sql
--- 三大模式種子資料
-INSERT INTO game_modes (id, name, description, sort_order) VALUES
-('career_traveler', '職游旅人卡', '探索職業性格與職涯方向', 1),
-('skill_inventory', '職能盤點卡', '分析個人優勢與成長領域', 2),
-('value_navigation', '價值導航卡', '釐清人生價值觀與優先順序', 3);
-```
-
-#### 2. 玩法種子資料 (gameplays.sql)
-
-```sql
--- 職游旅人卡的玩法
-INSERT INTO gameplays (id, mode_id, name, canvas_type, card_config) VALUES
-('personality_analysis', 'career_traveler', '六大性格分析', 'three_columns',
- '{"main_deck": "career_cards_100", "aux_deck": "riasec_cards"}'),
-('career_collector', 'career_traveler', '職業收藏家', 'collection_zone',
- '{"main_deck": "career_cards_100", "max_collection": 15}');
-
--- 職能盤點卡的玩法
-INSERT INTO gameplays (id, mode_id, name, canvas_type, card_config) VALUES
-('advantage_analysis', 'skill_inventory', '優劣勢分析', 'two_zones',
- '{"main_deck": "skill_cards", "zone_limits": {"advantage": 5, "disadvantage": 5}}'),
-('growth_planning', 'skill_inventory', '成長計畫', 'three_zones',
- '{"deck_a": "skill_cards", "deck_b": "ability_cards"}'),
-('position_breakdown', 'skill_inventory', '職位拆解', 'free_canvas',
- '{"main_deck": "skill_cards", "allow_screenshot": true}');
-
--- 價值導航卡的玩法
-INSERT INTO gameplays (id, mode_id, name, canvas_type, has_tokens, token_config) VALUES
-('value_ranking', 'value_navigation', '價值觀排序', 'grid_3x3',
- false, NULL),
-('life_redesign', 'value_navigation', '生活改造王', 'value_gauge',
- true, '{"total_tokens": 100, "token_name": "生活能量", "constraints": {"sum_equals": 100}}');
-```
-
-#### 3. 牌組種子資料 (card_decks.sql)
-
-```sql
--- 職業卡牌組（100張）
-INSERT INTO card_decks (id, name, deck_type, total_cards, cards_data) VALUES
-('career_cards_100', '職業卡', 'main', 100,
- '[
-   {"id": "c001", "title": "軟體工程師", "category": "R",
-    "description": "..."},
-   {"id": "c002", "title": "護理師", "category": "S",
-    "description": "..."},
-   -- ... 98 more cards
- ]');
-
--- RIASEC解釋卡（6張）
-INSERT INTO card_decks (id, name, deck_type, total_cards, cards_data) VALUES
-('riasec_cards', 'RIASEC性格卡', 'explanation', 6,
- '[
-   {"id": "R", "title": "實用型(R)",
-    "description": "喜歡動手操作..."},
-   {"id": "I", "title": "研究型(I)",
-    "description": "喜歡思考分析..."},
-   {"id": "A", "title": "藝術型(A)", "description": "喜歡創意表達..."},
-   {"id": "S", "title": "社交型(S)", "description": "喜歡與人互動..."},
-   {"id": "E", "title": "企業型(E)", "description": "喜歡領導管理..."},
-   {"id": "C", "title": "傳統型(C)", "description": "喜歡規律有序..."}
- ]');
-
--- 職能卡組
-INSERT INTO card_decks (id, name, deck_type, total_cards, cards_data) VALUES
-('skill_cards', '職能卡', 'main', 52,
- '[
-   {"id": "s001", "title": "溝通表達", "category": "soft", "description": "..."},
-   {"id": "s002", "title": "專案管理", "category": "hard", "description": "..."},
-   -- ... more skills
- ]');
-
--- 價值觀卡組（36張核心價值）
-INSERT INTO card_decks (id, name, deck_type, total_cards, cards_data) VALUES
-('value_cards', '價值觀卡', 'main', 36,
- '[
-   {"id": "v001", "title": "家庭", "description": "與家人共度時光..."},
-   {"id": "v002", "title": "事業", "description": "職涯成就與發展..."},
-   {"id": "v003", "title": "健康", "description": "身心健康與平衡..."},
-   -- ... 33 more values
- ]');
-```
-
-#### 4. 畫布配置種子資料 (canvas_configs.sql)
-
-```sql
--- 三欄式畫布（六大性格）
-INSERT INTO canvas_configs (id, canvas_type, layout_config, constraints) VALUES
-('three_columns', 'columns',
- '{"columns": ["like", "neutral", "dislike"], "column_names": ["喜歡", "中立", "討厭"]}',
- '{"max_per_column": {"like": 20, "dislike": 20}}');
-
--- 3x3格子畫布（價值觀排序）
-INSERT INTO canvas_configs (id, canvas_type, layout_config, constraints) VALUES
-('grid_3x3', 'grid',
- '{"rows": 3, "cols": 3, "numbered": true}',
- '{"unique_placement": true, "max_cards": 9}');
-
--- 雙區畫布（優劣勢）
-INSERT INTO canvas_configs (id, canvas_type, layout_config, constraints) VALUES
-('two_zones', 'zones',
- '{"zones": ["advantage", "disadvantage"], "zone_names": ["優勢", "劣勢"]}',
- '{"max_per_zone": 5}');
-
--- 量表畫布（生活改造王）
-INSERT INTO canvas_configs (id, canvas_type, layout_config, constraints) VALUES
-('value_gauge', 'gauge',
- '{"scale_min": 0, "scale_max": 100, "has_tokens": true}',
- '{"token_distribution": "manual", "token_sum": 100}');
-```
-
-### Seed Execution Script
-
-```python
-# backend/alembic/seeds/seed_game_content.py
-import json
-from sqlalchemy import text
-from app.core.database import SessionLocal
-
-def seed_game_modes():
-    """種植遊戲模式基礎資料"""
-    db = SessionLocal()
-    try:
-        # 讀取並執行SQL種子檔案
-        with open('seeds/game_modes.sql', 'r') as f:
-            db.execute(text(f.read()))
-
-        with open('seeds/gameplays.sql', 'r') as f:
-            db.execute(text(f.read()))
-
-        with open('seeds/card_decks.sql', 'r') as f:
-            db.execute(text(f.read()))
-
-        with open('seeds/canvas_configs.sql', 'r') as f:
-            db.execute(text(f.read()))
-
-        db.commit()
-        print("✅ Game content seeded successfully!")
-
-    except Exception as e:
-        db.rollback()
-        print(f"❌ Seed failed: {e}")
-    finally:
-        db.close()
-
-if __name__ == "__main__":
-    seed_game_modes()
-```
-
-### Testing Seed Data
+#### 1. GameStateStore 結構
 
 ```typescript
-// Test that seed data is properly loaded
-describe('Seed Data Tests', () => {
-  it('should have all three game modes in database', async () => {
-    const modes = await db.query('SELECT * FROM game_modes');
-    expect(modes.rows).toHaveLength(3);
-  });
+interface GameState {
+  cardPlacements: {
+    // PersonalityAnalysis
+    likeCards?: string[];
+    neutralCards?: string[];
+    dislikeCards?: string[];
 
-  it('should have correct gameplays for each mode', async () => {
-    const careerGameplays = await db.query(
-      'SELECT * FROM gameplays WHERE mode_id = $1',
-      ['career_traveler']
-    );
-    expect(careerGameplays.rows).toHaveLength(2);
-  });
+    // AdvantageAnalysis
+    advantageCards?: string[];
+    disadvantageCards?: string[];
 
-  it('should have complete card deck data', async () => {
-    const careerCards = await db.query(
-      'SELECT * FROM card_decks WHERE id = $1',
-      ['career_cards_100']
-    );
-    expect(careerCards.rows[0].total_cards).toBe(100);
-    expect(JSON.parse(careerCards.rows[0].cards_data)).toHaveLength(100);
-  });
-});
+    // 其他遊戲...
+  };
+  metadata: {
+    version: number;
+    lastModified: number;
+  };
+}
+
+interface GameStateStore {
+  states: Map<string, GameState>;
+  getGameState: (roomId: string, gameType: string) => GameState;
+  setGameState: (roomId: string, gameType: string, state: GameState) => void;
+  clearGameState: (roomId: string, gameType: string) => void;
+}
 ```
 
-## 🔄 重構步驟（TDD循環）
+#### 2. 實作重點
 
-### Step 1: Red Phase (寫失敗測試)
+- Zustand + localStorage 持久化
+- 自動版本控制
+- 跨分頁同步（storage events）
 
-```bash
-# 1. 創建測試檔案
-touch frontend/src/__tests__/game-modes.test.ts
-touch frontend/src/__tests__/token-system.test.ts
+#### 3. 遊戲組件更新
 
-# 2. 寫第一個失敗測試
-# 3. 執行測試確認失敗
-npm test -- --watch
-```
-
-### Step 2: Green Phase (最小實作)
+每個遊戲從共用 `usedCards` 改為獨立狀態：
 
 ```typescript
-// 只實作讓測試通過的最少程式碼
-// 不考慮優化，只求通過
-export class GameModeService {
-  static getAllModes() {
-    // Hardcode for now
-    return [
-      { id: 'career_traveler', name: '職游旅人卡' },
-      { id: 'skill_inventory', name: '職能盤點卡' },
-      { id: 'value_navigation', name: '價值導航卡' }
-    ];
+// Before
+const [usedCards, setUsedCards] = useState(parentUsedCards);
+
+// After
+const gameState = useGameStateStore(roomId, 'personality');
+const { likeCards, neutralCards, dislikeCards } = gameState.cardPlacements;
+```
+
+### Phase 2: 後端整合（未來）
+
+#### API 同步（1-2週後）
+
+```typescript
+// 背景同步，不阻塞 UI
+async syncWithBackend(roomId: string) {
+  const local = getLocalState(roomId);
+  const remote = await api.getState(roomId);
+
+  if (remote.version > local.version) {
+    setLocalState(roomId, remote);
   }
 }
 ```
 
-### Step 3: Refactor Phase (優化重構)
+#### WebSocket 即時同步（3-4週後）
 
 ```typescript
-// 測試通過後，優化程式碼
-// 提取常數、改善命名、減少重複
-const GAME_MODES = {
-  CAREER_TRAVELER: 'career_traveler',
-  SKILL_INVENTORY: 'skill_inventory',
-  VALUE_NAVIGATION: 'value_navigation'
-} as const;
-
-// 使用配置檔案取代硬編碼
-import modeConfigs from './configs/modes.json';
+ws.on('state-update', (data) => {
+  if (data.version > localVersion) {
+    updateLocalState(data);
+  }
+});
 ```
 
-## 🎮 資料結構設計
+## ✅ 測試計畫
 
-### Mode Configuration Schema
+### TDD 測試案例
 
 ```typescript
-interface GameMode {
-  id: string;
-  name: string;
-  description: string;
-  gameplays: Gameplay[];
-}
+describe('GameStateStore', () => {
+  it('各遊戲狀態應該獨立', () => {
+    store.setGameState('room1', 'personality', { cards: ['A'] });
+    store.setGameState('room1', 'advantage', { cards: ['B'] });
 
-interface Gameplay {
-  id: string;
-  name: string;
-  description: string;
-  config: GameplayConfig;
-}
+    expect(store.getGameState('room1', 'personality')).not.toBe(
+      store.getGameState('room1', 'advantage')
+    );
+  });
 
-interface GameplayConfig {
-  cards: {
-    main?: CardDeck;
-    auxiliary?: CardDeck;
-    explanation?: CardDeck;
-  };
-  canvas: CanvasConfig;
-  props?: {
-    tokens?: TokenConfig;
-    timer?: TimerConfig;
-  };
-  rules: GameRules;
-}
+  it('切換遊戲應保留狀態', () => {
+    store.setGameState('room1', 'personality', state1);
+    // 切換到其他遊戲
+    store.setGameState('room1', 'advantage', state2);
+    // 切回來
+    const restored = store.getGameState('room1', 'personality');
+    expect(restored).toEqual(state1);
+  });
 
-interface TokenConfig {
-  total: number;
-  distributable: boolean;
-  constraints?: {
-    min?: number;
-    max?: number;
-    sumEquals?: number;
-  };
-}
+  it('重新載入應恢復狀態', () => {
+    store.setGameState('room1', 'personality', state);
+    // 模擬重新載入
+    const newStore = createStore();
+    expect(newStore.getGameState('room1', 'personality')).toEqual(state);
+  });
+});
 ```
-
-## 🚦 測試覆蓋目標
-
-### 單元測試 (Unit Tests)
-
-- [ ] Mode selection logic - 80% coverage
-- [ ] Gameplay configuration - 80% coverage
-- [ ] Token system - 90% coverage
-- [ ] Canvas types - 75% coverage
-
-### 整合測試 (Integration Tests)
-
-- [ ] Mode → Gameplay flow
-- [ ] Gameplay → Configuration flow
-- [ ] Token distribution with canvas
-- [ ] State persistence across mode switches
-
-### E2E測試 (End-to-End Tests)
-
-- [ ] Complete user journey for each mode
-- [ ] Mode switching without data loss
-- [ ] Token system in 生活改造王
-- [ ] Multi-user token sync
 
 ## 📊 成功指標
 
-### 技術指標
-
-- ✅ 所有測試通過 (100% pass rate)
-- ✅ 測試覆蓋率 > 75%
-- ✅ 無破壞性變更 (backward compatible)
-- ✅ TypeScript類型完整
-
-### 業務指標
-
-- ✅ 新玩法上線時間 < 3天
-- ✅ 配置變更不需改程式碼
-- ✅ 支援未來擴展10+種玩法
-- ✅ 用戶體驗保持一致
-
-## 🔴 風險與緩解
-
-### 風險1：破壞現有功能
-
-**緩解**：
-
-- 保持舊API向後兼容
-- 使用feature flag逐步切換
-- 完整的regression測試
-
-### 風險2：複雜度增加
-
-**緩解**：
-
-- 清晰的抽象層級
-- 完善的文件說明
-- 程式碼審查機制
-
-### 風險3：效能影響
-
-**緩解**：
-
-- 配置檔案lazy loading
-- 使用React.memo優化
-- 監控關鍵效能指標
-
-## 📅 實施時程
-
-### Day 1-2: Test Writing Phase
-
-- 寫完所有失敗測試
-- 定義清楚的介面契約
-- 建立測試基礎設施
-
-### Day 3-4: Implementation Phase
-
-- Mode系統實作
-- Gameplay配置實作
-- Token系統實作
-
-### Day 5: Integration Phase
-
-- 整合新舊系統
-- 資料遷移腳本
-- 整合測試
-
-### Day 6-7: Polish Phase
-
-- UI/UX優化
-- 效能調校
-- 文件更新
-
-## 🎯 下一步行動
-
-1. **立即開始**：創建第一個測試檔案
-2. **小步前進**：一次只專注一個測試
-3. **持續整合**：每個測試通過就commit
-4. **及時重構**：綠燈後立即優化
-
-## 📝 實作進度記錄
-
-### ✅ Step 1: 建立3個基礎測試 (2025-09-21 完成)
-
-已創建測試檔案：`frontend/src/__tests__/game-modes-basic.test.tsx`
-
-#### 測試內容
-
-1. **模式列表正確性**
-   - ✅ 返回3個遊戲模式
-   - ✅ 正確的中文名稱
-   - ✅ 包含玩法配置
-
-2. **新舊ID映射**
-   - ✅ career_traveler → personality_assessment
-   - ✅ skill_inventory → skill_assessment
-   - ✅ value_navigation → value_ranking
-   - ✅ 未知模式的fallback處理
-
-3. **現有功能不受影響**
-   - ✅ RuleFactory.getRule() 正常運作
-   - ✅ GameEngine 使用舊rule_id
-   - ✅ 動作驗證邏輯保持不變
-
-### 🔄 舊系統移除策略（重要！）
-
-**問：橋接過去之後，舊的就可以刪除嗎？**
-
-**答：不要立即刪除！** 建議採用4階段策略：
-
-#### Phase 1: 並行運行 (Week 1-2)
-
-- 新舊系統並存
-- Feature Flag 控制切換
-- 收集穩定性數據
-
-#### Phase 2: 逐步遷移 (Week 3-4)
-
-- 10% → 50% → 100% 用戶漸進式遷移
-- 監控錯誤率和性能指標
-- 保留舊系統作為fallback
-
-#### Phase 3: 標記過時 (Month 2)
-
-- 添加 @deprecated 註解
-- 停止舊系統新功能開發
-- 保持可用但不再維護
-
-#### Phase 4: 安全移除 (Month 3)
-
-- 確認所有用戶都在新系統
-- 錯誤率 < 0.1%
-- 性能無下降
-- 完全移除舊代碼
-
-### ✅ Step 2: 實作核心服務層 (2025-09-21 完成)
-
-已完成以下服務實作：
-
-#### 2.1 GameModeService
-
-- ✅ 檔案：`frontend/src/game-modes/services/mode.service.ts`
-- ✅ 支援3個模式，7種玩法
-- ✅ 新舊ID映射功能
-- ✅ 16個測試案例全部通過
-
-#### 2.2 LegacyAdapter
-
-- ✅ 檔案：`frontend/src/game-modes/adapters/legacy-adapter.ts`
-- ✅ Adapter Pattern橋接新舊系統
-- ✅ Feature Flag支援漸進式遷移
-- ✅ 向後兼容保證
-
-#### 2.3 GameEngine & RuleFactory
-
-- ✅ 檔案：`frontend/src/game/engine.ts`
-- ✅ 檔案：`frontend/src/game/rules/rule-factory.ts`
-- ✅ 支援現有3個規則運作
-
-### ✅ Step 3: 建立完整資料層 (2025-09-21 完成)
-
-#### 3.1 牌卡資料 (194張卡片)
-
-- ✅ `riasec-cards.json` - 6張RIASEC解釋卡
-- ✅ `career-cards.json` - 100張職業卡
-- ✅ `skill-cards.json` - 52張技能卡
-- ✅ `value-cards.json` - 36張價值卡
-
-#### 3.2 畫布配置 (7種配置)
-
-- ✅ `canvas-configs.json` - 所有畫布配置
-  - three_columns (六大性格)
-  - two_zones (優劣勢)
-  - grid_3x3 (價值排序)
-  - collection_zone (職業收藏家)
-  - three_zones_growth (成長計畫)
-  - free_canvas (職位拆解)
-  - value_gauge (生活改造王)
-
-#### 3.3 籌碼系統
-
-- ✅ `TokenManager.ts` - 100點生活能量管理系統
-- ✅ 支援分配、轉移、約束驗證
-- ✅ 視覺化資料輸出
-- ✅ 匯出/匯入功能
-
-#### 3.4 服務層
-
-- ✅ `CardLoaderService` - 牌卡載入服務
-- ✅ 支援搜尋、篩選、隨機、驗證
-
-#### 3.5 測試覆蓋
-
-- ✅ `card-data-integrity.test.ts` - 資料完整性測試
-- ✅ 30+ 測試案例涵蓋所有牌卡和籌碼系統
-
-### 📊 實作統計
-
-| 項目 | 數量 | 狀態 |
-|------|------|------|
-| 遊戲模式 | 3 | ✅ |
-| 玩法種類 | 7 | ✅ |
-| 牌卡總數 | 194 | ✅ |
-| 畫布配置 | 7 | ✅ |
-| 測試案例 | 46+ | ✅ |
-| 程式碼行數 | ~4000 | ✅ |
-
-### 🚧 Next Step: UI元件實作
-
-需要實作的UI元件清單已準備，包含模式選擇器、玩法選擇器、籌碼顯示和控制元件。
-
-## 📚 參考資源
-
-- Kent Beck's "Test Driven Development: By Example"
-- Martin Fowler's "Refactoring"
-- Clean Architecture principles
-- React Testing Library best practices
+- ✅ 遊戲狀態完全隔離
+- ✅ 切換遊戲狀態保留
+- ✅ 頁面重載狀態恢復
+- ✅ 未來可無縫升級後端同步
 
 ---
 
-*Version: 1.1*
-*Date: 2025-09-21*
-*Status: Implementation Phase - Data Layer Complete*
-*Approach: Test-Driven Development with AI assistance*
+*Version: 3.0 (精簡版)*
+*Date: 2025-09-27*
+*Focus: 解決牌卡狀態隔離問題*

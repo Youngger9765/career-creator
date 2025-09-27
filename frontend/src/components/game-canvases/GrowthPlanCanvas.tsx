@@ -19,7 +19,11 @@ interface GrowthPlanCanvasProps {
   onCardUse?: (cardId: string) => void;
   onCardRemove?: (cardId: string) => void;
   onPlanCreate?: (cardAId: string, cardBId: string, plan: string) => void;
+  onPlanTextChange?: (text: string) => void;
   className?: string;
+  skillCards?: string[]; // 外部技能卡狀態
+  actionCards?: string[]; // 外部行動卡狀態
+  planText?: string; // 外部計畫文字狀態
 }
 
 interface GrowthPlan {
@@ -33,33 +37,29 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
   onCardUse,
   onCardRemove,
   onPlanCreate,
+  onPlanTextChange,
   className = '',
+  skillCards = [],
+  actionCards = [],
+  planText = '',
 }) => {
-  const [planText, setPlanText] = useState('');
-  const [cardA, setCardA] = useState<string[]>([]);
-  const [cardB, setCardB] = useState<string[]>([]);
-
   // 處理技能卡（A區）
   const handleCardAAdd = (cardId: string) => {
-    setCardA([cardId]);
     onCardUse?.(cardId);
-    checkAndCreatePlan([cardId], cardB, planText);
+    checkAndCreatePlan([cardId], actionCards, planText);
   };
 
   const handleCardARemove = (cardId: string) => {
-    setCardA([]);
     onCardRemove?.(cardId);
   };
 
   // 處理行動卡（B區）
   const handleCardBAdd = (cardId: string) => {
-    setCardB([cardId]);
     onCardUse?.(cardId);
-    checkAndCreatePlan(cardA, [cardId], planText);
+    checkAndCreatePlan(skillCards, [cardId], planText);
   };
 
   const handleCardBRemove = (cardId: string) => {
-    setCardB([]);
     onCardRemove?.(cardId);
   };
 
@@ -72,13 +72,13 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
 
   // 更新計畫文字
   const updatePlanText = (text: string) => {
-    setPlanText(text);
-    checkAndCreatePlan(cardA, cardB, text);
+    onPlanTextChange?.(text);
+    checkAndCreatePlan(skillCards, actionCards, text);
   };
 
   // 過濾技能卡和行動卡
-  const skillCards = cards.filter((card) => !card.id.startsWith('action_'));
-  const actionCards = cards.filter((card) => card.id.startsWith('action_'));
+  const availableSkillCards = cards.filter((card) => !card.id.startsWith('action_'));
+  const availableActionCards = cards.filter((card) => card.id.startsWith('action_'));
 
   return (
     <div className={`w-full h-full overflow-y-auto p-6 ${className}`}>
@@ -89,8 +89,8 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
             <div className="flex justify-center">
               <DropZone
                 id="cardA"
-                cards={skillCards}
-                placedCardIds={cardA}
+                cards={availableSkillCards}
+                placedCardIds={skillCards}
                 maxCards={1}
                 allowedCardTypes={['skill_']} // 只允許技能卡
                 title="技能卡"
@@ -122,8 +122,8 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
             <div className="flex justify-center">
               <DropZone
                 id="cardB"
-                cards={actionCards}
-                placedCardIds={cardB}
+                cards={availableActionCards}
+                placedCardIds={actionCards}
                 maxCards={1}
                 allowedCardTypes={['action_']} // 只允許行動卡
                 title="行動卡"
@@ -160,12 +160,12 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
                   value={planText}
                   onChange={(e) => updatePlanText(e.target.value)}
                   placeholder={
-                    cardA.length > 0 && cardB.length > 0
+                    skillCards.length > 0 && actionCards.length > 0
                       ? '以輸入文字方式，填入成長計畫...'
                       : '請先選擇技能卡和行動卡'
                   }
                   className="min-h-[100px] resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 border-gray-300 dark:border-gray-600"
-                  disabled={cardA.length === 0 || cardB.length === 0}
+                  disabled={skillCards.length === 0 || actionCards.length === 0}
                 />
               </div>
             </div>

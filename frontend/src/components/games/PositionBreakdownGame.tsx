@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import JobDecompositionCanvas from '../game-canvases/JobDecompositionCanvas';
 import GameLayout from '../common/GameLayout';
+import { useGameState } from '@/stores/game-state-store';
 
 interface PositionBreakdownGameProps {
   roomId: string;
@@ -26,7 +27,7 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
   deckType = 'skill_cards_52',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
+  const { state, updateCards } = useGameState(roomId, 'position');
   const [maxCards, setMaxCards] = useState(10);
 
   // 載入牌組
@@ -41,27 +42,46 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
 
   // 處理卡片移動
   const handleCardMove = (cardId: string, zone: string | null) => {
+    const currentCards = state.cardPlacements.positionCards || [];
+
     if (zone === null) {
-      // 卡片被移除，回到左邊
-      setUsedCards((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(cardId);
-        return newSet;
-      });
+      // 卡片被移除
+      updateCards({ positionCards: currentCards.filter((id) => id !== cardId) });
     } else {
       // 卡片被放置到分析區
-      setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
+      if (!currentCards.includes(cardId)) {
+        updateCards({ positionCards: [...currentCards, cardId] });
+      }
     }
   };
 
   // 處理文件上傳
   const handleFileUpload = (file: File) => {
     console.log('上傳文件:', file.name, file.type);
-    // 這裡可以加入文件處理邏輯
+
+    // 將文件轉換為 base64 並儲存
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      updateCards({
+        uploadedFile: {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          dataUrl: dataUrl,
+          uploadedAt: Date.now(),
+        },
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
+  // 計算已使用的卡片
+  const positionCards = state.cardPlacements.positionCards || [];
+  const usedCardIds = new Set(positionCards);
+
   // 過濾出未使用的卡片
-  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
+  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
 
   return (
     <GameLayout
@@ -94,6 +114,8 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
           isRoomOwner={isRoomOwner}
           onCardMove={handleCardMove}
           onFileUpload={handleFileUpload}
+          placedCards={positionCards}
+          uploadedFile={state.cardPlacements.uploadedFile}
         />
       }
     />

@@ -26,6 +26,14 @@ interface JobDecompositionCanvasProps {
   maxCards?: number;
   isRoomOwner?: boolean;
   className?: string;
+  placedCards?: string[]; // 外部狀態
+  uploadedFile?: {
+    name: string;
+    type: string;
+    size: number;
+    dataUrl: string;
+    uploadedAt: number;
+  };
 }
 
 const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
@@ -35,23 +43,23 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
   maxCards = 10,
   isRoomOwner = false,
   className = '',
+  placedCards = [],
+  uploadedFile,
 }) => {
-  const [placedCardIds, setPlacedCardIds] = useState<string[]>([]);
   const [isLocked, setIsLocked] = useState(false);
   const [localMaxCards, setLocalMaxCards] = useState(maxCards);
 
   const handleCardAdd = (cardId: string) => {
-    setPlacedCardIds((prev) => [...prev, cardId]);
     onCardMove?.(cardId, 'job-canvas');
   };
 
   const handleCardRemove = (cardId: string) => {
-    setPlacedCardIds((prev) => prev.filter((id) => id !== cardId));
     onCardMove?.(cardId, null);
   };
 
   const handleCardReorder = (newCardIds: string[]) => {
-    setPlacedCardIds(newCardIds);
+    // 重新排序時通知父組件 - 這裡可能需要新的callback
+    console.log('Card reorder:', newCardIds);
   };
 
   const handleMaxCardsChange = (newMax: number) => {
@@ -65,7 +73,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
         <DropZone
           id="job-decomposition-zone"
           cards={cards}
-          placedCardIds={placedCardIds}
+          placedCardIds={placedCards}
           maxCards={localMaxCards}
           title="職能分析區"
           subtitle="拖曳卡片到此處進行職位分析"
@@ -98,6 +106,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
           subtitle="上傳 JD 或職位需求文件"
           onFileUpload={onFileUpload}
           className="h-full"
+          initialFile={uploadedFile}
         />
       </div>
     </div>

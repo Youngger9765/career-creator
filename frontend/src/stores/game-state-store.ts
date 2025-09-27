@@ -30,9 +30,17 @@ export interface GameState {
     // GrowthPlanning
     skillCards?: string[];
     actionCards?: string[];
+    planText?: string;
 
     // PositionBreakdown
     positionCards?: string[];
+    uploadedFile?: {
+      name: string;
+      type: string;
+      size: number;
+      dataUrl: string; // Base64 data URL for persistence
+      uploadedAt: number;
+    };
 
     // LifeTransformation
     lifeAreas?: Record<
@@ -113,6 +121,7 @@ const getDefaultState = (gameType: string): GameState => {
       baseState.cardPlacements = {
         skillCards: [],
         actionCards: [],
+        planText: '',
       };
       break;
 

@@ -21,6 +21,11 @@ interface PDFUploaderProps {
   onFileUpload?: (file: File) => void;
   acceptedFormats?: string;
   className?: string;
+  initialFile?: {
+    name: string;
+    type: string;
+    dataUrl: string;
+  };
 }
 
 export const PDFUploader: React.FC<PDFUploaderProps> = ({
@@ -29,8 +34,20 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({
   onFileUpload,
   acceptedFormats = '.pdf,image/*',
   className = '',
+  initialFile,
 }) => {
-  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
+  // 從 initialFile 初始化狀態
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(() => {
+    if (initialFile) {
+      const fileType = initialFile.type.startsWith('image/') ? 'image' : 'pdf';
+      return {
+        type: fileType,
+        url: initialFile.dataUrl,
+        name: initialFile.name,
+      };
+    }
+    return null;
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {

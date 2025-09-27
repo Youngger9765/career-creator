@@ -10,6 +10,7 @@
 import React, { useState, useEffect } from 'react';
 import GameLayout from '../common/GameLayout';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
+import { useGameState } from '@/stores/game-state-store';
 import CardTokenWidget from './CardTokenWidget';
 import {
   Home,
@@ -43,9 +44,8 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
   isRoomOwner,
   mode = 'life_balance',
 }) => {
-  const [tokenAllocations, setTokenAllocations] = useState<TokenAllocation[]>([]);
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const { state, updateCards } = useGameState(roomId, 'life');
   const [maxCards, setMaxCards] = useState(10);
   const [totalTokens, setTotalTokens] = useState(100);
 
@@ -68,7 +68,11 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
   const handleCanvasDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const cardId = e.dataTransfer.getData('cardId');
-    if (cardId && !selectedCards.includes(cardId)) {
+    const lifeAreas = state.cardPlacements.lifeAreas || {};
+
+    // 檢查是否已經有這張卡片
+    const hasCard = Object.values(lifeAreas).some((area) => area.cards.includes(cardId));
+    if (cardId && !hasCard) {
       handleCardAdd(cardId);
     }
   };
@@ -77,37 +81,79 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
     e.preventDefault();
   };
 
-  // 計算已使用和剩餘籌碼
-  const usedTokens = tokenAllocations.reduce((sum, a) => sum + a.amount, 0);
+  // 從狀態計算已使用和剩餘籌碼
+  const rawLifeAreas = state.cardPlacements.lifeAreas || {};
+
+  // 數據遷移：清理舊的 "personal" 區域數據，將其轉換為新格式
+  const migratedLifeAreas = { ...rawLifeAreas };
+  if (migratedLifeAreas.personal && migratedLifeAreas.personal.cards) {
+    // 將舊的 personal 區域中的卡片遷移到獨立區域
+    const personalCards = migratedLifeAreas.personal.cards;
+    const personalTokens = migratedLifeAreas.personal.tokens || 0;
+
+    // 為每張卡片創建獨立區域
+    personalCards.forEach((cardId: string, index: number) => {
+      migratedLifeAreas[cardId] = {
+        cards: [cardId],
+        tokens: index === 0 ? personalTokens : 0, // 只給第一張卡片分配原來的籌碼
+      };
+    });
+
+    // 刪除舊的 personal 區域
+    delete migratedLifeAreas.personal;
+
+    // 保存遷移後的數據
+    updateCards({ lifeAreas: migratedLifeAreas });
+  }
+
+  const lifeAreas = migratedLifeAreas;
+  const usedTokens = Object.values(lifeAreas).reduce((sum, area) => sum + area.tokens, 0);
   const remainingTokens = totalTokens - usedTokens;
 
-  // 處理卡片添加 - 自動初始化為籌碼分配器
+  // 計算籌碼分配資料
+  const tokenAllocations: TokenAllocation[] = Object.entries(lifeAreas)
+    .filter(([_, area]) => area.tokens > 0)
+    .map(([areaKey, area]) => ({
+      area: areaKey,
+      amount: area.tokens,
+      percentage: (area.tokens / totalTokens) * 100,
+    }));
+
+  // 處理卡片添加 - 每張卡片創建獨立的生活領域
   const handleCardAdd = (cardId: string) => {
-    if (selectedCards.length >= maxCards) {
-      return; // 超過卡片限制
-    }
-    setSelectedCards((prev) => [...prev, cardId]);
-    // 為新卡片初始化籌碼分配
-    setTokenAllocations((prev) => [
-      ...prev,
-      {
-        area: cardId,
-        amount: 0,
-        percentage: 0,
+    const currentLifeAreas = state.cardPlacements.lifeAreas || {};
+
+    // 為每張卡片創建獨立的領域，使用卡片ID作為領域名稱
+    const updatedAreas = {
+      ...currentLifeAreas,
+      [cardId]: {
+        cards: [cardId],
+        tokens: 0,
       },
-    ]);
+    };
+
+    updateCards({ lifeAreas: updatedAreas });
   };
 
   // 處理卡片移除
   const handleCardRemove = (cardId: string) => {
-    setSelectedCards((prev) => prev.filter((id) => id !== cardId));
-    // 移除籌碼分配
-    setTokenAllocations((prev) => prev.filter((allocation) => allocation.area !== cardId));
+    const currentLifeAreas = state.cardPlacements.lifeAreas || {};
+    const updatedAreas = { ...currentLifeAreas };
+
+    // 刪除該卡片對應的獨立領域
+    delete updatedAreas[cardId];
+
+    updateCards({ lifeAreas: updatedAreas });
   };
 
+  // 計算已使用的卡片
+  const usedCardIds = new Set<string>();
+  Object.values(lifeAreas).forEach((area) => {
+    area.cards.forEach((cardId) => usedCardIds.add(cardId));
+  });
+
   // 過濾出未使用的卡片
-  const availableCards =
-    mainDeck?.cards?.filter((card: any) => !selectedCards.includes(card.id)) || [];
+  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
 
   return (
     <GameLayout
@@ -188,9 +234,9 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                 <div className="text-sm text-gray-700 dark:text-gray-700">
                   <span className="font-medium">已選卡片:</span>
                   <span
-                    className={`ml-1 ${selectedCards.length >= maxCards ? 'text-red-600 dark:text-red-600' : 'text-gray-900 dark:text-gray-900'}`}
+                    className={`ml-1 ${usedCardIds.size >= maxCards ? 'text-red-600 dark:text-red-600' : 'text-gray-900 dark:text-gray-900'}`}
                   >
-                    {selectedCards.length}/{maxCards}
+                    {usedCardIds.size}/{maxCards}
                   </span>
                 </div>
 
@@ -212,7 +258,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
             {/* 左側：卡片籌碼分配區 */}
             <div className="space-y-4">
               {/* 拖曳提示區 */}
-              {selectedCards.length === 0 && (
+              {usedCardIds.size === 0 && (
                 <div className="h-full flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-100">
                   <div className="text-center">
                     <Star className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
@@ -231,35 +277,44 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
 
               {/* 動態生成的卡片籌碼分配器 */}
               <div className="space-y-4 overflow-y-auto">
-                {selectedCards.map((cardId) => {
+                {Array.from(usedCardIds).map((cardId: string) => {
                   const card = mainDeck?.cards?.find((c: any) => c.id === cardId);
-                  const allocation = tokenAllocations.find((a) => a.area === cardId);
                   if (!card) return null;
+
+                  // 從該卡片的獨立領域中獲取token數量
+                  const cardArea = lifeAreas[cardId as string];
+                  const cardTokens = cardArea ? cardArea.tokens : 0;
+
+                  const allocation = {
+                    area: cardId as string, // 使用卡片ID作為區域名稱
+                    amount: cardTokens,
+                    percentage: cardTokens,
+                  };
 
                   return (
                     <CardTokenWidget
-                      key={cardId}
+                      key={cardId as string}
                       card={card}
                       allocation={allocation}
                       maxTokens={totalTokens}
                       onAllocationChange={(amount) => {
-                        setTokenAllocations((prev) => {
-                          const currentAllocation =
-                            prev.find((a) => a.area === cardId)?.amount || 0;
-                          const otherAllocations = prev
-                            .filter((a) => a.area !== cardId)
-                            .reduce((sum, a) => sum + a.amount, 0);
-                          const maxAvailable = totalTokens - otherAllocations;
-                          const finalAmount = Math.min(amount, maxAvailable);
+                        // 更新該卡片獨立領域的token數量
+                        const updatedAreas = { ...lifeAreas };
+                        if (updatedAreas[cardId as string]) {
+                          // 計算可用的剩餘籌碼（總籌碼 - 其他卡片已使用的籌碼）
+                          const otherUsedTokens = Object.entries(updatedAreas)
+                            .filter(([areaKey]) => areaKey !== cardId)
+                            .reduce((sum, [_, area]) => sum + area.tokens, 0);
+                          const maxAvailable = totalTokens - otherUsedTokens;
 
-                          return prev.map((a) =>
-                            a.area === cardId
-                              ? { ...a, amount: finalAmount, percentage: finalAmount }
-                              : a
-                          );
-                        });
+                          updatedAreas[cardId as string] = {
+                            ...updatedAreas[cardId as string],
+                            tokens: Math.min(amount, maxAvailable),
+                          };
+                        }
+                        updateCards({ lifeAreas: updatedAreas });
                       }}
-                      onRemove={() => handleCardRemove(cardId)}
+                      onRemove={() => handleCardRemove(cardId as string)}
                     />
                   );
                 })}
@@ -276,25 +331,32 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                 <div className="flex justify-center">
                   <div className="relative w-48 h-48">
                     <svg viewBox="0 0 200 200" className="w-full h-full">
-                      {tokenAllocations.length > 0 ? (
+                      {usedTokens > 0 ? (
                         (() => {
                           let cumulativeAngle = 0;
                           const colors = [
-                            '#22c55e', // green-500
-                            '#3b82f6', // blue-500
-                            '#f59e0b', // amber-500
-                            '#ef4444', // red-500
-                            '#8b5cf6', // violet-500
-                            '#06b6d4', // cyan-500
-                            '#f97316', // orange-500
-                            '#84cc16', // lime-500
-                            '#ec4899', // pink-500
-                            '#6366f1', // indigo-500
+                            '#22c55e',
+                            '#3b82f6',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6',
+                            '#06b6d4',
+                            '#f97316',
+                            '#84cc16',
+                            '#ec4899',
+                            '#6366f1',
                           ];
 
-                          return tokenAllocations.map((allocation, index) => {
-                            if (allocation.amount === 0) return null;
+                          // 從lifeAreas創建分配數據
+                          const allocations = Object.entries(lifeAreas)
+                            .filter(([_, area]) => area.tokens > 0)
+                            .map(([areaKey, area]) => ({
+                              area: areaKey,
+                              amount: area.tokens,
+                              cards: area.cards,
+                            }));
 
+                          return allocations.map((allocation, index) => {
                             const percentage = (allocation.amount / totalTokens) * 100;
                             const angle = (percentage / 100) * 360;
                             const startAngle = cumulativeAngle;
@@ -318,10 +380,6 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                             ].join(' ');
 
                             cumulativeAngle += angle;
-
-                            const card = mainDeck?.cards?.find(
-                              (c: any) => c.id === allocation.area
-                            );
 
                             return (
                               <g key={allocation.area}>

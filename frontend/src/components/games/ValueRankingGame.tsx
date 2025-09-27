@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GridCanvas from '../game-canvases/GridCanvas';
 import GameLayout from '../common/GameLayout';
+import { useGameState } from '@/stores/game-state-store';
 
 interface ValueRankingGameProps {
   roomId: string;
@@ -26,7 +27,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
   deckType = 'value_cards_36',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
+  const { state, updateCards } = useGameState(roomId, 'value');
 
   // 載入牌組
   useEffect(() => {
@@ -40,21 +41,32 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
 
   // 處理卡片移動
   const handleCardMove = (cardId: string, position: { row: number; col: number } | null) => {
+    const currentGrid = state.cardPlacements.gridCards || Array(9).fill(null);
+    let newGrid = [...currentGrid];
+
     if (position === null) {
-      // 卡片被移除，回到左邊
-      setUsedCards((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(cardId);
-        return newSet;
-      });
+      // 卡片被移除，從網格中清除
+      const cardIndex = newGrid.indexOf(cardId);
+      if (cardIndex !== -1) {
+        newGrid[cardIndex] = null;
+      }
     } else {
       // 卡片被放置到網格中
-      setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
+      const gridIndex = position.row * 3 + position.col;
+      if (gridIndex >= 0 && gridIndex < 9) {
+        newGrid[gridIndex] = cardId;
+      }
     }
+
+    updateCards({ gridCards: newGrid });
   };
 
+  // 計算已使用的卡片
+  const gridCards = state.cardPlacements.gridCards || Array(9).fill(null);
+  const usedCardIds = new Set(gridCards.filter((id) => id !== null));
+
   // 過濾出未使用的卡片
-  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
+  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
 
   return (
     <GameLayout
@@ -80,7 +92,13 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
         width: 'w-96',
         columns: 2,
       }}
-      canvas={<GridCanvas cards={mainDeck?.cards || []} onCardMove={handleCardMove} />}
+      canvas={
+        <GridCanvas
+          cards={mainDeck?.cards || []}
+          onCardMove={handleCardMove}
+          gridState={gridCards}
+        />
+      }
     />
   );
 };

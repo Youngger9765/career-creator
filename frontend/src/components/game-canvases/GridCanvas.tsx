@@ -17,6 +17,7 @@ interface GridCanvasProps {
   cards?: CardData[];
   onCardMove?: (cardId: string, position: { row: number; col: number } | null) => void;
   className?: string;
+  gridState?: Array<string | null>; // 外部狀態
 }
 
 interface GridZone {
@@ -29,64 +30,29 @@ interface GridZone {
   rank?: number;
 }
 
-const GridCanvas: React.FC<GridCanvasProps> = ({ cards = [], onCardMove, className = '' }) => {
-  // 初始化區域狀態
-  const [zones, setZones] = useState<GridZone[]>([
-    {
-      id: 'rank1',
-      title: '第一名',
-      placedCardIds: [],
-      maxCards: 1,
-      icon: Trophy,
-      type: 'rank',
-      rank: 1,
-    },
-    {
-      id: 'rank2',
-      title: '第二名',
-      placedCardIds: [],
-      maxCards: 1,
-      icon: Medal,
-      type: 'rank',
-      rank: 2,
-    },
-    {
-      id: 'rank3',
-      title: '第三名',
-      placedCardIds: [],
-      maxCards: 1,
-      icon: Award,
-      type: 'rank',
-      rank: 3,
-    },
-    { id: 'others', title: '其他', placedCardIds: [], maxCards: 7, icon: Square, type: 'others' },
-  ]);
+const GridCanvas: React.FC<GridCanvasProps> = ({
+  cards = [],
+  onCardMove,
+  className = '',
+  gridState,
+}) => {
+  // 定義區域配置
+  const zoneConfigs: Omit<GridZone, 'placedCardIds'>[] = [
+    { id: 'rank1', title: '第一名', maxCards: 1, icon: Trophy, type: 'rank', rank: 1 },
+    { id: 'rank2', title: '第二名', maxCards: 1, icon: Medal, type: 'rank', rank: 2 },
+    { id: 'rank3', title: '第三名', maxCards: 1, icon: Award, type: 'rank', rank: 3 },
+    { id: 'others', title: '其他', maxCards: 7, icon: Square, type: 'others' },
+  ];
+
+  // 從 gridState 計算每個區域的卡片
+  const zones: GridZone[] = zoneConfigs.map((config, index) => ({
+    ...config,
+    placedCardIds: gridState && gridState[index] ? [gridState[index]!] : [],
+  }));
 
   // 處理卡片添加
   const handleCardAdd = (zoneId: string, cardId: string) => {
-    // 先從所有區域移除該卡片（避免重複）
-    setZones((prev) =>
-      prev.map((zone) => ({
-        ...zone,
-        placedCardIds: zone.placedCardIds.filter((id) => id !== cardId),
-      }))
-    );
-
-    // 添加到目標區域
-    setZones((prev) =>
-      prev.map((zone) => {
-        if (zone.id === zoneId) {
-          return {
-            ...zone,
-            placedCardIds: [...zone.placedCardIds, cardId],
-          };
-        }
-        return zone;
-      })
-    );
-
-    // 通知父組件
-    const zoneIndex = zones.findIndex((z) => z.id === zoneId);
+    const zoneIndex = zoneConfigs.findIndex((z) => z.id === zoneId);
     if (zoneIndex !== -1) {
       onCardMove?.(cardId, { row: 0, col: zoneIndex });
     }
@@ -94,34 +60,14 @@ const GridCanvas: React.FC<GridCanvasProps> = ({ cards = [], onCardMove, classNa
 
   // 處理卡片移除
   const handleCardRemove = (zoneId: string, cardId: string) => {
-    setZones((prev) =>
-      prev.map((zone) => {
-        if (zone.id === zoneId) {
-          return {
-            ...zone,
-            placedCardIds: zone.placedCardIds.filter((id) => id !== cardId),
-          };
-        }
-        return zone;
-      })
-    );
-
-    // 通知父組件卡片被移除
     onCardMove?.(cardId, null);
   };
 
   // 處理最大卡片數變更（僅其他區域可變更）
   const handleMaxCardsChange = (zoneId: string, newMax: number) => {
-    if (zoneId === 'others') {
-      setZones((prev) =>
-        prev.map((zone) => {
-          if (zone.id === zoneId) {
-            return { ...zone, maxCards: newMax };
-          }
-          return zone;
-        })
-      );
-    }
+    // Note: This function is currently not used as maxCards is fixed by configuration
+    // In the future, this could be extended to support dynamic max card limits
+    console.log(`Max cards change for ${zoneId}: ${newMax}`);
   };
 
   return (

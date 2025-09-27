@@ -11,6 +11,7 @@ import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import CollectionCanvas from '../game-canvases/CollectionCanvas';
 import GameLayout from '../common/GameLayout';
+import { useGameState } from '@/stores/game-state-store';
 
 interface CareerCollectorGameProps {
   roomId: string;
@@ -26,8 +27,7 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
   deckType = 'career_cards_100',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const [usedCards, setUsedCards] = useState<Set<string>>(new Set());
-  const [collectedCardIds, setCollectedCardIds] = useState<string[]>([]);
+  const { state, updateCards } = useGameState(roomId, 'career');
   const [maxCards, setMaxCards] = useState(15);
 
   // 載入牌組
@@ -42,21 +42,21 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
 
   // 處理卡片收藏
   const handleCardCollect = (cardId: string, collected: boolean) => {
+    const currentCards = state.cardPlacements.collectedCards || [];
+
     if (collected) {
-      setUsedCards((prev) => new Set(Array.from(prev).concat(cardId)));
-      setCollectedCardIds((prev) => [...prev, cardId]);
+      updateCards({ collectedCards: [...currentCards, cardId] });
     } else {
-      setUsedCards((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(cardId);
-        return newSet;
-      });
-      setCollectedCardIds((prev) => prev.filter((id) => id !== cardId));
+      updateCards({ collectedCards: currentCards.filter((id) => id !== cardId) });
     }
   };
 
+  // 計算已收藏的卡片
+  const collectedCardIds = state.cardPlacements.collectedCards || [];
+  const usedCardIds = new Set(collectedCardIds);
+
   // 過濾出未使用的卡片
-  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
+  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
 
   return (
     <GameLayout

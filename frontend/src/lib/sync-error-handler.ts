@@ -61,10 +61,7 @@ export class SyncErrorHandler {
   /**
    * 標準化錯誤物件
    */
-  private static normalizeSyncError(
-    error: Error | SyncError,
-    context: string
-  ): SyncError {
+  private static normalizeSyncError(error: Error | SyncError, context: string): SyncError {
     if ('type' in error) {
       return error as SyncError;
     }
@@ -247,9 +244,9 @@ export class SyncErrorHandler {
    */
   static clearRetryCount(context: string): void {
     const keys = Object.keys(sessionStorage).filter(
-      key => key.startsWith('retry_') && key.includes(context)
+      (key) => key.startsWith('retry_') && key.includes(context)
     );
-    keys.forEach(key => sessionStorage.removeItem(key));
+    keys.forEach((key) => sessionStorage.removeItem(key));
   }
 
   /**
@@ -266,7 +263,7 @@ export class SyncErrorHandler {
       byType[errorType as SyncErrorType] = 0;
     }
 
-    this.errorQueue.forEach(error => {
+    this.errorQueue.forEach((error) => {
       byType[error.type] = (byType[error.type] || 0) + 1;
     });
 

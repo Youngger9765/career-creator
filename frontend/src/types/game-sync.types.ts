@@ -181,7 +181,12 @@ export interface UseGameCardSyncReturn<T extends GameState = GameState> {
   updateCards: (placements: Partial<T>) => void;
   cardSync: {
     isConnected: boolean;
-    moveCard: (cardId: string, toZone: string | null, fromZone?: string, broadcast?: boolean) => void;
+    moveCard: (
+      cardId: string,
+      toZone: string | null,
+      fromZone?: string,
+      broadcast?: boolean
+    ) => void;
     startDrag: (cardId: string) => void;
     endDrag: (cardId: string) => void;
     saveGameState: (state: Partial<T>) => void;
@@ -192,11 +197,7 @@ export interface UseGameCardSyncReturn<T extends GameState = GameState> {
 /**
  * 卡片移動處理器
  */
-export type CardMoveHandler = (
-  cardId: string,
-  zone: string | null,
-  broadcast?: boolean
-) => void;
+export type CardMoveHandler = (cardId: string, zone: string | null, broadcast?: boolean) => void;
 
 /**
  * 區域配置

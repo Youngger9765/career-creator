@@ -7,7 +7,6 @@ import { useRoomStore } from '@/stores/room-store';
 import { useGameSession } from '@/hooks/use-game-session';
 import { useRoomParticipants } from '@/hooks/use-room-participants';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
-import { VisitorGuidance } from '@/components/visitor/VisitorGuidance';
 import { ParticipantList } from '@/components/room/ParticipantList';
 import GameModeIntegration from './GameModeIntegration';
 
@@ -22,7 +21,6 @@ export default function RoomPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
   const [showVisitorWelcome, setShowVisitorWelcome] = useState(false);
-  const [showVisitorGuidance, setShowVisitorGuidance] = useState(false);
   const [visitorName, setVisitorName] = useState('');
 
   // Game Session for state persistence
@@ -145,7 +143,6 @@ export default function RoomPage() {
         setVisitorName(urlVisitorName);
         setIsChecking(false);
         setIsReady(true);
-        setShowVisitorGuidance(true);
       } else {
         // 沒有訪客名稱，顯示歡迎對話框
         setIsChecking(false);
@@ -282,14 +279,6 @@ export default function RoomPage() {
                 ? `訪客: ${visitorName || urlVisitorName}`
                 : `${user?.name} (${user?.roles?.join(', ')})`}
             </div>
-            {isVisitor && (
-              <button
-                onClick={() => setShowVisitorGuidance(!showVisitorGuidance)}
-                className="text-sm px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
-              >
-                {showVisitorGuidance ? '隱藏指引' : '顯示指引'}
-              </button>
-            )}
             {currentRoom && (
               <div className="text-sm text-gray-500">分享碼: {currentRoom.share_code}</div>
             )}
@@ -326,7 +315,6 @@ export default function RoomPage() {
           setVisitorName(name);
           setShowVisitorWelcome(false);
           setIsReady(true);
-          setShowVisitorGuidance(true);
 
           // Update URL to include visitor name
           const newUrl = new URL(window.location.href);
@@ -337,15 +325,6 @@ export default function RoomPage() {
           router.push('/');
         }}
       />
-
-      {/* Visitor Guidance Panel */}
-      {isVisitor && (
-        <VisitorGuidance
-          gameMode={selectedGameRule}
-          isVisible={showVisitorGuidance}
-          onClose={() => setShowVisitorGuidance(false)}
-        />
-      )}
     </div>
   );
 }

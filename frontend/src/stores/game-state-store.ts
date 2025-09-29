@@ -56,7 +56,7 @@ export interface GameState {
         tokens: number;
       }
     >;
-    
+
     // Allow dynamic zone names for unified sync
     [key: string]: any;
   };

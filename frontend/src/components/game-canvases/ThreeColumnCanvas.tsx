@@ -22,7 +22,11 @@ interface Card {
 
 interface ThreeColumnCanvasProps {
   cards?: Card[];
-  onCardMove?: (cardId: string, column: 'like' | 'neutral' | 'dislike' | null, broadcast?: boolean) => void;
+  onCardMove?: (
+    cardId: string,
+    column: 'like' | 'neutral' | 'dislike' | null,
+    broadcast?: boolean
+  ) => void;
   maxCardsPerColumn?: number;
   isRoomOwner?: boolean;
   className?: string;

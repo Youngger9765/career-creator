@@ -49,7 +49,6 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
     getDeck();
   }, [deckType]);
 
-
   // 計算已收藏的卡片
   const collectedCardIds = state.cardPlacements.collectedCards || [];
   const usedCardIds = new Set(collectedCardIds);
@@ -87,7 +86,9 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
           collectedCardIds={collectedCardIds}
           maxCards={maxCards}
           isRoomOwner={isRoomOwner}
-          onCardCollect={(cardId, collected) => handleCardMove(cardId, collected ? 'collected' : null)}
+          onCardCollect={(cardId, collected) =>
+            handleCardMove(cardId, collected ? 'collected' : null)
+          }
           onMaxCardsChange={setMaxCards}
           draggedByOthers={draggedByOthers}
           onDragStart={cardSync.startDrag}

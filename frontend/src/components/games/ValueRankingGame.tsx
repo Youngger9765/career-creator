@@ -30,7 +30,13 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
   const [mainDeck, setMainDeck] = useState<any>(null);
 
   // 使用統一的卡片同步 Hook
-  const { state, draggedByOthers, handleCardMove: baseHandleCardMove, cardSync, updateCards } = useUnifiedCardSync({
+  const {
+    state,
+    draggedByOthers,
+    handleCardMove: baseHandleCardMove,
+    cardSync,
+    updateCards,
+  } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.VALUE_RANKING,
     storeKey: 'value',
@@ -48,7 +54,6 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
     getDeck();
   }, [deckType]);
 
-
   // 處理卡片移動 - 從 GridCanvas 傳來的 zone
   const handleCardMove = (cardId: string, zone: string | null) => {
     baseHandleCardMove(cardId, zone);
@@ -65,7 +70,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
     ...rank1Cards,
     ...rank2Cards,
     ...rank3Cards,
-    ...othersCards
+    ...othersCards,
   ]);
 
   // 過濾出未使用的卡片

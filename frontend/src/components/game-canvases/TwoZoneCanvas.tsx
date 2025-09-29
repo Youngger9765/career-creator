@@ -24,7 +24,11 @@ interface TwoZoneCanvasProps {
   cards?: Card[];
   advantageCardIds?: string[];
   disadvantageCardIds?: string[];
-  onCardMove?: (cardId: string, zone: 'advantage' | 'disadvantage' | null, broadcast?: boolean) => void;
+  onCardMove?: (
+    cardId: string,
+    zone: 'advantage' | 'disadvantage' | null,
+    broadcast?: boolean
+  ) => void;
   maxCardsPerZone?: number;
   maxAdvantageCards?: number;
   maxDisadvantageCards?: number;

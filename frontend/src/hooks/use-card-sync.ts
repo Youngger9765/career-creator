@@ -77,9 +77,7 @@ export interface UseCardSyncReturn {
   error: string | null;
 }
 
-export function useCardSync(
-  options: UseCardSyncOptions
-): UseCardSyncReturn {
+export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   const {
     roomId,
     gameType,
@@ -333,7 +331,17 @@ export function useCardSync(
       channel.unsubscribe();
       channelRef.current = null;
     };
-  }, [roomId, gameType, isOwner, userId, onCardMove, onDragStart, onDragEnd, onStateReceived, loadGameState]);
+  }, [
+    roomId,
+    gameType,
+    isOwner,
+    userId,
+    onCardMove,
+    onDragStart,
+    onDragEnd,
+    onStateReceived,
+    loadGameState,
+  ]);
 
   return {
     draggedCards,

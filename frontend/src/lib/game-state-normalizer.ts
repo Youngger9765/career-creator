@@ -135,10 +135,7 @@ export class GameStateNormalizer {
 
   // === 轉換為儲存格式的方法 ===
 
-  private static toPersonalityFormat(
-    base: GameStateBase,
-    localState: any
-  ): PersonalityGameState {
+  private static toPersonalityFormat(base: GameStateBase, localState: any): PersonalityGameState {
     return {
       ...base,
       gameType: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
@@ -150,10 +147,7 @@ export class GameStateNormalizer {
     };
   }
 
-  private static toAdvantageFormat(
-    base: GameStateBase,
-    localState: any
-  ): AdvantageGameState {
+  private static toAdvantageFormat(base: GameStateBase, localState: any): AdvantageGameState {
     return {
       ...base,
       gameType: GAMEPLAY_IDS.ADVANTAGE_ANALYSIS,
@@ -164,10 +158,7 @@ export class GameStateNormalizer {
     };
   }
 
-  private static toValueRankingFormat(
-    base: GameStateBase,
-    localState: any
-  ): ValueRankingGameState {
+  private static toValueRankingFormat(base: GameStateBase, localState: any): ValueRankingGameState {
     return {
       ...base,
       gameType: GAMEPLAY_IDS.VALUE_RANKING,

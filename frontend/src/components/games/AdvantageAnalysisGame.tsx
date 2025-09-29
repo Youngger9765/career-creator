@@ -56,7 +56,6 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
     getDeck();
   }, [deckType]);
 
-
   // 過濾出未使用的卡片
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
 

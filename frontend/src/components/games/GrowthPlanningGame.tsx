@@ -51,7 +51,6 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     getDecks();
   }, []);
 
-
   // 處理卡片使用 - 從卡片ID推斷類型
   const handleCardUse = (cardId: string) => {
     // 從技能卡組中查找

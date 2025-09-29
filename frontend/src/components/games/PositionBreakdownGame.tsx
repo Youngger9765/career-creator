@@ -49,7 +49,6 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
     getDeck();
   }, [deckType]);
 
-
   // 處理文件上傳
   const handleFileUpload = (file: File) => {
     console.log('上傳文件:', file.name, file.type);

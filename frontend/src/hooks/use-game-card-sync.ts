@@ -51,12 +51,13 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
     ((cardId: string, zone: string | null, broadcast?: boolean) => void) | null
   >(null);
 
-  const setCustomMoveHandler = useCallback((
-    handler: ((cardId: string, zone: string | null, broadcast?: boolean) => void) | null
-  ) => {
-    customMoveHandlerRef.current = handler;
-    return handler;
-  }, []);
+  const setCustomMoveHandler = useCallback(
+    (handler: ((cardId: string, zone: string | null, broadcast?: boolean) => void) | null) => {
+      customMoveHandlerRef.current = handler;
+      return handler;
+    },
+    []
+  );
 
   // 使用牌卡同步 Hook
   const cardSync = useCardSync({
@@ -76,9 +77,11 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
       const currentPlacements = { ...state.cardPlacements };
 
       // 從所有區域移除該卡片
-      Object.keys(currentPlacements).forEach(key => {
+      Object.keys(currentPlacements).forEach((key) => {
         if (Array.isArray(currentPlacements[key])) {
-          currentPlacements[key] = currentPlacements[key].filter((id: string) => id !== event.cardId);
+          currentPlacements[key] = currentPlacements[key].filter(
+            (id: string) => id !== event.cardId
+          );
         }
       });
 
@@ -96,7 +99,7 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
     },
     onDragStart: (info) => {
       // 顯示誰在拖曳
-      setDraggedByOthers(prev => {
+      setDraggedByOthers((prev) => {
         const next = new Map(prev);
         next.set(info.cardId, info.performerName);
         return next;
@@ -104,7 +107,7 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
     },
     onDragEnd: (cardId) => {
       // 移除拖曳標記
-      setDraggedByOthers(prev => {
+      setDraggedByOthers((prev) => {
         const next = new Map(prev);
         next.delete(cardId);
         return next;
@@ -118,18 +121,21 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
   });
 
   // 建立預設的 handleCardMove
-  const handleCardMove = useCallback((cardId: string, zone: string | null, broadcast = true) => {
-    // 如果有自定義處理器，使用它
-    if (customMoveHandlerRef.current) {
-      customMoveHandlerRef.current(cardId, zone, broadcast);
-      return;
-    }
+  const handleCardMove = useCallback(
+    (cardId: string, zone: string | null, broadcast = true) => {
+      // 如果有自定義處理器，使用它
+      if (customMoveHandlerRef.current) {
+        customMoveHandlerRef.current(cardId, zone, broadcast);
+        return;
+      }
 
-    // 否則只廣播事件
-    if (broadcast && cardSync.isConnected) {
-      cardSync.moveCard(cardId, zone, 'unknown');
-    }
-  }, [cardSync]);
+      // 否則只廣播事件
+      if (broadcast && cardSync.isConnected) {
+        cardSync.moveCard(cardId, zone, 'unknown');
+      }
+    },
+    [cardSync]
+  );
 
   return {
     state,

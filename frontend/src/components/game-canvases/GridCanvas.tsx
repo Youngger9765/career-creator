@@ -59,7 +59,7 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
   // 從各個區域 props 計算每個區域的卡片
   const zones: GridZone[] = zoneConfigs.map((config) => {
     let placedCardIds: string[] = [];
-    switch(config.id) {
+    switch (config.id) {
       case 'rank1':
         placedCardIds = rank1Cards;
         break;

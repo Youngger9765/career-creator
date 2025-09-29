@@ -711,34 +711,16 @@ export function ConsultationArea({
   };
 
   // Disable card synchronization for single-machine mode
-  const {
-    syncedCards,
-    isActive: isSyncActive,
-    error: syncError,
-    syncCardEvent,
-    updateLocalCard,
-    applyToGameCards,
-    clearError: clearSyncError,
-  } = useCardSync({
+  const cardSync = useCardSync({
     roomId,
-    enabled: false, // Disable polling for single-machine mode
-    performerInfo,
+    gameType: 'consultation',
+    isOwner: true,
+    userName: performerInfo?.name || 'User',
+    userId: performerInfo?.id || 'user-1',
   });
 
-  // Apply synchronized state to local cards
-  useEffect(() => {
-    if (syncedCards.length === 0) return;
-
-    setCards((prevCards) => {
-      // Only update if there are actual changes
-      const updatedCards = applyToGameCards(prevCards);
-      // Check if cards actually changed to prevent unnecessary re-renders
-      if (JSON.stringify(prevCards) === JSON.stringify(updatedCards)) {
-        return prevCards;
-      }
-      return updatedCards;
-    });
-  }, [syncedCards, applyToGameCards]);
+  // Card synchronization disabled for single-machine mode
+  // useEffect removed - no synchronization needed
 
   const handleDealCard = useCallback(
     (cardData: CardData) => {
@@ -778,14 +760,15 @@ export function ConsultationArea({
 
       // Sync card dealt event
       if (!isReadOnly) {
-        syncCardEvent(newCard.id, 'card_dealt' as CardEventType, {
+        // syncCardEvent disabled for single-machine mode
+        onCardEvent?.(newCard.id, 'card_dealt' as CardEventType, {
           position: newCard.position,
           card_data: cardData,
           from_deck: true,
-        }).catch(console.error);
+        });
       }
     },
-    [cards.length, isReadOnly, syncCardEvent, selectedDeck, usedCardIds]
+    [cards.length, isReadOnly, onCardEvent, selectedDeck, usedCardIds]
   );
 
   const handleCardFlip = useCallback(
@@ -796,12 +779,12 @@ export function ConsultationArea({
 
       // Sync card flip event
       if (!isReadOnly) {
-        syncCardEvent(cardId, 'card_flipped' as CardEventType, {
+        onCardEvent?.(cardId, 'card_flipped' as CardEventType, {
           face_up: faceUp,
-        }).catch(console.error);
+        });
       }
     },
-    [isReadOnly, syncCardEvent]
+    [isReadOnly, onCardEvent]
   );
 
   const handleCardSelect = useCallback((cardId: string) => {
@@ -924,10 +907,10 @@ export function ConsultationArea({
 
           // Sync card arranged event
           if (!isReadOnly) {
-            syncCardEvent(draggedId, 'card_arranged' as CardEventType, {
+            onCardEvent?.(draggedId, 'card_arranged' as CardEventType, {
               drop_zone: over.id,
               zone: over.id,
-            }).catch(console.error);
+            });
           }
 
           onCardEvent?.(draggedId, CardEventType.CARD_ARRANGED, {
@@ -968,10 +951,10 @@ export function ConsultationArea({
 
           // Sync card arranged event
           if (!isReadOnly) {
-            syncCardEvent(draggedId, 'card_arranged' as CardEventType, {
+            onCardEvent?.(draggedId, 'card_arranged' as CardEventType, {
               drop_zone: over.id,
               zone: over.id,
-            }).catch(console.error);
+            });
           }
 
           onCardEvent?.(draggedId, CardEventType.CARD_ARRANGED, {
@@ -1011,10 +994,10 @@ export function ConsultationArea({
 
           // Sync card arranged event
           if (!isReadOnly) {
-            syncCardEvent(draggedId, 'card_arranged' as CardEventType, {
+            onCardEvent?.(draggedId, 'card_arranged' as CardEventType, {
               drop_zone: over.id,
               zone: over.id,
-            }).catch(console.error);
+            });
           }
 
           onCardEvent?.(draggedId, CardEventType.CARD_ARRANGED, {
@@ -1037,10 +1020,10 @@ export function ConsultationArea({
 
         // Sync card move event
         if (!isReadOnly) {
-          syncCardEvent(draggedId, 'card_moved' as CardEventType, {
+          onCardEvent?.(draggedId, 'card_moved' as CardEventType, {
             from_position: draggedCard.position,
             to_position: newPosition,
-          }).catch(console.error);
+          });
         }
 
         onCardEvent?.(draggedId, CardEventType.CARD_MOVED, {
@@ -1049,16 +1032,7 @@ export function ConsultationArea({
         });
       }
     },
-    [
-      cards,
-      gameTokens,
-      isReadOnly,
-      syncCardEvent,
-      onCardEvent,
-      selectedDeck,
-      usedCardIds,
-      mockCards,
-    ]
+    [cards, gameTokens, isReadOnly, onCardEvent, onCardEvent, selectedDeck, usedCardIds, mockCards]
   );
 
   const handleCardEvent = useCallback(

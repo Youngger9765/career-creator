@@ -87,7 +87,7 @@ export class GameStateNormalizer {
         return this.fromLifeTransformationFormat(gameState as LifeTransformationGameState);
 
       default:
-        throw new Error(`Unsupported game type: ${gameState.gameType}`);
+        throw new Error(`Unsupported game type: ${(gameState as any).gameType}`);
     }
   }
 

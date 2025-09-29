@@ -56,7 +56,8 @@ Building an online card consultation system for career counselors and their visi
 
 Following Kent Beck's canonical TDD workflow:
 
-1. **List Expected Behaviors**: Before coding, list all expected variants in the new behavior
+1. **List Expected Behaviors**: Before coding, list all expected variants in
+   the new behavior
    - Basic case
    - Edge cases (timeouts, missing data, etc.)
    - Existing behavior that shouldn't break
@@ -66,8 +67,8 @@ Following Kent Beck's canonical TDD workflow:
    - **Green**: Make it pass (even with ugly code)
    - **Refactor**: Clean up when test is green
 
-3. **One Test at a Time**: Focus on a single test, make it pass, then move
-   to the next
+3. **One Test at a Time**: Focus on a single test, make it pass, then
+   move to the next
 
 ### TDD as AI "Superpower"
 
@@ -204,4 +205,7 @@ Auto-deployment configured:
 Service Account configured for automated deployment.
 
 ---
-**Last updated: 2025-09-29**
+
+## Last Updated
+
+2025-09-29

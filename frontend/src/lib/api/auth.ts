@@ -109,6 +109,7 @@ class AuthAPI {
     // Clear localStorage
     localStorage.removeItem('access_token');
     localStorage.removeItem('user');
+    localStorage.removeItem('auth-storage');
 
     // Clear sessionStorage (in case anything is stored there)
     sessionStorage.clear();
@@ -120,8 +121,8 @@ class AuthAPI {
         .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
     });
 
-    // Redirect to login page
-    window.location.href = '/login';
+    // Redirect to homepage
+    window.location.href = '/';
   }
 
   /**

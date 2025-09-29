@@ -13,44 +13,14 @@ export default function LoginPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const checkAuth = async () => {
-      const token = localStorage.getItem('access_token');
-      const user = localStorage.getItem('user');
-
-      if (token && user) {
-        try {
-          // Verify token is still valid by making a test request
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/auth/me`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (response.ok) {
-            // Token is valid, redirect to dashboard
-            router.push('/dashboard');
-          } else {
-            // Token is invalid, clear storage
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('user');
-            setCheckingAuth(false);
-          }
-        } catch (error) {
-          // Network error or token invalid
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('user');
-          setCheckingAuth(false);
-        }
-      } else {
-        setCheckingAuth(false);
-      }
-    };
-
-    checkAuth();
+    // Simple token check
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      // Has token, redirect to dashboard
+      router.push('/dashboard');
+    } else {
+      setCheckingAuth(false);
+    }
   }, [router]);
 
   if (checkingAuth) {

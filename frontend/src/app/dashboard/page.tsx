@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { authAPI } from '../../lib/api/auth';
+import { useAuthStore } from '@/stores/auth-store';
 import { roomsAPI } from '../../lib/api/rooms';
 import { clientsAPI } from '../../lib/api/clients';
 import { cardEventsAPI } from '../../lib/api/card-events';
@@ -41,6 +42,7 @@ interface DashboardStats {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { logout } = useAuthStore();
   const [user, setUser] = useState<any>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
@@ -229,7 +231,8 @@ export default function DashboardPage() {
               <button
                 onClick={() => {
                   if (confirm('確定要登出嗎？')) {
-                    authAPI.logout();
+                    logout();
+                    window.location.href = '/';
                   }
                 }}
                 className="px-3 py-2 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors flex items-center gap-2 whitespace-nowrap"

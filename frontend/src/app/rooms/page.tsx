@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { authAPI } from '@/lib/api/auth';
+import { useAuthStore } from '@/stores/auth-store';
 import { roomsAPI, Room } from '@/lib/api/rooms';
 import QRCodeModal from '@/components/QRCodeModal';
 import { EditRoomDialog } from '@/components/rooms/EditRoomDialog';
@@ -11,6 +12,7 @@ import { DeleteRoomDialog } from '@/components/rooms/DeleteRoomDialog';
 
 export default function RoomsPage() {
   const router = useRouter();
+  const { logout } = useAuthStore();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -54,7 +56,8 @@ export default function RoomsPage() {
   }, [router]);
 
   const handleLogout = () => {
-    authAPI.logout();
+    logout();
+    window.location.href = '/';
   };
 
   const copyShareLink = async (shareCode: string) => {

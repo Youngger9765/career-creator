@@ -77,6 +77,12 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   // 選擇遊戲（模式 + 玩法）- Owner 同步選擇
   const handleGameSelect = (modeId: string, gameplayId: string) => {
+    // 檢查是否能互動（Owner 或 Owner 在線時）
+    if (!canInteract) {
+      console.warn('[GameModeIntegration] Cannot select game - owner is offline');
+      return;
+    }
+
     if (isRoomOwner) {
       // Owner: 同步到所有人
       // 找出對應的 deck 名稱
@@ -212,6 +218,23 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
           {/* 模式和玩法選擇器 - 顯示所有組合 */}
           {!gameStarted && !selectedGameplay && (
             <div className="h-full overflow-y-auto">
+              {/* Owner 離線提示（訪客才顯示） */}
+              {isVisitor && !ownerOnline && (
+                <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">⏸️</span>
+                    <div>
+                      <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                        等待諮詢師上線
+                      </p>
+                      <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                        諮詢師離線時無法切換遊戲模式
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <CombinedGameSelector
                 onGameSelect={handleGameSelect}
                 currentMode={selectedMode}
@@ -250,8 +273,30 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
           {/* 遊戲區域 - 遊戲開始後顯示 */}
           {(gameStarted || selectedGameplay) && !isLoading && (
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden relative">
               <div className="h-full">{renderGame()}</div>
+
+              {/* Owner 離線遮罩層 */}
+              {!canInteract && (
+                <div className="absolute inset-0 z-50 flex items-center justify-center">
+                  {/* 半透明黑色遮罩 */}
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+                  {/* 提示訊息 */}
+                  <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 mx-4 max-w-md text-center">
+                    <div className="mb-4">
+                      <span className="text-6xl">⏸️</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      等待諮詢師回來
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400">諮詢師離線時，房間暫時凍結</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-4">
+                      請稍候，諮詢師上線後即可繼續
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

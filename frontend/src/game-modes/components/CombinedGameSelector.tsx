@@ -200,9 +200,9 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
                       ${isHovered ? 'transform -translate-y-0.5 shadow-sm' : ''}
                       ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}
                     `}
-                    onMouseEnter={() => setHoveredOption(option.id)}
+                    onMouseEnter={() => !disabled && setHoveredOption(option.id)}
                     onMouseLeave={() => setHoveredOption(null)}
-                    onClick={() => handleOptionSelect(option)}
+                    onClick={() => !disabled && handleOptionSelect(option)}
                   >
                     {/* 左側彩色條 */}
                     <div

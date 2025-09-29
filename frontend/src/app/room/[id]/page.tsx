@@ -249,8 +249,8 @@ export default function RoomPage() {
               </div>
             )}
 
-            {/* 切換遊戲模式按鈕 - 僅在已選擇遊戲時顯示 */}
-            {showNewArchitecture && currentGameplay && (
+            {/* 切換遊戲模式按鈕 - 僅諮詢師在已選擇遊戲時顯示 */}
+            {isCounselor && showNewArchitecture && currentGameplay && (
               <button
                 onClick={() => setCurrentGameplay('')}
                 className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"

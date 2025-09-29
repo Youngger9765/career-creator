@@ -24,6 +24,7 @@ export const GAMEPLAY_IDS = {
   // 價值導航卡玩法
   VALUE_RANKING: 'value_ranking',
   LIFE_REDESIGN: 'life_redesign',
+  LIFE_TRANSFORMATION: 'life_transformation', // 生活改造王
 } as const;
 
 // 遊戲玩法名稱（用於顯示）
@@ -35,6 +36,7 @@ export const GAMEPLAY_NAMES: Record<string, string> = {
   [GAMEPLAY_IDS.POSITION_BREAKDOWN]: '職位拆解',
   [GAMEPLAY_IDS.VALUE_RANKING]: '價值觀排序',
   [GAMEPLAY_IDS.LIFE_REDESIGN]: '生活重新設計',
+  [GAMEPLAY_IDS.LIFE_TRANSFORMATION]: '生活改造王',
 };
 
 // 牌組與玩法的對應關係

@@ -15,9 +15,12 @@ import DropZone from '../common/DropZone';
 
 interface GridCanvasProps {
   cards?: CardData[];
-  onCardMove?: (cardId: string, position: { row: number; col: number } | null) => void;
+  onCardMove?: (cardId: string, zone: string | null) => void; // 改為 zone-based
   className?: string;
-  gridState?: Array<string | null>; // 外部狀態
+  rank1Cards?: string[]; // 第一名卡片
+  rank2Cards?: string[]; // 第二名卡片
+  rank3Cards?: string[]; // 第三名卡片
+  othersCards?: string[]; // 其他區域卡片
   draggedByOthers?: Map<string, string>; // cardId -> performerName
   onDragStart?: (cardId: string) => void;
   onDragEnd?: (cardId: string) => void;
@@ -37,7 +40,10 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
   cards = [],
   onCardMove,
   className = '',
-  gridState,
+  rank1Cards = [],
+  rank2Cards = [],
+  rank3Cards = [],
+  othersCards = [],
   draggedByOthers,
   onDragStart,
   onDragEnd,
@@ -50,18 +56,29 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
     { id: 'others', title: '其他', maxCards: 7, icon: Square, type: 'others' },
   ];
 
-  // 從 gridState 計算每個區域的卡片
-  const zones: GridZone[] = zoneConfigs.map((config, index) => ({
-    ...config,
-    placedCardIds: gridState && gridState[index] ? [gridState[index]!] : [],
-  }));
+  // 從各個區域 props 計算每個區域的卡片
+  const zones: GridZone[] = zoneConfigs.map((config) => {
+    let placedCardIds: string[] = [];
+    switch(config.id) {
+      case 'rank1':
+        placedCardIds = rank1Cards;
+        break;
+      case 'rank2':
+        placedCardIds = rank2Cards;
+        break;
+      case 'rank3':
+        placedCardIds = rank3Cards;
+        break;
+      case 'others':
+        placedCardIds = othersCards;
+        break;
+    }
+    return { ...config, placedCardIds };
+  });
 
   // 處理卡片添加
   const handleCardAdd = (zoneId: string, cardId: string) => {
-    const zoneIndex = zoneConfigs.findIndex((z) => z.id === zoneId);
-    if (zoneIndex !== -1) {
-      onCardMove?.(cardId, { row: 0, col: zoneIndex });
-    }
+    onCardMove?.(cardId, zoneId);
   };
 
   // 處理卡片移除

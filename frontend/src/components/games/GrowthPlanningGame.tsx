@@ -51,6 +51,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     getDecks();
   }, []);
 
+
   // 處理卡片使用 - 從卡片ID推斷類型
   const handleCardUse = (cardId: string) => {
     // 從技能卡組中查找
@@ -71,17 +72,12 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 
   // 處理計畫文字變更
   const handlePlanTextChange = (text: string) => {
-    // 保留現有的卡片配置，只更新 planText
-    updateCards({
-      ...state.cardPlacements,
-      planText: text
-    });
+    console.log('計畫文字變更:', text);
   };
 
   // 計算已使用的卡片 (注意：zone name + Cards)
   const skillCards = state.cardPlacements.skillsCards || [];
   const actionCards = state.cardPlacements.actionsCards || [];
-  const planText = state.cardPlacements.planText || '';
   const usedCardIds = new Set([...skillCards, ...actionCards]);
 
   // 過濾出未使用的卡片
@@ -136,7 +132,6 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
           onDragEnd={cardSync.endDrag}
           skillCards={skillCards}
           actionCards={actionCards}
-          planText={planText}
         />
       }
     />

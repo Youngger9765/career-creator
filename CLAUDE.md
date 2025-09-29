@@ -47,7 +47,8 @@ Building an online card consultation system for career counselors and their visi
 3. **Component Structure**: Keep components small and focused
 4. **Testing**: Write tests for critical functionality
 5. **Documentation**: Comment complex logic
-6. **⚠️ NO AUTO COMMIT**: NEVER commit new features without user testing first. Always wait for user to test and approve before committing.
+6. **⚠️ NO AUTO COMMIT**: NEVER commit new features without user testing
+   first. Always wait for user to test and approve before committing.
 
 ## TDD with AI Development (Kent Beck's Principles)
 
@@ -65,13 +66,15 @@ Following Kent Beck's canonical TDD workflow:
    - **Green**: Make it pass (even with ugly code)
    - **Refactor**: Clean up when test is green
 
-3. **One Test at a Time**: Focus on a single test, make it pass, then move to the next
+3. **One Test at a Time**: Focus on a single test, make it pass, then move
+   to the next
 
 ### TDD as AI "Superpower"
 
 According to Kent Beck, TDD is a "superpower" when working with AI agents:
 
-1. **Tests as Prompts**: Writing tests first essentially "prompts" the AI with exact requirements
+1. **Tests as Prompts**: Writing tests first essentially "prompts" the AI
+   with exact requirements
 2. **Guard Rails**: Tests prevent AI from introducing regressions
 3. **Small Context Window**: Keep tests focused to maintain high code quality
 4. **Immediate Feedback**: Tests catch when AI strays off course
@@ -100,7 +103,7 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 
 ## File Structure (Monorepo)
 
-```
+```text
 /frontend
   /src
     /app          # Next.js app router pages
@@ -125,109 +128,16 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 - Use polling for MVP (no WebSocket initially)
 - Visitors don't need registration
 - Room expires after 7 days by default
-- ~~Start with single card deck (職能盤點卡)~~ **CHANGED**: Implement all 3 game types with universal rules engine
+- Implement all 3 game types (職能盤點卡、價值導航卡、職游旅人卡) with
+  universal rules engine
 
-## Game Rules Engine Architecture
+## Game Architecture
 
-### Strategic Decision: Why Universal Framework?
-
-**Business Reality:**
-
-1. **持續演進需求**: 職涯諮詢工具會持續演進，市場會出現新的測評工具和方法
-2. **競爭優勢**: 新規則上線不能花費數週開發時間
-3. **用戶多樣化**: 不同諮詢師可能偏好不同工具
-
-**技術本質發現:**
-牌卡遊戲的**核心抽象是固定的**，變化的只是**配置參數**
-
-**Industry Best Practices:**
-現代iGaming平台（如EveryMatrix、NuxGame）都採用相同架構：
-
-- 統一遊戲引擎 + 可配置規則 + 多遊戲內容 = 快速擴展能力
-- 上新遊戲週期：1-2週（vs 傳統數月）
-
-Following iGaming industry best practices, we implement a **Three-Layer Universal Framework**:
-
-1. **Engine Layer**: Rule-agnostic core logic
-2. **Configuration Layer**: Game rules and content management
-3. **Application Layer**: Business logic and user interactions
-
-### Three Game Types (MVP全做)
-
-```
-1. 職能盤點卡 - 優劣勢分析 (2 zones, max 5 each)
-2. 價值導航卡 - 價值觀排序 (3x3 grid, unique ranking)
-3. 職游旅人卡 - 六大性格 (3 columns, like/neutral/dislike)
-```
-
-### Technical Benefits
-
-- **Rapid Expansion**: New rules in days, not weeks
-- **Configuration Driven**: No code changes for new game types
-- **Future Proof**: Supports user-defined cards later
-- **Consistent UX**: Unified interaction patterns
-
-### Architecture Advantages
-
-**1. 可擴展性**
-
-- 新規則只需實現 GameRules 接口
-- 新牌組只需配置數據
-- UI可通過配置自動生成
-
-**2. 可維護性**
-
-- 核心邏輯集中在引擎
-- 規則和內容分離
-- 清晰的抽象邊界
-
-**3. 可測試性**
-
-- 規則邏輯可獨立測試
-- 狀態變化可預測
-- 動作可重放和調試
-
-**4. 性能優化**
-
-- 規則配置可緩存
-- 狀態更新可批量處理
-- 可實現增量同步
-
-這個架構設計可以支撐未來5-10年的業務發展，新的牌卡規則上線只需要數天而不是數週。
-
-### Implementation Strategy
-
-1. **Phase 1**: Core engine + 3 official rule sets
-2. **Phase 2**: User-defined card content
-3. **Phase 3**: Advanced game analytics
-
-### TDD for Game Engine
-
-Apply TDD principles specifically for rules engine:
-
-```typescript
-// Example test-first approach
-describe('GameEngine', () => {
-  it('should validate card placement within zone limits', () => {
-    const state = createGameState('skill_assessment');
-    const action = createPlaceCardAction('advantage', 6); // Over limit
-
-    expect(engine.validateAction(action, state)).toBe(false);
-  });
-
-  it('should execute valid card arrangement', () => {
-    const action = createArrangeAction('skill_001', 'advantage');
-    const result = engine.executeAction(action);
-
-    expect(result.isSuccess).toBe(true);
-    expect(result.newState.zones.get('advantage').cards).toContain('skill_001');
-  });
-});
-```
+For detailed game architecture and implementation, see [GAME_DESIGN.md](./GAME_DESIGN.md)
 
 ## Testing Commands
 
-### Frontend
+### Frontend Commands
 
 ```bash
 cd frontend
@@ -237,7 +147,7 @@ npm run lint     # Lint check
 npm run test     # Run tests
 ```
 
-### Backend
+### Backend Commands
 
 ```bash
 cd backend
@@ -294,4 +204,4 @@ Auto-deployment configured:
 Service Account configured for automated deployment.
 
 ---
-*Last updated: 2025-09-15*
+**Last updated: 2025-09-29**

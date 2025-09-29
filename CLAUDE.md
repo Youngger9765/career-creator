@@ -49,6 +49,8 @@ Building an online card consultation system for career counselors and their visi
 5. **Documentation**: Comment complex logic
 6. **⚠️ NO AUTO COMMIT**: NEVER commit new features without user testing
    first. Always wait for user to test and approve before committing.
+7. **⚠️ NO --no-verify**: NEVER use `--no-verify` flag when committing.
+   Always fix linting and type errors properly before committing.
 
 ## TDD with AI Development (Kent Beck's Principles)
 

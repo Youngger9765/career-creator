@@ -147,116 +147,188 @@ function RoomHeader({ roomId }) {
 
 ---
 
-## 🎮 Phase 2: 遊戲模式同步（2-3 天）
+## ✅ Phase 2: 遊戲模式同步（已完成 2025-09-29）
 
 ### 目標
 
 Room owner 切換遊戲模式時，所有人畫面同步切換
 
-### 技術方案
+### 實際實作方案
 
-**Broadcast（即時） + Database（持久化）**
+**純 Broadcast + localStorage（不使用 Database）**
+
+#### 為什麼改變方案？
+
+- 簡化實作，不需要後端 API
+- 降低成本，Broadcast 不計費
+- Owner 的 localStorage 作為真相來源
+- 足夠應付 MVP 需求
 
 ### 實作架構
 
 ```typescript
 // 資料流
 Owner 切換遊戲
-  → 更新 DB (rooms.current_game_type)
+  → 更新 localStorage
   → Broadcast 事件給所有人
   → 所有人收到立即切換
-  → 新加入者從 DB 讀取當前模式
+  → 新加入者發送 request_state
+  → Owner 從 localStorage 回傳當前狀態
 
 // 資料結構
-interface GameModeChange {
-  gameType: 'life' | 'value' | 'traveler'
-  changedBy: string
-  changedAt: string
-  roomId: string
+interface GameModeState {
+  deck: string          // 牌組名稱
+  gameRule: string      // 玩法名稱
+  gameMode: string      // 遊戲模式ID
 }
 ```
 
-### 資料庫設計
+### 命名統一問題與解決
 
-```sql
--- 在 rooms 表新增欄位（如果還沒有）
-ALTER TABLE rooms ADD COLUMN IF NOT EXISTS
-  current_game_type VARCHAR(50) DEFAULT 'life';
+#### 問題：Root Cause
 
-ALTER TABLE rooms ADD COLUMN IF NOT EXISTS
-  game_mode_updated_at TIMESTAMP DEFAULT NOW();
+- UI 組件使用 `personality_analysis`
+- 同步系統使用 `personality_assessment`
+- 兩套命名不一致導致「玩法尚未實作」錯誤
+
+#### 解決方案
+
+```typescript
+// 建立統一常數定義
+// /frontend/src/constants/game-modes.ts
+export const GAMEPLAY_IDS = {
+  PERSONALITY_ASSESSMENT: 'personality_assessment',
+  ADVANTAGE_ANALYSIS: 'advantage_analysis',
+  // ...
+}
+
+// 所有地方使用同一套常數
 ```
 
 ### 核心程式碼
 
-```javascript
+```typescript
 // hooks/useGameModeSync.ts
-export function useGameModeSync(roomId: string, isOwner: boolean) {
-  const [currentGameType, setCurrentGameType] = useState<GameType>()
-  const channel = useRef<RealtimeChannel>()
+export function useGameModeSync(options: UseGameModeSyncOptions) {
+  const { roomId, isOwner, initialState, onStateChange } = options
 
+  const [syncedState, setSyncedState] = useState<GameModeState>(initialState)
+  const [ownerOnline, setOwnerOnline] = useState(false)
+  const [channel, setChannel] = useState<RealtimeChannel | null>(null)
+
+  // Owner: 從 localStorage 載入狀態
   useEffect(() => {
-    // 初始化：從 DB 讀取當前模式
-    fetchCurrentGameMode()
-
-    // 建立 channel 監聽變化
-    channel.current = supabase.channel(`room:${roomId}`)
-      // 監聽 Broadcast（即時）
-      .on('broadcast', { event: 'game-mode-change' }, ({ payload }) => {
-        setCurrentGameType(payload.gameType)
-        // 可選：顯示通知
-        toast.info(`遊戲模式已切換為 ${payload.gameType}`)
-      })
-      // 監聽 DB 變化（備用）
-      .on('postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'rooms',
-          filter: `id=eq.${roomId}`
-        },
-        (payload) => {
-          if (payload.new.current_game_type !== currentGameType) {
-            setCurrentGameType(payload.new.current_game_type)
-          }
-        }
-      )
-      .subscribe()
-
-    return () => {
-      channel.current?.unsubscribe()
+    if (isOwner && typeof window !== 'undefined') {
+      const storageKey = `career_creator_game_mode_${roomId}`
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        setSyncedState(parsed)
+      }
     }
-  }, [roomId])
+  }, [isOwner, roomId])
 
-  // Owner 專用：切換遊戲模式
-  const changeGameMode = async (newGameType: GameType) => {
-    if (!isOwner) return
+  // 切換遊戲模式 (Owner only)
+  const changeGameMode = useCallback((deck, gameRule, gameMode) => {
+    if (!isOwner || !channel) return
 
-    // 1. 更新 DB（持久化）
-    const { error } = await supabase
-      .from('rooms')
-      .update({
-        current_game_type: newGameType,
-        game_mode_updated_at: new Date().toISOString()
-      })
-      .eq('id', roomId)
+    const newState = { deck, gameRule, gameMode }
 
-    if (!error) {
-      // 2. Broadcast 給所有人（即時）
-      channel.current?.send({
-        type: 'broadcast',
-        event: 'game-mode-change',
-        payload: {
-          gameType: newGameType,
-          changedBy: getUserId(),
-          changedAt: new Date().toISOString()
-        }
-      })
-    }
-  }
+    // 更新本地狀態
+    setSyncedState(newState)
+    persistState(newState)  // 存 localStorage
 
-  return { currentGameType, changeGameMode }
+    // Broadcast 給其他人
+    channel.send({
+      type: 'broadcast',
+      event: 'mode_changed',
+      payload: newState
+    })
+  }, [isOwner, channel])
+
+  // 監聽事件
+  useEffect(() => {
+    const gameChannel = supabase.channel(`room:${roomId}:gamemode`)
+
+    // 監聽模式變更
+    gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
+      setSyncedState(payload)
+      onStateChange?.(payload)
+    })
+
+    // 新用戶請求狀態
+    gameChannel.on('broadcast', { event: 'request_state' }, () => {
+      if (isOwner) {
+        gameChannel.send({
+          type: 'broadcast',
+          event: 'current_state',
+          payload: syncedState
+        })
+      }
+    })
+
+    // Owner Presence 追蹤
+    gameChannel.on('presence', { event: 'sync' }, () => {
+      const state = gameChannel.presenceState()
+      const users = Object.values(state).flat()
+      const ownerExists = users.some(u => u.role === 'owner')
+      setOwnerOnline(ownerExists)
+    })
+
+    gameChannel.subscribe()
+
+    return () => gameChannel.unsubscribe()
+  }, [roomId, isOwner])
+
+  return { syncedState, ownerOnline, changeGameMode, canInteract }
 }
+```
+
+### 關鍵功能
+
+#### 1. 權限控制
+
+```typescript
+// Owner 離線時房間凍結
+const canInteract = isOwner || ownerOnline
+
+// 訪客無法切換模式
+if (!canInteract) {
+  console.warn('Cannot select game - owner is offline')
+  return
+}
+```
+
+#### 2. 視覺回饋
+
+```typescript
+// 同步狀態指示器
+<div className="bg-white rounded-lg shadow-lg px-3 py-2">
+  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
+  <span>{isConnected ? '已同步' : '未連線'}</span>
+</div>
+
+// Owner 離線遮罩層
+{!canInteract && (
+  <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm">
+    <div className="text-center">
+      <span className="text-6xl">⏸️</span>
+      <h3>等待諮詢師回來</h3>
+      <p>諮詢師離線時，房間暫時凍結</p>
+    </div>
+  </div>
+)}
+```
+
+#### 3. 按鈕權限
+
+```typescript
+// 「切換遊戲模式」按鈕僅諮詢師可見
+{isCounselor && currentGameplay && (
+  <button onClick={() => setCurrentGameplay('')}>
+    切換遊戲模式
+  </button>
+)}
 ```
 
 ### UI 整合
@@ -284,12 +356,15 @@ function GameContainer({ roomId, isOwner }) {
 }
 ```
 
-### 注意事項
+### 實作成果
 
-- 只有 Owner 可以切換模式
-- DB 作為 source of truth
-- Broadcast 確保即時性
-- 新加入者從 DB 讀取狀態
+- ✅ 純 Broadcast 實現，不需要資料庫
+- ✅ Owner 狀態持久化到 localStorage
+- ✅ 新用戶加入自動獲取當前狀態
+- ✅ Owner 離線時房間凍結
+- ✅ 統一命名系統避免 bug
+- ✅ 視覺化同步狀態顯示
+- ✅ 訪客權限控制完善
 
 ---
 

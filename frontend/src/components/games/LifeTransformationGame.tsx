@@ -10,7 +10,8 @@
 import React, { useState, useEffect } from 'react';
 import GameLayout from '../common/GameLayout';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
-import { useGameState } from '@/stores/game-state-store';
+import { useGameCardSync } from '@/hooks/use-game-card-sync';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 import CardTokenWidget from './CardTokenWidget';
 import {
   Home,
@@ -45,9 +46,16 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
   mode = 'life_balance',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const { state, updateCards } = useGameState(roomId, 'life');
   const [maxCards, setMaxCards] = useState(10);
   const [totalTokens, setTotalTokens] = useState(100);
+
+  // 使用通用的遊戲牌卡同步 Hook（雖然這個遊戲主要使用籌碼而非卡片）
+  const { state, draggedByOthers, updateCards, cardSync } = useGameCardSync({
+    roomId,
+    gameType: GAMEPLAY_IDS.LIFE_TRANSFORMATION,
+    storeKey: 'life',
+    isRoomOwner,
+  });
 
   // 載入牌組
   useEffect(() => {
@@ -133,6 +141,20 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
     };
 
     updateCards({ lifeAreas: updatedAreas });
+
+    // 廣播同步
+    if (cardSync.isConnected) {
+      cardSync.moveCard(cardId, cardId, 'deck');
+    }
+
+    // Owner 儲存狀態
+    if (isRoomOwner) {
+      cardSync.saveGameState({
+        lifeAreas: updatedAreas,
+        lastUpdated: Date.now(),
+        gameType: GAMEPLAY_IDS.LIFE_TRANSFORMATION,
+      });
+    }
   };
 
   // 處理卡片移除
@@ -144,6 +166,20 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
     delete updatedAreas[cardId];
 
     updateCards({ lifeAreas: updatedAreas });
+
+    // 廣播同步
+    if (cardSync.isConnected) {
+      cardSync.moveCard(cardId, null, cardId);
+    }
+
+    // Owner 儲存狀態
+    if (isRoomOwner) {
+      cardSync.saveGameState({
+        lifeAreas: updatedAreas,
+        lastUpdated: Date.now(),
+        gameType: GAMEPLAY_IDS.LIFE_TRANSFORMATION,
+      });
+    }
   };
 
   // 計算已使用的卡片

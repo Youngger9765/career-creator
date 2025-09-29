@@ -24,7 +24,7 @@ interface TwoZoneCanvasProps {
   cards?: Card[];
   advantageCardIds?: string[];
   disadvantageCardIds?: string[];
-  onCardMove?: (cardId: string, zone: 'advantage' | 'disadvantage' | null) => void;
+  onCardMove?: (cardId: string, zone: 'advantage' | 'disadvantage' | null, broadcast?: boolean) => void;
   maxCardsPerZone?: number;
   maxAdvantageCards?: number;
   maxDisadvantageCards?: number;
@@ -32,6 +32,9 @@ interface TwoZoneCanvasProps {
   onMaxDisadvantageCardsChange?: (newMax: number) => void;
   isRoomOwner?: boolean;
   className?: string;
+  draggedByOthers?: Map<string, string>; // cardId -> performerName
+  onDragStart?: (cardId: string) => void;
+  onDragEnd?: (cardId: string) => void;
 }
 
 const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
@@ -46,6 +49,9 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   onMaxDisadvantageCardsChange,
   isRoomOwner = false,
   className = '',
+  draggedByOthers,
+  onDragStart,
+  onDragEnd,
 }) => {
   const [advantageCards, setAdvantageCards] = useState<string[]>(advantageCardIds || []);
   const [disadvantageCards, setDisadvantageCards] = useState<string[]>(disadvantageCardIds || []);
@@ -73,12 +79,12 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
       setDisadvantageCards((prev) => prev.filter((id) => id !== cardId));
     }
     setAdvantageCards((prev) => [...prev, cardId]);
-    onCardMove?.(cardId, 'advantage');
+    onCardMove?.(cardId, 'advantage', true);
   };
 
   const handleAdvantageRemove = (cardId: string) => {
     setAdvantageCards((prev) => prev.filter((id) => id !== cardId));
-    onCardMove?.(cardId, null);
+    onCardMove?.(cardId, null, true);
   };
 
   const handleAdvantageReorder = (newCardIds: string[]) => {
@@ -91,12 +97,12 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
       setAdvantageCards((prev) => prev.filter((id) => id !== cardId));
     }
     setDisadvantageCards((prev) => [...prev, cardId]);
-    onCardMove?.(cardId, 'disadvantage');
+    onCardMove?.(cardId, 'disadvantage', true);
   };
 
   const handleDisadvantageRemove = (cardId: string) => {
     setDisadvantageCards((prev) => prev.filter((id) => id !== cardId));
-    onCardMove?.(cardId, null);
+    onCardMove?.(cardId, null, true);
   };
 
   const handleDisadvantageReorder = (newCardIds: string[]) => {
@@ -143,6 +149,9 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
           onCardAdd={handleAdvantageAdd}
           onCardRemove={handleAdvantageRemove}
           onCardReorder={handleAdvantageReorder}
+          onCardDragStart={onDragStart}
+          onCardDragEnd={onDragEnd}
+          draggedByOthers={draggedByOthers}
         />
 
         {/* 劣勢區域 */}
@@ -172,6 +181,9 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
           onCardAdd={handleDisadvantageAdd}
           onCardRemove={handleDisadvantageRemove}
           onCardReorder={handleDisadvantageReorder}
+          onCardDragStart={onDragStart}
+          onCardDragEnd={onDragEnd}
+          draggedByOthers={draggedByOthers}
         />
       </div>
     </div>

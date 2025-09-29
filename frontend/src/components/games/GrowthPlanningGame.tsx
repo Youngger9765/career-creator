@@ -11,7 +11,8 @@ import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GrowthPlanCanvas from '../game-canvases/GrowthPlanCanvas';
 import GameLayout from '../common/GameLayout';
-import { useGameState } from '@/stores/game-state-store';
+import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface GrowthPlanningGameProps {
   roomId: string;
@@ -28,7 +29,15 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 }) => {
   const [skillDeck, setSkillDeck] = useState<any>(null);
   const [actionDeck, setActionDeck] = useState<any>(null);
-  const { state, updateCards } = useGameState(roomId, 'growth');
+
+  // 使用統一的卡片同步 Hook
+  const { state, draggedByOthers, handleCardMove, cardSync, updateCards } = useUnifiedCardSync({
+    roomId,
+    gameType: GAMEPLAY_IDS.GROWTH_PLANNING,
+    storeKey: 'growth',
+    isRoomOwner,
+    zones: ['skills', 'actions'], // 定義這個遊戲的區域
+  });
 
   // 載入牌組
   useEffect(() => {
@@ -46,25 +55,13 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   const handleCardUse = (cardId: string) => {
     // 從技能卡組中查找
     const isSkillCard = skillDeck?.cards?.some((card: any) => card.id === cardId);
-
-    if (isSkillCard) {
-      const currentSkills = state.cardPlacements.skillCards || [];
-      updateCards({ skillCards: [...currentSkills, cardId] });
-    } else {
-      const currentActions = state.cardPlacements.actionCards || [];
-      updateCards({ actionCards: [...currentActions, cardId] });
-    }
+    const zone = isSkillCard ? 'skills' : 'actions';
+    handleCardMove(cardId, zone);
   };
 
-  // 處理卡片移除 - 從兩個陣列中都移除
+  // 處理卡片移除
   const handleCardRemove = (cardId: string) => {
-    const currentSkills = state.cardPlacements.skillCards || [];
-    const currentActions = state.cardPlacements.actionCards || [];
-
-    updateCards({
-      skillCards: currentSkills.filter((id) => id !== cardId),
-      actionCards: currentActions.filter((id) => id !== cardId),
-    });
+    handleCardMove(cardId, null); // null 表示移回牌組
   };
 
   // 處理計畫建立
@@ -74,12 +71,16 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 
   // 處理計畫文字變更
   const handlePlanTextChange = (text: string) => {
-    updateCards({ planText: text });
+    // 保留現有的卡片配置，只更新 planText
+    updateCards({
+      ...state.cardPlacements,
+      planText: text
+    });
   };
 
-  // 計算已使用的卡片
-  const skillCards = state.cardPlacements.skillCards || [];
-  const actionCards = state.cardPlacements.actionCards || [];
+  // 計算已使用的卡片 (注意：zone name + Cards)
+  const skillCards = state.cardPlacements.skillsCards || [];
+  const actionCards = state.cardPlacements.actionsCards || [];
   const planText = state.cardPlacements.planText || '';
   const usedCardIds = new Set([...skillCards, ...actionCards]);
 
@@ -130,6 +131,9 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
           onCardRemove={handleCardRemove}
           onPlanCreate={handlePlanCreate}
           onPlanTextChange={handlePlanTextChange}
+          draggedByOthers={draggedByOthers}
+          onDragStart={cardSync.startDrag}
+          onDragEnd={cardSync.endDrag}
           skillCards={skillCards}
           actionCards={actionCards}
           planText={planText}

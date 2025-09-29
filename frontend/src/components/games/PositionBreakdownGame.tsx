@@ -7,11 +7,12 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import JobDecompositionCanvas from '../game-canvases/JobDecompositionCanvas';
 import GameLayout from '../common/GameLayout';
-import { useGameState } from '@/stores/game-state-store';
+import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface PositionBreakdownGameProps {
   roomId: string;
@@ -27,8 +28,16 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
   deckType = 'skill_cards_52',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const { state, updateCards } = useGameState(roomId, 'position');
   const [maxCards, setMaxCards] = useState(10);
+
+  // 使用統一的卡片同步 Hook
+  const { state, draggedByOthers, handleCardMove, cardSync, updateCards } = useUnifiedCardSync({
+    roomId,
+    gameType: GAMEPLAY_IDS.POSITION_BREAKDOWN,
+    storeKey: 'position',
+    isRoomOwner,
+    zones: ['position'], // 定義這個遊戲的區域
+  });
 
   // 載入牌組
   useEffect(() => {
@@ -40,20 +49,6 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
     getDeck();
   }, [deckType]);
 
-  // 處理卡片移動
-  const handleCardMove = (cardId: string, zone: string | null) => {
-    const currentCards = state.cardPlacements.positionCards || [];
-
-    if (zone === null) {
-      // 卡片被移除
-      updateCards({ positionCards: currentCards.filter((id) => id !== cardId) });
-    } else {
-      // 卡片被放置到分析區
-      if (!currentCards.includes(cardId)) {
-        updateCards({ positionCards: [...currentCards, cardId] });
-      }
-    }
-  };
 
   // 處理文件上傳
   const handleFileUpload = (file: File) => {
@@ -112,10 +107,13 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
           cards={mainDeck?.cards || []}
           maxCards={maxCards}
           isRoomOwner={isRoomOwner}
-          onCardMove={handleCardMove}
+          onCardMove={(cardId, zone) => handleCardMove(cardId, zone ? 'position' : null)}
           onFileUpload={handleFileUpload}
           placedCards={positionCards}
           uploadedFile={state.cardPlacements.uploadedFile}
+          draggedByOthers={draggedByOthers}
+          onDragStart={cardSync.startDrag}
+          onDragEnd={cardSync.endDrag}
         />
       }
     />

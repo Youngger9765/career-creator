@@ -24,6 +24,9 @@ interface GrowthPlanCanvasProps {
   skillCards?: string[]; // 外部技能卡狀態
   actionCards?: string[]; // 外部行動卡狀態
   planText?: string; // 外部計畫文字狀態
+  draggedByOthers?: Map<string, string>; // 同步相關
+  onDragStart?: (cardId: string) => void; // 同步相關
+  onDragEnd?: (cardId: string) => void; // 同步相關
 }
 
 interface GrowthPlan {
@@ -159,13 +162,8 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
                 <Textarea
                   value={planText}
                   onChange={(e) => updatePlanText(e.target.value)}
-                  placeholder={
-                    skillCards.length > 0 && actionCards.length > 0
-                      ? '以輸入文字方式，填入成長計畫...'
-                      : '請先選擇技能卡和行動卡'
-                  }
+                  placeholder="以輸入文字方式，填入成長計畫..."
                   className="min-h-[100px] resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 border-gray-300 dark:border-gray-600"
-                  disabled={skillCards.length === 0 || actionCards.length === 0}
                 />
               </div>
             </div>

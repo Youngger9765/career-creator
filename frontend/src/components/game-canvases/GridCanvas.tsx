@@ -18,6 +18,9 @@ interface GridCanvasProps {
   onCardMove?: (cardId: string, position: { row: number; col: number } | null) => void;
   className?: string;
   gridState?: Array<string | null>; // 外部狀態
+  draggedByOthers?: Map<string, string>; // cardId -> performerName
+  onDragStart?: (cardId: string) => void;
+  onDragEnd?: (cardId: string) => void;
 }
 
 interface GridZone {
@@ -35,6 +38,9 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
   onCardMove,
   className = '',
   gridState,
+  draggedByOthers,
+  onDragStart,
+  onDragEnd,
 }) => {
   // 定義區域配置
   const zoneConfigs: Omit<GridZone, 'placedCardIds'>[] = [
@@ -97,6 +103,9 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 cardHeight="210px" // 增大卡片高度
                 onCardAdd={(cardId) => handleCardAdd(zone.id, cardId)}
                 onCardRemove={(cardId) => handleCardRemove(zone.id, cardId)}
+                onCardDragStart={onDragStart}
+                onCardDragEnd={onDragEnd}
+                draggedByOthers={draggedByOthers}
                 dragOverColor={`border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20`}
                 className="h-full"
                 headerClassName="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20"
@@ -130,6 +139,9 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 cardHeight="180px" // 增大卡片高度
                 onCardAdd={(cardId) => handleCardAdd(zone.id, cardId)}
                 onCardRemove={(cardId) => handleCardRemove(zone.id, cardId)}
+                onCardDragStart={onDragStart}
+                onCardDragEnd={onDragEnd}
+                draggedByOthers={draggedByOthers}
                 onMaxCardsChange={(newMax) => handleMaxCardsChange(zone.id, newMax)}
                 dragOverColor={`border-green-500 bg-green-50 dark:bg-green-900/20`}
                 className="h-full"

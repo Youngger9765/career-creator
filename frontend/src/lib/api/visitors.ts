@@ -36,11 +36,16 @@ class VisitorsAPI {
   }
 
   /**
-   * Join a room as visitor
+   * Join a room as visitor using share code
    */
   async joinRoom(data: JoinRoomData): Promise<Visitor> {
     try {
-      const response = await apiClient.post<Visitor>('/api/visitors/join', data);
+      // Extract share code from room - we need to get it first
+      const room = await import('./rooms').then((m) => m.roomsAPI.getRoom(data.room_id));
+      const response = await apiClient.post<Visitor>(
+        `/api/visitors/join-room/${room.share_code}`,
+        data
+      );
 
       // Store visitor session
       sessionStorage.setItem(

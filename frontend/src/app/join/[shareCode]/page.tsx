@@ -161,7 +161,7 @@ export default function JoinByShareCodePage() {
                 onChange={(e) => setVisitorName(e.target.value)}
                 placeholder="您的姓名或暱稱"
                 maxLength={50}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 bg-white text-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
                 disabled={!room.is_active}
               />

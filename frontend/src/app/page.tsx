@@ -4,14 +4,25 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
 import { DemoAccount } from '@/types/api';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+  const router = useRouter();
   const { isAuthenticated, user, demoAccounts, loadDemoAccounts, login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
+    // Simple auth check
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      // Has token, redirect to dashboard
+      router.push('/dashboard');
+    } else {
+      setIsCheckingAuth(false);
+    }
     loadDemoAccounts();
-  }, [loadDemoAccounts]);
+  }, [router, loadDemoAccounts]);
 
   const handleDemoLogin = async (account: DemoAccount) => {
     setIsLoading(true);
@@ -27,11 +38,13 @@ export default function HomePage() {
     }
   };
 
-  if (isAuthenticated && user) {
-    // Redirect all authenticated users to dashboard
-    // Dashboard will handle role-based functionality
-    window.location.href = '/dashboard';
-    return null;
+  // Don't render anything while checking auth
+  if (isCheckingAuth) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-gray-600">載入中...</div>
+      </main>
+    );
   }
 
   return (

@@ -62,6 +62,10 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         authAPI.logout();
+        // Clear both state and localStorage
+        localStorage.removeItem('auth-storage');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
         set({
           user: null,
           isAuthenticated: false,
@@ -70,7 +74,13 @@ export const useAuthStore = create<AuthState>()(
       },
 
       getCurrentUser: async () => {
-        if (!localStorage.getItem('access_token')) {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
           return;
         }
 
@@ -89,8 +99,10 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
         } catch (error: any) {
-          // Token might be invalid
-          authAPI.logout();
+          // Token might be invalid, clear local storage but don't redirect
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('auth-storage');
           set({
             user: null,
             isAuthenticated: false,

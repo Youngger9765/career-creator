@@ -131,7 +131,7 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
 
       // 否則只廣播事件
       if (broadcast && cardSync.isConnected) {
-        cardSync.moveCard(cardId, zone, 'unknown');
+        cardSync.moveCard(cardId, zone || 'deck', 'unknown');
       }
     },
     [cardSync]
@@ -141,7 +141,6 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
     state,
     draggedByOthers,
     handleCardMove,
-    setCustomMoveHandler,
     updateCards,
     cardSync,
     userId,

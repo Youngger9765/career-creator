@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRoomStore } from '@/stores/room-store';
 import { useGameSession } from '@/hooks/use-game-session';
+import { useRoomParticipants } from '@/hooks/use-room-participants';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
 import { VisitorGuidance } from '@/components/visitor/VisitorGuidance';
 import { ParticipantList } from '@/components/room/ParticipantList';
@@ -96,21 +97,44 @@ export default function RoomPage() {
   // 檢查是否為諮詢師
   const isCounselor = user?.roles?.includes('counselor') || user?.roles?.includes('admin');
 
-  // 簡單的參與者顯示 (暫時用靜態資料)
-  const participants = [
-    {
-      id: user?.id || 'current-user',
+  // 使用 useRoomParticipants hook 追蹤參與者
+  // IMPORTANT: Use useMemo to prevent re-creating object on every render
+  const currentUserInfo = useMemo(() => {
+    if (!isReady) return undefined;
+    return {
+      id: user?.id || (isVisitor ? `visitor-${visitorName || urlVisitorName}` : 'current-user'),
       name: isVisitor ? visitorName || urlVisitorName : user?.name || 'User',
-      type: isVisitor ? 'visitor' : isCounselor ? 'counselor' : 'user',
-      initials: isVisitor
-        ? (visitorName || urlVisitorName || 'V').substring(0, 2).toUpperCase()
-        : (user?.name || 'U').substring(0, 2).toUpperCase(),
-      lastActiveAt: new Date().toISOString(),
-      isOnline: true,
-    },
-  ];
-  const onlineCount = 1;
-  const participantsLoading = false;
+      type: (isVisitor ? 'visitor' : isCounselor ? 'counselor' : 'user') as
+        | 'counselor'
+        | 'visitor'
+        | 'user',
+    };
+  }, [isReady, user?.id, user?.name, isVisitor, visitorName, urlVisitorName, isCounselor]);
+
+  const {
+    participants,
+    participantCount,
+    onlineCount,
+    isLoading: participantsLoading,
+    error: participantsError,
+    refreshParticipants,
+  } = useRoomParticipants({
+    roomId,
+    currentUser: currentUserInfo,
+    updateInterval: 10000, // 10 seconds
+    offlineThreshold: 60000, // 1 minute
+  });
+
+  // Debug log for participants (only on significant changes)
+  useEffect(() => {
+    if (participantCount > 0) {
+      console.log('[RoomPage] Participants updated:', {
+        count: participantCount,
+        online: onlineCount,
+        loading: participantsLoading,
+      });
+    }
+  }, [participantCount, onlineCount]);
 
   // 簡單的認證檢查
   useEffect(() => {

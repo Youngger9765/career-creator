@@ -1,9 +1,11 @@
 /**
  * useRoomParticipants Hook
  * 諮詢室參與者 Hook - 追蹤諮詢室內的參與者
+ * 整合 Supabase Presence 即時在線狀態
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { cardEventsAPI } from '@/lib/api/card-events';
+import { usePresence } from './use-presence';
 
 export interface RoomParticipant {
   id: string;
@@ -65,6 +67,19 @@ export function useRoomParticipants(
   const [participants, setParticipants] = useState<RoomParticipant[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+
+  // 使用 Supabase Presence 獲取即時在線狀態
+  const { onlineUsers, isConnected: presenceConnected, error: presenceError } = usePresence(roomId);
+
+  // Debug log (only on connection change)
+  useEffect(() => {
+    if (presenceConnected) {
+      console.log(
+        '[useRoomParticipants] Presence connected, online users:',
+        onlineUsers?.length || 0
+      );
+    }
+  }, [presenceConnected, onlineUsers?.length]);
 
   // Refresh participants from recent card events
   const refreshParticipants = useCallback(async () => {
@@ -150,22 +165,79 @@ export function useRoomParticipants(
     refreshParticipants();
 
     // Set up interval
-    const interval = setInterval(refreshParticipants, updateInterval);
+    const interval = setInterval(() => {
+      refreshParticipants();
+    }, updateInterval);
 
     return () => {
       clearInterval(interval);
     };
-  }, [refreshParticipants, updateInterval]);
+  }, [updateInterval]); // Remove refreshParticipants from deps to prevent re-creating interval
 
-  const participantCount = participants.length;
-  const onlineCount = participants.filter((p) => p.isOnline).length;
+  // Separate effect for initial load when dependencies change
+  useEffect(() => {
+    refreshParticipants();
+  }, [roomId]); // Only refresh when roomId changes
+
+  // 整合 Presence 在線狀態與參與者列表
+  const mergedParticipants = useMemo(() => {
+    const merged = [...participants];
+
+    // 如果有 Presence 連線，使用即時在線狀態
+    if (presenceConnected && onlineUsers.length > 0) {
+      // 將 Presence 用戶加入或更新到參與者列表
+      onlineUsers.forEach((presenceUser) => {
+        const existingIndex = merged.findIndex((p) => p.id === presenceUser.id);
+
+        if (existingIndex >= 0) {
+          // 更新現有參與者的在線狀態
+          merged[existingIndex] = {
+            ...merged[existingIndex],
+            isOnline: true,
+            lastActiveAt: presenceUser.joinedAt || new Date().toISOString(),
+          };
+        } else {
+          // 新增在線參與者
+          merged.push({
+            id: presenceUser.id,
+            name: presenceUser.name,
+            type: presenceUser.role === 'owner' ? 'counselor' : 'visitor',
+            initials: generateInitials(presenceUser.name),
+            lastActiveAt: presenceUser.joinedAt || new Date().toISOString(),
+            isOnline: true,
+          });
+        }
+      });
+
+      // 標記不在 Presence 列表中的用戶為離線
+      merged.forEach((participant) => {
+        const isInPresence = onlineUsers.some((u) => u.id === participant.id);
+        if (!isInPresence && participant.id !== currentUser?.id) {
+          participant.isOnline = false;
+        }
+      });
+    }
+
+    // 排序：在線優先，然後按最後活動時間
+    merged.sort((a, b) => {
+      if (a.isOnline !== b.isOnline) {
+        return a.isOnline ? -1 : 1;
+      }
+      return new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime();
+    });
+
+    return merged;
+  }, [participants, onlineUsers, presenceConnected, currentUser?.id]);
+
+  const participantCount = mergedParticipants.length;
+  const onlineCount = mergedParticipants.filter((p) => p.isOnline).length;
 
   return {
-    participants,
+    participants: mergedParticipants,
     participantCount,
     onlineCount,
-    isLoading,
-    error,
+    isLoading: isLoading || !presenceConnected,
+    error: error || presenceError ? new Error(presenceError || 'Unknown error') : null,
     refreshParticipants,
   };
 }

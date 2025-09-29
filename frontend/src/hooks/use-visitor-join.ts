@@ -36,15 +36,33 @@ export function useVisitorJoin() {
     }
   }, []);
 
-  const createVisitor = useCallback(
-    async (data: Omit<VisitorCreate, 'session_id'>): Promise<Visitor> => {
-      validateVisitorName(data.name);
+  const createVisitorByShareCode = useCallback(
+    async (shareCode: string, name: string): Promise<Visitor> => {
+      validateVisitorName(name);
 
       const sessionId = generateSessionId();
-      const visitor = await visitorsAPI.createVisitor({
-        ...data,
-        session_id: sessionId,
-      });
+
+      // Call API endpoint directly with share code
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/visitors/join-room/${shareCode}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name.trim(),
+            session_id: sessionId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || 'Failed to join room');
+      }
+
+      const visitor = await response.json();
 
       // Store visitor session in localStorage
       const session: VisitorSession = {
@@ -81,11 +99,8 @@ export function useVisitorJoin() {
           throw new Error('諮詢室已過期，無法加入');
         }
 
-        // Create visitor
-        const visitor = await createVisitor({
-          name: visitorName.trim(),
-          room_id: room.id,
-        });
+        // Create visitor using share code
+        const visitor = await createVisitorByShareCode(shareCode.toUpperCase(), visitorName.trim());
 
         return visitor;
       } catch (err: any) {
@@ -96,7 +111,7 @@ export function useVisitorJoin() {
         setIsLoading(false);
       }
     },
-    [createVisitor]
+    [createVisitorByShareCode]
   );
 
   const joinRoomAndRedirect = useCallback(
@@ -133,7 +148,7 @@ export function useVisitorJoin() {
     error,
     generateSessionId,
     validateVisitorName,
-    createVisitor,
+    createVisitorByShareCode,
     validateAndJoinRoom,
     joinRoomAndRedirect,
     getStoredSession,

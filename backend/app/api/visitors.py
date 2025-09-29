@@ -11,7 +11,12 @@ from sqlmodel import Session, select
 
 from app.core.database import get_session
 from app.models.room import Room
-from app.models.visitor import Visitor, VisitorCreate, VisitorResponse, VisitorUpdate
+from app.models.visitor import (
+    Visitor,
+    VisitorJoinRequest,
+    VisitorResponse,
+    VisitorUpdate,
+)
 
 router = APIRouter(prefix="/api/visitors", tags=["visitors"])
 
@@ -19,7 +24,7 @@ router = APIRouter(prefix="/api/visitors", tags=["visitors"])
 @router.post("/join-room/{share_code}", response_model=VisitorResponse, status_code=201)
 def join_room_as_visitor(
     share_code: str,
-    visitor_data: VisitorCreate,
+    visitor_data: VisitorJoinRequest,
     session: Session = Depends(get_session),
 ):
     """Join room as anonymous visitor using share code"""

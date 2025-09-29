@@ -36,6 +36,13 @@ class VisitorCreate(VisitorBase):
     session_id: str = Field(max_length=255)
 
 
+class VisitorJoinRequest(SQLModel):
+    """Schema for visitor joining room by share code"""
+
+    name: str = Field(max_length=100)
+    session_id: str = Field(max_length=255)
+
+
 class VisitorResponse(VisitorBase):
     """Schema for visitor response"""
 

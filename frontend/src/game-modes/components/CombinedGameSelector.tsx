@@ -12,6 +12,7 @@ import { GameModeService, GameMode, Gameplay } from '../services/mode.service';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 import {
   Users,
   BarChart,

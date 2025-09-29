@@ -26,6 +26,7 @@ vi.mock('@/lib/api/visitors', () => ({
   visitorsAPI: {
     createVisitor: vi.fn(),
     joinRoom: vi.fn(),
+    joinRoomByCode: vi.fn(),
   },
 }));
 
@@ -65,38 +66,49 @@ describe('Visitor API Integration', () => {
     });
   });
 
-  it('should create visitor with backend API', async () => {
+  it('should create visitor with backend API using share code', async () => {
     const { useVisitorJoin } = await import('@/hooks/use-visitor-join');
     const { renderHook } = await import('@testing-library/react');
 
-    vi.mocked(visitorsAPI.createVisitor).mockResolvedValue(mockVisitor);
+    // Mock fetch for createVisitorByShareCode
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockVisitor),
+      } as Response)
+    );
 
     const { result } = renderHook(() => useVisitorJoin());
 
-    await result.current.createVisitor({
-      name: '測試訪客',
-      room_id: 'room-123',
-    });
+    await result.current.createVisitorByShareCode('ABC123', '測試訪客');
 
-    expect(visitorsAPI.createVisitor).toHaveBeenCalledWith({
-      name: '測試訪客',
-      room_id: 'room-123',
-      session_id: expect.any(String),
-    });
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/visitors/join-room/ABC123'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: expect.stringContaining('"name":"測試訪客"'),
+      })
+    );
   });
 
   it('should handle visitor session storage correctly', async () => {
     const { useVisitorJoin } = await import('@/hooks/use-visitor-join');
     const { renderHook } = await import('@testing-library/react');
 
-    vi.mocked(visitorsAPI.createVisitor).mockResolvedValue(mockVisitor);
+    // Mock fetch for createVisitorByShareCode
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockVisitor),
+      } as Response)
+    );
 
     const { result } = renderHook(() => useVisitorJoin());
 
-    await result.current.createVisitor({
-      name: '測試訪客',
-      room_id: 'room-123',
-    });
+    await result.current.createVisitorByShareCode('ABC123', '測試訪客');
 
     expect(localStorage.setItem).toHaveBeenCalledWith(
       'visitor_session',
@@ -154,16 +166,19 @@ describe('Visitor API Integration', () => {
     const { useVisitorJoin } = await import('@/hooks/use-visitor-join');
     const { renderHook } = await import('@testing-library/react');
 
-    vi.mocked(visitorsAPI.createVisitor).mockRejectedValue(new Error('Network error'));
+    // Mock fetch to fail
+    global.fetch = vi.fn(() =>
+      Promise.resolve({
+        ok: false,
+        text: () => Promise.resolve('Network error'),
+      } as Response)
+    );
 
     const { result } = renderHook(() => useVisitorJoin());
 
-    await expect(
-      result.current.createVisitor({
-        name: '測試訪客',
-        room_id: 'room-123',
-      })
-    ).rejects.toThrow('Network error');
+    await expect(result.current.createVisitorByShareCode('ABC123', '測試訪客')).rejects.toThrow(
+      'Network error'
+    );
   });
 
   it('should validate visitor name format', async () => {

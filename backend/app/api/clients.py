@@ -81,8 +81,7 @@ async def get_my_clients(
                 .where(
                     RoomClient.client_id == client.id,
                     Room.is_active,
-                    Room.counselor_id
-                    == str(current_user["user_id"]),  # 只計算當前諮詢師的活躍諮詢室
+                    Room.counselor_id == str(current_user["user_id"]),  # 只計算當前諮詢師的活躍諮詢室
                 )
             ).first()
             or 0
@@ -95,8 +94,7 @@ async def get_my_clients(
                 .join(RoomClient)
                 .where(
                     RoomClient.client_id == client.id,
-                    Room.counselor_id
-                    == str(current_user["user_id"]),  # 只計算當前諮詢師的諮詢次數
+                    Room.counselor_id == str(current_user["user_id"]),  # 只計算當前諮詢師的諮詢次數
                 )
             ).first()
             or 0
@@ -115,8 +113,7 @@ async def get_my_clients(
             .join(RoomClient)
             .where(
                 RoomClient.client_id == client.id,
-                Room.counselor_id
-                == str(current_user["user_id"]),  # 只顯示當前諮詢師的諮詢室
+                Room.counselor_id == str(current_user["user_id"]),  # 只顯示當前諮詢師的諮詢室
             )
             .order_by(Room.created_at.desc())
         ).all()

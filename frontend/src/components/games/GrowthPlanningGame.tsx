@@ -7,11 +7,13 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GrowthPlanCanvas from '../game-canvases/GrowthPlanCanvas';
 import GameLayout from '../common/GameLayout';
 import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
+import { useCardSync } from '@/hooks/use-card-sync';
+import { useAuthStore } from '@/stores/auth-store';
 import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface GrowthPlanningGameProps {
@@ -29,8 +31,14 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 }) => {
   const [skillDeck, setSkillDeck] = useState<any>(null);
   const [actionDeck, setActionDeck] = useState<any>(null);
+  const [planText, setPlanText] = useState<string>('');
 
-  // 使用統一的卡片同步 Hook
+  // Auth 資訊
+  const { user } = useAuthStore();
+  const userId = user?.id || `visitor-${Date.now()}`;
+  const userName = user?.name || '訪客';
+
+  // 使用統一的卡片同步 Hook - 處理牌卡同步
   const { state, draggedByOthers, handleCardMove, cardSync, updateCards } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.GROWTH_PLANNING,
@@ -38,6 +46,38 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     isRoomOwner,
     zones: ['skills', 'actions'], // 定義這個遊戲的區域
   });
+
+  // 使用 useCardSync 處理文字同步 - 使用不同的 channel 避免衝突
+  const gameSync = useCardSync({
+    roomId,
+    gameType: `${GAMEPLAY_IDS.GROWTH_PLANNING}_settings`, // 使用不同的 channel 名稱
+    isOwner: isRoomOwner,
+    userName,
+    userId,
+    onCardMove: () => {}, // 忽略卡片移動（由 useUnifiedCardSync 處理）
+    onStateReceived: (receivedState) => {
+      console.log('[GrowthPlanning] 接收到遊戲狀態:', receivedState);
+
+      // 處理文字輸入 - 像 LifeTransformationGame 一樣存在 settings 中
+      if (receivedState.settings?.planText !== undefined) {
+        console.log('[GrowthPlanning] 更新文字:', receivedState.settings.planText);
+        setPlanText(receivedState.settings.planText);
+      }
+    },
+  });
+
+  // 載入已儲存的狀態
+  useEffect(() => {
+    if (gameSync.isConnected) {
+      const savedState = gameSync.loadGameState();
+      console.log('[GrowthPlanning] 載入遊戲狀態:', savedState);
+
+      if (savedState?.settings?.planText !== undefined) {
+        console.log('[GrowthPlanning] 載入已儲存文字:', savedState.settings.planText);
+        setPlanText(savedState.settings.planText);
+      }
+    }
+  }, [gameSync.isConnected]);
 
   // 載入牌組
   useEffect(() => {
@@ -69,15 +109,35 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     console.log('計畫建立:', { cardAId, cardBId, planText });
   };
 
-  // 處理計畫文字變更
-  const handlePlanTextChange = (text: string) => {
-    console.log('計畫文字變更:', text);
-  };
+  // 處理計畫文字變更（只有房主可以編輯）
+  const handlePlanTextChange = useCallback(
+    (text: string) => {
+      if (!isRoomOwner) return; // 訪客不能編輯
+
+      setPlanText(text); // 立即更新本地狀態
+
+      // 立即同步到遠端
+      if (gameSync.isConnected) {
+        const gameState = {
+          cards: {}, // 空的卡片資料
+          settings: {
+            planText: text, // 文字存在 settings 中
+          },
+          lastUpdated: Date.now(),
+          gameType: `${GAMEPLAY_IDS.GROWTH_PLANNING}_settings`,
+        };
+
+        // 儲存狀態 - saveGameState 會自動廣播給所有人
+        gameSync.saveGameState(gameState);
+      }
+    },
+    [gameSync, isRoomOwner]
+  );
 
   // 計算已使用的卡片 (注意：zone name + Cards)
-  const skillCards = state.cardPlacements.skillsCards || [];
-  const actionCards = state.cardPlacements.actionsCards || [];
-  const usedCardIds = new Set([...skillCards, ...actionCards]);
+  const skillCardsInUse = state.cardPlacements.skillsCards || [];
+  const actionCardsInUse = state.cardPlacements.actionsCards || [];
+  const usedCardIds = new Set([...skillCardsInUse, ...actionCardsInUse]);
 
   // 過濾出未使用的卡片
   const availableSkillCards =
@@ -129,8 +189,10 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
           draggedByOthers={draggedByOthers}
           onDragStart={cardSync.startDrag}
           onDragEnd={cardSync.endDrag}
-          skillCards={skillCards}
-          actionCards={actionCards}
+          skillCards={skillCardsInUse}
+          actionCards={actionCardsInUse}
+          planText={planText} // 傳遞同步的文字狀態
+          isReadOnly={!isRoomOwner} // 訪客只能讀
         />
       }
     />

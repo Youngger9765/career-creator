@@ -27,6 +27,7 @@ interface GrowthPlanCanvasProps {
   draggedByOthers?: Map<string, string>; // 同步相關
   onDragStart?: (cardId: string) => void; // 同步相關
   onDragEnd?: (cardId: string) => void; // 同步相關
+  isReadOnly?: boolean; // 是否為唯讀模式
 }
 
 interface GrowthPlan {
@@ -45,6 +46,7 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
   skillCards = [],
   actionCards = [],
   planText = '',
+  isReadOnly = false,
 }) => {
   // 處理技能卡（A區）
   const handleCardAAdd = (cardId: string) => {
@@ -159,12 +161,28 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
                   <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   <span className="font-medium text-gray-900 dark:text-gray-100">成長計畫</span>
                 </div>
-                <Textarea
-                  value={planText}
-                  onChange={(e) => updatePlanText(e.target.value)}
-                  placeholder="以輸入文字方式，填入成長計畫..."
-                  className="min-h-[100px] resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 border-gray-300 dark:border-gray-600"
-                />
+                {isReadOnly ? (
+                  // 訪客看到的是閱讀區域
+                  <div className="min-h-[100px] p-3 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
+                    {planText ? (
+                      <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">
+                        {planText}
+                      </p>
+                    ) : (
+                      <p className="text-gray-400 dark:text-gray-500 italic">
+                        等待諮詢師輸入成長計畫...
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  // 諮詢師看到的是輸入區域
+                  <Textarea
+                    value={planText}
+                    onChange={(e) => updatePlanText(e.target.value)}
+                    placeholder="以輸入文字方式，填入成長計畫..."
+                    className="min-h-[100px] resize-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 border-gray-300 dark:border-gray-600"
+                  />
+                )}
               </div>
             </div>
           </div>

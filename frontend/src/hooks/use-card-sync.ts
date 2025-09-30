@@ -37,6 +37,12 @@ export interface CardGameState {
       index?: number;
     };
   };
+  settings?: {
+    [key: string]: any; // 支援遊戲設定（如 LifeTransformationGame 的 maxCards, totalTokens, 或 GrowthPlanning 的 planText）
+  };
+  textInputs?: {
+    [key: string]: string; // 支援多個文字欄位（保留向後相容）
+  };
   lastUpdated: number;
   gameType: string;
 }
@@ -75,6 +81,8 @@ export interface UseCardSyncReturn {
   // 連線狀態
   isConnected: boolean;
   error: string | null;
+  // Channel reference for direct access
+  channelRef: React.MutableRefObject<RealtimeChannel | null>;
 }
 
 export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
@@ -121,6 +129,22 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
       try {
         localStorage.setItem(storageKey, JSON.stringify(state));
         console.log('[CardSyncRT] Game state saved');
+
+        // 同時廣播狀態給其他人
+        if (channelRef.current) {
+          channelRef.current
+            .send({
+              type: 'broadcast',
+              event: 'current_game_state',
+              payload: state,
+            })
+            .then(() => {
+              console.log('[CardSyncRT] Game state broadcasted');
+            })
+            .catch((err) => {
+              console.error('[CardSyncRT] Failed to broadcast game state:', err);
+            });
+        }
       } catch (err) {
         console.error('[CardSyncRT] Failed to save game state:', err);
       }
@@ -352,5 +376,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     saveGameState,
     isConnected,
     error,
+    channelRef, // Export for direct channel access
   };
 }

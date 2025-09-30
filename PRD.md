@@ -494,15 +494,24 @@
 
 ### 後端
 
-- Next.js API Routes
-- PostgreSQL + Prisma
+- FastAPI（Python 3.11+）
+- PostgreSQL + SQLModel
 - JWT 認證
-- Polling（暫不用 WebSocket）
+- **Supabase Realtime（即時同步） ✅ 已實作**
+
+### 即時同步架構 ✅ 已實作
+
+- **Supabase Broadcast** - 低延遲即時通訊
+- **遊戲狀態同步** - 卡片位置、選擇狀態即時更新
+- **在線狀態顯示** - 即時顯示房間內參與者
+- **文字輸入同步** - 支援多人協作編輯
+- 詳細架構請參考 [同步架構文件](docs/SYNC_ARCHITECTURE.md)
 
 ### 部署
 
-- Vercel（簡單快速）
+- GCP Cloud Run（前後端分離部署）
 - PostgreSQL on Supabase
+- GitHub Actions CI/CD
 
 ## 第1個月時程
 

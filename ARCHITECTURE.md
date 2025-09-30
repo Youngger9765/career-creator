@@ -17,6 +17,7 @@ A monorepo architecture with separated frontend (Next.js) and backend
 - **State**: Zustand
 - **Drag & Drop**: @dnd-kit
 - **API Client**: Axios + React Query
+- **Real-time Sync**: Supabase Realtime (Broadcast)
 
 ### Backend
 
@@ -195,6 +196,49 @@ All card operations are stored as immutable events, allowing:
 - SQL injection prevention via ORM
 - Input validation via Pydantic
 
+## Real-time Synchronization Architecture
+
+### Sync Overview
+
+The system uses Supabase Realtime for low-latency synchronization
+across multiple clients in the same room.
+
+### Architecture Components
+
+```text
+┌─────────────────────────────────────────┐
+│            Browser Client A              │
+│         (Consultant/Owner)               │
+└─────────────────────────────────────────┘
+                    ↕ WebSocket
+┌─────────────────────────────────────────┐
+│        Supabase Realtime Server          │
+│         (Broadcast Channels)             │
+└─────────────────────────────────────────┘
+                    ↕ WebSocket
+┌─────────────────────────────────────────┐
+│            Browser Client B              │
+│           (Visitor/Client)               │
+└─────────────────────────────────────────┘
+```
+
+### Synchronization Features
+
+1. **Online Presence** - Real-time participant list
+2. **Game Mode Sync** - Synchronized game selection
+3. **Card State Sync** - Card positions and selections
+4. **Text Input Sync** - Collaborative text editing
+5. **Drag State Sync** - Visual feedback for card dragging
+
+### Implementation Details
+
+- **Hooks**: `useCardSync`, `useUnifiedCardSync`, `usePresence`
+- **Channels**: Room-based broadcast channels
+- **State Management**: LocalStorage + Broadcast hybrid
+- **Conflict Resolution**: Last-write-wins with timestamps
+
+For detailed architecture, see [Synchronization Architecture](docs/SYNC_ARCHITECTURE.md)
+
 ## Deployment Strategy
 
 ### Development
@@ -215,6 +259,8 @@ docker-compose up  # Runs both services locally
 ```bash
 # Frontend
 NEXT_PUBLIC_API_URL
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 # Backend
 DATABASE_URL
@@ -267,4 +313,6 @@ GCS_BUCKET_NAME
 
 ---
 
-**Last updated: 2025-09-29**
+## Last Updated
+
+2025-09-29

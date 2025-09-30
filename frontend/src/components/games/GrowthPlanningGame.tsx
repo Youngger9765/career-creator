@@ -109,10 +109,63 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     console.log('計畫建立:', { cardAId, cardBId, planText });
   };
 
+  // 計算已使用的卡片 (注意：zone name + Cards)
+  const skillCardsInUse = state.cardPlacements.skillsCards || [];
+  const actionCardsInUse = state.cardPlacements.actionsCards || [];
+  const usedCardIds = new Set([...skillCardsInUse, ...actionCardsInUse]);
+
+  // 合併所有卡片供查找使用
+  const allCards = [...(skillDeck?.cards || []), ...(actionDeck?.cards || [])];
+
+  // 建立卡片前綴文字
+  const getCardPrefix = useCallback(() => {
+    // 如果都沒有選擇卡片，不顯示前綴
+    if (!skillCardsInUse[0] && !actionCardsInUse[0]) return '';
+
+    // 從所有卡片中找出選中的卡片
+    const skillCard = skillCardsInUse[0]
+      ? allCards.find((card: any) => card.id === skillCardsInUse[0])
+      : null;
+    const actionCard = actionCardsInUse[0]
+      ? allCards.find((card: any) => card.id === actionCardsInUse[0])
+      : null;
+
+    // 取得卡片名稱 (使用 title 屬性，不是 name!)
+    const skillName = skillCard?.title || '未選擇';
+    const actionName = actionCard?.title || '未選擇';
+
+    console.log('[GrowthPlanning] Card prefix debug:', {
+      skillCardId: skillCardsInUse[0],
+      actionCardId: actionCardsInUse[0],
+      skillCard,
+      actionCard,
+      skillName,
+      actionName,
+      totalCards: allCards.length,
+    });
+
+    return `【技能卡: ${skillName} | 行動卡: ${actionName}】\n----------\n`;
+  }, [skillCardsInUse, actionCardsInUse, allCards]);
+
   // 處理計畫文字變更（只有房主可以編輯）
   const handlePlanTextChange = useCallback(
     (text: string) => {
       if (!isRoomOwner) return; // 訪客不能編輯
+
+      // 取得當前的前綴
+      const prefix = getCardPrefix();
+
+      // 如果文字開頭不是前綴，或者前綴已更改，則更新
+      if (prefix && !text.startsWith(prefix)) {
+        // 移除舊的前綴（如果有的話）
+        const oldPrefixMatch = text.match(/^【技能卡:.*?】\n----------\n/);
+        let userContent = text;
+        if (oldPrefixMatch) {
+          userContent = text.substring(oldPrefixMatch[0].length);
+        }
+        // 加上新的前綴
+        text = prefix + userContent;
+      }
 
       setPlanText(text); // 立即更新本地狀態
 
@@ -131,22 +184,47 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         gameSync.saveGameState(gameState);
       }
     },
-    [gameSync, isRoomOwner]
+    [gameSync, isRoomOwner, getCardPrefix]
   );
 
-  // 計算已使用的卡片 (注意：zone name + Cards)
-  const skillCardsInUse = state.cardPlacements.skillsCards || [];
-  const actionCardsInUse = state.cardPlacements.actionsCards || [];
-  const usedCardIds = new Set([...skillCardsInUse, ...actionCardsInUse]);
+  // 當卡片改變時，自動更新前綴
+  useEffect(() => {
+    if (!isRoomOwner) return;
+
+    const prefix = getCardPrefix();
+    if (!prefix) return;
+
+    // 如果已有內容，更新前綴
+    if (planText) {
+      const oldPrefixMatch = planText.match(/^【技能卡:.*?】\n----------\n/);
+      let userContent = planText;
+      if (oldPrefixMatch) {
+        userContent = planText.substring(oldPrefixMatch[0].length);
+      }
+      const newText = prefix + userContent;
+      if (newText !== planText) {
+        handlePlanTextChange(newText);
+      }
+    } else if (skillCardsInUse.length > 0 || actionCardsInUse.length > 0) {
+      // 如果沒有內容但有卡片，初始化前綴
+      handlePlanTextChange(prefix);
+    }
+  }, [
+    skillCardsInUse,
+    actionCardsInUse,
+    skillDeck,
+    actionDeck,
+    isRoomOwner,
+    getCardPrefix,
+    handlePlanTextChange,
+    planText,
+  ]);
 
   // 過濾出未使用的卡片
   const availableSkillCards =
     skillDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
   const availableActionCards =
     actionDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
-
-  // 合併所有卡片供畫布使用
-  const allCards = [...(skillDeck?.cards || []), ...(actionDeck?.cards || [])];
 
   return (
     <GameLayout

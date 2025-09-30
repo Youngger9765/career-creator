@@ -23,15 +23,11 @@ class GameRuleTemplate(SQLModel, table=True):
     version: str = Field(default="1.0", max_length=20)
 
     # 配置數據 (JSONB)
-    layout_config: Dict[str, Any] = Field(
-        sa_column=Column(JSON), description="布局配置"
-    )
+    layout_config: Dict[str, Any] = Field(sa_column=Column(JSON), description="布局配置")
     constraint_config: Dict[str, Any] = Field(
         sa_column=Column(JSON), description="約束配置"
     )
-    validation_rules: Dict[str, Any] = Field(
-        sa_column=Column(JSON), description="驗證規則"
-    )
+    validation_rules: Dict[str, Any] = Field(sa_column=Column(JSON), description="驗證規則")
     ui_config: Optional[Dict[str, Any]] = Field(
         default=None, sa_column=Column(JSON), description="UI配置"
     )
@@ -74,9 +70,7 @@ class Card(SQLModel, table=True):
     title: str = Field(max_length=200, description="牌卡標題")
     description: Optional[str] = Field(default=None, description="牌卡描述")
     category: Optional[str] = Field(default=None, max_length=50, description="分類")
-    subcategory: Optional[str] = Field(
-        default=None, max_length=50, description="子分類"
-    )
+    subcategory: Optional[str] = Field(default=None, max_length=50, description="子分類")
     display_order: int = Field(default=0, description="顯示順序")
 
     # 擴展屬性

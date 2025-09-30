@@ -21,6 +21,9 @@ interface CollectionCanvasProps {
   onMaxCardsChange?: (newMax: number) => void;
   isRoomOwner?: boolean;
   className?: string;
+  draggedByOthers?: Map<string, string>;
+  onDragStart?: (cardId: string) => void;
+  onDragEnd?: (cardId: string) => void;
 }
 
 const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
@@ -31,19 +34,13 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   onMaxCardsChange,
   isRoomOwner = false,
   className = '',
+  draggedByOthers,
+  onDragStart,
+  onDragEnd,
 }) => {
-  // 收藏的卡片ID列表 - 優先使用外部狀態
-  const [collectedCardIds, setCollectedCardIds] = useState<string[]>(
-    externalCollectedCardIds || []
-  );
+  // 使用外部狀態，不再內部管理
+  const collectedCardIds = externalCollectedCardIds || [];
   const [isLimitLocked, setIsLimitLocked] = useState(false);
-
-  // 同步外部狀態
-  React.useEffect(() => {
-    if (externalCollectedCardIds) {
-      setCollectedCardIds(externalCollectedCardIds);
-    }
-  }, [externalCollectedCardIds]);
 
   // 處理卡片添加
   const handleCardAdd = (cardId: string) => {
@@ -52,20 +49,20 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
       return;
     }
 
-    // 添加到收藏
-    setCollectedCardIds((prev) => [...prev, cardId]);
+    // 通知外部添加卡片
     onCardCollect?.(cardId, true);
   };
 
   // 處理卡片移除
   const handleCardRemove = (cardId: string) => {
-    setCollectedCardIds((prev) => prev.filter((id) => id !== cardId));
+    // 通知外部移除卡片
     onCardCollect?.(cardId, false);
   };
 
   // 處理卡片重新排序
   const handleCardReorder = (newCardIds: string[]) => {
-    setCollectedCardIds(newCardIds);
+    // TODO: 需要一個單獨的 onReorder 回調來處理重新排序
+    console.log('Reorder not implemented yet:', newCardIds);
   };
 
   // 處理上限變更
@@ -104,6 +101,9 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
           onCardAdd={handleCardAdd}
           onCardRemove={handleCardRemove}
           onCardReorder={handleCardReorder}
+          onCardDragStart={onDragStart}
+          onCardDragEnd={onDragEnd}
+          draggedByOthers={draggedByOthers}
         />
       </div>
     </div>

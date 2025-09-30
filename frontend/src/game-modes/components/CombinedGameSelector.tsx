@@ -12,6 +12,7 @@ import { GameModeService, GameMode, Gameplay } from '../services/mode.service';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 import {
   Users,
   BarChart,
@@ -199,9 +200,9 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
                       ${isHovered ? 'transform -translate-y-0.5 shadow-sm' : ''}
                       ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}
                     `}
-                    onMouseEnter={() => setHoveredOption(option.id)}
+                    onMouseEnter={() => !disabled && setHoveredOption(option.id)}
                     onMouseLeave={() => setHoveredOption(null)}
-                    onClick={() => handleOptionSelect(option)}
+                    onClick={() => !disabled && handleOptionSelect(option)}
                   >
                     {/* 左側彩色條 */}
                     <div

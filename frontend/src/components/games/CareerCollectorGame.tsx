@@ -7,11 +7,12 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import CollectionCanvas from '../game-canvases/CollectionCanvas';
 import GameLayout from '../common/GameLayout';
-import { useGameState } from '@/stores/game-state-store';
+import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface CareerCollectorGameProps {
   roomId: string;
@@ -27,8 +28,16 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
   deckType = 'career_cards_100',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const { state, updateCards } = useGameState(roomId, 'career');
   const [maxCards, setMaxCards] = useState(15);
+
+  // 使用統一的卡片同步 Hook
+  const { state, draggedByOthers, handleCardMove, cardSync } = useUnifiedCardSync({
+    roomId,
+    gameType: GAMEPLAY_IDS.CAREER_COLLECTOR,
+    storeKey: 'career',
+    isRoomOwner,
+    zones: ['collected'], // 定義這個遊戲的區域
+  });
 
   // 載入牌組
   useEffect(() => {
@@ -39,17 +48,6 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
     };
     getDeck();
   }, [deckType]);
-
-  // 處理卡片收藏
-  const handleCardCollect = (cardId: string, collected: boolean) => {
-    const currentCards = state.cardPlacements.collectedCards || [];
-
-    if (collected) {
-      updateCards({ collectedCards: [...currentCards, cardId] });
-    } else {
-      updateCards({ collectedCards: currentCards.filter((id) => id !== cardId) });
-    }
-  };
 
   // 計算已收藏的卡片
   const collectedCardIds = state.cardPlacements.collectedCards || [];
@@ -88,8 +86,13 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
           collectedCardIds={collectedCardIds}
           maxCards={maxCards}
           isRoomOwner={isRoomOwner}
-          onCardCollect={handleCardCollect}
+          onCardCollect={(cardId, collected) =>
+            handleCardMove(cardId, collected ? 'collected' : null)
+          }
           onMaxCardsChange={setMaxCards}
+          draggedByOthers={draggedByOthers}
+          onDragStart={cardSync.startDrag}
+          onDragEnd={cardSync.endDrag}
         />
       }
     />

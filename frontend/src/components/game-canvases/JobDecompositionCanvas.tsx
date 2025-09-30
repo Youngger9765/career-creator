@@ -34,6 +34,9 @@ interface JobDecompositionCanvasProps {
     dataUrl: string;
     uploadedAt: number;
   };
+  draggedByOthers?: Map<string, string>; // cardId -> performerName
+  onDragStart?: (cardId: string) => void;
+  onDragEnd?: (cardId: string) => void;
 }
 
 const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
@@ -45,6 +48,9 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
   className = '',
   placedCards = [],
   uploadedFile,
+  draggedByOthers,
+  onDragStart,
+  onDragEnd,
 }) => {
   const [isLocked, setIsLocked] = useState(false);
   const [localMaxCards, setLocalMaxCards] = useState(maxCards);
@@ -96,6 +102,9 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
           onCardAdd={handleCardAdd}
           onCardRemove={handleCardRemove}
           onCardReorder={handleCardReorder}
+          onCardDragStart={onDragStart}
+          onCardDragEnd={onDragEnd}
+          draggedByOthers={draggedByOthers}
         />
       </div>
 

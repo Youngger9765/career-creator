@@ -63,6 +63,11 @@ export interface DropZoneProps {
   onCardAdd?: (cardId: string) => void;
   onCardRemove?: (cardId: string) => void;
   onCardReorder?: (cardIds: string[]) => void;
+  onCardDragStart?: (cardId: string) => void;
+  onCardDragEnd?: (cardId: string) => void;
+
+  // 拖曳標籤
+  draggedByOthers?: Map<string, string>; // cardId -> performerName
 
   // 自定義渲染
   renderCard?: (card: CardData, index: number) => React.ReactNode;
@@ -99,6 +104,9 @@ const DropZone: React.FC<DropZoneProps> = ({
   onCardAdd,
   onCardRemove,
   onCardReorder,
+  onCardDragStart,
+  onCardDragEnd,
+  draggedByOthers,
   renderCard,
   renderHeader,
   renderEmpty,
@@ -212,6 +220,11 @@ const DropZone: React.FC<DropZoneProps> = ({
     e.dataTransfer.setData('sourceZone', id);
     e.dataTransfer.setData('sourceIndex', index.toString());
     e.dataTransfer.effectAllowed = 'move';
+    onCardDragStart?.(cardId);
+  };
+
+  const handleCardDragEnd = (cardId: string) => {
+    onCardDragEnd?.(cardId);
   };
 
   const isOverLimit = placedCardIds.length >= maxCards;
@@ -260,6 +273,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   // 預設卡片渲染 - 直立長方形樣式
   const defaultRenderCard = (card: CardData, index: number) => {
     const isFlipped = flippedCards.has(card.id);
+    const draggedBy = draggedByOthers?.get(card.id);
 
     return (
       <div
@@ -268,6 +282,7 @@ const DropZone: React.FC<DropZoneProps> = ({
         style={{ width: typeof cardWidth === 'number' ? `${cardWidth}px` : cardWidth }}
         draggable={allowReorder}
         onDragStart={(e) => allowReorder && handleCardDragStart(e, card.id, index)}
+        onDragEnd={() => allowReorder && handleCardDragEnd(card.id)}
         onDragOver={(e) => {
           if (!allowReorder) return;
           e.preventDefault();
@@ -290,6 +305,15 @@ const DropZone: React.FC<DropZoneProps> = ({
         {/* 插入線 */}
         {allowReorder && dragOverIndex === index && (
           <div className="absolute left-0 top-0 w-0.5 h-full bg-blue-500 animate-pulse -ml-1" />
+        )}
+
+        {/* 拖曳標籤 - 顯示誰在移動 */}
+        {draggedBy && (
+          <div className="absolute -top-8 left-0 right-0 z-30 flex justify-center animate-pulse">
+            <div className="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-lg whitespace-nowrap">
+              {draggedBy} 正在移動
+            </div>
+          </div>
         )}
 
         {/* 卡片編號 */}

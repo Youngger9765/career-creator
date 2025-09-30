@@ -23,13 +23,19 @@ export interface GameState {
 
     // ValueRanking
     gridCards?: Array<string | null>;
+    rank1Cards?: string[];
+    rank2Cards?: string[];
+    rank3Cards?: string[];
+    othersCards?: string[];
 
     // CareerCollector
     collectedCards?: string[];
 
     // GrowthPlanning
     skillCards?: string[];
+    skillsCards?: string[]; // Alternative name used in unified sync
     actionCards?: string[];
+    actionsCards?: string[]; // Alternative name used in unified sync
     planText?: string;
 
     // PositionBreakdown
@@ -50,6 +56,9 @@ export interface GameState {
         tokens: number;
       }
     >;
+
+    // Allow dynamic zone names for unified sync
+    [key: string]: any;
   };
   metadata: {
     version: number;

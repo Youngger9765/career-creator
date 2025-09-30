@@ -22,7 +22,11 @@ interface Card {
 
 interface ThreeColumnCanvasProps {
   cards?: Card[];
-  onCardMove?: (cardId: string, column: 'like' | 'neutral' | 'dislike' | null) => void;
+  onCardMove?: (
+    cardId: string,
+    column: 'like' | 'neutral' | 'dislike' | null,
+    broadcast?: boolean
+  ) => void;
   maxCardsPerColumn?: number;
   isRoomOwner?: boolean;
   className?: string;
@@ -31,6 +35,9 @@ interface ThreeColumnCanvasProps {
     neutralCards?: string[];
     dislikeCards?: string[];
   };
+  draggedByOthers?: Map<string, string>; // cardId -> performerName
+  onDragStart?: (cardId: string) => void;
+  onDragEnd?: (cardId: string) => void;
 }
 
 const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
@@ -40,6 +47,9 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   isRoomOwner = false,
   className = '',
   cardPlacements,
+  draggedByOthers,
+  onDragStart,
+  onDragEnd,
 }) => {
   // 使用外部狀態，如果沒有則使用本地狀態
   const likeCards = cardPlacements?.likeCards || [];
@@ -53,11 +63,11 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   const [localMaxDislike, setLocalMaxDislike] = useState(maxCardsPerColumn);
 
   const handleLikeAdd = (cardId: string) => {
-    onCardMove?.(cardId, 'like');
+    onCardMove?.(cardId, 'like', true);
   };
 
   const handleLikeRemove = (cardId: string) => {
-    onCardMove?.(cardId, null);
+    onCardMove?.(cardId, null, true);
   };
 
   const handleLikeReorder = (newCardIds: string[]) => {
@@ -65,11 +75,11 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   };
 
   const handleNeutralAdd = (cardId: string) => {
-    onCardMove?.(cardId, 'neutral');
+    onCardMove?.(cardId, 'neutral', true);
   };
 
   const handleNeutralRemove = (cardId: string) => {
-    onCardMove?.(cardId, null);
+    onCardMove?.(cardId, null, true);
   };
 
   const handleNeutralReorder = (newCardIds: string[]) => {
@@ -77,11 +87,11 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   };
 
   const handleDislikeAdd = (cardId: string) => {
-    onCardMove?.(cardId, 'dislike');
+    onCardMove?.(cardId, 'dislike', true);
   };
 
   const handleDislikeRemove = (cardId: string) => {
-    onCardMove?.(cardId, null);
+    onCardMove?.(cardId, null, true);
   };
 
   const handleDislikeReorder = (newCardIds: string[]) => {
@@ -98,6 +108,25 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
 
   const handleDislikeMaxChange = (newMax: number) => {
     setLocalMaxDislike(newMax);
+  };
+
+  // 自定義卡片渲染，加入拖曳標籤
+  const renderCardWithLabel = (card: Card, index: number) => {
+    const draggedBy = draggedByOthers?.get(card.id);
+
+    return (
+      <div key={card.id} className="relative">
+        {/* 拖曳標籤 */}
+        {draggedBy && (
+          <div className="absolute -top-6 left-0 right-0 z-20 flex justify-center animate-pulse">
+            <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full shadow-lg whitespace-nowrap">
+              {draggedBy} 正在移動
+            </div>
+          </div>
+        )}
+        {/* 原始卡片內容由 DropZone 處理 */}
+      </div>
+    );
   };
 
   return (
@@ -129,6 +158,9 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardAdd={handleLikeAdd}
           onCardRemove={handleLikeRemove}
           onCardReorder={handleLikeReorder}
+          onCardDragStart={onDragStart}
+          onCardDragEnd={onDragEnd}
+          draggedByOthers={draggedByOthers}
         />
 
         {/* 中立欄位 */}
@@ -157,6 +189,9 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardAdd={handleNeutralAdd}
           onCardRemove={handleNeutralRemove}
           onCardReorder={handleNeutralReorder}
+          onCardDragStart={onDragStart}
+          onCardDragEnd={onDragEnd}
+          draggedByOthers={draggedByOthers}
         />
 
         {/* 不喜歡欄位 */}
@@ -185,6 +220,9 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardAdd={handleDislikeAdd}
           onCardRemove={handleDislikeRemove}
           onCardReorder={handleDislikeReorder}
+          onCardDragStart={onDragStart}
+          onCardDragEnd={onDragEnd}
+          draggedByOthers={draggedByOthers}
         />
       </div>
     </div>

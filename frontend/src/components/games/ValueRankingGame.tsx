@@ -11,7 +11,8 @@ import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GridCanvas from '../game-canvases/GridCanvas';
 import GameLayout from '../common/GameLayout';
-import { useGameState } from '@/stores/game-state-store';
+import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface ValueRankingGameProps {
   roomId: string;
@@ -27,7 +28,21 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
   deckType = 'value_cards_36',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
-  const { state, updateCards } = useGameState(roomId, 'value');
+
+  // 使用統一的卡片同步 Hook
+  const {
+    state,
+    draggedByOthers,
+    handleCardMove: baseHandleCardMove,
+    cardSync,
+    updateCards,
+  } = useUnifiedCardSync({
+    roomId,
+    gameType: GAMEPLAY_IDS.VALUE_RANKING,
+    storeKey: 'value',
+    isRoomOwner,
+    zones: ['rank1', 'rank2', 'rank3', 'others'], // 定義正確的區域：3個排名區域和1個其他區域
+  });
 
   // 載入牌組
   useEffect(() => {
@@ -39,31 +54,24 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
     getDeck();
   }, [deckType]);
 
-  // 處理卡片移動
-  const handleCardMove = (cardId: string, position: { row: number; col: number } | null) => {
-    const currentGrid = state.cardPlacements.gridCards || Array(9).fill(null);
-    let newGrid = [...currentGrid];
-
-    if (position === null) {
-      // 卡片被移除，從網格中清除
-      const cardIndex = newGrid.indexOf(cardId);
-      if (cardIndex !== -1) {
-        newGrid[cardIndex] = null;
-      }
-    } else {
-      // 卡片被放置到網格中
-      const gridIndex = position.row * 3 + position.col;
-      if (gridIndex >= 0 && gridIndex < 9) {
-        newGrid[gridIndex] = cardId;
-      }
-    }
-
-    updateCards({ gridCards: newGrid });
+  // 處理卡片移動 - 從 GridCanvas 傳來的 zone
+  const handleCardMove = (cardId: string, zone: string | null) => {
+    baseHandleCardMove(cardId, zone);
   };
 
+  // 從 zone-based state 建構卡片分布
+  const rank1Cards = state.cardPlacements.rank1Cards || [];
+  const rank2Cards = state.cardPlacements.rank2Cards || [];
+  const rank3Cards = state.cardPlacements.rank3Cards || [];
+  const othersCards = state.cardPlacements.othersCards || [];
+
   // 計算已使用的卡片
-  const gridCards = state.cardPlacements.gridCards || Array(9).fill(null);
-  const usedCardIds = new Set(gridCards.filter((id) => id !== null));
+  const usedCardIds = new Set<string>([
+    ...rank1Cards,
+    ...rank2Cards,
+    ...rank3Cards,
+    ...othersCards,
+  ]);
 
   // 過濾出未使用的卡片
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
@@ -96,7 +104,13 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
         <GridCanvas
           cards={mainDeck?.cards || []}
           onCardMove={handleCardMove}
-          gridState={gridCards}
+          rank1Cards={rank1Cards}
+          rank2Cards={rank2Cards}
+          rank3Cards={rank3Cards}
+          othersCards={othersCards}
+          draggedByOthers={draggedByOthers}
+          onDragStart={cardSync.startDrag}
+          onDragEnd={cardSync.endDrag}
         />
       }
     />

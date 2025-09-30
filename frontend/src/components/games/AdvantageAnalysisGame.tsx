@@ -7,11 +7,12 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import TwoZoneCanvas from '../game-canvases/TwoZoneCanvas';
 import GameLayout from '../common/GameLayout';
-import { useGameState } from '@/stores/game-state-store';
+import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface AdvantageAnalysisGameProps {
   roomId: string;
@@ -30,8 +31,14 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
   const [maxAdvantageCards, setMaxAdvantageCards] = useState(5);
   const [maxDisadvantageCards, setMaxDisadvantageCards] = useState(5);
 
-  // 使用 GameStateStore 管理狀態
-  const { state, updateCards } = useGameState(roomId, 'advantage');
+  // 使用統一的卡片同步 Hook
+  const { state, draggedByOthers, handleCardMove, cardSync } = useUnifiedCardSync({
+    roomId,
+    gameType: GAMEPLAY_IDS.ADVANTAGE_ANALYSIS,
+    storeKey: 'advantage',
+    isRoomOwner,
+    zones: ['advantage', 'disadvantage'], // 定義這個遊戲的區域
+  });
 
   // 從 Store 取得已使用的牌
   const usedCards = new Set([
@@ -48,37 +55,6 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
     };
     getDeck();
   }, [deckType]);
-
-  // 處理卡片移動
-  const handleCardMove = (cardId: string, zone: 'advantage' | 'disadvantage' | null) => {
-    const currentPlacements = { ...state.cardPlacements };
-
-    // 先從所有區域移除該卡片
-    if (currentPlacements.advantageCards) {
-      currentPlacements.advantageCards = currentPlacements.advantageCards.filter(
-        (id) => id !== cardId
-      );
-    }
-    if (currentPlacements.disadvantageCards) {
-      currentPlacements.disadvantageCards = currentPlacements.disadvantageCards.filter(
-        (id) => id !== cardId
-      );
-    }
-
-    // 如果有新區域，加入該卡片
-    if (zone !== null) {
-      if (zone === 'advantage') {
-        if (!currentPlacements.advantageCards) currentPlacements.advantageCards = [];
-        currentPlacements.advantageCards.push(cardId);
-      } else if (zone === 'disadvantage') {
-        if (!currentPlacements.disadvantageCards) currentPlacements.disadvantageCards = [];
-        currentPlacements.disadvantageCards.push(cardId);
-      }
-    }
-
-    // 更新 Store
-    updateCards(currentPlacements);
-  };
 
   // 過濾出未使用的卡片
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
@@ -118,6 +94,9 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
           onMaxAdvantageCardsChange={setMaxAdvantageCards}
           onMaxDisadvantageCardsChange={setMaxDisadvantageCards}
           onCardMove={handleCardMove}
+          draggedByOthers={draggedByOthers}
+          onDragStart={cardSync.startDrag}
+          onDragEnd={cardSync.endDrag}
         />
       }
     />

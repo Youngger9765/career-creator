@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRoomStore } from '@/stores/room-store';
 import { useGameSession } from '@/hooks/use-game-session';
+import { useRoomParticipants } from '@/hooks/use-room-participants';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
-import { VisitorGuidance } from '@/components/visitor/VisitorGuidance';
 import { ParticipantList } from '@/components/room/ParticipantList';
 import GameModeIntegration from './GameModeIntegration';
 
@@ -21,7 +21,6 @@ export default function RoomPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isChecking, setIsChecking] = useState(true);
   const [showVisitorWelcome, setShowVisitorWelcome] = useState(false);
-  const [showVisitorGuidance, setShowVisitorGuidance] = useState(false);
   const [visitorName, setVisitorName] = useState('');
 
   // Game Session for state persistence
@@ -96,21 +95,44 @@ export default function RoomPage() {
   // 檢查是否為諮詢師
   const isCounselor = user?.roles?.includes('counselor') || user?.roles?.includes('admin');
 
-  // 簡單的參與者顯示 (暫時用靜態資料)
-  const participants = [
-    {
-      id: user?.id || 'current-user',
+  // 使用 useRoomParticipants hook 追蹤參與者
+  // IMPORTANT: Use useMemo to prevent re-creating object on every render
+  const currentUserInfo = useMemo(() => {
+    if (!isReady) return undefined;
+    return {
+      id: user?.id || (isVisitor ? `visitor-${visitorName || urlVisitorName}` : 'current-user'),
       name: isVisitor ? visitorName || urlVisitorName : user?.name || 'User',
-      type: isVisitor ? 'visitor' : isCounselor ? 'counselor' : 'user',
-      initials: isVisitor
-        ? (visitorName || urlVisitorName || 'V').substring(0, 2).toUpperCase()
-        : (user?.name || 'U').substring(0, 2).toUpperCase(),
-      lastActiveAt: new Date().toISOString(),
-      isOnline: true,
-    },
-  ];
-  const onlineCount = 1;
-  const participantsLoading = false;
+      type: (isVisitor ? 'visitor' : isCounselor ? 'counselor' : 'user') as
+        | 'counselor'
+        | 'visitor'
+        | 'user',
+    };
+  }, [isReady, user?.id, user?.name, isVisitor, visitorName, urlVisitorName, isCounselor]);
+
+  const {
+    participants,
+    participantCount,
+    onlineCount,
+    isLoading: participantsLoading,
+    error: participantsError,
+    refreshParticipants,
+  } = useRoomParticipants({
+    roomId,
+    currentUser: currentUserInfo,
+    updateInterval: 10000, // 10 seconds
+    offlineThreshold: 60000, // 1 minute
+  });
+
+  // Debug log for participants (only on significant changes)
+  useEffect(() => {
+    if (participantCount > 0) {
+      console.log('[RoomPage] Participants updated:', {
+        count: participantCount,
+        online: onlineCount,
+        loading: participantsLoading,
+      });
+    }
+  }, [participantCount, onlineCount]);
 
   // 簡單的認證檢查
   useEffect(() => {
@@ -121,7 +143,6 @@ export default function RoomPage() {
         setVisitorName(urlVisitorName);
         setIsChecking(false);
         setIsReady(true);
-        setShowVisitorGuidance(true);
       } else {
         // 沒有訪客名稱，顯示歡迎對話框
         setIsChecking(false);
@@ -225,8 +246,8 @@ export default function RoomPage() {
               </div>
             )}
 
-            {/* 切換遊戲模式按鈕 - 僅在已選擇遊戲時顯示 */}
-            {showNewArchitecture && currentGameplay && (
+            {/* 切換遊戲模式按鈕 - 僅諮詢師在已選擇遊戲時顯示 */}
+            {isCounselor && showNewArchitecture && currentGameplay && (
               <button
                 onClick={() => setCurrentGameplay('')}
                 className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
@@ -258,14 +279,6 @@ export default function RoomPage() {
                 ? `訪客: ${visitorName || urlVisitorName}`
                 : `${user?.name} (${user?.roles?.join(', ')})`}
             </div>
-            {isVisitor && (
-              <button
-                onClick={() => setShowVisitorGuidance(!showVisitorGuidance)}
-                className="text-sm px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors"
-              >
-                {showVisitorGuidance ? '隱藏指引' : '顯示指引'}
-              </button>
-            )}
             {currentRoom && (
               <div className="text-sm text-gray-500">分享碼: {currentRoom.share_code}</div>
             )}
@@ -302,7 +315,6 @@ export default function RoomPage() {
           setVisitorName(name);
           setShowVisitorWelcome(false);
           setIsReady(true);
-          setShowVisitorGuidance(true);
 
           // Update URL to include visitor name
           const newUrl = new URL(window.location.href);
@@ -313,15 +325,6 @@ export default function RoomPage() {
           router.push('/');
         }}
       />
-
-      {/* Visitor Guidance Panel */}
-      {isVisitor && (
-        <VisitorGuidance
-          gameMode={selectedGameRule}
-          isVisible={showVisitorGuidance}
-          onClose={() => setShowVisitorGuidance(false)}
-        />
-      )}
     </div>
   );
 }

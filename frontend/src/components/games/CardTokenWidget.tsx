@@ -143,7 +143,7 @@ const CardTokenWidget: React.FC<CardTokenWidgetProps> = ({
             onChange={handleSliderChange}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
             style={{
-              background: `linear-gradient(to right, #22d3ee 0%, #22d3ee ${currentAmount}%, #e5e7eb ${currentAmount}%, #e5e7eb 100%)`,
+              background: `linear-gradient(to right, #22d3ee 0%, #22d3ee ${(currentAmount / maxTokens) * 100}%, #e5e7eb ${(currentAmount / maxTokens) * 100}%, #e5e7eb 100%)`,
             }}
           />
         </div>

@@ -11,7 +11,8 @@ import React, { useState, useEffect } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import ThreeColumnCanvas from '../game-canvases/ThreeColumnCanvas';
 import GameLayout from '../common/GameLayout';
-import { useGameState } from '@/stores/game-state-store';
+import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
+import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface PersonalityAnalysisGameProps {
   roomId: string;
@@ -29,8 +30,14 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
   const [mainDeck, setMainDeck] = useState<any>(null);
   const [maxCardsPerColumn, setMaxCardsPerColumn] = useState(10);
 
-  // 使用 GameStateStore 管理狀態
-  const { state, updateCards } = useGameState(roomId, 'personality');
+  // 使用統一的卡片同步 Hook
+  const { state, draggedByOthers, handleCardMove, cardSync } = useUnifiedCardSync({
+    roomId,
+    gameType: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
+    storeKey: 'personality',
+    isRoomOwner,
+    zones: ['like', 'neutral', 'dislike'], // 定義這個遊戲的區域
+  });
 
   // 從 Store 取得已使用的牌
   const usedCards = new Set([
@@ -48,40 +55,6 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
     };
     getDeck();
   }, [deckType]);
-
-  // 處理卡片移動
-  const handleCardMove = (cardId: string, column: 'like' | 'neutral' | 'dislike' | null) => {
-    const currentPlacements = { ...state.cardPlacements };
-
-    // 先從所有欄位移除該卡片
-    if (currentPlacements.likeCards) {
-      currentPlacements.likeCards = currentPlacements.likeCards.filter((id) => id !== cardId);
-    }
-    if (currentPlacements.neutralCards) {
-      currentPlacements.neutralCards = currentPlacements.neutralCards.filter((id) => id !== cardId);
-    }
-    if (currentPlacements.dislikeCards) {
-      currentPlacements.dislikeCards = currentPlacements.dislikeCards.filter((id) => id !== cardId);
-    }
-
-    // 如果有新欄位，加入該卡片
-    if (column !== null) {
-      const columnKey = `${column}Cards`;
-      if (columnKey === 'likeCards') {
-        if (!currentPlacements.likeCards) currentPlacements.likeCards = [];
-        currentPlacements.likeCards.push(cardId);
-      } else if (columnKey === 'neutralCards') {
-        if (!currentPlacements.neutralCards) currentPlacements.neutralCards = [];
-        currentPlacements.neutralCards.push(cardId);
-      } else if (columnKey === 'dislikeCards') {
-        if (!currentPlacements.dislikeCards) currentPlacements.dislikeCards = [];
-        currentPlacements.dislikeCards.push(cardId);
-      }
-    }
-
-    // 更新 Store
-    updateCards(currentPlacements);
-  };
 
   // 過濾出未使用的卡片
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];
@@ -117,6 +90,9 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
           maxCardsPerColumn={maxCardsPerColumn}
           onCardMove={handleCardMove}
           cardPlacements={state.cardPlacements}
+          draggedByOthers={draggedByOthers}
+          onDragStart={cardSync.startDrag}
+          onDragEnd={cardSync.endDrag}
         />
       }
     />

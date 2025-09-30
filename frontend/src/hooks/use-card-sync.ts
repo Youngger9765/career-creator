@@ -1,281 +1,381 @@
 /**
  * useCardSync Hook
- * 卡牌同步 Hook - 處理卡牌狀態同步的 React Hook (Polling Only for MVP)
+ * 牌卡即時同步 Hook - 使用 Supabase Broadcast 實現即時同步
+ * Phase 3: 雙方都能移動，最後操作優先
  */
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { CardSyncService, SyncedCardState, createCardSyncService } from '@/lib/services/card-sync';
-import { CardEventType } from '@/lib/api/card-events';
-import { GameCard } from '@/types/cards';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase } from '@/lib/supabase-client';
+import type { RealtimeChannel } from '@supabase/supabase-js';
+
+// 牌卡移動事件
+export interface CardMoveEvent {
+  cardId: string;
+  fromZone?: string;
+  toZone: string;
+  position?: { x: number; y: number };
+  index?: number;
+  timestamp: number;
+  performedBy: 'owner' | 'visitor';
+  performerName: string;
+  performerId: string;
+}
+
+// 拖曳狀態
+export interface DragInfo {
+  cardId: string;
+  performerName: string;
+  performerId: string;
+  startTime: number;
+}
+
+// 遊戲狀態（存在 localStorage）
+export interface CardGameState {
+  cards: {
+    [cardId: string]: {
+      zone: string;
+      position?: { x: number; y: number };
+      index?: number;
+    };
+  };
+  settings?: {
+    [key: string]: any; // 支援遊戲設定（如 LifeTransformationGame 的 maxCards, totalTokens, 或 GrowthPlanning 的 planText）
+  };
+  textInputs?: {
+    [key: string]: string; // 支援多個文字欄位（保留向後相容）
+  };
+  lastUpdated: number;
+  gameType: string;
+}
 
 export interface UseCardSyncOptions {
   roomId: string;
-  enabled?: boolean;
-  syncInterval?: number;
-  optimisticUpdates?: boolean;
-  smartPolling?: boolean;
-  idleTimeout?: number;
-  performerInfo?: {
-    id?: string;
-    name?: string;
-    type?: string;
-  };
+  gameType: string; // 不同遊戲獨立狀態
+  isOwner: boolean;
+  userName: string;
+  userId: string;
+  onCardMove?: (event: CardMoveEvent) => void;
+  onDragStart?: (info: DragInfo) => void;
+  onDragEnd?: (cardId: string) => void;
+  onStateReceived?: (state: CardGameState) => void;
 }
 
 export interface UseCardSyncReturn {
-  syncedCards: SyncedCardState[];
-  isActive: boolean;
-  lastSyncTime: string | null;
-  error: Error | null;
-  isPolling: boolean;
-  pendingOperations: Map<string, PendingOperation>;
-  syncCardEvent: (
+  // 誰在拖曳什麼牌
+  draggedCards: Map<string, DragInfo>;
+  // 發送牌卡移動
+  moveCard: (
     cardId: string,
-    eventType: CardEventType,
-    eventData?: Record<string, any>
-  ) => Promise<void>;
-  updateLocalCard: (cardId: string, updates: Partial<SyncedCardState>) => void;
-  applyToGameCards: (gameCards: GameCard[]) => GameCard[];
-  clearError: () => void;
-  triggerUserActivity: () => void;
-}
-
-interface PendingOperation {
-  id: string;
-  cardId: string;
-  eventType: CardEventType;
-  eventData?: Record<string, any>;
-  timestamp: number;
-  status: 'pending' | 'resolved' | 'failed';
+    toZone: string,
+    fromZone?: string,
+    position?: { x: number; y: number },
+    index?: number
+  ) => void;
+  // 開始拖曳
+  startDrag: (cardId: string) => void;
+  // 結束拖曳
+  endDrag: (cardId: string) => void;
+  // 載入遊戲狀態
+  loadGameState: () => CardGameState | null;
+  // 儲存遊戲狀態（Owner only）
+  saveGameState: (state: CardGameState) => void;
+  // 連線狀態
+  isConnected: boolean;
+  error: string | null;
+  // Channel reference for direct access
+  channelRef: React.MutableRefObject<RealtimeChannel | null>;
 }
 
 export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   const {
     roomId,
-    enabled = true,
-    syncInterval = 4000, // Default to 4 seconds for smart polling
-    optimisticUpdates = true,
-    smartPolling = true,
-    idleTimeout = 30000, // Stop polling after 30s of inactivity
-    performerInfo,
+    gameType,
+    isOwner,
+    userName,
+    userId,
+    onCardMove,
+    onDragStart,
+    onDragEnd,
+    onStateReceived,
   } = options;
 
-  const [syncedCards, setSyncedCards] = useState<SyncedCardState[]>([]);
-  const [isActive, setIsActive] = useState(false);
-  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [isPolling, setIsPolling] = useState(false);
-  const [pendingOperations, setPendingOperations] = useState<Map<string, PendingOperation>>(
-    new Map()
-  );
-  const lastActivityRef = useRef<number>(Date.now());
+  const [draggedCards, setDraggedCards] = useState<Map<string, DragInfo>>(new Map());
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // LocalStorage key
+  const storageKey = `career_creator_cards_${roomId}_${gameType}`;
 
-  const syncServiceRef = useRef<CardSyncService | null>(null);
+  // 載入遊戲狀態
+  const loadGameState = useCallback((): CardGameState | null => {
+    if (typeof window === 'undefined') return null;
 
-  // Initialize sync service (polling only)
-  useEffect(() => {
-    if (!roomId || !enabled) {
-      return;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (err) {
+        console.error('[CardSyncRT] Failed to parse game state:', err);
+      }
     }
+    return null;
+  }, [storageKey]);
 
-    syncServiceRef.current = createCardSyncService({
-      roomId,
-      syncInterval,
-      optimisticUpdates,
-      smartPolling,
-      performerInfo,
+  // 儲存遊戲狀態（Owner only）
+  const saveGameState = useCallback(
+    (state: CardGameState) => {
+      if (!isOwner || typeof window === 'undefined') return;
+
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(state));
+        console.log('[CardSyncRT] Game state saved');
+
+        // 同時廣播狀態給其他人
+        if (channelRef.current) {
+          channelRef.current
+            .send({
+              type: 'broadcast',
+              event: 'current_game_state',
+              payload: state,
+            })
+            .then(() => {
+              console.log('[CardSyncRT] Game state broadcasted');
+            })
+            .catch((err) => {
+              console.error('[CardSyncRT] Failed to broadcast game state:', err);
+            });
+        }
+      } catch (err) {
+        console.error('[CardSyncRT] Failed to save game state:', err);
+      }
+    },
+    [isOwner, storageKey]
+  );
+
+  // 發送牌卡移動
+  const moveCard = useCallback(
+    (
+      cardId: string,
+      toZone: string,
+      fromZone?: string,
+      position?: { x: number; y: number },
+      index?: number
+    ) => {
+      if (!channelRef.current) {
+        console.warn('[CardSyncRT] Channel not connected');
+        return;
+      }
+
+      const event: CardMoveEvent = {
+        cardId,
+        fromZone,
+        toZone,
+        position,
+        index,
+        timestamp: Date.now(),
+        performedBy: isOwner ? 'owner' : 'visitor',
+        performerName: userName,
+        performerId: userId,
+      };
+
+      // 廣播移動事件
+      channelRef.current
+        .send({
+          type: 'broadcast',
+          event: 'card_moved',
+          payload: event,
+        })
+        .then(() => {
+          console.log('[CardSyncRT] Card move broadcasted:', cardId, '→', toZone);
+        })
+        .catch((err) => {
+          console.error('[CardSyncRT] Failed to broadcast move:', err);
+          setError('無法同步牌卡移動');
+        });
+
+      // 本地也要處理
+      onCardMove?.(event);
+    },
+    [isOwner, userName, userId, onCardMove]
+  );
+
+  // 開始拖曳
+  const startDrag = useCallback(
+    (cardId: string) => {
+      if (!channelRef.current) return;
+
+      const info: DragInfo = {
+        cardId,
+        performerName: userName,
+        performerId: userId,
+        startTime: Date.now(),
+      };
+
+      // 廣播開始拖曳
+      channelRef.current
+        .send({
+          type: 'broadcast',
+          event: 'drag_start',
+          payload: info,
+        })
+        .then(() => {
+          console.log('[CardSyncRT] Drag start broadcasted:', cardId);
+        })
+        .catch((err) => {
+          console.error('[CardSyncRT] Failed to broadcast drag start:', err);
+        });
+    },
+    [userName, userId]
+  );
+
+  // 結束拖曳
+  const endDrag = useCallback((cardId: string) => {
+    if (!channelRef.current) return;
+
+    // 廣播結束拖曳
+    channelRef.current
+      .send({
+        type: 'broadcast',
+        event: 'drag_end',
+        payload: { cardId },
+      })
+      .then(() => {
+        console.log('[CardSyncRT] Drag end broadcasted:', cardId);
+      })
+      .catch((err) => {
+        console.error('[CardSyncRT] Failed to broadcast drag end:', err);
+      });
+  }, []);
+
+  // 設置頻道和監聽器
+  useEffect(() => {
+    if (!supabase || !roomId) return;
+
+    console.log('[CardSyncRT] Setting up for room:', roomId, 'game:', gameType);
+
+    // 建立頻道
+    const channel = supabase.channel(`room:${roomId}:cards:${gameType}`);
+
+    // 監聽牌卡移動
+    channel.on('broadcast', { event: 'card_moved' }, ({ payload }) => {
+      const event = payload as CardMoveEvent;
+      console.log('[CardSyncRT] Received card move:', event);
+
+      // 如果是自己的操作，跳過（已在本地處理）
+      if (event.performerId === userId) return;
+
+      // 處理他人的移動
+      onCardMove?.(event);
+    });
+
+    // 監聽拖曳開始
+    channel.on('broadcast', { event: 'drag_start' }, ({ payload }) => {
+      const info = payload as DragInfo;
+
+      // 如果是自己，跳過
+      if (info.performerId === userId) return;
+
+      console.log('[CardSyncRT] Someone started dragging:', info);
+
+      // 更新拖曳狀態
+      setDraggedCards((prev) => {
+        const next = new Map(prev);
+        next.set(info.cardId, info);
+        return next;
+      });
+
+      onDragStart?.(info);
+    });
+
+    // 監聽拖曳結束
+    channel.on('broadcast', { event: 'drag_end' }, ({ payload }) => {
+      const { cardId } = payload;
+
+      console.log('[CardSyncRT] Drag ended:', cardId);
+
+      // 移除拖曳狀態
+      setDraggedCards((prev) => {
+        const next = new Map(prev);
+        next.delete(cardId);
+        return next;
+      });
+
+      onDragEnd?.(cardId);
+    });
+
+    // 新用戶請求狀態
+    channel.on('broadcast', { event: 'request_game_state' }, ({ payload }) => {
+      if (isOwner) {
+        const state = loadGameState();
+        if (state) {
+          console.log('[CardSyncRT] Sending game state to new user');
+          channel.send({
+            type: 'broadcast',
+            event: 'current_game_state',
+            payload: state,
+          });
+        }
+      }
+    });
+
+    // 接收完整狀態（新用戶）
+    channel.on('broadcast', { event: 'current_game_state' }, ({ payload }) => {
+      if (!isOwner) {
+        console.log('[CardSyncRT] Received game state from owner');
+        const state = payload as CardGameState;
+        onStateReceived?.(state);
+      }
+    });
+
+    // 訂閱頻道
+    channel.subscribe(async (status, err) => {
+      if (err) {
+        console.error('[CardSyncRT] Subscribe error:', err);
+        setError('無法連接到牌卡同步服務');
+        setIsConnected(false);
+      } else if (status === 'SUBSCRIBED') {
+        console.log('[CardSyncRT] Connected to card sync');
+        setIsConnected(true);
+        setError(null);
+        channelRef.current = channel;
+
+        // 新用戶請求當前狀態
+        if (!isOwner) {
+          channel.send({
+            type: 'broadcast',
+            event: 'request_game_state',
+            payload: { userId },
+          });
+        }
+      }
     });
 
     return () => {
-      syncServiceRef.current?.destroy();
-      syncServiceRef.current = null;
+      console.log('[CardSyncRT] Cleaning up channel');
+      channel.unsubscribe();
+      channelRef.current = null;
     };
-  }, [roomId, enabled, syncInterval, optimisticUpdates, smartPolling, performerInfo]);
-
-  // Smart polling implementation
-  const startSmartPolling = useCallback(() => {
-    if (!syncServiceRef.current || !smartPolling) return;
-
-    const pollAndCheck = async () => {
-      try {
-        setIsPolling(true);
-        const result = await syncServiceRef.current!.pollChanges();
-
-        if (result.changed) {
-          setSyncedCards(result.cards);
-          setLastSyncTime(new Date().toISOString());
-          lastActivityRef.current = Date.now();
-        }
-
-        // Check if idle timeout reached
-        if (Date.now() - lastActivityRef.current > idleTimeout) {
-          stopPolling();
-          setIsActive(false);
-          return;
-        }
-
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Polling failed'));
-      } finally {
-        setIsPolling(false);
-      }
-    };
-
-    // Start immediately
-    pollAndCheck();
-
-    // Then poll at intervals
-    pollingIntervalRef.current = setInterval(pollAndCheck, syncInterval);
-    setIsActive(true);
-  }, [syncInterval, smartPolling, idleTimeout]);
-
-  const stopPolling = useCallback(() => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
-    if (idleTimeoutRef.current) {
-      clearTimeout(idleTimeoutRef.current);
-      idleTimeoutRef.current = null;
-    }
-    setIsPolling(false);
-    setIsActive(false);
-  }, []);
-
-  // Start/stop polling based on enabled state
-  useEffect(() => {
-    if (enabled && syncServiceRef.current) {
-      startSmartPolling();
-    } else {
-      stopPolling();
-    }
-
-    return stopPolling;
-  }, [enabled, startSmartPolling, stopPolling]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      stopPolling();
-    };
-  }, [stopPolling]);
-
-  const syncCardEvent = useCallback(
-    async (cardId: string, eventType: CardEventType, eventData?: Record<string, any>) => {
-      if (!syncServiceRef.current) return;
-
-      const operationId = `${cardId}-${eventType}-${Date.now()}`;
-      const operation: PendingOperation = {
-        id: operationId,
-        cardId,
-        eventType,
-        eventData,
-        timestamp: Date.now(),
-        status: 'pending',
-      };
-
-      setPendingOperations((prev) => new Map(prev).set(operationId, operation));
-
-      try {
-        await syncServiceRef.current.submitCardEvent(cardId, eventType, eventData);
-
-        setPendingOperations((prev) => {
-          const updated = new Map(prev);
-          const op = updated.get(operationId);
-          if (op) {
-            updated.set(operationId, { ...op, status: 'resolved' });
-          }
-          return updated;
-        });
-
-        // Trigger activity
-        triggerUserActivity();
-      } catch (error) {
-        setPendingOperations((prev) => {
-          const updated = new Map(prev);
-          const op = updated.get(operationId);
-          if (op) {
-            updated.set(operationId, { ...op, status: 'failed' });
-          }
-          return updated;
-        });
-        throw error;
-      }
-    },
-    []
-  );
-
-  const updateLocalCard = useCallback((cardId: string, updates: Partial<SyncedCardState>) => {
-    setSyncedCards((prev) =>
-      prev.map((card) => (card.id === cardId ? { ...card, ...updates } : card))
-    );
-  }, []);
-
-  const applyToGameCards = useCallback(
-    (gameCards: GameCard[]): GameCard[] => {
-      return gameCards.map((gameCard) => {
-        const syncedCard = syncedCards.find((sc) => sc.id === gameCard.id);
-        if (syncedCard) {
-          return {
-            ...gameCard,
-            ...syncedCard,
-          };
-        }
-        return gameCard;
-      });
-    },
-    [syncedCards]
-  );
-
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
-
-  const triggerUserActivity = useCallback(() => {
-    lastActivityRef.current = Date.now();
-
-    // Restart polling if idle
-    if (!isActive && enabled) {
-      startSmartPolling();
-    }
-
-    // Reset idle timeout
-    if (idleTimeoutRef.current) {
-      clearTimeout(idleTimeoutRef.current);
-    }
-
-    idleTimeoutRef.current = setTimeout(() => {
-      if (Date.now() - lastActivityRef.current >= idleTimeout) {
-        stopPolling();
-      }
-    }, idleTimeout);
-  }, [isActive, enabled, startSmartPolling, stopPolling, idleTimeout]);
+  }, [
+    roomId,
+    gameType,
+    isOwner,
+    userId,
+    onCardMove,
+    onDragStart,
+    onDragEnd,
+    onStateReceived,
+    loadGameState,
+  ]);
 
   return {
-    syncedCards,
-    isActive,
-    lastSyncTime,
+    draggedCards,
+    moveCard,
+    startDrag,
+    endDrag,
+    loadGameState,
+    saveGameState,
+    isConnected,
     error,
-    isPolling,
-    pendingOperations,
-    syncCardEvent,
-    updateLocalCard,
-    applyToGameCards,
-    clearError,
-    triggerUserActivity,
+    channelRef, // Export for direct channel access
   };
-}
-
-/**
- * Default hook for MVP - polling only
- */
-export function useCardSyncPolling(roomId: string, enabled = true) {
-  return useCardSync({
-    roomId,
-    enabled,
-    smartPolling: true, // Use smart polling for MVP
-  });
 }

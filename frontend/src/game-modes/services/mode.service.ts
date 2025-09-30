@@ -5,6 +5,8 @@
  * 提供新舊系統ID映射功能
  */
 
+import { DECK_TYPES, GAMEPLAY_IDS, GAMEPLAY_NAMES } from '@/constants/game-modes';
+
 export interface Gameplay {
   id: string;
   name: string;
@@ -32,13 +34,13 @@ export class GameModeService {
       legacyRuleId: 'personality_assessment',
       gameplays: [
         {
-          id: 'personality_analysis',
+          id: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
           name: '六大性格分析',
           description: '透過RIASEC模型分析職業性格偏好',
         },
         {
-          id: 'career_collector',
-          name: '職業收藏家',
+          id: GAMEPLAY_IDS.CAREER_COLLECTOR,
+          name: '職能收集家',
           description: '從100張職業卡中精選最感興趣的15張',
         },
       ],
@@ -50,17 +52,17 @@ export class GameModeService {
       legacyRuleId: 'skill_assessment',
       gameplays: [
         {
-          id: 'advantage_analysis',
+          id: GAMEPLAY_IDS.ADVANTAGE_ANALYSIS,
           name: '優劣勢分析',
           description: '識別個人的優勢與待改進領域',
         },
         {
-          id: 'growth_planning',
-          name: '成長計畫',
+          id: GAMEPLAY_IDS.GROWTH_PLANNING,
+          name: '成長規劃',
           description: '制定職涯發展路徑和技能提升計畫',
         },
         {
-          id: 'position_breakdown',
+          id: GAMEPLAY_IDS.POSITION_BREAKDOWN,
           name: '職位拆解',
           description: '深度分析特定職位所需的各項能力',
         },
@@ -73,13 +75,13 @@ export class GameModeService {
       legacyRuleId: 'value_ranking',
       gameplays: [
         {
-          id: 'value_ranking',
+          id: GAMEPLAY_IDS.VALUE_RANKING,
           name: '價值觀排序',
           description: '從36張價值卡中排出優先順序',
         },
         {
-          id: 'life_redesign',
-          name: '生活改造王',
+          id: GAMEPLAY_IDS.LIFE_REDESIGN,
+          name: '生活重新設計',
           description: '使用100點生活能量重新分配人生重點',
         },
       ],

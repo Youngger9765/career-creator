@@ -25,7 +25,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
   roomId,
   isRoomOwner,
   mode = 'personality',
-  deckType = 'career_cards_100',
+  deckType = 'riasec_explanation',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
   const [maxCardsPerColumn, setMaxCardsPerColumn] = useState(10);
@@ -65,7 +65,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
         mode: '職游旅人',
         gameplay: '六大性格分析',
         canvas: '三欄分類畫布',
-        deckName: mainDeck?.name || '六大性格卡',
+        deckName: mainDeck?.name || '解說卡',
         totalCards: mainDeck?.cards?.length || 0,
         availableCards: availableCards.length,
       }}
@@ -74,7 +74,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
         decks: [
           {
             id: 'personality',
-            label: '職游旅人卡',
+            label: '解說卡',
             cards: availableCards,
             color: 'purple',
             type: 'career',

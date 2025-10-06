@@ -7,7 +7,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Upload, FileText, Image as ImageIcon, X } from 'lucide-react';
+import { Upload, FileText, Image as ImageIcon, X, Maximize2, Minimize2 } from 'lucide-react';
 
 interface UploadedFile {
   type: 'pdf' | 'image';
@@ -48,6 +48,7 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({
     }
     return null;
   });
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,21 +78,12 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({
 
   return (
     <div className={`h-full flex flex-col ${className}`}>
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">{title}</h3>
-        {subtitle && <p className="text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>}
-      </div>
-
       {!uploadedFile ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <div className="mb-4">
               <Upload className="w-16 h-16 text-gray-400 mx-auto" />
             </div>
-            <h4 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
-              拖曳或選擇文件
-            </h4>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{subtitle}</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -103,7 +95,7 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({
               onClick={() => fileInputRef.current?.click()}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              選擇文件
+              上傳文件
             </button>
           </div>
         </div>
@@ -120,24 +112,75 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({
                 {uploadedFile.name}
               </span>
             </div>
-            <button
-              onClick={removeUploadedFile}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-              title="移除文件"
-            >
-              <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsFullscreen(true)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                title="全螢幕檢視"
+              >
+                <Maximize2 className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              </button>
+              <button
+                onClick={removeUploadedFile}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                title="移除文件"
+              >
+                <X className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+              </button>
+            </div>
           </div>
 
           {/* File Display Area */}
           <div className="flex-1 overflow-auto bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
             {uploadedFile.type === 'pdf' ? (
-              <iframe src={uploadedFile.url} className="w-full h-full rounded" title="PDF Viewer" />
+              <iframe
+                src={`${uploadedFile.url}#toolbar=0&navpanes=0&view=FitH`}
+                className="w-full h-full rounded border-0"
+                title="PDF Viewer"
+              />
             ) : (
               <img
                 src={uploadedFile.url}
                 alt="Uploaded Document"
                 className="w-full h-auto rounded"
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Modal */}
+      {isFullscreen && uploadedFile && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col">
+          <div className="flex items-center justify-between p-4 bg-black">
+            <div className="flex items-center gap-3">
+              {uploadedFile.type === 'pdf' ? (
+                <FileText className="w-6 h-6 text-white" />
+              ) : (
+                <ImageIcon className="w-6 h-6 text-white" />
+              )}
+              <span className="text-lg font-medium text-white">{uploadedFile.name}</span>
+            </div>
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              title="關閉全螢幕"
+            >
+              <Minimize2 className="w-6 h-6 text-white" />
+            </button>
+          </div>
+          <div className="flex-1 flex items-center justify-center p-4 overflow-hidden">
+            {uploadedFile.type === 'pdf' ? (
+              <iframe
+                src={`${uploadedFile.url}#toolbar=0&navpanes=0&view=FitH`}
+                className="w-full h-full border-0"
+                title="PDF Viewer Fullscreen"
+              />
+            ) : (
+              <img
+                src={uploadedFile.url}
+                alt="Uploaded Document"
+                className="max-w-full max-h-full object-contain"
               />
             )}
           </div>

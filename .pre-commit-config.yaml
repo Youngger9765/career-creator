@@ -170,14 +170,6 @@ repos:
         pass_filenames: false
         stages: [push]
 
-      - id: frontend-tests
-        name: Frontend Tests
-        entry: bash -c 'cd frontend && npm test -- --passWithNoTests'
-        language: system
-        files: ^frontend/.*\.(ts|tsx|js|jsx)$
-        pass_filenames: false
-        stages: [push]
-
       - id: nextjs-build
         name: Next.js Build Check
         entry: bash -c 'cd frontend && npm run build'

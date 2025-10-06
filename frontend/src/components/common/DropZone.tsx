@@ -348,7 +348,9 @@ const DropZone: React.FC<DropZoneProps> = ({
                 title="查看大卡"
               >
                 <Eye className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">查看</span>
+                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                  查看
+                </span>
               </button>
               <button
                 onClick={(e) => {
@@ -359,7 +361,9 @@ const DropZone: React.FC<DropZoneProps> = ({
                 title="翻轉卡片"
               >
                 <RotateCw className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">翻轉</span>
+                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                  翻轉
+                </span>
               </button>
             </div>
             {!isFlipped ? (
@@ -467,7 +471,9 @@ const DropZone: React.FC<DropZoneProps> = ({
                 {card.title}
               </p>
               {card.category && (
-                <p className={`text-[10px] font-medium ${getCategoryColor(card.id)} uppercase tracking-wide`}>
+                <p
+                  className={`text-[10px] font-medium ${getCategoryColor(card.id)} uppercase tracking-wide`}
+                >
                   {card.category}
                 </p>
               )}

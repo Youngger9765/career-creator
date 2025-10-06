@@ -186,79 +186,80 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   };
 
   // 同步狀態組件
-  const syncStatusComponent = isConnected && portalContainer ? (
-    <>
-      {syncInfoExpanded ? (
-        // 展開狀態 - 顯示完整資訊
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 space-y-2 min-w-[200px] absolute right-0 top-full mt-2 z-50">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}
-              />
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {isConnected ? '已同步' : '未連線'}
-              </span>
-            </div>
-            <button
-              onClick={() => setSyncInfoExpanded(false)}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
+  const syncStatusComponent =
+    isConnected && portalContainer ? (
+      <>
+        {syncInfoExpanded ? (
+          // 展開狀態 - 顯示完整資訊
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 space-y-2 min-w-[200px] absolute right-0 top-full mt-2 z-50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}
                 />
-              </svg>
-            </button>
-          </div>
-
-          {/* Owner 狀態（訪客才顯示） */}
-          {isVisitor && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              {ownerOnline ? '🟢 諮詢師在線' : '⏸️ 等待諮詢師'}
-            </div>
-          )}
-
-          {/* 當前同步模式 */}
-          {syncedState.deck && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-2 py-1.5">
-              <div className="text-xs text-gray-500 dark:text-gray-400">當前同步模式：</div>
-              <div className="text-sm font-medium text-blue-700 dark:text-blue-400">
-                {syncedState.deck} - {syncedState.gameRule}
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {isConnected ? '已同步' : '未連線'}
+                </span>
               </div>
+              <button
+                onClick={() => setSyncInfoExpanded(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
-          )}
-        </div>
-      ) : (
-        // 收合狀態 - 只顯示圖標
-        <button
-          onClick={() => setSyncInfoExpanded(true)}
-          className="bg-white dark:bg-gray-800 rounded-full shadow-md p-2 hover:shadow-lg transition-all flex items-center gap-1.5 group relative"
-          title="點擊查看同步資訊"
-        >
-          <div
-            className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}
-          />
-          <svg
-            className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+
+            {/* Owner 狀態（訪客才顯示） */}
+            {isVisitor && (
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {ownerOnline ? '🟢 諮詢師在線' : '⏸️ 等待諮詢師'}
+              </div>
+            )}
+
+            {/* 當前同步模式 */}
+            {syncedState.deck && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-2 py-1.5">
+                <div className="text-xs text-gray-500 dark:text-gray-400">當前同步模式：</div>
+                <div className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                  {syncedState.deck} - {syncedState.gameRule}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          // 收合狀態 - 只顯示圖標
+          <button
+            onClick={() => setSyncInfoExpanded(true)}
+            className="bg-white dark:bg-gray-800 rounded-full shadow-md p-2 hover:shadow-lg transition-all flex items-center gap-1.5 group relative"
+            title="點擊查看同步資訊"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            <div
+              className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}
             />
-          </svg>
-        </button>
-      )}
-    </>
-  ) : null;
+            <svg
+              className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </button>
+        )}
+      </>
+    ) : null;
 
   return (
     <div className="h-full flex flex-col relative">

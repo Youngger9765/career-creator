@@ -13,7 +13,6 @@ from sqlmodel import Session
 
 from tests.factories import TestDataBuilder, UserFactory
 
-
 # Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 

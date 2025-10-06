@@ -4,12 +4,12 @@ Pytest configuration for tests
 """
 
 import os
+
 import pytest
-from sqlmodel import Session, SQLModel, create_engine
 from sqlalchemy import text
+from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import settings
-
 
 # Use PostgreSQL for testing instead of SQLite to support ARRAY types
 TEST_DATABASE_URL = os.getenv(
@@ -49,9 +49,10 @@ def session_fixture(engine):
     session = Session(bind=connection)
 
     # Seed demo users for testing using the test session
+    from uuid import UUID
+
     from app.core.auth import DEMO_ACCOUNTS, get_password_hash
     from app.models.user import User
-    from uuid import UUID
 
     for demo_data in DEMO_ACCOUNTS:
         user_uuid = UUID(demo_data["id"])

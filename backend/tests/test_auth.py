@@ -10,7 +10,6 @@ from sqlmodel import Session
 from app.core.database import get_session
 from app.main import app
 
-
 # Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 

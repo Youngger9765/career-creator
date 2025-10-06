@@ -85,15 +85,15 @@ export default function DashboardPage() {
   return (
     <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Sidebar */}
-      <aside className={`hidden md:flex md:flex-shrink-0 h-screen transition-all duration-300 ${
-        sidebarCollapsed ? 'w-20' : 'w-64'
-      }`}>
+      <aside
+        className={`hidden md:flex md:flex-shrink-0 h-screen transition-all duration-300 ${
+          sidebarCollapsed ? 'w-20' : 'w-64'
+        }`}
+      >
         <div className="flex flex-col w-full h-full bg-white border-r border-gray-200">
           {/* Logo / Title */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-            {!sidebarCollapsed && (
-              <h1 className="text-xl font-bold text-gray-900">諮詢師儀表板</h1>
-            )}
+            {!sidebarCollapsed && <h1 className="text-xl font-bold text-gray-900">諮詢師儀表板</h1>}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
@@ -214,9 +214,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-lg font-bold text-gray-900">諮詢師儀表板</h1>
-                <p className="text-xs text-gray-600 truncate">
-                  {user?.full_name || user?.email}
-                </p>
+                <p className="text-xs text-gray-600 truncate">{user?.full_name || user?.email}</p>
               </div>
               <div className="flex items-center gap-2">
                 <Link

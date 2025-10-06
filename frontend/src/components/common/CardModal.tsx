@@ -9,12 +9,7 @@
 
 import React from 'react';
 import { X, RotateCw } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface CardData {
   id: string;
@@ -31,12 +26,7 @@ interface CardModalProps {
   showFlip?: boolean; // 是否顯示翻轉功能
 }
 
-const CardModal: React.FC<CardModalProps> = ({
-  card,
-  isOpen,
-  onClose,
-  showFlip = true,
-}) => {
+const CardModal: React.FC<CardModalProps> = ({ card, isOpen, onClose, showFlip = true }) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
 
   // 當 modal 關閉時重置翻轉狀態

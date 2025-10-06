@@ -356,9 +356,7 @@ export default function RoomPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>確認退出諮詢室</DialogTitle>
-            <DialogDescription>
-              您確定要退出諮詢室嗎？未儲存的變更可能會遺失。
-            </DialogDescription>
+            <DialogDescription>您確定要退出諮詢室嗎？未儲存的變更可能會遺失。</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-2 sm:gap-0">
             <button

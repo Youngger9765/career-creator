@@ -3,7 +3,16 @@
 import React from 'react';
 import Link from 'next/link';
 import { Room } from '@/types/api';
-import { ExternalLink, Calendar, Clock, Users, MessageCircle, Copy, Home, Trash2 } from 'lucide-react';
+import {
+  ExternalLink,
+  Calendar,
+  Clock,
+  Users,
+  MessageCircle,
+  Copy,
+  Home,
+  Trash2,
+} from 'lucide-react';
 
 interface RoomListTableProps {
   rooms: Room[];

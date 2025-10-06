@@ -9,15 +9,13 @@ from sqlmodel import Session
 
 from app.core.database import get_session
 from app.main import app
-from tests.factories import (
-    # CardEventFactory,  # Disabled for now
+from tests.factories import (  # CardEventFactory,  # Disabled for now
     RoomFactory,
     TestDataBuilder,
     UserFactory,
     VisitorFactory,
 )
 from tests.helpers import create_auth_headers
-
 
 # Session fixture removed - using PostgreSQL conftest.py fixture instead
 
@@ -139,9 +137,7 @@ class TestWithFactories:
 
         # 驗證
         assert len(rooms) == 3
-        assert all(
-            r.counselor_id == counselor.id for r in rooms
-        )  # Compare as strings
+        assert all(r.counselor_id == counselor.id for r in rooms)  # Compare as strings
 
         # 在 session 中查詢驗證
         from sqlmodel import select

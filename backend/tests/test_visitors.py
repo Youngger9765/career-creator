@@ -16,7 +16,6 @@ from app.models.room import Room
 from app.models.user import User
 from app.models.visitor import Visitor
 
-
 # Test database setup
 # Session fixture removed - using PostgreSQL conftest.py fixture instead
 

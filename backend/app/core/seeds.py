@@ -8,7 +8,7 @@ from uuid import UUID
 
 from sqlmodel import Session, select
 
-from app.core.auth import DEMO_ACCOUNTS, DEMO_ACCOUNT_UUIDS, get_password_hash
+from app.core.auth import DEMO_ACCOUNT_UUIDS, DEMO_ACCOUNTS, get_password_hash
 from app.core.database import engine
 from app.models.client import Client, ClientStatus, ConsultationRecord, RoomClient
 from app.models.game_rule import Card, CardDeck, GameRuleTemplate
@@ -747,7 +747,9 @@ def seed_test_rooms():
             return
 
         # 檢查是否已存在測試諮詢室
-        existing_room = session.exec(select(Room).where(Room.name == "測試諮詢室")).first()
+        existing_room = session.exec(
+            select(Room).where(Room.name == "測試諮詢室")
+        ).first()
 
         if not existing_room:
             # 創建活躍的測試諮詢室
@@ -982,7 +984,9 @@ def seed_crm_data():
                     print(f"  ✅ Linked room to client: {client.name}")
 
                     # **特殊處理** - 為第一個客戶的第二個諮詢師也創建一個諮詢室
-                    if client_idx == 0 and room_idx == 2:  # 第一個客戶的第三個諮詢室類型
+                    if (
+                        client_idx == 0 and room_idx == 2
+                    ):  # 第一個客戶的第三個諮詢室類型
                         # 為第二個諮詢師創建相同類型的諮詢室
                         second_counselor_room_name = (
                             f"{client.name.split(' ')[0]} 的轉職{room_type['suffix']}"

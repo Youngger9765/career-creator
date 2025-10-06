@@ -31,13 +31,14 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
   const [maxCardsPerColumn, setMaxCardsPerColumn] = useState(10);
 
   // 使用統一的卡片同步 Hook
-  const { state, draggedByOthers, handleCardMove, handleCardReorder, cardSync } = useUnifiedCardSync({
-    roomId,
-    gameType: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
-    storeKey: 'personality',
-    isRoomOwner,
-    zones: ['like', 'neutral', 'dislike'], // 定義這個遊戲的區域
-  });
+  const { state, draggedByOthers, handleCardMove, handleCardReorder, cardSync } =
+    useUnifiedCardSync({
+      roomId,
+      gameType: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
+      storeKey: 'personality',
+      isRoomOwner,
+      zones: ['like', 'neutral', 'dislike'], // 定義這個遊戲的區域
+    });
 
   // 從 Store 取得已使用的牌
   const usedCards = new Set([

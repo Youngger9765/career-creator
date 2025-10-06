@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from sqlmodel import Session
 
 from app.core.auth import get_password_hash
+
 # from app.models.card_event import CardEvent  # Disabled for now
 from app.models.room import Room
 from app.models.user import User

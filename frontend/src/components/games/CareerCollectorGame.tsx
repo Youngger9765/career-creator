@@ -31,13 +31,14 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
   const [maxCards, setMaxCards] = useState(15);
 
   // 使用統一的卡片同步 Hook
-  const { state, draggedByOthers, handleCardMove, handleCardReorder, cardSync } = useUnifiedCardSync({
-    roomId,
-    gameType: GAMEPLAY_IDS.CAREER_COLLECTOR,
-    storeKey: 'career',
-    isRoomOwner,
-    zones: ['collected'], // 定義這個遊戲的區域
-  });
+  const { state, draggedByOthers, handleCardMove, handleCardReorder, cardSync } =
+    useUnifiedCardSync({
+      roomId,
+      gameType: GAMEPLAY_IDS.CAREER_COLLECTOR,
+      storeKey: 'career',
+      isRoomOwner,
+      zones: ['collected'], // 定義這個遊戲的區域
+    });
 
   // 載入牌組
   useEffect(() => {

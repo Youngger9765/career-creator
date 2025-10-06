@@ -53,11 +53,17 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
   return (
     <div className="relative w-full h-full">
       {/* 背景卡片層 - 創造堆疊效果（3層，向左上平移） */}
-      <div className={`${getCardBackground()} border-2 rounded-lg shadow-md absolute top-0 left-0 right-0 bottom-0 -translate-x-4 -translate-y-4 opacity-25`} />
-      <div className={`${getCardBackground()} border-2 rounded-lg shadow-lg absolute top-0 left-0 right-0 bottom-0 -translate-x-2 -translate-y-2 opacity-45`} />
+      <div
+        className={`${getCardBackground()} border-2 rounded-lg shadow-md absolute top-0 left-0 right-0 bottom-0 -translate-x-4 -translate-y-4 opacity-25`}
+      />
+      <div
+        className={`${getCardBackground()} border-2 rounded-lg shadow-lg absolute top-0 left-0 right-0 bottom-0 -translate-x-2 -translate-y-2 opacity-45`}
+      />
 
       {/* 主卡片 */}
-      <div className={`${getCardBackground()} border-2 rounded-lg shadow-2xl h-full w-full flex flex-col relative z-10`}>
+      <div
+        className={`${getCardBackground()} border-2 rounded-lg shadow-2xl h-full w-full flex flex-col relative z-10`}
+      >
         {/* 翻轉按鈕 */}
         <button
           onClick={(e) => {
@@ -73,48 +79,50 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
 
         {/* 卡片內容 */}
         <div className="p-5 pb-16 flex flex-col h-full">
-        {!isFlipped ? (
-          // 正面
-          <>
-            {/* 分類標籤 */}
-            {card.category && (
-              <div className={`text-sm font-semibold uppercase tracking-wider ${getCategoryColor()} mb-3`}>
-                {card.category}
-              </div>
-            )}
-            {/* 標題 */}
-            <div className="flex-1 flex items-center justify-center px-2">
-              <div className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center break-words leading-relaxed">
-                {card.title}
-              </div>
-            </div>
-            {/* 描述 */}
-            {card.description && (
-              <div className="text-sm text-gray-600 dark:text-gray-300 mt-3 text-center leading-relaxed">
-                {card.description}
-              </div>
-            )}
-          </>
-        ) : (
-          // 背面 - 顯示詳細說明
-          <div className="flex flex-col h-full">
-            <div className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 text-center">
-              詳細說明
-            </div>
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="text-base text-gray-700 dark:text-gray-300 text-center leading-relaxed px-2">
-                {card.description || card.title}
-              </div>
+          {!isFlipped ? (
+            // 正面
+            <>
+              {/* 分類標籤 */}
               {card.category && (
-                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                    分類: <span className={getCategoryColor()}>{card.category}</span>
-                  </div>
+                <div
+                  className={`text-sm font-semibold uppercase tracking-wider ${getCategoryColor()} mb-3`}
+                >
+                  {card.category}
                 </div>
               )}
+              {/* 標題 */}
+              <div className="flex-1 flex items-center justify-center px-2">
+                <div className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center break-words leading-relaxed">
+                  {card.title}
+                </div>
+              </div>
+              {/* 描述 */}
+              {card.description && (
+                <div className="text-sm text-gray-600 dark:text-gray-300 mt-3 text-center leading-relaxed">
+                  {card.description}
+                </div>
+              )}
+            </>
+          ) : (
+            // 背面 - 顯示詳細說明
+            <div className="flex flex-col h-full">
+              <div className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 text-center">
+                詳細說明
+              </div>
+              <div className="flex-1 flex flex-col justify-center">
+                <div className="text-base text-gray-700 dark:text-gray-300 text-center leading-relaxed px-2">
+                  {card.description || card.title}
+                </div>
+                {card.category && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                      分類: <span className={getCategoryColor()}>{card.category}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
         </div>
       </div>
     </div>
@@ -310,9 +318,7 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
                 {/* 切換按鈕 */}
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() =>
-                      setCurrentCardIndex((prev) => Math.max(0, prev - 1))
-                    }
+                    onClick={() => setCurrentCardIndex((prev) => Math.max(0, prev - 1))}
                     disabled={currentCardIndex === 0}
                     className="p-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
                     title="上一張"
@@ -488,9 +494,7 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
 
                       <div className="flex items-center gap-4">
                         <button
-                          onClick={() =>
-                            setCurrentCardIndex((prev) => Math.max(0, prev - 1))
-                          }
+                          onClick={() => setCurrentCardIndex((prev) => Math.max(0, prev - 1))}
                           disabled={currentCardIndex === 0}
                           className="p-2 rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
                           title="上一張"

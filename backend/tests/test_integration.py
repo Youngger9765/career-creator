@@ -14,7 +14,6 @@ from app.main import app
 from app.models.user import User
 from tests.helpers import create_auth_headers
 
-
 # Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 

@@ -39,7 +39,6 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [viewingClient, setViewingClient] = useState<Client | null>(null);
@@ -128,9 +127,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
         client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (client.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
-      const matchesStatus = selectedStatus === 'all' || client.status === selectedStatus;
-
-      return matchesSearch && matchesStatus;
+      return matchesSearch;
     })
     .sort((a, b) => {
       // 封存的客戶排到最後
@@ -236,53 +233,9 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">客戶管理</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">管理您的諮詢客戶資料</p>
-          </div>
-          <div className="flex items-center gap-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <button
-              onClick={() => setSelectedStatus('all')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                selectedStatus === 'all'
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              全部狀態
-            </button>
-            <button
-              onClick={() => setSelectedStatus('active')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                selectedStatus === 'active'
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              活躍
-            </button>
-            <button
-              onClick={() => setSelectedStatus('inactive')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                selectedStatus === 'inactive'
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              暫停
-            </button>
-            <button
-              onClick={() => setSelectedStatus('archived')}
-              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                selectedStatus === 'archived'
-                  ? 'bg-blue-500 text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              封存
-            </button>
-          </div>
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">客戶管理</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">管理您的諮詢客戶資料</p>
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
@@ -309,7 +262,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
         {filteredClients.length === 0 ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-            {searchTerm || selectedStatus !== 'all' ? '沒有符合條件的客戶' : '尚未新增任何客戶'}
+            {searchTerm ? '沒有符合條件的客戶' : '尚未新增任何客戶'}
           </div>
         ) : (
           <div className="overflow-x-auto">

@@ -204,6 +204,9 @@ def list_user_rooms(
         if client_name:
             room_dict["primary_client_name"] = client_name
 
+        # DEBUG: Print to console
+        print(f"DEBUG: Room '{room.name}' - client_name from query: '{client_name}'")
+
         # Add counselor name by looking up in database
         counselor = session.get(User, room.counselor_id)
         room_dict["counselor_name"] = counselor.name if counselor else "諮詢師"

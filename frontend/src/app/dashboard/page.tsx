@@ -83,12 +83,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Sidebar */}
-      <aside className={`hidden md:flex md:flex-shrink-0 transition-all duration-300 ${
+      <aside className={`hidden md:flex md:flex-shrink-0 h-screen transition-all duration-300 ${
         sidebarCollapsed ? 'w-20' : 'w-64'
       }`}>
-        <div className="flex flex-col w-full bg-white border-r border-gray-200">
+        <div className="flex flex-col w-full h-full bg-white border-r border-gray-200">
           {/* Logo / Title */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
             {!sidebarCollapsed && (

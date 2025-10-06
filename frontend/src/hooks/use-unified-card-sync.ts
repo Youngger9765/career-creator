@@ -142,10 +142,46 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     [moveCardInternal, cardSync, isRoomOwner, zones, state.cardPlacements, gameType]
   );
 
+  /**
+   * 卡片排序函數
+   */
+  const handleCardReorder = useCallback(
+    (zone: string, newCardIds: string[]) => {
+      console.log(`[${gameType}] Reorder in zone ${zone}:`, newCardIds);
+
+      // 更新該區域的卡片順序
+      const currentPlacements = { ...state.cardPlacements };
+      const key = `${zone}Cards`;
+      currentPlacements[key] = newCardIds;
+
+      // 更新狀態
+      updateCards(currentPlacements);
+
+      // Owner 儲存狀態（排序也需要同步）
+      if (isRoomOwner) {
+        const gameState = {
+          cards: zones.reduce((acc, z) => {
+            const zoneKey = `${z}Cards`;
+            const cards = currentPlacements[zoneKey] || [];
+            cards.forEach((id: string) => {
+              acc[id] = { zone: z };
+            });
+            return acc;
+          }, {} as any),
+          lastUpdated: Date.now(),
+          gameType,
+        };
+        cardSync.saveGameState(gameState);
+      }
+    },
+    [state.cardPlacements, zones, updateCards, isRoomOwner, cardSync, gameType]
+  );
+
   return {
     state,
     draggedByOthers,
     handleCardMove,
+    handleCardReorder, // Export reorder function
     updateCards, // Export for components that need it (e.g., file upload)
     cardSync,
     userId,

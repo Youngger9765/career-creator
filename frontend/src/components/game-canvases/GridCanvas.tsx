@@ -16,6 +16,7 @@ import DropZone from '../common/DropZone';
 interface GridCanvasProps {
   cards?: CardData[];
   onCardMove?: (cardId: string, zone: string | null) => void; // 改為 zone-based
+  onCardReorder?: (zone: string, newCardIds: string[]) => void;
   className?: string;
   rank1Cards?: string[]; // 第一名卡片
   rank2Cards?: string[]; // 第二名卡片
@@ -39,6 +40,7 @@ interface GridZone {
 const GridCanvas: React.FC<GridCanvasProps> = ({
   cards = [],
   onCardMove,
+  onCardReorder,
   className = '',
   rank1Cards = [],
   rank2Cards = [],
@@ -84,6 +86,11 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
   // 處理卡片移除
   const handleCardRemove = (zoneId: string, cardId: string) => {
     onCardMove?.(cardId, null);
+  };
+
+  // 處理卡片重新排序
+  const handleCardReorder = (zoneId: string, newCardIds: string[]) => {
+    onCardReorder?.(zoneId, newCardIds);
   };
 
   // 處理最大卡片數變更（僅其他區域可變更）
@@ -156,6 +163,7 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 cardHeight="180px" // 增大卡片高度
                 onCardAdd={(cardId) => handleCardAdd(zone.id, cardId)}
                 onCardRemove={(cardId) => handleCardRemove(zone.id, cardId)}
+                onCardReorder={(newCardIds) => handleCardReorder(zone.id, newCardIds)}
                 onCardDragStart={onDragStart}
                 onCardDragEnd={onDragEnd}
                 draggedByOthers={draggedByOthers}

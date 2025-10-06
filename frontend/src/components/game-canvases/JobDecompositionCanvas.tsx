@@ -22,6 +22,7 @@ interface Card {
 interface JobDecompositionCanvasProps {
   cards?: Card[];
   onCardMove?: (cardId: string, zone: string | null) => void;
+  onCardReorder?: (newCardIds: string[]) => void;
   onFileUpload?: (file: File) => void;
   maxCards?: number;
   isRoomOwner?: boolean;
@@ -42,6 +43,7 @@ interface JobDecompositionCanvasProps {
 const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
   cards = [],
   onCardMove,
+  onCardReorder,
   onFileUpload,
   maxCards = 10,
   isRoomOwner = false,
@@ -64,8 +66,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
   };
 
   const handleCardReorder = (newCardIds: string[]) => {
-    // 重新排序時通知父組件 - 這裡可能需要新的callback
-    console.log('Card reorder:', newCardIds);
+    onCardReorder?.(newCardIds);
   };
 
   const handleMaxCardsChange = (newMax: number) => {

@@ -34,6 +34,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
     state,
     draggedByOthers,
     handleCardMove: baseHandleCardMove,
+    handleCardReorder,
     cardSync,
     updateCards,
   } = useUnifiedCardSync({
@@ -104,6 +105,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
         <GridCanvas
           cards={mainDeck?.cards || []}
           onCardMove={handleCardMove}
+          onCardReorder={handleCardReorder}
           rank1Cards={rank1Cards}
           rank2Cards={rank2Cards}
           rank3Cards={rank3Cards}

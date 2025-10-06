@@ -31,13 +31,14 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
   const [maxCards, setMaxCards] = useState(10);
 
   // 使用統一的卡片同步 Hook
-  const { state, draggedByOthers, handleCardMove, cardSync, updateCards } = useUnifiedCardSync({
-    roomId,
-    gameType: GAMEPLAY_IDS.POSITION_BREAKDOWN,
-    storeKey: 'position',
-    isRoomOwner,
-    zones: ['position'], // 定義這個遊戲的區域
-  });
+  const { state, draggedByOthers, handleCardMove, handleCardReorder, cardSync, updateCards } =
+    useUnifiedCardSync({
+      roomId,
+      gameType: GAMEPLAY_IDS.POSITION_BREAKDOWN,
+      storeKey: 'position',
+      isRoomOwner,
+      zones: ['position'], // 定義這個遊戲的區域
+    });
 
   // 載入牌組
   useEffect(() => {
@@ -107,6 +108,7 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
           maxCards={maxCards}
           isRoomOwner={isRoomOwner}
           onCardMove={(cardId, zone) => handleCardMove(cardId, zone ? 'position' : null)}
+          onCardReorder={(newCardIds) => handleCardReorder('position', newCardIds)}
           onFileUpload={handleFileUpload}
           placedCards={positionCards}
           uploadedFile={state.cardPlacements.uploadedFile}

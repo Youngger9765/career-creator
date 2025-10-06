@@ -17,6 +17,7 @@ interface CollectionCanvasProps {
   cards?: CardData[];
   collectedCardIds?: string[];
   onCardCollect?: (cardId: string, collected: boolean) => void;
+  onCardReorder?: (newCardIds: string[]) => void;
   maxCards?: number;
   onMaxCardsChange?: (newMax: number) => void;
   isRoomOwner?: boolean;
@@ -30,6 +31,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   cards = [],
   collectedCardIds: externalCollectedCardIds,
   onCardCollect,
+  onCardReorder,
   maxCards = 15,
   onMaxCardsChange,
   isRoomOwner = false,
@@ -61,8 +63,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
 
   // 處理卡片重新排序
   const handleCardReorder = (newCardIds: string[]) => {
-    // TODO: 需要一個單獨的 onReorder 回調來處理重新排序
-    console.log('Reorder not implemented yet:', newCardIds);
+    onCardReorder?.(newCardIds);
   };
 
   // 處理上限變更

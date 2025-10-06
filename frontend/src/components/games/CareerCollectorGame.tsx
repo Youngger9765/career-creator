@@ -31,7 +31,7 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
   const [maxCards, setMaxCards] = useState(15);
 
   // 使用統一的卡片同步 Hook
-  const { state, draggedByOthers, handleCardMove, cardSync } = useUnifiedCardSync({
+  const { state, draggedByOthers, handleCardMove, handleCardReorder, cardSync } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.CAREER_COLLECTOR,
     storeKey: 'career',
@@ -89,6 +89,7 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
           onCardCollect={(cardId, collected) =>
             handleCardMove(cardId, collected ? 'collected' : null)
           }
+          onCardReorder={(newCardIds) => handleCardReorder('collected', newCardIds)}
           onMaxCardsChange={setMaxCards}
           draggedByOthers={draggedByOthers}
           onDragStart={cardSync.startDrag}

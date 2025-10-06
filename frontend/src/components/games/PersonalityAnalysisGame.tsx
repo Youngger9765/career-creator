@@ -31,7 +31,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
   const [maxCardsPerColumn, setMaxCardsPerColumn] = useState(10);
 
   // 使用統一的卡片同步 Hook
-  const { state, draggedByOthers, handleCardMove, cardSync } = useUnifiedCardSync({
+  const { state, draggedByOthers, handleCardMove, handleCardReorder, cardSync } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
     storeKey: 'personality',
@@ -89,6 +89,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
           isRoomOwner={isRoomOwner}
           maxCardsPerColumn={maxCardsPerColumn}
           onCardMove={handleCardMove}
+          onCardReorder={handleCardReorder}
           cardPlacements={state.cardPlacements}
           draggedByOthers={draggedByOthers}
           onDragStart={cardSync.startDrag}

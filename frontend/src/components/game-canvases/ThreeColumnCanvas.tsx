@@ -27,6 +27,7 @@ interface ThreeColumnCanvasProps {
     column: 'like' | 'neutral' | 'dislike' | null,
     broadcast?: boolean
   ) => void;
+  onCardReorder?: (column: 'like' | 'neutral' | 'dislike', newCardIds: string[]) => void;
   maxCardsPerColumn?: number;
   isRoomOwner?: boolean;
   className?: string;
@@ -43,6 +44,7 @@ interface ThreeColumnCanvasProps {
 const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   cards = [],
   onCardMove,
+  onCardReorder,
   maxCardsPerColumn = 10,
   isRoomOwner = false,
   className = '',
@@ -71,7 +73,10 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   };
 
   const handleLikeReorder = (newCardIds: string[]) => {
-    // 排序功能暫時不實作
+    // 通過父組件更新排序
+    if (onCardReorder) {
+      onCardReorder('like', newCardIds);
+    }
   };
 
   const handleNeutralAdd = (cardId: string) => {
@@ -83,7 +88,10 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   };
 
   const handleNeutralReorder = (newCardIds: string[]) => {
-    // 排序功能暫時不實作
+    // 通過父組件更新排序
+    if (onCardReorder) {
+      onCardReorder('neutral', newCardIds);
+    }
   };
 
   const handleDislikeAdd = (cardId: string) => {
@@ -95,7 +103,10 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   };
 
   const handleDislikeReorder = (newCardIds: string[]) => {
-    // 排序功能暫時不實作
+    // 通過父組件更新排序
+    if (onCardReorder) {
+      onCardReorder('dislike', newCardIds);
+    }
   };
 
   const handleLikeMaxChange = (newMax: number) => {

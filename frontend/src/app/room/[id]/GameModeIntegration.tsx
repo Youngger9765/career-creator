@@ -9,6 +9,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { GameModeService } from '@/game-modes/services/mode.service';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import CombinedGameSelector from '@/game-modes/components/CombinedGameSelector';
@@ -52,8 +53,16 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   const [selectedGameplay, setSelectedGameplay] = useState<string>(currentGameplay || '');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [syncInfoExpanded, setSyncInfoExpanded] = useState(false);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
   const isRoomOwner = !isVisitor;
+
+  // 找到 Portal 容器
+  useEffect(() => {
+    const container = document.getElementById('sync-status-container');
+    setPortalContainer(container);
+  }, []);
 
   // 使用遊戲模式同步 Hook
   const {
@@ -176,33 +185,46 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     }
   };
 
-  return (
-    <div className="h-full flex flex-col relative">
-      {/* 同步狀態顯示 */}
-      {isConnected && (
-        <div className="absolute top-4 right-4 z-10 space-y-2">
-          {/* 連線狀態 */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg px-3 py-2 flex items-center gap-2">
-            <div
-              className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}
-            />
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              {isConnected ? '已同步' : '未連線'}
-            </span>
+  // 同步狀態組件
+  const syncStatusComponent = isConnected && portalContainer ? (
+    <>
+      {syncInfoExpanded ? (
+        // 展開狀態 - 顯示完整資訊
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-3 space-y-2 min-w-[200px] absolute right-0 top-full mt-2 z-50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`}
+              />
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                {isConnected ? '已同步' : '未連線'}
+              </span>
+            </div>
+            <button
+              onClick={() => setSyncInfoExpanded(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
 
           {/* Owner 狀態（訪客才顯示） */}
           {isVisitor && (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg px-3 py-2">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                {ownerOnline ? '🟢 諮詢師在線' : '⏸️ 等待諮詢師'}
-              </span>
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              {ownerOnline ? '🟢 諮詢師在線' : '⏸️ 等待諮詢師'}
             </div>
           )}
 
           {/* 當前同步模式 */}
           {syncedState.deck && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-3 py-2">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg px-2 py-1.5">
               <div className="text-xs text-gray-500 dark:text-gray-400">當前同步模式：</div>
               <div className="text-sm font-medium text-blue-700 dark:text-blue-400">
                 {syncedState.deck} - {syncedState.gameRule}
@@ -210,7 +232,38 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
             </div>
           )}
         </div>
+      ) : (
+        // 收合狀態 - 只顯示圖標
+        <button
+          onClick={() => setSyncInfoExpanded(true)}
+          className="bg-white dark:bg-gray-800 rounded-full shadow-md p-2 hover:shadow-lg transition-all flex items-center gap-1.5 group relative"
+          title="點擊查看同步資訊"
+        >
+          <div
+            className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}
+          />
+          <svg
+            className="w-4 h-4 text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </button>
       )}
+    </>
+  ) : null;
+
+  return (
+    <div className="h-full flex flex-col relative">
+      {/* 使用 Portal 將同步狀態渲染到頂部容器 */}
+      {portalContainer && syncStatusComponent && createPortal(syncStatusComponent, portalContainer)}
 
       {/* 主要內容區域 */}
       <div className="flex-1 overflow-hidden">

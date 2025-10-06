@@ -9,6 +9,14 @@ import { useRoomParticipants } from '@/hooks/use-room-participants';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
 import { ParticipantList } from '@/components/room/ParticipantList';
 import GameModeIntegration from './GameModeIntegration';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export default function RoomPage() {
   const params = useParams();
@@ -22,6 +30,7 @@ export default function RoomPage() {
   const [isChecking, setIsChecking] = useState(true);
   const [showVisitorWelcome, setShowVisitorWelcome] = useState(false);
   const [visitorName, setVisitorName] = useState('');
+  const [showExitDialog, setShowExitDialog] = useState(false);
 
   // Game Session for state persistence
   const gameSession = useGameSession({
@@ -229,9 +238,23 @@ export default function RoomPage() {
       <div className="sticky top-0 z-50 bg-white shadow-sm border-b">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center space-x-6">
-            <button onClick={() => router.push('/')} className="text-gray-600 hover:text-gray-800">
-              ← 返回
-            </button>
+            {/* 退出按鈕 - 只在選擇遊戲模式時顯示 */}
+            {!currentGameplay && (
+              <button
+                onClick={() => setShowExitDialog(true)}
+                className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2 font-medium"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+                退出諮詢室
+              </button>
+            )}
 
             {currentRoom && (
               <div>
@@ -282,6 +305,8 @@ export default function RoomPage() {
             {currentRoom && (
               <div className="text-sm text-gray-500">分享碼: {currentRoom.share_code}</div>
             )}
+            {/* 同步資訊圖標移到這裡 */}
+            <div id="sync-status-container" className="relative"></div>
           </div>
         </div>
       </div>
@@ -325,6 +350,35 @@ export default function RoomPage() {
           router.push('/');
         }}
       />
+
+      {/* Exit Confirmation Dialog */}
+      <Dialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>確認退出諮詢室</DialogTitle>
+            <DialogDescription>
+              您確定要退出諮詢室嗎？未儲存的變更可能會遺失。
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <button
+              onClick={() => setShowExitDialog(false)}
+              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              取消
+            </button>
+            <button
+              onClick={() => {
+                setShowExitDialog(false);
+                router.push('/dashboard');
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              確認退出
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

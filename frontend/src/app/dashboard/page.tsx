@@ -418,14 +418,22 @@ export default function DashboardPage() {
                     新建諮詢室
                   </Link>
                 </div>
-                <RoomListTable rooms={activeRooms} emptyMessage="目前沒有活躍的諮詢室" />
+                <RoomListTable
+                  rooms={activeRooms}
+                  emptyMessage="目前沒有活躍的諮詢室"
+                  onDelete={(room) => setDeletingRoom(room)}
+                />
               </div>
             )}
 
             {selectedTab === 'history' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">歷史記錄</h3>
-                <RoomListTable rooms={historyRooms} emptyMessage="目前沒有歷史記錄" />
+                <RoomListTable
+                  rooms={historyRooms}
+                  emptyMessage="目前沒有歷史記錄"
+                  onDelete={(room) => setDeletingRoom(room)}
+                />
               </div>
             )}
           </div>
@@ -560,7 +568,11 @@ export default function DashboardPage() {
             {selectedTab === 'history' && (
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">歷史記錄</h3>
-                <RoomListTable rooms={historyRooms} emptyMessage="目前沒有歷史記錄" />
+                <RoomListTable
+                  rooms={historyRooms}
+                  emptyMessage="目前沒有歷史記錄"
+                  onDelete={(room) => setDeletingRoom(room)}
+                />
               </div>
             )}
           </div>

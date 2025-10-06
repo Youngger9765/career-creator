@@ -3,18 +3,20 @@
 import React from 'react';
 import Link from 'next/link';
 import { Room } from '@/types/api';
-import { ExternalLink, Calendar, Clock, Users, MessageCircle, Copy, Home } from 'lucide-react';
+import { ExternalLink, Calendar, Clock, Users, MessageCircle, Copy, Home, Trash2 } from 'lucide-react';
 
 interface RoomListTableProps {
   rooms: Room[];
   showClient?: boolean;
   emptyMessage?: string;
+  onDelete?: (room: Room) => void;
 }
 
 export function RoomListTable({
   rooms,
   showClient = true,
   emptyMessage = '沒有諮詢室記錄',
+  onDelete,
 }: RoomListTableProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -145,6 +147,18 @@ export function RoomListTable({
                     <Copy className="w-4 h-4" />
                     <span className="font-mono">#{room.share_code}</span>
                   </button>
+                  {onDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(room);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 rounded transition-colors"
+                      title="刪除諮詢室"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>

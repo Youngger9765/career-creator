@@ -1,53 +1,40 @@
 # Pre-commit hooks for code quality
-# Install: pip install pre-commit && pre-commit install
+# Install: pip install pre-commit && pre-commit install && pre-commit install --hook-type pre-push
 # Run manually: pre-commit run --all-files
+#
+# Strategy:
+# - COMMIT: Functionality, security, and model-related checks
+# - PUSH: Formatting and comprehensive tests
 
 repos:
-  # General hooks
+  # ============================================================
+  # COMMIT STAGE: Functionality, Security, Model Checks
+  # ============================================================
+
+  # File structure and data model validation
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
       - id: check-yaml
-      - id: check-added-large-files
-        args: ['--maxkb=500']
       - id: check-json
       - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=500']
       - id: check-merge-conflict
-      - id: detect-private-key
-      - id: mixed-line-ending
-        args: ['--fix=lf']
       - id: check-case-conflict
+      - id: detect-private-key
 
-  # Python - Black formatter
-  - repo: https://github.com/psf/black
-    rev: 24.3.0
-    hooks:
-      - id: black
-        files: ^backend/
-        language_version: python3.11
-
-  # Python - isort (import sorting)
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        files: ^backend/
-        args: ["--profile", "black"]
-
-  # Python - Flake8 linter
+  # Python - Functionality checks (linting and type checking)
   - repo: https://github.com/pycqa/flake8
     rev: 7.0.0
     hooks:
       - id: flake8
         files: ^backend/
         args:
-          - --max-line-length=88  # Match Black's line length
-          - --extend-ignore=E203,W503  # Compatible with Black
+          - --max-line-length=88
+          - --extend-ignore=E203,W503
           - --exclude=backend/alembic/versions/*
 
-  # Python - Type checking with mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.9.0
     hooks:
@@ -60,18 +47,7 @@ repos:
           - sqlmodel
           - pydantic
 
-  # Python - Run tests with pytest
-  - repo: local
-    hooks:
-      - id: pytest
-        name: Pytest
-        entry: bash -c 'cd backend && pytest --tb=short'
-        language: system
-        files: ^backend/.*\.py$
-        pass_filenames: false
-        stages: [push]  # Only run on push to avoid slowdown
-
-  # Frontend - ESLint
+  # Frontend - Functionality checks (linting and type checking)
   - repo: local
     hooks:
       - id: eslint
@@ -81,9 +57,6 @@ repos:
         files: ^frontend/.*\.(js|jsx|ts|tsx)$
         pass_filenames: false
 
-  # Frontend - TypeScript Compiler
-  - repo: local
-    hooks:
       - id: tsc
         name: TypeScript Compiler
         entry: bash -c 'cd frontend && npx tsc --noEmit'
@@ -91,93 +64,28 @@ repos:
         files: ^frontend/.*\.(ts|tsx)$
         pass_filenames: false
 
-  # Frontend - Build Check
-  - repo: local
-    hooks:
-      - id: nextjs-build
-        name: Next.js Build Check
-        entry: bash -c 'cd frontend && npm run build'
-        language: system
-        files: ^frontend/.*\.(ts|tsx|js|jsx)$
-        pass_filenames: false
-        stages: [push]  # Only run on push, not every commit
-
-  # Frontend - Tests (if exist)
-  - repo: local
-    hooks:
-      - id: frontend-tests
-        name: Frontend Tests
-        entry: bash -c 'cd frontend && npm test -- --passWithNoTests'
-        language: system
-        files: ^frontend/.*\.(ts|tsx|js|jsx)$
-        pass_filenames: false
-        stages: [push]  # Only run on push
-
-  # Frontend - Prettier formatter
-  - repo: local
-    hooks:
-      - id: prettier
-        name: Prettier
-        entry: bash -c 'cd frontend && npx prettier --check "src/**/*.{js,jsx,ts,tsx,css,md,json}"'
-        language: system
-        files: ^frontend/.*\.(js|jsx|ts|tsx|css|md|json)$
-        pass_filenames: false
-
-  # SQL formatter (for migrations)
-  - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 3.0.2
-    hooks:
-      - id: sqlfluff-lint
-        files: ^backend/alembic/versions/.*\.py$
-        args: [--dialect, postgres]
-
-  # Security checks - Bandit for Python
+  # Security checks - Python
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.7
     hooks:
       - id: bandit
         files: ^backend/.*\.py$
         exclude: ^(backend/alembic/|backend/tests/|backend/scripts/)
-        args: [-ll, --skip, B101]  # Skip assert_used test, only show medium+ issues
+        args: [-ll, --skip, B101]
 
-  # Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.39.0
-    hooks:
-      - id: markdownlint
-        args: [--fix]
-        exclude: ^frontend/node_modules/
-
-  # Dockerfile linting - REMOVED (too slow for development)
-  # - repo: https://github.com/hadolint/hadolint
-  #   rev: v2.12.0
-  #   hooks:
-  #     - id: hadolint-docker
-  #       files: Dockerfile$
-
-  # Quick check for obvious hardcoded secrets
-  - repo: local
-    hooks:
-      - id: check-obvious-secrets
-        name: Check for obvious hardcoded secrets
-        entry: echo "Security check skipped - run ./scripts/security-check.sh manually"
-        language: system
-        pass_filenames: false
-
-  # Check for secrets with Gitleaks
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.18.2
-    hooks:
-      - id: gitleaks
-
-  # Additional security checks - Safety for Python dependencies
   - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
     rev: v1.3.3
     hooks:
       - id: python-safety-dependencies-check
         files: ^backend/requirements.*\.txt$
 
-  # Security check for frontend - npm audit
+  # Security checks - Secrets detection
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+
+  # Security checks - Frontend npm audit
   - repo: local
     hooks:
       - id: npm-audit
@@ -187,25 +95,95 @@ repos:
         files: ^frontend/package.*\.json$
         pass_filenames: false
 
-  # TruffleHog secret scanner (optional - requires Docker)
-  # Uncomment if you want to use TruffleHog
-  # - repo: local
-  #   hooks:
-  #     - id: trufflehog
-  #       name: TruffleHog Secret Scanner
-  #       entry: bash -c 'docker run --rm -v "$PWD:/pwd" trufflesecurity/trufflehog:latest filesystem /pwd --only-verified --fail || true'
-  #       language: system
-  #       pass_filenames: false
-  #       stages: [commit]
+  # ============================================================
+  # PUSH STAGE: Formatting and Comprehensive Tests
+  # ============================================================
 
-  # Semgrep - Advanced static analysis (optional - slower but thorough)
-  # Uncomment if you want comprehensive security analysis
-  # - repo: https://github.com/returntocorp/semgrep
-  #   rev: v1.45.0
-  #   hooks:
-  #     - id: semgrep
-  #       args: ['--config=auto', '--error']
-  #       exclude: ^(frontend/node_modules|backend/venv|backend/alembic)/
+  # Python - Formatters (push only)
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        files: ^backend/
+        language_version: python3.11
+        stages: [push]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        files: ^backend/
+        args: ["--profile", "black"]
+        stages: [push]
+
+  # General formatters (push only)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        stages: [push]
+      - id: end-of-file-fixer
+        stages: [push]
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+        stages: [push]
+
+  # Frontend - Prettier formatter (push only)
+  - repo: local
+    hooks:
+      - id: prettier
+        name: Prettier
+        entry: bash -c 'cd frontend && npx prettier --check "src/**/*.{js,jsx,ts,tsx,css,md,json}"'
+        language: system
+        files: ^frontend/.*\.(js|jsx|ts|tsx|css|md|json)$
+        pass_filenames: false
+        stages: [push]
+
+  # SQL formatter (push only)
+  - repo: https://github.com/sqlfluff/sqlfluff
+    rev: 3.0.2
+    hooks:
+      - id: sqlfluff-lint
+        files: ^backend/alembic/versions/.*\.py$
+        args: [--dialect, postgres]
+        stages: [push]
+
+  # Markdown linting (push only)
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        exclude: ^frontend/node_modules/
+        stages: [push]
+
+  # Tests (push only)
+  - repo: local
+    hooks:
+      - id: pytest
+        name: Pytest
+        entry: bash -c 'cd backend && pytest --tb=short'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [push]
+
+      - id: frontend-tests
+        name: Frontend Tests
+        entry: bash -c 'cd frontend && npm test -- --passWithNoTests'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        stages: [push]
+
+      - id: nextjs-build
+        name: Next.js Build Check
+        entry: bash -c 'cd frontend && npm run build'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        stages: [push]
+
 
 # Configuration for specific tools
 exclude: |

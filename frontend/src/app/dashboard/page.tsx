@@ -7,8 +7,7 @@ import { authAPI } from '../../lib/api/auth';
 import { useAuthStore } from '@/stores/auth-store';
 import { roomsAPI } from '../../lib/api/rooms';
 import { clientsAPI } from '../../lib/api/clients';
-import { cardEventsAPI } from '../../lib/api/card-events';
-import { Room, CardEvent } from '../../types/api';
+import { Room } from '../../types/api';
 import { ClientManagement } from '../../components/clients/ClientManagement';
 import {
   Calendar,
@@ -37,7 +36,6 @@ interface DashboardStats {
   totalRooms: number;
   activeRooms: number;
   totalSessions: number;
-  recentEvents: CardEvent[];
 }
 
 export default function DashboardPage() {
@@ -49,7 +47,6 @@ export default function DashboardPage() {
     totalRooms: 0,
     activeRooms: 0,
     totalSessions: 0,
-    recentEvents: [],
   });
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState<'clients' | 'active' | 'history'>(
@@ -115,22 +112,10 @@ export default function DashboardPage() {
         // Calculate stats using the new expiration hook
         const activeRooms = roomExpiration.filterActiveRooms(myRooms);
 
-        // Load recent events from all rooms
-        const recentEvents: CardEvent[] = [];
-        for (const room of myRooms.slice(0, 5)) {
-          try {
-            const events = await cardEventsAPI.getLatestRoomEvents(room.id, 5);
-            recentEvents.push(...events);
-          } catch (error) {
-            console.error(`Failed to load events for room ${room.id}:`, error);
-          }
-        }
-
         setStats({
           totalRooms: myRooms.length,
           activeRooms: activeRooms.length,
           totalSessions: myRooms.reduce((sum, room) => sum + (room.session_count || 1), 0),
-          recentEvents: recentEvents.slice(0, 10),
         });
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
@@ -297,17 +282,17 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Weekly Activity Card */}
+          {/* Total Clients Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-orange-500"></div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-orange-50 rounded-xl">
-                  <TrendingUp className="w-6 h-6 text-orange-600" />
+                  <Users className="w-6 h-6 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 mb-1">本週活動</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.recentEvents.length}</p>
+                  <p className="text-sm text-gray-500 mb-1">客戶總數</p>
+                  <p className="text-3xl font-bold text-gray-900">{clientCount}</p>
                 </div>
               </div>
             </div>

@@ -52,8 +52,8 @@ export default function DashboardPage() {
     recentEvents: [],
   });
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'clients' | 'active' | 'history'>(
-    'overview'
+  const [selectedTab, setSelectedTab] = useState<'clients' | 'active' | 'history'>(
+    'active'
   );
 
   // Room filters and search
@@ -245,12 +245,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Stats Cards - Only show on overview tab for mobile */}
-      <div
-        className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${
-          selectedTab === 'overview' ? 'block' : 'hidden sm:block'
-        }`}
-      >
+      {/* Stats Cards */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 hidden sm:block">
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
           {/* Total Rooms Card */}
@@ -323,16 +319,6 @@ export default function DashboardPage() {
           <div className="border-b">
             <nav className="flex -mb-px">
               <button
-                onClick={() => setSelectedTab('overview')}
-                className={`px-6 py-3 text-sm font-medium ${
-                  selectedTab === 'overview'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                總覽
-              </button>
-              <button
                 onClick={() => setSelectedTab('clients')}
                 className={`px-6 py-3 text-sm font-medium ${
                   selectedTab === 'clients'
@@ -366,40 +352,6 @@ export default function DashboardPage() {
           </div>
 
           <div className="p-6">
-            {selectedTab === 'overview' && (
-              <div className="space-y-6">
-                {/* Recent Activity */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">最近活動</h3>
-                  {stats.recentEvents.length > 0 ? (
-                    <div className="space-y-3">
-                      {stats.recentEvents.map((event) => (
-                        <div
-                          key={event.id}
-                          className="flex items-center justify-between py-3 border-b"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-blue-50 rounded">
-                              <Activity className="w-4 h-4 text-blue-600" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">
-                                {event.performer_name || '未知用戶'} - {event.event_type}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {formatDate(event.created_at)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 text-center py-8">尚無活動記錄</p>
-                  )}
-                </div>
-              </div>
-            )}
 
             {selectedTab === 'clients' && (
               <div className="space-y-6">
@@ -441,39 +393,7 @@ export default function DashboardPage() {
 
         {/* Mobile Content - Only show active tab on mobile */}
         <div className="sm:hidden bg-white rounded-lg shadow">
-          <div className="p-4">
-            {selectedTab === 'overview' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">最近活動</h3>
-                {stats.recentEvents.length > 0 ? (
-                  <div className="space-y-3">
-                    {stats.recentEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
-                      >
-                        <div className="p-2 bg-blue-100 rounded-full">
-                          <Activity className="w-4 h-4 text-blue-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {event.event_type}
-                          </p>
-                          <p className="text-xs text-gray-500">{formatDate(event.created_at)}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg">
-                    <Archive className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <h3 className="text-sm font-medium text-gray-900 mb-2">沒有歷史記錄</h3>
-                    <p className="text-sm text-gray-500">完成的諮詢諮詢室會顯示在這裡</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          <div className="p-4"></div>
         </div>
       </div>
 
@@ -500,36 +420,6 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4 sm:hidden">
         <div className="bg-white rounded-lg shadow">
           <div className="p-4">
-            {selectedTab === 'overview' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">最近活動</h3>
-                {stats.recentEvents.length > 0 ? (
-                  <div className="space-y-3">
-                    {stats.recentEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="flex items-center justify-between py-3 border-b"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-blue-50 rounded">
-                            <Activity className="w-4 h-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">
-                              {event.performer_name || '未知用戶'} - {event.event_type}
-                            </p>
-                            <p className="text-xs text-gray-500">{formatDate(event.created_at)}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-center py-8">尚無活動記錄</p>
-                )}
-              </div>
-            )}
-
             {selectedTab === 'clients' && (
               <div className="space-y-4">
                 <ClientManagement />
@@ -582,15 +472,6 @@ export default function DashboardPage() {
       {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 sm:hidden">
         <nav className="flex justify-around">
-          <button
-            onClick={() => setSelectedTab('overview')}
-            className={`flex flex-col items-center py-2 px-3 min-w-0 flex-1 ${
-              selectedTab === 'overview' ? 'text-blue-600' : 'text-gray-600'
-            }`}
-          >
-            <TrendingUp className="w-5 h-5 mb-1" />
-            <span className="text-xs font-medium truncate">總覽</span>
-          </button>
           <button
             onClick={() => setSelectedTab('clients')}
             className={`flex flex-col items-center py-2 px-3 min-w-0 flex-1 relative ${

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { ClientForm } from './ClientForm';
 import { RoomListTable } from '../rooms/RoomListTable';
+import { DeleteRoomDialog } from '../rooms/DeleteRoomDialog';
 
 interface ClientManagementProps {
   className?: string;
@@ -45,6 +46,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [deletingRoom, setDeletingRoom] = useState<any>(null);
 
   useEffect(() => {
     loadClients();
@@ -112,6 +114,12 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     alert(
       `未來功能：系統將寄送驗證信件到 ${clientEmail}\n\n客戶將收到驗證連結，點擊後即可完成 Email 驗證。\n\n此功能正在開發中，敬請期待！`
     );
+  };
+
+  const handleDeleteRoomSuccess = (deletedRoomId: string) => {
+    // Refresh clients to update room counts
+    loadClients();
+    setDeletingRoom(null);
   };
 
   const filteredClients = clients
@@ -501,6 +509,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       )}
                                       showClient={false}
                                       emptyMessage="尚無諮詢室"
+                                      onDelete={(room) => setDeletingRoom(room)}
                                     />
 
                                     {/* 創建諮詢室按鈕 - 虛線框樣式 */}
@@ -712,6 +721,16 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
             )}
           </div>
         </div>
+      )}
+
+      {/* Delete Room Dialog */}
+      {deletingRoom && (
+        <DeleteRoomDialog
+          room={deletingRoom}
+          open={!!deletingRoom}
+          onClose={() => setDeletingRoom(null)}
+          onSuccess={handleDeleteRoomSuccess}
+        />
       )}
     </div>
   );

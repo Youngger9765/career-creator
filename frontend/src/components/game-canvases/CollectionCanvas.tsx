@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
 import { Star } from 'lucide-react';
 import DropZone from '../common/DropZone';
@@ -42,7 +42,6 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
 }) => {
   // 使用外部狀態，不再內部管理
   const collectedCardIds = externalCollectedCardIds || [];
-  const [isLimitLocked, setIsLimitLocked] = useState(false);
 
   // 處理卡片添加
   const handleCardAdd = (cardId: string) => {
@@ -71,8 +70,6 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
     onMaxCardsChange?.(newMax);
   };
 
-  const hasCards = collectedCardIds.length > 0;
-
   return (
     <div className={`w-full h-full overflow-y-auto ${className}`}>
       <div className="min-h-full">
@@ -96,9 +93,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
           allowReorder={true}
           showCounter={true}
           isEditable={isRoomOwner}
-          isLocked={isLimitLocked || hasCards}
           onMaxCardsChange={handleMaxCardsChange}
-          onLockToggle={setIsLimitLocked}
           onCardAdd={handleCardAdd}
           onCardRemove={handleCardRemove}
           onCardReorder={handleCardReorder}

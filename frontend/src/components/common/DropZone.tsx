@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, LucideIcon, Edit2, Lock, Unlock, Save, X, RotateCw, Eye, LayoutGrid, List } from 'lucide-react';
+import { AlertCircle, LucideIcon, RotateCw, Eye, LayoutGrid, List } from 'lucide-react';
 import CardModal from './CardModal';
 
 // 簡化的卡片介面
@@ -116,27 +116,15 @@ const DropZone: React.FC<DropZoneProps> = ({
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [isEditingLimit, setIsEditingLimit] = useState(false);
   const [tempMaxCards, setTempMaxCards] = useState(maxCards);
-  const [localLocked, setLocalLocked] = useState(isLocked);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [viewingCard, setViewingCard] = useState<CardData | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid'); // 視圖模式
-
-  // 同步外部 isLocked 狀態
-  useEffect(() => {
-    setLocalLocked(isLocked);
-  }, [isLocked]);
 
   // 同步外部 maxCards 狀態
   useEffect(() => {
     setTempMaxCards(maxCards);
   }, [maxCards]);
-
-  // 判斷是否有卡片（影響是否能編輯上限）
-  const hasCards = placedCardIds.length > 0;
-  // 當有卡片時自動鎖定，或手動鎖定
-  const effectivelyLocked = localLocked || hasCards;
 
   // 卡片類型驗證函數
   const isCardTypeAllowed = (cardId: string): boolean => {
@@ -504,10 +492,10 @@ const DropZone: React.FC<DropZoneProps> = ({
                   e.stopPropagation();
                   onCardRemove?.(card.id);
                 }}
-                className="p-1.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                className="p-1.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-md transition-colors opacity-0 group-hover:opacity-100 text-red-600 dark:text-red-400 font-bold text-sm"
                 title="移除卡片"
               >
-                <X className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
+                ×
               </button>
             )}
           </div>
@@ -559,17 +547,52 @@ const DropZone: React.FC<DropZoneProps> = ({
               className={`flex-shrink-0 px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 ${headerClassName}`}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   {Icon && <Icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
-                  <div>
+                  <div className="flex-1">
                     {title && (
                       <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {title}
                       </h3>
                     )}
-                    {subtitle && (
-                      <p className="text-xs text-gray-600 dark:text-gray-400">{subtitle}</p>
-                    )}
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {subtitle && (
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{subtitle}</p>
+                      )}
+                      {/* 數量編輯器 - 簡化版 */}
+                      {isEditable && showCounter && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">上限:</span>
+                          <input
+                            type="text"
+                            value={tempMaxCards.toString()}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value !== '' && !/^\d*$/.test(value)) return;
+                              setTempMaxCards(value === '' ? 0 : parseInt(value));
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                const finalValue = Math.max(1, tempMaxCards);
+                                setTempMaxCards(finalValue);
+                                onMaxCardsChange?.(finalValue);
+                                e.currentTarget.blur();
+                              }
+                            }}
+                            onBlur={() => {
+                              const finalValue = Math.max(1, tempMaxCards);
+                              if (finalValue !== maxCards) {
+                                setTempMaxCards(finalValue);
+                                onMaxCardsChange?.(finalValue);
+                              }
+                            }}
+                            className="w-10 text-xs text-center px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-900 dark:text-gray-100 font-medium"
+                            onFocus={(e) => e.target.select()}
+                          />
+                          <span className="text-xs text-gray-500 dark:text-gray-400">張</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -599,121 +622,10 @@ const DropZone: React.FC<DropZoneProps> = ({
                     </button>
                   </div>
 
-                  {/* 鎖定按鈕 */}
-                  {isEditable && (
-                    <button
-                      onClick={() => {
-                        if (!hasCards) {
-                          const newLocked = !localLocked;
-                          setLocalLocked(newLocked);
-                          onLockToggle?.(newLocked);
-                        }
-                      }}
-                      className={`p-1 rounded text-xs ${
-                        hasCards
-                          ? 'bg-yellow-500 text-white cursor-default'
-                          : localLocked
-                            ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                            : 'bg-gray-500 hover:bg-gray-600 text-white'
-                      }`}
-                      title={hasCards ? '有卡片時自動鎖定' : localLocked ? '點擊解鎖' : '點擊鎖定'}
-                    >
-                      {effectivelyLocked ? (
-                        <Lock className="w-3 h-3" />
-                      ) : (
-                        <Unlock className="w-3 h-3" />
-                      )}
-                    </button>
-                  )}
-
-                  {/* 計數器和編輯 */}
+                  {/* 計數器 */}
                   {showCounter && (
-                    <div className="flex items-center space-x-1">
-                      {isEditingLimit ? (
-                        <div className="flex items-center space-x-1 bg-white dark:bg-gray-800 rounded-md px-2 py-1 border-2 border-blue-500">
-                          <span className="text-xs text-gray-600 dark:text-gray-400">
-                            {placedCardIds.length} /
-                          </span>
-                          <input
-                            type="text"
-                            value={tempMaxCards.toString()}
-                            onChange={(e) => {
-                              // 允許清空和輸入任何數字
-                              const value = e.target.value;
-
-                              // 如果輸入的不是數字，直接返回
-                              if (value !== '' && !/^\d*$/.test(value)) {
-                                return;
-                              }
-
-                              // 允許暫時清空（顯示空白）
-                              if (value === '') {
-                                setTempMaxCards(0);
-                                return;
-                              }
-
-                              // 設定數字值
-                              const numValue = parseInt(value);
-                              setTempMaxCards(numValue);
-                            }}
-                            onBlur={() => {
-                              // 失去焦點時，如果是0或無效值，設為1
-                              if (tempMaxCards === 0) {
-                                setTempMaxCards(1);
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                const finalValue = Math.max(1, tempMaxCards);
-                                setTempMaxCards(finalValue);
-                                onMaxCardsChange?.(finalValue);
-                                setIsEditingLimit(false);
-                                if (!localLocked && !hasCards) {
-                                  setLocalLocked(true);
-                                  onLockToggle?.(true);
-                                }
-                              } else if (e.key === 'Escape') {
-                                setTempMaxCards(maxCards);
-                                setIsEditingLimit(false);
-                              }
-                            }}
-                            className="w-12 text-xs text-center bg-yellow-50 dark:bg-gray-700 border-b border-blue-500 outline-none text-gray-900 dark:text-gray-100 font-bold"
-                            autoFocus
-                            onFocus={(e) => e.target.select()}
-                          />
-                          <button
-                            onClick={() => {
-                              // 儲存時確保至少為1
-                              const finalValue = Math.max(1, tempMaxCards);
-                              setTempMaxCards(finalValue);
-                              onMaxCardsChange?.(finalValue);
-                              setIsEditingLimit(false);
-                              // 編輯完成後自動鎖定
-                              if (!localLocked && !hasCards) {
-                                setLocalLocked(true);
-                                onLockToggle?.(true);
-                              }
-                            }}
-                            className="text-green-600 hover:text-green-700 p-0.5"
-                            title="儲存並鎖定"
-                          >
-                            <Save className="w-3 h-3" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setTempMaxCards(maxCards);
-                              setIsEditingLimit(false);
-                            }}
-                            className="text-red-600 hover:text-red-700 p-0.5"
-                            title="取消"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <span
-                            className={`
+                    <span
+                      className={`
                         text-xs font-medium px-2 py-1 rounded flex items-center space-x-1
                         ${
                           isOverLimit
@@ -721,28 +633,11 @@ const DropZone: React.FC<DropZoneProps> = ({
                             : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                         }
                       `}
-                          >
-                            <span>
-                              {placedCardIds.length} / {maxCards}
-                            </span>
-                          </span>
-
-                          {/* 編輯按鈕 - 在數字右邊 */}
-                          {isEditable && !effectivelyLocked && (
-                            <button
-                              onClick={() => {
-                                setTempMaxCards(maxCards);
-                                setIsEditingLimit(true);
-                              }}
-                              className="p-1 rounded text-xs bg-blue-500 hover:bg-blue-600 text-white transition-colors"
-                              title="編輯上限"
-                            >
-                              <Edit2 className="w-3 h-3" />
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
+                    >
+                      <span>
+                        {placedCardIds.length} / {maxCards}
+                      </span>
+                    </span>
                   )}
 
                   {isOverLimit && <AlertCircle className="w-4 h-4 text-red-500" />}

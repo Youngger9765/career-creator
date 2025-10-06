@@ -104,10 +104,18 @@ jobs:
           echo "🌐 Backend deployed to: $SERVICE_URL"
 
       - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ env.DIRECT_DATABASE_URL }}
         run: |
           echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
-          # Note: Migrations should be run from a secure environment
-          # For now, we'll skip this and run manually
+          # Install alembic and required dependencies
+          pip install alembic sqlmodel psycopg2-binary
+
+          # Navigate to backend directory and run migrations
+          cd backend
+          alembic upgrade head
+
+          echo "✅ Migrations completed successfully"
 
       - name: Run health check
         run: |

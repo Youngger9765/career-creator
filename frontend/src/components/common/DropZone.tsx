@@ -8,7 +8,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, LucideIcon, Edit2, Lock, Unlock, Save, X, RotateCw, Eye } from 'lucide-react';
+import { AlertCircle, LucideIcon, Edit2, Lock, Unlock, Save, X, RotateCw, Eye, LayoutGrid, List } from 'lucide-react';
 import CardModal from './CardModal';
 
 // 簡化的卡片介面
@@ -121,6 +121,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   const [localLocked, setLocalLocked] = useState(isLocked);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [viewingCard, setViewingCard] = useState<CardData | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid'); // 視圖模式
 
   // 同步外部 isLocked 狀態
   useEffect(() => {
@@ -282,7 +283,7 @@ const DropZone: React.FC<DropZoneProps> = ({
     return (
       <div
         key={card.id}
-        className="relative"
+        className="relative group"
         style={{ width: typeof cardWidth === 'number' ? `${cardWidth}px` : cardWidth }}
         draggable={allowReorder}
         onDragStart={(e) => allowReorder && handleCardDragStart(e, card.id, index)}
@@ -348,18 +349,31 @@ const DropZone: React.FC<DropZoneProps> = ({
         >
           {/* 卡片正面/背面內容 */}
           <div className="p-3 pb-12 flex flex-col h-full relative">
-            {/* 翻面按鈕 - 在卡片內容底部 */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleCardFlip(card.id);
-              }}
-              className="absolute bottom-2 left-3 right-3 px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white dark:hover:bg-gray-700 transition-colors z-20 border border-gray-200 dark:border-gray-600 shadow-sm"
-              title="翻轉卡片"
-            >
-              <RotateCw className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-              <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">翻轉</span>
-            </button>
+            {/* 底部按鈕組 - 查看大卡 & 翻轉 */}
+            <div className="absolute bottom-2 left-3 right-3 flex gap-1.5 z-20">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setViewingCard(card);
+                }}
+                className="flex-1 px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600 shadow-sm"
+                title="查看大卡"
+              >
+                <Eye className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">查看</span>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleCardFlip(card.id);
+                }}
+                className="flex-1 px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600 shadow-sm"
+                title="翻轉卡片"
+              >
+                <RotateCw className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
+                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">翻轉</span>
+              </button>
+            </div>
             {!isFlipped ? (
               // 正面
               <>
@@ -559,6 +573,32 @@ const DropZone: React.FC<DropZoneProps> = ({
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
+                  {/* 視圖模式切換 */}
+                  <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-md p-0.5">
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === 'grid'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                      title="網格模式"
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('compact')}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === 'compact'
+                          ? 'bg-white dark:bg-gray-700 shadow-sm'
+                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
+                      title="列表模式"
+                    >
+                      <List className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                  </div>
+
                   {/* 鎖定按鈕 */}
                   {isEditable && (
                     <button
@@ -720,12 +760,12 @@ const DropZone: React.FC<DropZoneProps> = ({
             defaultRenderEmpty()
           )
         ) : (
-          <div className={compactMode ? 'flex flex-col gap-2' : 'flex flex-wrap gap-2'}>
+          <div className={viewMode === 'compact' ? 'flex flex-col gap-2' : 'flex flex-wrap gap-2'}>
             {placedCardIds.map((cardId, index) => {
               const card = cards.find((c) => c.id === cardId);
               if (!card) return null;
 
-              // 使用自定義渲染或根據 compact 模式選擇渲染方式
+              // 使用自定義渲染或根據視圖模式選擇渲染方式
               if (renderCard) {
                 return (
                   <div key={cardId} className="group">
@@ -735,11 +775,11 @@ const DropZone: React.FC<DropZoneProps> = ({
               }
 
               // Compact 模式 - 橫向標題條
-              if (compactMode) {
+              if (viewMode === 'compact') {
                 return compactRenderCard(card, index);
               }
 
-              // Full 模式 - 完整卡片
+              // Grid 模式 - 完整卡片
               return defaultRenderCard(card, index);
             })}
           </div>

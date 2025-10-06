@@ -202,7 +202,7 @@ def list_user_rooms(
     for room, client_name in results:
         room_dict = room.model_dump()
         if client_name:
-            room_dict["client_name"] = client_name
+            room_dict["primary_client_name"] = client_name
 
         # Add counselor name by looking up in database
         counselor = session.get(User, room.counselor_id)

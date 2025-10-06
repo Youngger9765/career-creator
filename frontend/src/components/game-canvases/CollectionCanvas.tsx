@@ -95,6 +95,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
           showRemoveButton={true}
           allowReorder={true}
           showCounter={true}
+          compactMode={true}
           isEditable={isRoomOwner}
           isLocked={isLimitLocked || hasCards}
           onMaxCardsChange={handleMaxCardsChange}

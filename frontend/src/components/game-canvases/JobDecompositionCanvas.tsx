@@ -96,6 +96,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
           showRemoveButton={true}
           allowReorder={true}
           showCounter={true}
+          compactMode={true}
           isEditable={isRoomOwner}
           isLocked={isLocked}
           onMaxCardsChange={handleMaxCardsChange}

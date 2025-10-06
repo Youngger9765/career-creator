@@ -8,7 +8,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { AlertCircle, LucideIcon, Edit2, Lock, Unlock, Save, X, RotateCw } from 'lucide-react';
+import { AlertCircle, LucideIcon, Edit2, Lock, Unlock, Save, X, RotateCw, Eye } from 'lucide-react';
+import CardModal from './CardModal';
 
 // 簡化的卡片介面
 interface CardData {
@@ -52,6 +53,7 @@ export interface DropZoneProps {
   showRemoveButton?: boolean;
   allowReorder?: boolean;
   showCounter?: boolean;
+  compactMode?: boolean; // 精簡模式 - 只顯示標題條
 
   // 管理功能
   isEditable?: boolean;
@@ -97,6 +99,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   showRemoveButton = true,
   allowReorder = true,
   showCounter = true,
+  compactMode = false,
   isEditable = false,
   isLocked = false,
   onMaxCardsChange,
@@ -117,6 +120,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   const [tempMaxCards, setTempMaxCards] = useState(maxCards);
   const [localLocked, setLocalLocked] = useState(isLocked);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
+  const [viewingCard, setViewingCard] = useState<CardData | null>(null);
 
   // 同步外部 isLocked 狀態
   useEffect(() => {
@@ -407,6 +411,102 @@ const DropZone: React.FC<DropZoneProps> = ({
     );
   };
 
+  // Compact 模式卡片渲染 - 橫向標題條
+  const compactRenderCard = (card: CardData, index: number) => {
+    const draggedBy = draggedByOthers?.get(card.id);
+
+    return (
+      <div
+        key={card.id}
+        className="relative w-full"
+        draggable={allowReorder}
+        onDragStart={(e) => allowReorder && handleCardDragStart(e, card.id, index)}
+        onDragEnd={() => allowReorder && handleCardDragEnd(card.id)}
+        onDragOver={(e) => {
+          if (!allowReorder) return;
+          e.preventDefault();
+          e.stopPropagation();
+          setDragOverIndex(index);
+        }}
+        onDrop={(e) => {
+          if (!allowReorder) return;
+          e.preventDefault();
+          e.stopPropagation();
+          handleDrop(e, index);
+        }}
+      >
+        {/* 插入線 */}
+        {allowReorder && dragOverIndex === index && (
+          <div className="absolute -top-1 left-0 right-0 h-0.5 bg-blue-500 animate-pulse" />
+        )}
+
+        {/* 拖曳標籤 */}
+        {draggedBy && (
+          <div className="absolute -top-6 left-0 right-0 z-30 flex justify-center animate-pulse">
+            <div className="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full shadow-lg whitespace-nowrap">
+              {draggedBy} 正在移動
+            </div>
+          </div>
+        )}
+
+        {/* 標題條 */}
+        <div
+          className={`${getCardBackground(card.id)} border rounded-lg px-3 py-2.5 flex items-center justify-between gap-2 hover:shadow-md transition-all cursor-move group`}
+        >
+          {/* 左側：編號 + 標題 */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {showCardNumbers && (
+              <div className="flex-shrink-0 w-5 h-5 bg-blue-500 text-white rounded-full flex items-center justify-center">
+                <span className="text-[10px] font-bold">{index + 1}</span>
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                {card.title}
+              </p>
+              {card.category && (
+                <p className={`text-[10px] font-medium ${getCategoryColor(card.id)} uppercase tracking-wide`}>
+                  {card.category}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* 右側：查看按鈕 + 移除按鈕 */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setViewingCard(card);
+              }}
+              className="p-1.5 bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 rounded-md transition-colors border border-gray-200 dark:border-gray-600"
+              title="查看大卡"
+            >
+              <Eye className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+            </button>
+            {showRemoveButton && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCardRemove?.(card.id);
+                }}
+                className="p-1.5 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                title="移除卡片"
+              >
+                <X className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 最後一張卡片後的插入線 */}
+        {allowReorder && dragOverIndex === index + 1 && index === placedCardIds.length - 1 && (
+          <div className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-500 animate-pulse" />
+        )}
+      </div>
+    );
+  };
+
   // 預設空狀態渲染
   const defaultRenderEmpty = () => (
     <div className="h-full flex flex-col items-center justify-center text-center p-4">
@@ -620,20 +720,34 @@ const DropZone: React.FC<DropZoneProps> = ({
             defaultRenderEmpty()
           )
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className={compactMode ? 'flex flex-col gap-2' : 'flex flex-wrap gap-2'}>
             {placedCardIds.map((cardId, index) => {
               const card = cards.find((c) => c.id === cardId);
               if (!card) return null;
 
-              return (
-                <div key={cardId} className="group">
-                  {renderCard ? renderCard(card, index) : defaultRenderCard(card, index)}
-                </div>
-              );
+              // 使用自定義渲染或根據 compact 模式選擇渲染方式
+              if (renderCard) {
+                return (
+                  <div key={cardId} className="group">
+                    {renderCard(card, index)}
+                  </div>
+                );
+              }
+
+              // Compact 模式 - 橫向標題條
+              if (compactMode) {
+                return compactRenderCard(card, index);
+              }
+
+              // Full 模式 - 完整卡片
+              return defaultRenderCard(card, index);
             })}
           </div>
         )}
       </div>
+
+      {/* CardModal for viewing large cards */}
+      <CardModal card={viewingCard} isOpen={!!viewingCard} onClose={() => setViewingCard(null)} />
     </div>
   );
 };

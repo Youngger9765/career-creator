@@ -158,6 +158,7 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 showRemoveButton={true}
                 allowReorder={true}
                 showCounter={true}
+                compactMode={true}
                 isEditable={true}
                 cardWidth="120px" // 增大卡片寬度
                 cardHeight="180px" // 增大卡片高度

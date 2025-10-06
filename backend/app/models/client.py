@@ -55,8 +55,10 @@ class Client(ClientBase, table=True):
     )
 
     # Simplified ownership model - each counselor has independent client records
-    counselor_id: str = Field(
-        max_length=255, index=True, description="Counselor who owns this client record"
+    counselor_id: UUID = Field(
+        foreign_key="users.id",
+        index=True,
+        description="Counselor who owns this client record",
     )
 
     # Email verification for customer portal access
@@ -116,8 +118,8 @@ class ConsultationRecord(SQLModel, table=True):
     client_id: UUID = Field(
         foreign_key="clients.id", index=True, description="Client ID"
     )
-    counselor_id: str = Field(
-        max_length=255, index=True, description="Counselor ID (UUID or demo ID)"
+    counselor_id: UUID = Field(
+        foreign_key="users.id", index=True, description="Counselor ID"
     )
     session_date: datetime = Field(description="Consultation session date and time")
     duration_minutes: Optional[int] = Field(
@@ -139,7 +141,6 @@ class ConsultationRecord(SQLModel, table=True):
     # Relationships
     room: "Room" = Relationship(back_populates="consultation_records")
     client: Client = Relationship(back_populates="consultation_records")
-    # Note: counselor relationship removed as counselor_id can be demo account (not in users table)
 
 
 # Request/Response models
@@ -179,7 +180,7 @@ class ClientResponse(ClientBase):
     """Client response model."""
 
     id: UUID
-    counselor_id: str
+    counselor_id: UUID
     email_verified: bool
     verified_at: Optional[datetime]
     created_at: datetime
@@ -217,7 +218,7 @@ class ConsultationRecordResponse(SQLModel):
     id: UUID
     room_id: UUID
     client_id: UUID
-    counselor_id: str
+    counselor_id: UUID
     session_date: datetime
     duration_minutes: Optional[int]
     topics: List[str]

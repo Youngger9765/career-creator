@@ -9,29 +9,12 @@ Test Game Rules Engine - 三層架構核心測試
 4. 支援職能盤點卡、價值導航卡、職游旅人卡三種規則
 """
 
-import pytest
-from sqlalchemy.pool import StaticPool
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session
 
 from tests.factories import TestDataBuilder, UserFactory
 
 
-@pytest.fixture(name="session")
-def session_fixture():
-    """Create test database session"""
-    # Import all models to ensure they're registered
-    import app.models.game_rule  # noqa
-    import app.models.room  # noqa
-    import app.models.user  # noqa
-    import app.models.visitor  # noqa
-
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        yield session
+# Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 
 class TestGameRuleConfig:
@@ -232,7 +215,7 @@ class TestGameIntegration:
         room = Room(
             name="Test Room",
             description="Test room with game rule",
-            counselor_id=str(counselor.id),  # Convert UUID to string for SQLite
+            counselor_id=counselor.id,  # Convert UUID to string for SQLite
             game_rule_id=skill_assessment_rule.id,
         )
         session.add(room)

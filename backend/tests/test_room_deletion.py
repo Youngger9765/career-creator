@@ -7,8 +7,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session
 
 from app.core.database import get_session
 from app.main import app
@@ -18,16 +17,7 @@ from tests.helpers import create_auth_headers
 
 
 # Test database setup
-@pytest.fixture(name="session")
-def session_fixture():
-    """Create test database session"""
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        yield session
+# Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 
 @pytest.fixture(name="client")
@@ -45,11 +35,14 @@ def client_fixture(session: Session):
 
 def create_test_user(session: Session, email: str, roles: list) -> User:
     """Create test user helper"""
+    from app.core.auth import get_password_hash
+
     user = User(
         id=uuid4(),
         email=email,
-        password_hash="test_hash",
-        roles=",".join(roles),  # Convert list to comma-separated string for SQLite
+        name=f"Test User ({email})",
+        hashed_password=get_password_hash("test123"),
+        roles=roles,  # PostgreSQL supports ARRAY directly
         is_active=True,
     )
     session.add(user)

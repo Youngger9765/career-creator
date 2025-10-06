@@ -3,7 +3,7 @@ Client management API endpoints
 客戶管理 API 端點
 """
 
-from datetime import date, datetime
+from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
@@ -87,7 +87,8 @@ async def get_my_clients(
             or 0
         )
 
-        # Get total consultations (sum of session_count from all rooms for current counselor)
+        # Get total consultations (sum of session_count from all rooms
+        # for current counselor)
         total_consultations = (
             session.exec(
                 select(func.sum(Room.session_count))
@@ -113,27 +114,18 @@ async def get_my_clients(
             .join(RoomClient)
             .where(
                 RoomClient.client_id == client.id,
-                Room.counselor_id == str(current_user["user_id"]),  # 只顯示當前諮詢師的諮詢室
+                Room.counselor_id == current_user["user_id"],  # 只顯示當前諮詢師的諮詢室
             )
             .order_by(Room.created_at.desc())
         ).all()
 
         rooms_data = []
         for room in rooms:
-            # Get counselor name
-            counselor_name = None
-            if room.counselor_id.startswith("demo-"):
-                from app.core.auth import DEMO_ACCOUNTS
+            # Get counselor name from database
+            from app.models.user import User
 
-                demo_account = next(
-                    (acc for acc in DEMO_ACCOUNTS if acc["id"] == room.counselor_id),
-                    None,
-                )
-                counselor_name = (
-                    demo_account["name"] if demo_account else room.counselor_id
-                )
-            else:
-                counselor_name = "諮詢師"  # Could extend with User lookup if needed
+            counselor = session.get(User, room.counselor_id)
+            counselor_name = counselor.name if counselor else "諮詢師"
 
             rooms_data.append(
                 {

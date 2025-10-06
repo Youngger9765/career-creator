@@ -1,4 +1,9 @@
-from .card_event import CardEvent, CardEventCreate, CardEventResponse
+# Disabled for now
+# from .card_event import (
+#     CardEvent,
+#     CardEventCreate,
+#     CardEventResponse,
+# )
 from .client import (
     Client,
     ClientCreate,
@@ -25,9 +30,9 @@ __all__ = [
     "Visitor",
     "VisitorCreate",
     "VisitorResponse",
-    "CardEvent",
-    "CardEventCreate",
-    "CardEventResponse",
+    # "CardEvent",  # Disabled for now
+    # "CardEventCreate",  # Disabled for now
+    # "CardEventResponse",  # Disabled for now
     "GameRuleTemplate",
     "CardDeck",
     "Card",

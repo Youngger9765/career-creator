@@ -37,7 +37,9 @@ class Room(RoomBase, table=True):
     __tablename__ = "rooms"
 
     id: UUID = Field(default_factory=uuid4, primary_key=True)
-    counselor_id: str = Field(max_length=255)  # Support both UUID and demo account IDs
+    counselor_id: UUID = Field(
+        foreign_key="users.id", index=True, description="Counselor who owns this room"
+    )
     share_code: str = Field(
         default_factory=generate_share_code, unique=True, max_length=6
     )
@@ -73,7 +75,7 @@ class RoomResponse(RoomBase):
     """Schema for room response"""
 
     id: UUID
-    counselor_id: str  # Support both UUID and demo account IDs
+    counselor_id: UUID
     share_code: str
     is_active: bool
     created_at: datetime

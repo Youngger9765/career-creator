@@ -94,10 +94,18 @@ def get_current_user_from_token(
     }
 
 
+# Fixed UUIDs for demo accounts (for consistency across environments)
+DEMO_ACCOUNT_UUIDS = {
+    "demo.counselor@example.com": "00000000-0000-0000-0001-000000000001",
+    "demo.counselor2@example.com": "00000000-0000-0000-0001-000000000002",
+    "demo.admin@example.com": "00000000-0000-0000-0001-000000000003",
+    "demo.client@example.com": "00000000-0000-0000-0001-000000000004",
+}
+
 # Demo accounts configuration
 DEMO_ACCOUNTS = [
     {
-        "id": "demo-counselor-001",
+        "id": DEMO_ACCOUNT_UUIDS["demo.counselor@example.com"],
         "name": "Dr. Sarah Chen",
         "email": "demo.counselor@example.com",
         "roles": ["counselor"],
@@ -105,7 +113,7 @@ DEMO_ACCOUNTS = [
         "password": "demo123",  # This will be hashed
     },
     {
-        "id": "demo-counselor-002",
+        "id": DEMO_ACCOUNT_UUIDS["demo.counselor2@example.com"],
         "name": "Prof. Michael Wang",
         "email": "demo.counselor2@example.com",
         "roles": ["counselor"],
@@ -113,7 +121,7 @@ DEMO_ACCOUNTS = [
         "password": "demo123",
     },
     {
-        "id": "demo-admin-001",
+        "id": DEMO_ACCOUNT_UUIDS["demo.admin@example.com"],
         "name": "Admin User",
         "email": "demo.admin@example.com",
         "roles": ["admin", "counselor"],
@@ -121,7 +129,7 @@ DEMO_ACCOUNTS = [
         "password": "demo123",
     },
     {
-        "id": "demo-client-001",
+        "id": DEMO_ACCOUNT_UUIDS["demo.client@example.com"],
         "name": "Alex Johnson",
         "email": "demo.client@example.com",
         "roles": ["client"],

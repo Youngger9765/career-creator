@@ -3,12 +3,12 @@ Database Seeding System
 資料庫種子資料系統
 """
 
-import uuid
 from datetime import date, datetime, timedelta
+from uuid import UUID
 
 from sqlmodel import Session, select
 
-from app.core.auth import DEMO_ACCOUNTS, get_password_hash
+from app.core.auth import DEMO_ACCOUNTS, DEMO_ACCOUNT_UUIDS, get_password_hash
 from app.core.database import engine
 from app.models.client import Client, ClientStatus, ConsultationRecord, RoomClient
 from app.models.game_rule import Card, CardDeck, GameRuleTemplate
@@ -17,16 +17,16 @@ from app.models.user import User
 
 
 def seed_demo_users():
-    """創建demo用戶"""
+    """創建demo用戶（使用固定UUID）"""
     with Session(engine) as session:
         for demo_data in DEMO_ACCOUNTS:
-            # Check if user already exists
-            existing = session.exec(
-                select(User).where(User.email == demo_data["email"])
-            ).first()
+            # Check if user already exists by UUID
+            user_uuid = UUID(demo_data["id"])
+            existing = session.get(User, user_uuid)
 
             if not existing:
                 user = User(
+                    id=user_uuid,
                     email=demo_data["email"],
                     name=demo_data["name"],
                     hashed_password=get_password_hash(demo_data["password"]),
@@ -34,6 +34,10 @@ def seed_demo_users():
                     is_active=True,
                 )
                 session.add(user)
+                print(
+                    f"  ✅ Created demo user: {demo_data['email']} "
+                    f"with UUID {user_uuid}"
+                )
 
         session.commit()
         print("✅ Demo users seeded")
@@ -670,6 +674,8 @@ def seed_skill_cards():
 
 def seed_test_users():
     """創建測試用戶（開發環境用）"""
+    from uuid import uuid4
+
     with Session(engine) as session:
         # 測試諮詢師 1
         existing_user = session.exec(
@@ -678,7 +684,7 @@ def seed_test_users():
 
         if not existing_user:
             test_user = User(
-                id=uuid.uuid4(),
+                id=uuid4(),
                 email="test@example.com",
                 name="測試諮詢師",
                 hashed_password=get_password_hash("demo123"),
@@ -695,7 +701,7 @@ def seed_test_users():
 
         if not existing_user2:
             test_user2 = User(
-                id=uuid.uuid4(),
+                id=uuid4(),
                 email="counselor@example.com",
                 name="王諮詢師",
                 hashed_password=get_password_hash("password123"),
@@ -712,7 +718,7 @@ def seed_test_users():
 
         if not existing_admin:
             admin_user = User(
-                id=uuid.uuid4(),
+                id=uuid4(),
                 email="admin@example.com",
                 name="系統管理員",
                 hashed_password=get_password_hash("admin123"),
@@ -728,6 +734,8 @@ def seed_test_users():
 
 def seed_test_rooms():
     """創建測試諮詢室（開發環境用）"""
+    from uuid import uuid4
+
     with Session(engine) as session:
         # 獲取測試用戶
         test_user = session.exec(
@@ -744,12 +752,10 @@ def seed_test_rooms():
         if not existing_room:
             # 創建活躍的測試諮詢室
             test_room = Room(
-                id=uuid.uuid4(),
+                id=uuid4(),
                 name="測試諮詢室",
                 description="這是一個測試用的諮詢室",
                 counselor_id=test_user.id,
-                status="active",
-                share_code="TEST123",
                 expires_at=datetime.utcnow() + timedelta(days=7),
                 created_at=datetime.utcnow(),
             )
@@ -763,12 +769,11 @@ def seed_test_rooms():
         if not existing_expired_room:
             # 創建過期的測試諮詢室
             expired_room = Room(
-                id=uuid.uuid4(),
+                id=uuid4(),
                 name="已過期的諮詢室",
                 description="這個諮詢室已經過期了",
                 counselor_id=test_user.id,
-                status="expired",
-                share_code="EXPIRED1",
+                is_active=False,
                 expires_at=datetime.utcnow() - timedelta(days=1),
                 created_at=datetime.utcnow() - timedelta(days=8),
             )
@@ -783,21 +788,9 @@ def seed_crm_data():
     print("🏢 Seeding CRM data with simplified model...")
 
     with Session(engine) as session:
-        # Get actual counselor UUIDs from database
-        counselor1 = session.exec(
-            select(User).where(User.email == "demo.counselor@example.com")
-        ).first()
-        counselor2 = session.exec(
-            select(User).where(User.email == "demo.counselor2@example.com")
-        ).first()
-
-        if not counselor1 or not counselor2:
-            print("❌ Demo counselors not found! Please run seed_demo_users() first.")
-            return
-
-        # Use actual counselor IDs (convert UUID to string)
-        counselor1_id = str(counselor1.id)
-        counselor2_id = str(counselor2.id)
+        # Use fixed UUIDs for demo counselors
+        counselor1_id = UUID(DEMO_ACCOUNT_UUIDS["demo.counselor@example.com"])
+        counselor2_id = UUID(DEMO_ACCOUNT_UUIDS["demo.counselor2@example.com"])
 
         # 創建客戶資料 - 每個諮商師有獨立的客戶紀錄
         clients_data = [
@@ -979,7 +972,8 @@ def seed_crm_data():
                     session.commit()
                     session.refresh(room)
                     print(
-                        f"  ✅ Created room: {room_name} for counselor {demo_counselor_id}"
+                        f"  ✅ Created room: {room_name} "
+                        f"for counselor {demo_counselor_id}"
                     )
 
                     # 關聯諮詢室與客戶
@@ -1001,8 +995,11 @@ def seed_crm_data():
                         if not existing_second_room:
                             second_room = Room(
                                 name=second_counselor_room_name,
-                                description=f"為 {client.name} 提供的轉職輔導{room_type['desc']}服務",
-                                counselor_id=demo_counselor_ids[1],  # 第二個諮詢師
+                                description=(
+                                    f"為 {client.name} 提供的轉職輔導"
+                                    f"{room_type['desc']}服務"
+                                ),
+                                counselor_id=demo_counselor_ids[1],
                                 is_active=True,
                                 expires_at=datetime.utcnow() + timedelta(days=35),
                                 session_count=1,
@@ -1011,7 +1008,9 @@ def seed_crm_data():
                             session.commit()
                             session.refresh(second_room)
                             print(
-                                f"  ✅ Created cross-counselor room: {second_counselor_room_name} for counselor {demo_counselor_ids[1]}"
+                                f"  ✅ Created cross-counselor room: "
+                                f"{second_counselor_room_name} "
+                                f"for counselor {demo_counselor_ids[1]}"
                             )
 
                             # 關聯諮詢室與客戶
@@ -1020,7 +1019,8 @@ def seed_crm_data():
                             )
                             session.add(room_client_cross)
                             print(
-                                f"  ✅ Linked cross-counselor room to client: {client.name}"
+                                f"  ✅ Linked cross-counselor room "
+                                f"to client: {client.name}"
                             )
 
                             # 為這個諮詢室創建諮詢記錄
@@ -1057,9 +1057,13 @@ def seed_crm_data():
                                 if record_idx > 0
                                 else room_type["topics"]
                             ),
-                            notes=f"第 {record_idx + 1} 次{room_type['desc']}會議記錄。討論了相關主題，客戶表現積極。",
-                            follow_up_required=(client_idx + room_idx + record_idx) % 2
-                            == 0,
+                            notes=(
+                                f"第 {record_idx + 1} 次{room_type['desc']}"
+                                f"會議記錄。討論了相關主題，客戶表現積極。"
+                            ),
+                            follow_up_required=(
+                                (client_idx + room_idx + record_idx) % 2 == 0
+                            ),
                             follow_up_date=(
                                 date.today() + timedelta(days=7 + record_idx * 3)
                                 if (client_idx + room_idx + record_idx) % 2 == 0
@@ -1069,7 +1073,8 @@ def seed_crm_data():
                         session.add(record)
 
                     print(
-                        f"  ✅ Created {num_records} consultation record(s) for {client.name} in {room.name}"
+                        f"  ✅ Created {num_records} consultation record(s) "
+                        f"for {client.name} in {room.name}"
                     )
 
         session.commit()

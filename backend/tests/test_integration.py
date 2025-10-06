@@ -7,8 +7,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session
 
 from app.core.database import get_session
 from app.main import app
@@ -16,16 +15,7 @@ from app.models.user import User
 from tests.helpers import create_auth_headers
 
 
-@pytest.fixture(name="session")
-def session_fixture():
-    """Create test database session"""
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        yield session
+# Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 
 @pytest.fixture(name="client")

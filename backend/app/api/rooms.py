@@ -9,7 +9,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlmodel import Session, select
 
-from app.core.auth import DEMO_ACCOUNTS, get_current_user_from_token
+from app.core.auth import get_current_user_from_token
 from app.core.database import get_session
 from app.core.roles import Permission, has_permission
 from app.models.client import Client, RoomClient
@@ -36,35 +36,22 @@ def get_current_user_info(
     current_user: dict = Depends(get_current_user_from_token),
     session: Session = Depends(get_session),
 ) -> dict:
-    """Get current user information from JWT token or fallback to header"""
+    """Get current user information from JWT token"""
     user_id = current_user["user_id"]
 
-    # Handle demo accounts
-    if user_id.startswith("demo-"):
-        demo_account = next(
-            (acc for acc in DEMO_ACCOUNTS if acc["id"] == user_id), None
-        )
-        if demo_account:
-            return {
-                "id": user_id,
-                "email": demo_account["email"],
-                "roles": demo_account["roles"],
-                "is_active": True,
-            }
-
-    # Regular database user
+    # All users (including demo accounts) are now in the database
     try:
         user_uuid = UUID(user_id)
         user = session.get(User, user_uuid)
         if user:
             return {
-                "id": str(user.id),
+                "id": user.id,  # Return UUID directly
                 "email": user.email,
                 "roles": user.roles,
                 "is_active": user.is_active,
             }
     except ValueError:
-        pass
+        raise HTTPException(status_code=400, detail="Invalid user ID format")
 
     raise HTTPException(status_code=404, detail="User not found")
 
@@ -138,7 +125,7 @@ def create_room(
 
         game_rule_id = game_rule.id
 
-    # Create room
+    # Create room (current_user["id"] is now UUID)
     room = Room(
         name=room_data.name,
         description=room_data.description,
@@ -217,18 +204,9 @@ def list_user_rooms(
         if client_name:
             room_dict["client_name"] = client_name
 
-        # Add counselor name for display
-        if room.counselor_id.startswith("demo-"):
-            # Handle demo accounts
-            demo_account = next(
-                (acc for acc in DEMO_ACCOUNTS if acc["id"] == room.counselor_id), None
-            )
-            room_dict["counselor_name"] = (
-                demo_account["name"] if demo_account else room.counselor_id
-            )
-        else:
-            # Handle regular users - could extend this with User lookup if needed
-            room_dict["counselor_name"] = "諮詢師"
+        # Add counselor name by looking up in database
+        counselor = session.get(User, room.counselor_id)
+        room_dict["counselor_name"] = counselor.name if counselor else "諮詢師"
 
         rooms.append(room_dict)
 
@@ -291,3 +269,35 @@ def delete_room(
     session.commit()
 
     return {"message": "Room deleted successfully"}
+
+
+@router.post("/{room_id}/restore")
+def restore_room(
+    room_id: UUID,
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user_info),
+):
+    """Restore deleted room - only room owner or admin can restore"""
+
+    # Get room (including deleted ones)
+    room = session.get(Room, room_id)
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+
+    # Check ownership or admin permission
+    if room.counselor_id != current_user["id"] and "admin" not in current_user["roles"]:
+        raise HTTPException(
+            status_code=403, detail="Only room owner or admin can restore room"
+        )
+
+    # Check if room is already active
+    if room.is_active:
+        raise HTTPException(status_code=400, detail="Room is already active")
+
+    # Restore room - mark as active
+    room.is_active = True
+    session.add(room)
+    session.commit()
+    session.refresh(room)
+
+    return room

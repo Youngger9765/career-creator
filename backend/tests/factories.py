@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Optional
 from sqlmodel import Session
 
 from app.core.auth import get_password_hash
-from app.models.card_event import CardEvent
+# from app.models.card_event import CardEvent  # Disabled for now
 from app.models.room import Room
 from app.models.user import User
 from app.models.visitor import Visitor
@@ -89,7 +89,7 @@ class RoomFactory:
 
         defaults = {
             "name": name,
-            "counselor_id": str(counselor.id),  # Convert UUID to string
+            "counselor_id": counselor.id,  # UUID directly (refactored)
             "share_code": share_code,
             "is_active": True,
         }
@@ -127,7 +127,7 @@ class VisitorFactory:
 
         defaults = {
             "name": name,
-            "room_id": str(room.id),  # Convert UUID to string
+            "room_id": room.id,  # UUID directly (refactored)
             "session_id": f"session_{datetime.now().timestamp()}",
             "is_active": True,
         }
@@ -140,68 +140,69 @@ class VisitorFactory:
         return visitor
 
 
-class CardEventFactory:
-    """牌卡事件工廠"""
-
-    @staticmethod
-    def create(
-        session: Session,
-        room: Optional[Room] = None,
-        event_type: str = "card_flipped",
-        **kwargs: Any,
-    ) -> CardEvent:
-        """創建測試牌卡事件"""
-        if room is None:
-            room = RoomFactory.create(session)
-
-        defaults = {
-            "room_id": str(room.id),  # Convert UUID to string
-            "event_type": event_type,
-            "card_id": f"card_{datetime.now().timestamp()}",
-            "performer_type": "user",
-            "sequence_number": 1,
-        }
-        defaults.update(kwargs)
-
-        event = CardEvent(**defaults)
-        session.add(event)
-        session.commit()
-        session.refresh(event)
-        return event
-
-    @staticmethod
-    def create_flip_event(session: Session, room: Room, **kwargs: Any) -> CardEvent:
-        """創建翻牌事件"""
-        kwargs.setdefault("event_type", "card_flipped")
-        kwargs.setdefault("event_data", {"face_up": True})
-        return CardEventFactory.create(session, room, **kwargs)
-
-    @staticmethod
-    def create_move_event(session: Session, room: Room, **kwargs: Any) -> CardEvent:
-        """創建移動事件"""
-        kwargs.setdefault("event_type", "card_moved")
-        kwargs.setdefault("event_data", {"position": {"x": 100, "y": 200}})
-        return CardEventFactory.create(session, room, **kwargs)
-
-    @staticmethod
-    def create_arrange_event(
-        session: Session, room: Room, zone: str = "advantage", **kwargs: Any
-    ) -> CardEvent:
-        """創建排列事件"""
-        kwargs.setdefault("event_type", "card_arranged")
-        kwargs.setdefault(
-            "event_data", {"drop_zone": zone, "position": {"x": 400, "y": 150}}
-        )
-        return CardEventFactory.create(session, room, **kwargs)
-
-    @staticmethod
-    def create_note_event(
-        session: Session, room: Room, notes: str = "Test note", **kwargs: Any
-    ) -> CardEvent:
-        """創建註記事件"""
-        kwargs.setdefault("event_type", "notes_added")
-        kwargs.setdefault("notes", notes)
-        return CardEventFactory.create(session, room, **kwargs)
+# CardEventFactory - Disabled for now
+# class CardEventFactory:
+#     """牌卡事件工廠"""
+#
+#     @staticmethod
+#     def create(
+#         session: Session,
+#         room: Optional[Room] = None,
+#         event_type: str = "card_flipped",
+#         **kwargs: Any,
+#     ) -> CardEvent:
+#         """創建測試牌卡事件"""
+#         if room is None:
+#             room = RoomFactory.create(session)
+#
+#         defaults = {
+#             "room_id": room.id,  # UUID directly (refactored)
+#             "event_type": event_type,
+#             "card_id": f"card_{datetime.now().timestamp()}",
+#             "performer_type": "user",
+#             "sequence_number": 1,
+#         }
+#         defaults.update(kwargs)
+#
+#         event = CardEvent(**defaults)
+#         session.add(event)
+#         session.commit()
+#         session.refresh(event)
+#         return event
+#
+#     @staticmethod
+#     def create_flip_event(session: Session, room: Room, **kwargs: Any) -> CardEvent:
+#         """創建翻牌事件"""
+#         kwargs.setdefault("event_type", "card_flipped")
+#         kwargs.setdefault("event_data", {"face_up": True})
+#         return CardEventFactory.create(session, room, **kwargs)
+#
+#     @staticmethod
+#     def create_move_event(session: Session, room: Room, **kwargs: Any) -> CardEvent:
+#         """創建移動事件"""
+#         kwargs.setdefault("event_type", "card_moved")
+#         kwargs.setdefault("event_data", {"position": {"x": 100, "y": 200}})
+#         return CardEventFactory.create(session, room, **kwargs)
+#
+#     @staticmethod
+#     def create_arrange_event(
+#         session: Session, room: Room, zone: str = "advantage", **kwargs: Any
+#     ) -> CardEvent:
+#         """創建排列事件"""
+#         kwargs.setdefault("event_type", "card_arranged")
+#         kwargs.setdefault(
+#             "event_data", {"drop_zone": zone, "position": {"x": 400, "y": 150}}
+#         )
+#         return CardEventFactory.create(session, room, **kwargs)
+#
+#     @staticmethod
+#     def create_note_event(
+#         session: Session, room: Room, notes: str = "Test note", **kwargs: Any
+#     ) -> CardEvent:
+#         """創建註記事件"""
+#         kwargs.setdefault("event_type", "notes_added")
+#         kwargs.setdefault("notes", notes)
+#         return CardEventFactory.create(session, room, **kwargs)
 
 
 class TestDataBuilder:
@@ -212,7 +213,7 @@ class TestDataBuilder:
         self.counselor: Optional[User] = None
         self.room: Optional[Room] = None
         self.visitors: List[Visitor] = []
-        self.events: List[CardEvent] = []
+        # self.events: List[CardEvent] = []  # Disabled - card events feature
 
     def with_counselor(self, **kwargs: Any) -> "TestDataBuilder":
         """添加諮詢師"""
@@ -237,50 +238,51 @@ class TestDataBuilder:
             self.visitors.append(visitor)
         return self
 
-    def with_card_events(
-        self, events_config: Optional[List[Dict[str, Any]]] = None
-    ) -> "TestDataBuilder":
-        """添加牌卡事件"""
-        if self.room is None:
-            self.with_room()
-
-        if events_config is None:
-            # 預設事件序列
-            events_config = [
-                {"type": "flip"},
-                {"type": "move"},
-                {"type": "arrange", "zone": "advantage"},
-                {"type": "note", "notes": "Important observation"},
-            ]
-
-        for config in events_config:
-            event_type = config.pop("type", "flip")
-            if event_type == "flip":
-                event = CardEventFactory.create_flip_event(
-                    self.session, self.room, **config
-                )
-            elif event_type == "move":
-                event = CardEventFactory.create_move_event(
-                    self.session, self.room, **config
-                )
-            elif event_type == "arrange":
-                zone = config.pop("zone", "advantage")
-                event = CardEventFactory.create_arrange_event(
-                    self.session, self.room, zone, **config
-                )
-            elif event_type == "note":
-                notes = config.pop("notes", "Test note")
-                event = CardEventFactory.create_note_event(
-                    self.session, self.room, notes, **config
-                )
-            else:
-                event = CardEventFactory.create(
-                    self.session, self.room, event_type=event_type, **config
-                )
-
-            self.events.append(event)
-
-        return self
+    # Disabled - card events feature
+    # def with_card_events(
+    #     self, events_config: Optional[List[Dict[str, Any]]] = None
+    # ) -> "TestDataBuilder":
+    #     """添加牌卡事件"""
+    #     if self.room is None:
+    #         self.with_room()
+    #
+    #     if events_config is None:
+    #         # 預設事件序列
+    #         events_config = [
+    #             {"type": "flip"},
+    #             {"type": "move"},
+    #             {"type": "arrange", "zone": "advantage"},
+    #             {"type": "note", "notes": "Important observation"},
+    #         ]
+    #
+    #     for config in events_config:
+    #         event_type = config.pop("type", "flip")
+    #         if event_type == "flip":
+    #             event = CardEventFactory.create_flip_event(
+    #                 self.session, self.room, **config
+    #             )
+    #         elif event_type == "move":
+    #             event = CardEventFactory.create_move_event(
+    #                 self.session, self.room, **config
+    #             )
+    #         elif event_type == "arrange":
+    #             zone = config.pop("zone", "advantage")
+    #             event = CardEventFactory.create_arrange_event(
+    #                 self.session, self.room, zone, **config
+    #             )
+    #         elif event_type == "note":
+    #             notes = config.pop("notes", "Test note")
+    #             event = CardEventFactory.create_note_event(
+    #                 self.session, self.room, notes, **config
+    #             )
+    #         else:
+    #             event = CardEventFactory.create(
+    #                 self.session, self.room, event_type=event_type, **config
+    #             )
+    #
+    #         self.events.append(event)
+    #
+    #     return self
 
     def build(self) -> Dict[str, Any]:
         """建構並返回所有測試資料"""
@@ -288,5 +290,5 @@ class TestDataBuilder:
             "counselor": self.counselor,
             "room": self.room,
             "visitors": self.visitors,
-            "events": self.events,
+            # "events": self.events,  # Disabled - card events feature
         }

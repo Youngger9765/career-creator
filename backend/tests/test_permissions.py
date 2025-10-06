@@ -7,8 +7,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session
 
 from app.core.database import get_session
 from app.core.roles import Permission, get_user_permissions, has_permission
@@ -17,16 +16,7 @@ from app.models.user import User
 from tests.helpers import create_auth_headers
 
 
-@pytest.fixture(name="session")
-def session_fixture():
-    """Create test database session"""
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        yield session
+# Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 
 @pytest.fixture(name="client")
@@ -76,6 +66,7 @@ class TestRolePermissions:
             Permission.ANNOTATE_CARD,
             Permission.SEND_MESSAGE,
             Permission.VIEW_CHAT,
+            Permission.MANAGE_CLIENTS,
         }
 
         assert permissions == expected_permissions
@@ -152,7 +143,7 @@ class TestRolePermissions:
         """Test handling of invalid roles"""
         permissions = get_user_permissions(["invalid_role", "counselor"])
 
-        # Should only get permissions from valid roles
+        # Should only get permissions from valid roles (counselor)
         expected_permissions = {
             Permission.CREATE_ROOM,
             Permission.JOIN_ROOM,
@@ -161,6 +152,7 @@ class TestRolePermissions:
             Permission.ANNOTATE_CARD,
             Permission.SEND_MESSAGE,
             Permission.VIEW_CHAT,
+            Permission.MANAGE_CLIENTS,
         }
 
         assert permissions == expected_permissions

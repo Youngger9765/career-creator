@@ -30,7 +30,8 @@ class User(UserBase, table=True):
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    # Note: CRM relationships removed as counselor_id can be demo account (not in users table)
+    # Note: CRM relationships removed as counselor_id can be demo account
+    # (not in users table)
 
     def has_role(self, role: str) -> bool:
         """Check if user has specific role"""
@@ -58,7 +59,7 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     """Schema for user response (no sensitive data)"""
 
-    id: str  # Support both UUID and demo account string IDs
+    id: UUID  # All users now use UUID
     roles: List[str]
     is_active: bool
-    created_at: str  # ISO string format for demo accounts
+    created_at: datetime

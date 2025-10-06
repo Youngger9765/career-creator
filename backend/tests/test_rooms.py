@@ -7,8 +7,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session
 
 from app.core.database import get_session
 from app.main import app
@@ -18,16 +17,7 @@ from tests.helpers import create_auth_headers
 
 
 # Test database setup
-@pytest.fixture(name="session")
-def session_fixture():
-    """Create test database session"""
-    engine = create_engine(
-        "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
-    )
-    SQLModel.metadata.create_all(engine)
-
-    with Session(engine) as session:
-        yield session
+# Session fixture removed - using PostgreSQL conftest.py fixture instead
 
 
 @pytest.fixture(name="client")
@@ -133,7 +123,7 @@ class TestGetRoom:
             id=uuid4(),
             name="Test Room",
             description="Test Description",
-            counselor_id=str(test_user.id),  # Convert UUID to string
+            counselor_id=test_user.id,  # Convert UUID to string
             share_code="ABC123",
             is_active=True,
         )
@@ -161,7 +151,7 @@ class TestGetRoom:
         room = Room(
             id=uuid4(),
             name="Shared Room",
-            counselor_id=str(test_user.id),  # Convert UUID to string
+            counselor_id=test_user.id,  # Convert UUID to string
             share_code="XYZ789",
             is_active=True,
         )

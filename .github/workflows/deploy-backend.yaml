@@ -109,12 +109,14 @@ jobs:
 
           # Transform pooled URL to direct URL for migrations
           # Supabase pooled connections (.pooler.) don't work with Alembic
-          # We need direct connections (.db.) for migrations
+          # We need direct connections for migrations
+          # Try removing the pooler segment from AWS-style URLs
           DIRECT_URL="${{ env.DIRECT_DATABASE_URL }}"
-          DIRECT_URL="${DIRECT_URL//\.pooler\.supabase\.com/.db.supabase.com}"
+          DIRECT_URL="${DIRECT_URL//.pooler.supabase.com/.supabase.com}"
           export DATABASE_URL="$DIRECT_URL"
 
           echo "Using direct connection for migrations (not pooled)"
+          echo "Connection hostname: $(echo $DATABASE_URL | grep -oP '(?<=@)[^/]+' || echo 'Could not extract hostname')"
 
           # Install backend dependencies (includes alembic, sqlmodel, pydantic-settings, etc.)
           pip install -r backend/requirements.txt

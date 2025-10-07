@@ -108,8 +108,8 @@ jobs:
           DATABASE_URL: ${{ env.DIRECT_DATABASE_URL }}
         run: |
           echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
-          # Install alembic and required dependencies
-          pip install alembic sqlmodel psycopg2-binary
+          # Install backend dependencies (includes alembic, sqlmodel, pydantic-settings, etc.)
+          pip install -r backend/requirements.txt
 
           # Navigate to backend directory and run migrations
           cd backend

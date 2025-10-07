@@ -104,10 +104,18 @@ jobs:
           echo "🌐 Backend deployed to: $SERVICE_URL"
 
       - name: Run database migrations
-        env:
-          DATABASE_URL: ${{ env.DIRECT_DATABASE_URL }}
         run: |
           echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
+
+          # Transform pooled URL to direct URL for migrations
+          # Supabase pooled connections (.pooler.) don't work with Alembic
+          # We need direct connections (.db.) for migrations
+          DIRECT_URL="${{ env.DIRECT_DATABASE_URL }}"
+          DIRECT_URL="${DIRECT_URL//\.pooler\.supabase\.com/.db.supabase.com}"
+          export DATABASE_URL="$DIRECT_URL"
+
+          echo "Using direct connection for migrations (not pooled)"
+
           # Install backend dependencies (includes alembic, sqlmodel, pydantic-settings, etc.)
           pip install -r backend/requirements.txt
 

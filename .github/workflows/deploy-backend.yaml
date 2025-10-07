@@ -39,7 +39,7 @@ jobs:
             echo "ENVIRONMENT=staging" >> $GITHUB_ENV
             echo "SERVICE_NAME=career-creator-backend-staging" >> $GITHUB_ENV
             echo "DATABASE_URL=${{ secrets.DATABASE_URL_STAGING }}" >> $GITHUB_ENV
-            echo "DIRECT_DATABASE_URL=${{ secrets.DIRECT_DATABASE_URL_STAGING }}" >> $GITHUB_ENV
+            echo "DATABASE_POOLER_URL=${{ secrets.DATABASE_POOLER_URL_STAGING }}" >> $GITHUB_ENV
             echo "JWT_SECRET=${{ secrets.JWT_SECRET_STAGING }}" >> $GITHUB_ENV
             echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_STAGING }}" >> $GITHUB_ENV
             echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_STAGING }}" >> $GITHUB_ENV
@@ -47,7 +47,7 @@ jobs:
             echo "ENVIRONMENT=production" >> $GITHUB_ENV
             echo "SERVICE_NAME=career-creator-backend-production" >> $GITHUB_ENV
             echo "DATABASE_URL=${{ secrets.DATABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
-            echo "DIRECT_DATABASE_URL=${{ secrets.DIRECT_DATABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            echo "DATABASE_POOLER_URL=${{ secrets.DATABASE_POOLER_URL_PRODUCTION }}" >> $GITHUB_ENV
             echo "JWT_SECRET=${{ secrets.JWT_SECRET_PRODUCTION }}" >> $GITHUB_ENV
             echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
             echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY_PRODUCTION }}" >> $GITHUB_ENV
@@ -107,8 +107,8 @@ jobs:
         run: |
           echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
 
-          # Use the DIRECT_DATABASE_URL from secrets (should already be direct connection)
-          export DATABASE_URL="${{ env.DIRECT_DATABASE_URL }}"
+          # Use session pooler URL (port 5432) - IPv4 compatible for GitHub Actions
+          export DATABASE_URL="${{ env.DATABASE_POOLER_URL }}"
 
           # Debug: Show connection details (mask password)
           echo "🔍 DEBUG: Database connection info:"
@@ -117,11 +117,11 @@ jobs:
           echo "  - Port: $(echo $DATABASE_URL | grep -oP '(?<=:)[0-9]+(?=/)' || echo 'Could not extract')"
           echo "  - Database: $(echo $DATABASE_URL | grep -oP '(?<=/)[^?]+' || echo 'Could not extract')"
 
-          # Check if URL contains 'pooler' (should not for direct connection)
-          if echo "$DATABASE_URL" | grep -q "pooler"; then
-            echo "⚠️  WARNING: URL contains 'pooler' - this may cause migration issues!"
+          # Check if using session pooler (port 5432) for IPv4 compatibility
+          if echo "$DATABASE_URL" | grep -q "pooler.supabase.com:5432"; then
+            echo "✅ Using session pooler (IPv4 compatible)"
           else
-            echo "✅ URL looks correct (no 'pooler' found)"
+            echo "⚠️  WARNING: Not using expected session pooler URL!"
           fi
 
           # Install backend dependencies (includes alembic, sqlmodel, pydantic-settings, etc.)

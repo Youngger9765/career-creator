@@ -334,8 +334,8 @@ export default function RoomPage() {
         />
       </div>
 
-      {/* Notes Drawer - Only for counselors */}
-      {isCounselor && (
+      {/* Notes Drawer - Only for counselors and only during gameplay */}
+      {isCounselor && currentGameplay && (
         <NotesDrawer
           roomId={roomId}
           isOpen={notesDrawerOpen}

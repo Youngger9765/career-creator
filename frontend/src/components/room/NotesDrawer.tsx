@@ -59,7 +59,7 @@ export function NotesDrawer({ roomId, isOpen, onToggle }: NotesDrawerProps) {
   return (
     <>
       {/* Backdrop */}
-      {isOpen && <div className="fixed inset-0 bg-black/20 z-40 md:hidden" onClick={onToggle} />}
+      {isOpen && <div className="fixed inset-0 bg-black/20 z-30 md:hidden" onClick={onToggle} />}
 
       {/* Drawer */}
       <div
@@ -69,7 +69,7 @@ export function NotesDrawer({ roomId, isOpen, onToggle }: NotesDrawerProps) {
           w-80 md:w-96
           bg-white border-l shadow-lg
           transform transition-transform duration-300 ease-in-out
-          z-50
+          z-40
           flex flex-col
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         `}

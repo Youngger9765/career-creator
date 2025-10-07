@@ -107,16 +107,22 @@ jobs:
         run: |
           echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
 
-          # Transform pooled URL to direct URL for migrations
-          # Supabase pooled connections (.pooler.) don't work with Alembic
-          # We need direct connections for migrations
-          # Try removing the pooler segment from AWS-style URLs
-          DIRECT_URL="${{ env.DIRECT_DATABASE_URL }}"
-          DIRECT_URL="${DIRECT_URL//.pooler.supabase.com/.supabase.com}"
-          export DATABASE_URL="$DIRECT_URL"
+          # Use the DIRECT_DATABASE_URL from secrets (should already be direct connection)
+          export DATABASE_URL="${{ env.DIRECT_DATABASE_URL }}"
 
-          echo "Using direct connection for migrations (not pooled)"
-          echo "Connection hostname: $(echo $DATABASE_URL | grep -oP '(?<=@)[^/]+' || echo 'Could not extract hostname')"
+          # Debug: Show connection details (mask password)
+          echo "🔍 DEBUG: Database connection info:"
+          echo "  - Full URL (masked): $(echo $DATABASE_URL | sed 's/:\/\/[^:]*:[^@]*@/:\/\/***:***@/')"
+          echo "  - Hostname: $(echo $DATABASE_URL | grep -oP '(?<=@)[^:/]+' || echo 'Could not extract')"
+          echo "  - Port: $(echo $DATABASE_URL | grep -oP '(?<=:)[0-9]+(?=/)' || echo 'Could not extract')"
+          echo "  - Database: $(echo $DATABASE_URL | grep -oP '(?<=/)[^?]+' || echo 'Could not extract')"
+
+          # Check if URL contains 'pooler' (should not for direct connection)
+          if echo "$DATABASE_URL" | grep -q "pooler"; then
+            echo "⚠️  WARNING: URL contains 'pooler' - this may cause migration issues!"
+          else
+            echo "✅ URL looks correct (no 'pooler' found)"
+          fi
 
           # Install backend dependencies (includes alembic, sqlmodel, pydantic-settings, etc.)
           pip install -r backend/requirements.txt

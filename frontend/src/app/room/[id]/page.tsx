@@ -8,6 +8,7 @@ import { useGameSession } from '@/hooks/use-game-session';
 import { useRoomParticipants } from '@/hooks/use-room-participants';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
 import { ParticipantList } from '@/components/room/ParticipantList';
+import { NotesDrawer } from '@/components/room/NotesDrawer';
 import GameModeIntegration from './GameModeIntegration';
 import {
   Dialog,
@@ -31,6 +32,7 @@ export default function RoomPage() {
   const [showVisitorWelcome, setShowVisitorWelcome] = useState(false);
   const [visitorName, setVisitorName] = useState('');
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [notesDrawerOpen, setNotesDrawerOpen] = useState(true);
 
   // Game Session for state persistence
   const gameSession = useGameSession({
@@ -312,7 +314,13 @@ export default function RoomPage() {
       </div>
 
       {/* 主要內容區 */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div
+        className={`
+          flex-1 flex flex-col overflow-hidden
+          transition-all duration-300
+          ${isCounselor && notesDrawerOpen ? 'md:pr-96' : 'pr-0'}
+        `}
+      >
         <GameModeIntegration
           roomId={roomId}
           isVisitor={isVisitor}
@@ -325,6 +333,15 @@ export default function RoomPage() {
           }}
         />
       </div>
+
+      {/* Notes Drawer - Only for counselors */}
+      {isCounselor && (
+        <NotesDrawer
+          roomId={roomId}
+          isOpen={notesDrawerOpen}
+          onToggle={() => setNotesDrawerOpen(!notesDrawerOpen)}
+        />
+      )}
 
       {(errorMessage || roomError) && (
         <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">

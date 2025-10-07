@@ -40,30 +40,26 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
 
     try {
       // Try to get active session for room
-      let activeSession;
+      // Note: game-sessions API is disabled, skip this for now
+      let activeSession: GameSession | null = null;
       try {
         activeSession = await gameSessionsAPI.getActiveForRoom(roomId);
       } catch (err: any) {
-        // No active session found, create new one
-        if (err.message.includes('404') || err.message.includes('not found')) {
-          // Create new session
-          activeSession = await gameSessionsAPI.create({
-            room_id: roomId,
-            game_rule_id: gameRuleSlug || 'career_personality', // Default rule
-          });
-        } else {
-          throw err;
-        }
+        // Game sessions API is disabled, just use local state
+        console.debug('Game sessions API not available, using local state only');
+        activeSession = null;
       }
 
-      setSession(activeSession);
+      if (activeSession) {
+        setSession(activeSession);
 
-      // Load game state from session
-      if (activeSession.game_state) {
-        setGameState((prevState) => ({
-          ...prevState,
-          ...activeSession.game_state,
-        }));
+        // Load game state from session
+        if (activeSession.game_state) {
+          setGameState((prevState) => ({
+            ...prevState,
+            ...activeSession.game_state,
+          }));
+        }
       }
     } catch (err: any) {
       setError(`Failed to initialize session: ${err.message}`);

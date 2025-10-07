@@ -88,14 +88,8 @@ class CardEventsAPI {
    * Get latest events for a room
    */
   async getLatestRoomEvents(roomId: string, limit: number = 50): Promise<CardEvent[]> {
-    try {
-      const response = await apiClient.get<CardEvent[]>(`/api/card-events/room/${roomId}/latest`, {
-        params: { limit },
-      });
-      return response.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+    // Card events API is disabled - return empty array
+    return [];
   }
 
   /**

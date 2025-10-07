@@ -6,6 +6,7 @@ from app.api.auth import router as auth_router
 
 # from app.api.card_events import router as card_events_router  # Disabled for now
 from app.api.clients import router as clients_router
+from app.api.counselor_notes import router as counselor_notes_router
 from app.api.game_rules import router as game_rules_router
 
 # from app.api.game_sessions import router as game_sessions_router  # Disabled for now
@@ -41,19 +42,28 @@ if settings.environment == "production":
     origins = [
         "https://career-creator-frontend-production-990202338378.asia-east1.run.app",
     ]
+    allow_credentials = True
 elif settings.environment == "staging":
     origins = [
         "https://career-creator-frontend-staging-990202338378.asia-east1.run.app",
         "http://localhost:3000",  # Allow local development
+        "http://localhost:3001",  # Alternative dev port
     ]
+    allow_credentials = True
 else:
-    # Development: Allow all origins for easier testing
-    origins = ["*"]
+    # Development: Allow local development ports
+    origins = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+    ]
+    allow_credentials = True
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,  # Must be False when origins=["*"]
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -67,6 +77,7 @@ app.include_router(game_rules_router, prefix="/api/game-rules", tags=["game-rule
 # app.include_router(game_sessions_router)  # Disabled for now
 app.include_router(admin_router)
 app.include_router(clients_router)
+app.include_router(counselor_notes_router, prefix="/api")
 
 
 @app.get("/")

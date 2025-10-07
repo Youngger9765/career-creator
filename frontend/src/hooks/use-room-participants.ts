@@ -4,7 +4,7 @@
  * 整合 Supabase Presence 即時在線狀態
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { cardEventsAPI } from '@/lib/api/card-events';
+import { cardEventsAPI, CardEvent } from '@/lib/api/card-events';
 import { usePresence } from './use-presence';
 
 export interface RoomParticipant {
@@ -90,7 +90,15 @@ export function useRoomParticipants(
       setError(null);
 
       // Get recent events (last 100 events should capture recent participants)
-      const events = await cardEventsAPI.getLatestRoomEvents(roomId, 100);
+      // Note: card-events API is disabled, so this will fail gracefully
+      let events: CardEvent[] = [];
+      try {
+        events = await cardEventsAPI.getLatestRoomEvents(roomId, 100);
+      } catch (apiError) {
+        // Card events API is disabled, just show current user
+        console.debug('Card events API not available, showing current user only');
+        events = [];
+      }
 
       // Extract unique participants from events
       const participantMap = new Map<string, RoomParticipant>();

@@ -8,6 +8,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from app.models.client import ConsultationRecord, RoomClient
+    from app.models.counselor_note import CounselorNote
 
 
 def generate_share_code() -> str:
@@ -57,6 +58,7 @@ class Room(RoomBase, table=True):
     consultation_records: List["ConsultationRecord"] = Relationship(
         back_populates="room"
     )
+    counselor_note: Optional["CounselorNote"] = Relationship(back_populates="room")
 
 
 class RoomCreate(RoomBase):

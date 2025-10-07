@@ -58,9 +58,9 @@ export const gameSessionsAPI = {
   },
 
   // Get active session for a room
-  getActiveForRoom: async (roomId: string) => {
-    const response = await apiClient.get(`/api/game-sessions/room/${roomId}/active`);
-    return response.data;
+  getActiveForRoom: async (roomId: string): Promise<GameSession | null> => {
+    // Game sessions API is disabled - return null
+    return null;
   },
 
   // Start a game session

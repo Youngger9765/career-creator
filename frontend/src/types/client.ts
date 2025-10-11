@@ -21,6 +21,9 @@ export interface Client {
   active_rooms_count?: number;
   total_consultations?: number;
   last_consultation_date?: string;
+  // Default room (for simplified UX)
+  default_room_id?: string;
+  default_room_name?: string;
   // Room data from expanded API response
   rooms?: Array<{
     id: string;
@@ -62,25 +65,43 @@ export interface ClientEmailBind {
 export interface ConsultationRecord {
   id: string;
   client_id: string;
-  room_id?: string;
-  game_session_id?: string;
-  consultation_date: string;
+  room_id: string;
+  counselor_id: string;
+  session_date: string;
   duration_minutes?: number;
-  session_type: 'initial' | 'followup' | 'assessment' | 'closure';
+  // Visual records
+  screenshots: string[]; // GCS URL array
+  // Data records
+  game_state?: {
+    gameMode: string;
+    gameplay: string;
+    cards: Array<{
+      id: string;
+      title: string;
+      zone: string;
+      position?: { x: number; y: number };
+      flipped: boolean;
+    }>;
+  };
+  topics: string[];
   notes?: string;
-  tags: string[];
+  follow_up_required: boolean;
+  follow_up_date?: string;
+  ai_summary?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface ConsultationRecordCreate {
-  room_id?: string;
-  game_session_id?: string;
-  consultation_date?: string;
+  room_id: string;
+  client_id: string;
+  session_date: string;
   duration_minutes?: number;
-  session_type?: 'initial' | 'followup' | 'assessment' | 'closure';
+  game_state?: Record<string, any>;
+  topics?: string[];
   notes?: string;
-  tags?: string[];
+  follow_up_required?: boolean;
+  follow_up_date?: string;
 }
 
 export interface RoomClient {

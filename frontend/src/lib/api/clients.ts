@@ -113,4 +113,26 @@ export const consultationRecordsAPI = {
     const response = await apiClient.put(`/api/clients/consultation-records/${recordId}`, data);
     return response.data;
   },
+
+  /**
+   * Upload screenshot for consultation record
+   */
+  uploadScreenshot: async (
+    recordId: string,
+    file: File
+  ): Promise<{ url: string; record_id: string; total_screenshots: number }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post(
+      `/api/clients/consultation-records/${recordId}/screenshots`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  },
 };

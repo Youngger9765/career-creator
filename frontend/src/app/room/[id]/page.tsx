@@ -18,6 +18,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import html2canvas from 'html2canvas';
+import { Camera } from 'lucide-react';
+import { consultationRecordsAPI } from '@/lib/api/clients';
+import { ConsultationRecord } from '@/types/client';
 
 export default function RoomPage() {
   const params = useParams();
@@ -33,6 +37,13 @@ export default function RoomPage() {
   const [visitorName, setVisitorName] = useState('');
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(true);
+  const [isCapturingScreenshot, setIsCapturingScreenshot] = useState(false);
+  const [screenshotMessage, setScreenshotMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
+  const gameAreaRef = useRef<HTMLDivElement>(null);
+  const [currentConsultationRecord, setCurrentConsultationRecord] = useState<ConsultationRecord | null>(null);
 
   // Game Session for state persistence
   const gameSession = useGameSession({
@@ -204,6 +215,45 @@ export default function RoomPage() {
     });
   }, [isReady, roomId, joinRoom]);
 
+  // 自動創建或獲取當天的 consultation record（僅諮詢師）
+  useEffect(() => {
+    if (!currentRoom || !isCounselor || !currentRoom.client_id) return;
+
+    const initConsultationRecord = async () => {
+      try {
+        // 先嘗試獲取今天的記錄
+        const records = await consultationRecordsAPI.getClientRecords(currentRoom.client_id!);
+        const today = new Date().toISOString().split('T')[0];
+        const todayRecord = records.find((r) =>
+          r.session_date.startsWith(today)
+        );
+
+        if (todayRecord) {
+          setCurrentConsultationRecord(todayRecord);
+          console.log('[Room] Found today consultation record:', todayRecord.id);
+        } else {
+          // 創建新的記錄
+          const newRecord = await consultationRecordsAPI.createRecord(
+            currentRoom.client_id!,
+            {
+              room_id: roomId,
+              client_id: currentRoom.client_id!,
+              session_date: new Date().toISOString(),
+              topics: [],
+              follow_up_required: false,
+            }
+          );
+          setCurrentConsultationRecord(newRecord);
+          console.log('[Room] Created new consultation record:', newRecord.id);
+        }
+      } catch (error) {
+        console.error('[Room] Failed to init consultation record:', error);
+      }
+    };
+
+    initConsultationRecord();
+  }, [currentRoom, isCounselor, roomId]);
+
   // 顯示檢查中的狀態
   if (isChecking) {
     return (
@@ -233,6 +283,78 @@ export default function RoomPage() {
   console.log('Is counselor:', isCounselor);
   console.log('Is visitor:', isVisitor);
   console.log('Will be read-only:', !isCounselor && !isVisitor);
+
+  // Screenshot capture handler
+  const handleCaptureScreenshot = async () => {
+    if (!gameAreaRef.current) {
+      setScreenshotMessage({
+        type: 'error',
+        text: '找不到遊戲區域',
+      });
+      return;
+    }
+
+    if (!currentConsultationRecord) {
+      setScreenshotMessage({
+        type: 'error',
+        text: '尚未建立諮詢記錄，請稍候再試',
+      });
+      return;
+    }
+
+    setIsCapturingScreenshot(true);
+    setScreenshotMessage(null);
+
+    try {
+      // Capture the game area using html2canvas
+      const canvas = await html2canvas(gameAreaRef.current, {
+        backgroundColor: '#f3f4f6',
+        scale: 2, // Higher quality
+        logging: false,
+        useCORS: true,
+      });
+
+      // Convert canvas to blob
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          throw new Error('無法生成截圖');
+        }
+
+        // Create File object from blob
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const file = new File(
+          [blob],
+          `consultation-${currentRoom?.name}-${timestamp}.png`,
+          { type: 'image/png' }
+        );
+
+        // Upload to backend
+        const result = await consultationRecordsAPI.uploadScreenshot(
+          currentConsultationRecord.id,
+          file
+        );
+
+        console.log('[Room] Screenshot uploaded:', result);
+
+        setScreenshotMessage({
+          type: 'success',
+          text: `截圖已上傳 (共 ${result.total_screenshots} 張)`,
+        });
+
+        // Clear message after 3 seconds
+        setTimeout(() => setScreenshotMessage(null), 3000);
+      }, 'image/png');
+    } catch (error) {
+      console.error('Screenshot capture error:', error);
+      setScreenshotMessage({
+        type: 'error',
+        text: '截圖上傳失敗，請稍後再試',
+      });
+      setTimeout(() => setScreenshotMessage(null), 3000);
+    } finally {
+      setIsCapturingScreenshot(false);
+    }
+  };
 
   return (
     <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col overflow-hidden">
@@ -273,20 +395,33 @@ export default function RoomPage() {
 
             {/* 切換遊戲模式按鈕 - 僅諮詢師在已選擇遊戲時顯示 */}
             {isCounselor && showNewArchitecture && currentGameplay && (
-              <button
-                onClick={() => setCurrentGameplay('')}
-                className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-                切換遊戲模式
-              </button>
+              <>
+                <button
+                  onClick={() => setCurrentGameplay('')}
+                  className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                    />
+                  </svg>
+                  切換遊戲模式
+                </button>
+
+                {/* 截圖按鈕 - 僅諮詢師在已選擇遊戲時顯示 */}
+                <button
+                  onClick={handleCaptureScreenshot}
+                  disabled={isCapturingScreenshot}
+                  className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="儲存諮詢畫面截圖"
+                >
+                  <Camera className="w-4 h-4" />
+                  {isCapturingScreenshot ? '處理中...' : '儲存截圖'}
+                </button>
+              </>
             )}
 
             {/* 參與者列表 */}
@@ -315,6 +450,7 @@ export default function RoomPage() {
 
       {/* 主要內容區 */}
       <div
+        ref={gameAreaRef}
         className={`
           flex-1 flex flex-col overflow-hidden
           transition-all duration-300
@@ -346,6 +482,19 @@ export default function RoomPage() {
       {(errorMessage || roomError) && (
         <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {errorMessage || roomError}
+        </div>
+      )}
+
+      {/* Screenshot message */}
+      {screenshotMessage && (
+        <div
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded shadow-lg ${
+            screenshotMessage.type === 'success'
+              ? 'bg-green-100 border border-green-400 text-green-700'
+              : 'bg-red-100 border border-red-400 text-red-700'
+          }`}
+        >
+          {screenshotMessage.text}
         </div>
       )}
 

@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { clientsAPI } from '@/lib/api/clients';
-import { Client, ClientCreate, ClientUpdate } from '@/types/client';
+import { clientsAPI, consultationRecordsAPI } from '@/lib/api/clients';
+import { Client, ClientCreate, ClientUpdate, ConsultationRecord } from '@/types/client';
 import {
   Users,
   Plus,
@@ -26,6 +26,7 @@ import {
   AlertCircle,
   Eye,
   X,
+  Camera,
 } from 'lucide-react';
 import { ClientForm } from './ClientForm';
 import { RoomListTable } from '../rooms/RoomListTable';
@@ -46,6 +47,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
   const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
   const [submitLoading, setSubmitLoading] = useState(false);
   const [deletingRoom, setDeletingRoom] = useState<any>(null);
+  const [clientRecords, setClientRecords] = useState<Record<string, ConsultationRecord[]>>({});
+  const [loadingRecords, setLoadingRecords] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadClients();
@@ -170,7 +173,9 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     );
   };
 
-  const toggleClientExpansion = (clientId: string) => {
+  const toggleClientExpansion = async (clientId: string) => {
+    const isExpanding = !expandedClients.has(clientId);
+
     setExpandedClients((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(clientId)) {
@@ -180,6 +185,23 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
       }
       return newSet;
     });
+
+    // 如果是展開且尚未載入記錄，則查詢
+    if (isExpanding && !clientRecords[clientId]) {
+      setLoadingRecords((prev) => new Set(prev).add(clientId));
+      try {
+        const records = await consultationRecordsAPI.getClientRecords(clientId);
+        setClientRecords((prev) => ({ ...prev, [clientId]: records }));
+      } catch (error) {
+        console.error('Failed to load consultation records:', error);
+      } finally {
+        setLoadingRecords((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(clientId);
+          return newSet;
+        });
+      }
+    }
   };
 
   const getRoomStatusBadge = (isActive: boolean, expiresAt?: string) => {
@@ -411,6 +433,19 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         </td>
                         <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                           <div className="flex flex-col items-center gap-1">
+                            {client.default_room_id && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.location.href = `/room/${client.default_room_id}`;
+                                }}
+                                className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors whitespace-nowrap"
+                                title="進入諮詢室"
+                              >
+                                <Home className="w-3 h-3" />
+                                進入諮詢室
+                              </button>
+                            )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -464,6 +499,64 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       emptyMessage="尚無諮詢室"
                                       onDelete={(room) => setDeletingRoom(room)}
                                     />
+
+                                    {/* Recent Screenshots Section */}
+                                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                      <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                                        <Camera className="w-4 h-4" />
+                                        最近諮詢截圖
+                                      </h4>
+                                      <div className="text-sm text-gray-500">
+                                        {loadingRecords.has(client.id) ? (
+                                          <div className="flex items-center gap-2 text-gray-400">
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                                            載入中...
+                                          </div>
+                                        ) : (() => {
+                                          const records = clientRecords[client.id] || [];
+                                          const allScreenshots = records.flatMap((r) =>
+                                            (r.screenshots || []).map((url) => ({
+                                              url,
+                                              recordId: r.id,
+                                              date: r.session_date,
+                                            }))
+                                          );
+
+                                          if (allScreenshots.length === 0) {
+                                            return (
+                                              <p className="text-gray-400 italic">
+                                                前往諮詢室並點擊「儲存截圖」按鈕來記錄諮詢過程
+                                              </p>
+                                            );
+                                          }
+
+                                          return (
+                                            <div className="grid grid-cols-4 gap-2 mt-2">
+                                              {allScreenshots.slice(0, 8).map((screenshot, idx) => (
+                                                <div
+                                                  key={`${screenshot.recordId}-${idx}`}
+                                                  className="relative group"
+                                                >
+                                                  <img
+                                                    src={screenshot.url}
+                                                    alt={`諮詢截圖 ${new Date(screenshot.date).toLocaleDateString()}`}
+                                                    className="w-full h-24 object-cover rounded cursor-pointer hover:opacity-75 transition-opacity border border-gray-300"
+                                                    onClick={() => window.open(screenshot.url, '_blank')}
+                                                    onError={(e) => {
+                                                      (e.target as HTMLImageElement).src =
+                                                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E載入失敗%3C/text%3E%3C/svg%3E';
+                                                    }}
+                                                  />
+                                                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded-b opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {new Date(screenshot.date).toLocaleDateString()}
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          );
+                                        })()}
+                                      </div>
+                                    </div>
 
                                     {/* 創建諮詢室按鈕 - 虛線框樣式 */}
                                     <div className="mt-4">

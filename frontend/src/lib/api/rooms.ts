@@ -14,6 +14,9 @@ export interface Room {
   created_at: string;
   expires_at?: string;
   session_count?: number;
+  client_id?: string;
+  client_name?: string;
+  last_activity?: string;
 }
 
 export interface CreateRoomData {

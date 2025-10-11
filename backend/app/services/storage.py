@@ -3,10 +3,15 @@ GCS Storage Service
 Google Cloud Storage 文件上傳服務
 """
 
-from typing import BinaryIO
+import os
+from typing import BinaryIO, Optional
 from uuid import UUID, uuid4
 
 from fastapi import UploadFile
+
+# GCS Configuration
+GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME", "career-creator-screenshots")
+USE_MOCK_STORAGE = os.getenv("USE_MOCK_STORAGE", "true").lower() == "true"
 
 
 async def upload_screenshot(
@@ -24,9 +29,6 @@ async def upload_screenshot(
 
     Returns:
         str: Public URL of uploaded file
-
-    TODO: Implement actual GCS upload
-    Currently returns mock URL for development
     """
     # Generate unique filename
     file_extension = file.filename.split(".")[-1] if file.filename else "png"
@@ -35,19 +37,37 @@ async def upload_screenshot(
     # Construct file path in bucket
     file_path = f"screenshots/{counselor_id}/{record_id}/{unique_filename}"
 
-    # TODO: Implement actual GCS upload
-    # from google.cloud import storage
-    # client = storage.Client()
-    # bucket = client.bucket("career-creator-screenshots")
-    # blob = bucket.blob(file_path)
-    # blob.upload_from_file(file.file, content_type=file.content_type)
-    # blob.make_public()
-    # return blob.public_url
+    # Use mock storage for development/testing
+    if USE_MOCK_STORAGE:
+        mock_url = f"https://storage.googleapis.com/{GCS_BUCKET_NAME}/{file_path}"
+        return mock_url
 
-    # Mock URL for development
-    mock_url = f"https://storage.googleapis.com/career-creator-screenshots/{file_path}"
+    # Real GCS upload
+    try:
+        from google.cloud import storage
 
-    return mock_url
+        client = storage.Client()
+        bucket = client.bucket(GCS_BUCKET_NAME)
+        blob = bucket.blob(file_path)
+
+        # Upload file
+        file.file.seek(0)  # Reset file pointer
+        blob.upload_from_file(
+            file.file,
+            content_type=file.content_type or "image/png"
+        )
+
+        # Make public
+        blob.make_public()
+
+        return blob.public_url
+
+    except Exception as e:
+        # Log error and fall back to mock URL in development
+        print(f"GCS upload error: {e}")
+        if os.getenv("ENV", "development") == "development":
+            return f"https://storage.googleapis.com/{GCS_BUCKET_NAME}/{file_path}"
+        raise
 
 
 async def upload_to_gcs(
@@ -65,19 +85,73 @@ async def upload_to_gcs(
 
     Returns:
         str: Public URL of uploaded file
-
-    TODO: Implement actual GCS upload
     """
-    # TODO: Implement actual GCS upload
-    # from google.cloud import storage
-    # client = storage.Client()
-    # bucket = client.bucket("career-creator-screenshots")
-    # blob = bucket.blob(file_path)
-    # blob.upload_from_file(file_content, content_type=content_type)
-    # blob.make_public()
-    # return blob.public_url
+    # Use mock storage for development/testing
+    if USE_MOCK_STORAGE:
+        mock_url = f"https://storage.googleapis.com/{GCS_BUCKET_NAME}/{file_path}"
+        return mock_url
 
-    # Mock URL for development
-    mock_url = f"https://storage.googleapis.com/career-creator-screenshots/{file_path}"
+    # Real GCS upload
+    try:
+        from google.cloud import storage
 
-    return mock_url
+        client = storage.Client()
+        bucket = client.bucket(GCS_BUCKET_NAME)
+        blob = bucket.blob(file_path)
+
+        # Upload file
+        file_content.seek(0)  # Reset file pointer
+        blob.upload_from_file(file_content, content_type=content_type)
+
+        # Make public
+        blob.make_public()
+
+        return blob.public_url
+
+    except Exception as e:
+        # Log error and fall back to mock URL in development
+        print(f"GCS upload error: {e}")
+        if os.getenv("ENV", "development") == "development":
+            return f"https://storage.googleapis.com/{GCS_BUCKET_NAME}/{file_path}"
+        raise
+
+
+def init_gcs_bucket() -> Optional[str]:
+    """
+    Initialize GCS bucket with proper configuration
+
+    Returns:
+        str: Bucket name if successful, None otherwise
+    """
+    if USE_MOCK_STORAGE:
+        print("Using mock storage (GCS disabled)")
+        return None
+
+    try:
+        from google.cloud import storage
+
+        client = storage.Client()
+        bucket = client.bucket(GCS_BUCKET_NAME)
+
+        # Check if bucket exists
+        if not bucket.exists():
+            print(f"Warning: GCS bucket '{GCS_BUCKET_NAME}' does not exist")
+            return None
+
+        # Set CORS configuration
+        bucket.cors = [
+            {
+                "origin": ["*"],
+                "method": ["GET", "POST"],
+                "responseHeader": ["Content-Type"],
+                "maxAgeSeconds": 3600
+            }
+        ]
+        bucket.patch()
+
+        print(f"GCS bucket '{GCS_BUCKET_NAME}' initialized successfully")
+        return GCS_BUCKET_NAME
+
+    except Exception as e:
+        print(f"GCS initialization error: {e}")
+        return None

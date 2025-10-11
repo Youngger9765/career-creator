@@ -147,6 +147,9 @@ async def get_my_clients(
                 }
             )
 
+        # Get default room (first room by created_at)
+        default_room = rooms[0] if rooms else None
+
         response = ClientResponse(
             id=client.id,
             email=client.email,
@@ -165,6 +168,8 @@ async def get_my_clients(
             last_consultation_date=(
                 last_consultation.session_date if last_consultation else None
             ),
+            default_room_id=default_room.id if default_room else None,
+            default_room_name=default_room.name if default_room else None,
             rooms=rooms_data,
         )
         responses.append(response)
@@ -212,9 +217,32 @@ async def create_client(
         email_verified=False,
     )
     session.add(client)
-    session.commit()
+    session.flush()  # Flush to get client.id without committing
 
+    # Auto-create first room for this client
+    client_display_name = client.name or "Anonymous"
+    default_room = Room(
+        counselor_id=str(current_user["user_id"]),
+        name=f"{client_display_name} 的諮詢室",
+        description="主要諮詢空間",
+        is_active=True,
+        expires_at=None,  # Permanent room (no expiration)
+    )
+    session.add(default_room)
+    session.flush()  # Flush to get room.id
+
+    # Create room-client association
+    room_client = RoomClient(
+        room_id=default_room.id,
+        client_id=client.id,
+    )
+    session.add(room_client)
+
+    # Commit all changes
+    session.commit()
     session.refresh(client)
+    session.refresh(default_room)
+
     return ClientResponse(
         id=client.id,
         email=client.email,
@@ -228,9 +256,12 @@ async def create_client(
         verified_at=client.verified_at,
         created_at=client.created_at,
         updated_at=client.updated_at,
-        active_rooms_count=0,
+        active_rooms_count=1,
         total_consultations=0,
         last_consultation_date=None,
+        default_room_id=default_room.id,
+        default_room_name=default_room.name,
+        rooms=[],
     )
 
 

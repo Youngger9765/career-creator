@@ -5,7 +5,8 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import TEXT, UniqueConstraint
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlmodel import JSON, Column, Field, Relationship, SQLModel
 
 
@@ -125,6 +126,21 @@ class ConsultationRecord(SQLModel, table=True):
     duration_minutes: Optional[int] = Field(
         default=None, description="Session duration in minutes"
     )
+
+    # Visual records: Screenshots from GCS
+    screenshots: List[str] = Field(
+        default_factory=list,
+        sa_column=Column(ARRAY(TEXT)),
+        description="Screenshot URLs from GCP Storage"
+    )
+
+    # Data records: Game state snapshot
+    game_state: Optional[Dict[str, Any]] = Field(
+        default=None,
+        sa_column=Column(JSON),
+        description="Game state snapshot (cards, positions, etc.)"
+    )
+
     topics: List[str] = Field(
         default_factory=list, sa_column=Column(JSON), description="Topics discussed"
     )
@@ -135,6 +151,12 @@ class ConsultationRecord(SQLModel, table=True):
     follow_up_date: Optional[date] = Field(
         default=None, description="Scheduled follow-up date"
     )
+
+    # AI summary (future feature)
+    ai_summary: Optional[str] = Field(
+        default=None, description="AI-generated consultation summary"
+    )
+
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -194,6 +216,12 @@ class ClientResponse(ClientBase):
     last_consultation_date: Optional[datetime] = Field(
         default=None, description="Last consultation date"
     )
+    default_room_id: Optional[UUID] = Field(
+        default=None, description="First room ID (for simplified UX)"
+    )
+    default_room_name: Optional[str] = Field(
+        default=None, description="First room name"
+    )
     rooms: Optional[List[Dict[str, Any]]] = Field(
         default_factory=list, description="Rooms associated with this client"
     )
@@ -206,6 +234,7 @@ class ConsultationRecordCreate(SQLModel):
     client_id: UUID
     session_date: datetime
     duration_minutes: Optional[int] = Field(default=None)
+    game_state: Optional[Dict[str, Any]] = Field(default=None)
     topics: List[str] = Field(default_factory=list)
     notes: Optional[str] = Field(default=None)
     follow_up_required: bool = Field(default=False)
@@ -221,10 +250,13 @@ class ConsultationRecordResponse(SQLModel):
     counselor_id: UUID
     session_date: datetime
     duration_minutes: Optional[int]
+    screenshots: List[str] = Field(default_factory=list)
+    game_state: Optional[Dict[str, Any]] = None
     topics: List[str]
     notes: Optional[str]
     follow_up_required: bool
     follow_up_date: Optional[date]
+    ai_summary: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

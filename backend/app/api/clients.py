@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from sqlmodel import Session, func, or_, select
 
 from app.core.auth import get_current_user_from_token
@@ -684,3 +684,55 @@ async def get_consultation_records(
     ).all()
 
     return [ConsultationRecordResponse(**record.dict()) for record in records]
+
+
+@router.post("/consultation-records/{record_id}/screenshots")
+async def upload_consultation_screenshot(
+    record_id: UUID,
+    file: UploadFile = File(...),
+    session: Session = Depends(get_session),
+    current_user: dict = Depends(get_current_user_from_token),
+):
+    """
+    Upload screenshot for a consultation record
+    上傳諮詢記錄的截圖到 GCS
+    """
+    # Verify record exists and check ownership
+    record = session.get(ConsultationRecord, record_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Consultation record not found")
+
+    # Check if this record belongs to the current counselor
+    if record.counselor_id != str(current_user["user_id"]):
+        raise HTTPException(
+            status_code=403,
+            detail="You don't have permission to upload screenshots for this record",
+        )
+
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(
+            status_code=400,
+            detail="Only image files are allowed"
+        )
+
+    # Upload to GCS
+    from app.services.storage import upload_screenshot
+
+    public_url = await upload_screenshot(
+        file=file,
+        counselor_id=UUID(current_user["user_id"]),
+        record_id=record_id
+    )
+
+    # Update record with new screenshot URL
+    record.screenshots = record.screenshots + [public_url]
+    record.updated_at = datetime.utcnow()
+    session.add(record)
+    session.commit()
+
+    return {
+        "url": public_url,
+        "record_id": record_id,
+        "total_screenshots": len(record.screenshots)
+    }

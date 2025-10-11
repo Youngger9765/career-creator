@@ -71,6 +71,12 @@
    - ❌ 歷史資料匯出
    - ❌ 諮詢報告生成
 
+6. **客戶諮詢室架構簡化** 🆕 (2025-10-11 新增)
+   - ❌ Dashboard 改版：從「房間列表」改為「客戶列表」
+   - ❌ 截圖功能：儲存諮詢畫面與牌卡狀態
+   - ❌ ConsultationRecord 擴充：screenshots (GCS URLs) + game_state (JSON)
+   - 詳細規格：[SPEC_CLIENT_ROOM_SIMPLIFICATION.md](docs/SPEC_CLIENT_ROOM_SIMPLIFICATION.md)
+
 ### 第3個月：AI 輔助與進階功能
 
 **目標**：智慧化輔助與規模化

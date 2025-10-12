@@ -31,6 +31,7 @@ import {
 import { ClientForm } from './ClientForm';
 import { RoomListTable } from '../rooms/RoomListTable';
 import { DeleteRoomDialog } from '../rooms/DeleteRoomDialog';
+import { GAMEPLAY_NAMES } from '@/constants/game-modes';
 
 interface ClientManagementProps {
   className?: string;
@@ -327,20 +328,17 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                   <th className="w-[25%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     聯絡方式
                   </th>
-                  <th className="w-[7%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    狀態
-                  </th>
-                  <th className="w-[11%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    諮詢統計
-                  </th>
                   <th className="w-[11%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     最後諮詢
                   </th>
-                  <th className="w-[18%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[24%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     備註
                   </th>
-                  <th className="w-[10%] px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  <th className="w-[14%] px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     操作
+                  </th>
+                  <th className="w-[8%] px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    管理
                   </th>
                 </tr>
               </thead>
@@ -417,13 +415,6 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             )}
                           </div>
                         </td>
-                        <td className="px-3 py-4">{getStatusBadge(client.status)}</td>
-                        <td className="px-3 py-4 text-sm text-gray-900 dark:text-gray-100">
-                          <div className="space-y-1">
-                            <div>總諮詢: {client.total_consultations || 0} 次</div>
-                            <div>活躍諮詢室: {client.active_rooms_count || 0} 個</div>
-                          </div>
-                        </td>
                         <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                           {client.last_consultation_date ? (
                             <div className="flex items-center gap-2">
@@ -441,18 +432,18 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             </p>
                           </div>
                         </td>
-                        <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                          <div className="flex flex-col items-center gap-1">
+                        <td className="px-3 py-4">
+                          <div className="flex flex-col items-center gap-3">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleEnterRoom(client);
                               }}
-                              className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors whitespace-nowrap"
+                              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors whitespace-nowrap shadow-sm hover:shadow"
                               title="進入諮詢室"
                               disabled={submitLoading}
                             >
-                              <Home className="w-3 h-3" />
+                              <Home className="w-4 h-4" />
                               進入諮詢室
                             </button>
                             <button
@@ -460,23 +451,27 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                 e.stopPropagation();
                                 handleToggleRecords(client.id);
                               }}
-                              className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors whitespace-nowrap"
+                              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors whitespace-nowrap shadow-sm hover:shadow"
                               title="查看諮詢記錄"
                             >
                               {expandedRecords.has(client.id) ? (
-                                <ChevronDown className="w-3 h-3" />
+                                <ChevronDown className="w-4 h-4" />
                               ) : (
-                                <ChevronRight className="w-3 h-3" />
+                                <ChevronRight className="w-4 h-4" />
                               )}
                               記錄
                             </button>
+                          </div>
+                        </td>
+                        <td className="px-3 py-4">
+                          <div className="flex flex-col items-center justify-center gap-1.5">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setViewingClient(client);
                                 setIsEditMode(false);
                               }}
-                              className="flex items-center justify-center w-6 h-6 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                              className="flex items-center justify-center w-8 h-8 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
                               title="檢視"
                             >
                               <Eye className="w-4 h-4" />
@@ -486,7 +481,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                 e.stopPropagation();
                                 setEditingClient(client);
                               }}
-                              className="flex items-center justify-center w-6 h-6 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                              className="flex items-center justify-center w-8 h-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
                               title="編輯"
                             >
                               <Edit2 className="w-4 h-4" />
@@ -496,7 +491,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                 e.stopPropagation();
                                 handleDeleteClient(client.id, client.name);
                               }}
-                              className="flex items-center justify-center w-6 h-6 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+                              className="flex items-center justify-center w-8 h-8 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
                               title="刪除"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -508,8 +503,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                       {/* Expanded Records Row */}
                       {expandedRecords.has(client.id) && (
                         <tr className="bg-gray-50 dark:bg-gray-800">
-                          <td colSpan={7} className="px-12 py-6">
-                            <div className="space-y-3">
+                          <td colSpan={8} className="px-12 py-6">
+                            <div className="space-y-3 ml-8 pl-6 border-l-4 border-blue-500">
                               <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                 <Activity className="w-4 h-4" />
                                 諮詢記錄
@@ -525,43 +520,53 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                   {clientRecords[client.id].map((record) => (
                                     <div
                                       key={record.id}
-                                      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                                      className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
                                     >
                                       <div className="flex gap-6">
                                         {/* 左欄：日期、玩法、筆記 */}
-                                        <div className="flex-1 space-y-2">
-                                          <div className="space-y-1">
-                                            <p className="text-sm text-gray-900 dark:text-gray-100">
-                                              {formatDate(record.session_date)}
-                                            </p>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                              {record.game_rule_name || '未指定'}
-                                            </p>
+                                        <div className="flex-1 space-y-3">
+                                          <div className="flex items-center gap-3 flex-wrap">
+                                            <div className="flex items-center gap-2">
+                                              <Clock className="w-4 h-4 text-gray-400" />
+                                              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                {formatDate(record.session_date)}
+                                              </p>
+                                            </div>
+                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700 rounded-full">
+                                              <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                                              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                                                {(record.game_state?.gameplay && GAMEPLAY_NAMES[record.game_state.gameplay]) || record.game_rule_name || '未指定'}
+                                              </span>
+                                            </div>
                                           </div>
 
                                           {record.notes && (
-                                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap pt-2">
-                                              {record.notes}
-                                            </p>
+                                            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                                              <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                                                {record.notes}
+                                              </p>
+                                            </div>
                                           )}
                                         </div>
 
                                         {/* 右欄：截圖 */}
                                         {record.screenshots && record.screenshots.length > 0 && (
-                                          <div className="flex gap-2 flex-wrap">
+                                          <div className="flex gap-3 flex-wrap">
                                             {record.screenshots.map((url, idx) => (
                                               <button
                                                 key={idx}
                                                 onClick={() => setSelectedImage(url)}
-                                                className="relative group cursor-pointer"
+                                                className="relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all transform hover:scale-105"
                                               >
                                                 <img
                                                   src={url}
                                                   alt={`Screenshot ${idx + 1}`}
-                                                  className="w-64 h-auto object-contain rounded border border-gray-300 dark:border-gray-600 hover:border-blue-500 transition-colors"
+                                                  className="w-64 h-auto object-contain bg-gray-100 dark:bg-gray-700"
                                                 />
-                                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded flex items-center justify-center">
-                                                  <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                  <div className="bg-white/90 dark:bg-gray-800/90 rounded-full p-3">
+                                                    <Camera className="w-5 h-5 text-gray-800 dark:text-white" />
+                                                  </div>
                                                 </div>
                                               </button>
                                             ))}

@@ -316,6 +316,9 @@ export default function RoomPage() {
           client_id: currentRoom.client_id,
           game_rule_id: currentRoom.game_rule_id || undefined,
           session_date: new Date().toISOString(),
+          game_state: {
+            gameplay: currentGameplay || '', // Store current gameplay for filtering
+          },
           topics: [],
           follow_up_required: false,
           notes: notes || undefined, // Include current notes
@@ -471,7 +474,7 @@ export default function RoomPage() {
         className={`
           flex-1 flex flex-col overflow-hidden
           transition-all duration-300
-          ${isCounselor && notesDrawerOpen ? 'md:pr-96' : 'pr-0'}
+          ${isCounselor && currentGameplay && notesDrawerOpen ? 'md:pr-96' : 'pr-0'}
         `}
       >
         <GameModeIntegration
@@ -491,6 +494,8 @@ export default function RoomPage() {
       {isCounselor && currentGameplay && (
         <NotesDrawer
           roomId={roomId}
+          clientId={currentRoom?.client_id}
+          currentGameplay={currentGameplay}
           isOpen={notesDrawerOpen}
           onToggle={() => setNotesDrawerOpen(!notesDrawerOpen)}
           onCaptureScreenshot={handleCaptureScreenshot}

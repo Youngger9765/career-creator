@@ -271,43 +271,32 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
         <div className="h-full flex flex-col">
           {/* 模式和玩法選擇器 - 顯示所有組合 */}
           {!gameStarted && !selectedGameplay && (
-            <div className="h-full overflow-y-auto">
-              {/* Owner 離線提示（訪客才顯示） */}
-              {isVisitor && !ownerOnline && (
-                <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">⏸️</span>
-                    <div>
-                      <p className="font-medium text-yellow-800 dark:text-yellow-200">
-                        等待諮詢師上線
-                      </p>
-                      <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                        諮詢師離線時無法切換遊戲模式
-                      </p>
+            <div className="h-full overflow-y-auto px-6 py-8">
+              <div className="max-w-7xl mx-auto">
+                {/* Owner 離線提示（訪客才顯示） */}
+                {isVisitor && !ownerOnline && (
+                  <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">⏸️</span>
+                      <div>
+                        <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                          等待諮詢師上線
+                        </p>
+                        <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                          諮詢師離線時無法切換遊戲模式
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <CombinedGameSelector
-                onGameSelect={handleGameSelect}
-                currentMode={selectedMode}
-                currentGameplay={selectedGameplay}
-                disabled={!canInteract}
-              />
-
-              {/* 開始遊戲按鈕（Owner 才能看到） */}
-              {isRoomOwner && syncedState.gameMode && (
-                <div className="fixed bottom-8 right-8 z-20">
-                  <Button
-                    size="lg"
-                    onClick={startGame}
-                    className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
-                  >
-                    開始遊戲
-                  </Button>
-                </div>
-              )}
+                <CombinedGameSelector
+                  onGameSelect={handleGameSelect}
+                  currentMode={selectedMode}
+                  currentGameplay={selectedGameplay}
+                  disabled={!canInteract}
+                />
+              </div>
             </div>
           )}
 

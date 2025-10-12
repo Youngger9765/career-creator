@@ -1,14 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api/client';
+import { consultationRecordsAPI } from '@/lib/api/clients';
 import { Camera } from 'lucide-react';
+import type { ConsultationRecord } from '@/types/client';
+import { GAMEPLAY_NAMES } from '@/constants/game-modes';
 
 interface NotesDrawerProps {
   roomId: string;
+  clientId?: string;
+  currentGameplay?: string; // Current gameplay ID for filtering
   isOpen: boolean;
   onToggle: () => void;
   onCaptureScreenshot?: (notes: string) => void;
+  onScreenshotSuccess?: () => void; // Callback after screenshot saved
   isCapturingScreenshot?: boolean;
   screenshotMessage?: {
     type: 'success' | 'error';
@@ -16,27 +22,53 @@ interface NotesDrawerProps {
   } | null;
 }
 
-export function NotesDrawer({ roomId, isOpen, onToggle, onCaptureScreenshot, isCapturingScreenshot, screenshotMessage }: NotesDrawerProps) {
+export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggle, onCaptureScreenshot, onScreenshotSuccess, isCapturingScreenshot, screenshotMessage }: NotesDrawerProps) {
   const [noteContent, setNoteContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [consultationRecords, setConsultationRecords] = useState<ConsultationRecord[]>([]);
+  const [recordsLoading, setRecordsLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<ConsultationRecord | null>(null); // For modal
+  const [newRecordId, setNewRecordId] = useState<string | null>(null); // Track newly added record for animation
+  const [historyExpanded, setHistoryExpanded] = useState(true); // Control history section expansion
 
-  // Fetch note on mount
+  // Fetch note and consultation records on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch note
         const noteRes = await apiClient.get(`/api/rooms/${roomId}/notes`);
         setNoteContent(noteRes.data.content || '');
+
+        // Fetch consultation records if clientId is available
+        if (clientId) {
+          setRecordsLoading(true);
+          const records = await consultationRecordsAPI.getClientRecords(clientId);
+
+          console.log('[NotesDrawer] Current gameplay:', currentGameplay);
+          console.log('[NotesDrawer] All records:', records.map(r => ({ id: r.id, gameplay: r.game_state?.gameplay, screenshots: r.screenshots.length })));
+
+          // Filter records by current gameplay and sort by date descending
+          const filtered = records
+            .filter(r => r.game_state?.gameplay === currentGameplay && r.screenshots.length > 0)
+            .sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
+
+          console.log('[NotesDrawer] Filtered records:', filtered.length);
+
+          setConsultationRecords(filtered);
+          setRecordsLoading(false);
+        }
       } catch (error) {
         console.error('Failed to fetch data:', error);
+        setRecordsLoading(false);
       }
     };
 
     if (isOpen) {
       fetchData();
     }
-  }, [roomId, isOpen]);
+  }, [roomId, clientId, currentGameplay, isOpen]);
 
   // Auto-save with debounce
   useEffect(() => {
@@ -62,6 +94,63 @@ export function NotesDrawer({ roomId, isOpen, onToggle, onCaptureScreenshot, isC
       setIsSaving(false);
     }
   };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).replace(/\//g, '/').replace(',', '');
+  };
+
+  // Refresh records and clear notes after screenshot
+  const refreshAfterScreenshot = useCallback(async () => {
+    if (!clientId || !currentGameplay) {
+      console.log('[NotesDrawer] Refresh skipped - clientId or currentGameplay missing:', { clientId, currentGameplay });
+      return;
+    }
+
+    try {
+      // Fetch updated records
+      const records = await consultationRecordsAPI.getClientRecords(clientId);
+
+      console.log('[NotesDrawer Refresh] Current gameplay:', currentGameplay);
+      console.log('[NotesDrawer Refresh] All records:', records.map(r => ({ id: r.id, gameplay: r.game_state?.gameplay, screenshots: r.screenshots.length })));
+
+      const filtered = records
+        .filter(r => r.game_state?.gameplay === currentGameplay && r.screenshots.length > 0)
+        .sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
+
+      console.log('[NotesDrawer Refresh] Filtered records:', filtered.length);
+
+      // Set new record ID for animation
+      if (filtered.length > 0) {
+        setNewRecordId(filtered[0].id);
+        // Clear animation after 2 seconds
+        setTimeout(() => setNewRecordId(null), 2000);
+      }
+
+      setConsultationRecords(filtered);
+      // Clear notes
+      setNoteContent('');
+    } catch (error) {
+      console.error('Failed to refresh records:', error);
+    }
+  }, [clientId, currentGameplay]);
+
+  // Watch for screenshot success message
+  useEffect(() => {
+    if (screenshotMessage?.type === 'success') {
+      if (onScreenshotSuccess) {
+        onScreenshotSuccess();
+      }
+      refreshAfterScreenshot();
+    }
+  }, [screenshotMessage, onScreenshotSuccess, refreshAfterScreenshot]);
 
   return (
     <>
@@ -125,8 +214,70 @@ export function NotesDrawer({ roomId, isOpen, onToggle, onCaptureScreenshot, isC
           </div>
         )}
 
+        {/* Consultation Records History */}
+        {clientId && consultationRecords.length > 0 && (
+          <div className="border-b">
+            {/* History Header - Collapsible */}
+            <button
+              onClick={() => setHistoryExpanded(!historyExpanded)}
+              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+            >
+              <h4 className="text-sm font-semibold text-gray-700">
+                歷史紀錄 ({consultationRecords.length})
+              </h4>
+              <svg
+                className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${
+                  historyExpanded ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* History Content - Expandable */}
+            <div
+              className={`overflow-hidden transition-all duration-300 ${
+                historyExpanded ? 'max-h-[40vh] opacity-100' : 'max-h-0 opacity-0'
+              }`}
+            >
+              <div className="px-4 pb-4 overflow-y-auto max-h-[40vh]">
+                <div className="space-y-2">
+                  {consultationRecords.map((record) => (
+                    <button
+                      key={record.id}
+                      onClick={() => setSelectedRecord(record)}
+                      className={`w-full text-left p-3 rounded-lg hover:bg-gray-100 transition-all duration-300 border ${
+                        record.id === newRecordId
+                          ? 'animate-pulse bg-green-50 border-green-500'
+                          : 'bg-gray-50 border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="text-xs text-gray-500 mb-1">
+                            {formatDate(record.session_date)}
+                          </div>
+                          <div className="text-sm font-medium text-gray-700">
+                            {(record.game_state?.gameplay && GAMEPLAY_NAMES[record.game_state.gameplay]) || record.game_rule_name || '未知玩法'}
+                          </div>
+                        </div>
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Notes Area */}
-        <div className="flex-1 flex flex-col p-4">
+        <div className="flex-1 flex flex-col p-4 min-h-0">
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-semibold text-gray-700">筆記</h4>
             <div className="text-xs text-gray-500">
@@ -141,7 +292,10 @@ export function NotesDrawer({ roomId, isOpen, onToggle, onCaptureScreenshot, isC
             value={noteContent}
             onChange={(e) => setNoteContent(e.target.value)}
             placeholder="記錄觀察、計畫、重要資訊..."
-            className="flex-1 w-full p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={isCapturingScreenshot}
+            className={`flex-1 w-full p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              isCapturingScreenshot ? 'bg-gray-100 cursor-not-allowed' : ''
+            }`}
           />
         </div>
       </div>
@@ -180,6 +334,104 @@ export function NotesDrawer({ roomId, isOpen, onToggle, onCaptureScreenshot, isC
             </svg>
           </button>
         </>
+      )}
+
+      {/* Record Detail Modal */}
+      {selectedRecord && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedRecord(null)}
+        >
+          <div
+            className="relative bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+              <div>
+                <h3 className="font-semibold text-gray-900">
+                  {(selectedRecord.game_state?.gameplay && GAMEPLAY_NAMES[selectedRecord.game_state.gameplay]) || selectedRecord.game_rule_name || '未知玩法'}
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formatDate(selectedRecord.session_date)}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedRecord(null)}
+                className="p-1 hover:bg-gray-200 rounded transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {/* Screenshots */}
+              {selectedRecord.screenshots && selectedRecord.screenshots.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">截圖</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedRecord.screenshots.map((url, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedImage(url)}
+                        className="relative group cursor-pointer"
+                      >
+                        <img
+                          src={url}
+                          alt={`Screenshot ${idx + 1}`}
+                          className="w-full h-auto object-cover rounded border border-gray-300 hover:border-blue-500 transition-colors"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded flex items-center justify-center">
+                          <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Notes */}
+              {selectedRecord.notes && (
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">筆記</h4>
+                  <div className="bg-gray-50 rounded p-3">
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                      {selectedRecord.notes}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Preview Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-7xl max-h-full">
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-10 right-0 text-white hover:text-gray-300"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <img
+              src={selectedImage}
+              alt="Preview"
+              className="max-w-full max-h-[90vh] object-contain rounded"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
       )}
     </>
   );

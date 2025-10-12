@@ -67,5 +67,3 @@ backend/create_test_user.py
 # Playwright test files
 test-screenshot.js
 debug-screenshot.png
-package.json
-package-lock.json

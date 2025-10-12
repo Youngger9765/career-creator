@@ -527,24 +527,27 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                       key={record.id}
                                       className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
                                     >
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                          <p className="text-xs text-gray-500 dark:text-gray-400">諮詢日期</p>
-                                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            {formatDate(record.session_date)}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <p className="text-xs text-gray-500 dark:text-gray-400">玩法</p>
-                                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                            {record.game_rule_name || '未指定'}
-                                          </p>
-                                        </div>
-                                      </div>
+                                      <div className="flex gap-6">
+                                        {/* 左欄：日期、玩法、筆記 */}
+                                        <div className="flex-1 space-y-2">
+                                          <div className="space-y-1">
+                                            <p className="text-sm text-gray-900 dark:text-gray-100">
+                                              {formatDate(record.session_date)}
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                              {record.game_rule_name || '未指定'}
+                                            </p>
+                                          </div>
 
-                                      {record.screenshots && record.screenshots.length > 0 && (
-                                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">截圖</p>
+                                          {record.notes && (
+                                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap pt-2">
+                                              {record.notes}
+                                            </p>
+                                          )}
+                                        </div>
+
+                                        {/* 右欄：截圖 */}
+                                        {record.screenshots && record.screenshots.length > 0 && (
                                           <div className="flex gap-2 flex-wrap">
                                             {record.screenshots.map((url, idx) => (
                                               <button
@@ -563,17 +566,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                               </button>
                                             ))}
                                           </div>
-                                        </div>
-                                      )}
-
-                                      {record.notes && (
-                                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">備註</p>
-                                          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                                            {record.notes}
-                                          </p>
-                                        </div>
-                                      )}
+                                        )}
+                                      </div>
                                     </div>
                                   ))}
                                 </div>

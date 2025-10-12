@@ -1032,6 +1032,11 @@ def seed_crm_data():
                                 room_id=second_room.id,
                                 client_id=client.id,
                                 counselor_id=demo_counselor_ids[1],
+                                game_rule_id=(
+                                    room_type["game_rule"].id
+                                    if room_type["game_rule"]
+                                    else None
+                                ),
                                 session_date=datetime.utcnow() - timedelta(days=10),
                                 duration_minutes=60,
                                 topics=["轉職輔導", "第二意見"],
@@ -1052,6 +1057,11 @@ def seed_crm_data():
                             room_id=room.id,
                             client_id=client.id,
                             counselor_id=demo_counselor_id,
+                            game_rule_id=(
+                                room_type["game_rule"].id
+                                if room_type["game_rule"]
+                                else None
+                            ),
                             session_date=session_date,
                             duration_minutes=45
                             + room_idx * 15

@@ -8,8 +8,12 @@
 
 ## 📚 相關文件連結
 
-- **[第一個月進度報告](https://docs.google.com/document/d/1p327JR-X3XeUxIKgkRZZfVXEWid_lTG4_rq0rVTAVuQ/edit?tab=t.0#heading=h.gjdgxs)** - 詳細記錄第一個月（2025-09-01 ~ 09-30）完成項目與技術決策
-- **[第二個月目標與需求](https://docs.google.com/document/d/1vSz-w5ST-hQKcZ85ALZlOF-AcxHzVt6bSWvzitH4_X4/edit?tab=t.0)** - 第二個月（2025-10-01 ~ 10-31）詳細需求規格與期望目標
+- **[第一個月進度報告]** - 詳細記錄第一個月（2025-09-01 ~ 09-30）
+  完成項目與技術決策
+  <https://docs.google.com/document/d/1p327JR-X3XeUxIKgkRZZfVXEWid_lTG4_rq0rVTAVuQ/edit>
+- **[第二個月目標與需求]** - 第二個月（2025-10-01 ~ 10-31）
+  詳細需求規格與期望目標
+  <https://docs.google.com/document/d/1vSz-w5ST-hQKcZ85ALZlOF-AcxHzVt6bSWvzitH4_X4/edit>
 
 ## 🎯 三階段開發計畫
 
@@ -563,6 +567,7 @@
 | **總計** | **8項** | **3項 + 額外** | **~45%** |
 
 **本週完成（Week 8）**：
+
 - ✅ 客戶諮詢室架構簡化（一鍵進入、截圖整合、自動記錄）
 
 **核心待辦事項**：
@@ -574,7 +579,8 @@
 
 #### 與用戶需求文件對照分析（更新至 2025-10-12 Week 8）
 
-基於 [第二個月目標與需求文件](https://docs.google.com/document/d/1vSz-w5ST-hQKcZ85ALZlOF-AcxHzVt6bSWvzitH4_X4/edit?tab=t.0) 的對照：
+基於 [第二個月目標與需求文件] 的對照：
+<https://docs.google.com/document/d/1vSz-w5ST-hQKcZ85ALZlOF-AcxHzVt6bSWvzitH4_X4/edit>
 
 | 用戶需求項目 | PRD 狀態 | 完成度 | 備註 |
 |------------|---------|-------|------|

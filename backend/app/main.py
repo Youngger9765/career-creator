@@ -1,5 +1,8 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
@@ -78,6 +81,10 @@ app.include_router(game_rules_router, prefix="/api/game-rules", tags=["game-rule
 app.include_router(admin_router)
 app.include_router(clients_router)
 app.include_router(counselor_notes_router, prefix="/api")
+
+# Mount static files for uploaded screenshots (development only)
+if os.path.exists("uploads"):
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 
 @app.get("/")

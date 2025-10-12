@@ -297,38 +297,35 @@ export default function RoomPage() {
     setIsCapturingScreenshot(true);
     setScreenshotMessage(null);
 
-    // 如果沒有 consultation record，先創建一個
-    let recordId = currentConsultationRecord?.id;
-    if (!recordId && currentRoom?.client_id) {
-      try {
-        const newRecord = await consultationRecordsAPI.createRecord(
-          currentRoom.client_id,
-          {
-            room_id: roomId,
-            client_id: currentRoom.client_id,
-            session_date: new Date().toISOString(),
-            topics: [],
-            follow_up_required: false,
-          }
-        );
-        setCurrentConsultationRecord(newRecord);
-        recordId = newRecord.id;
-        console.log('[Room] Created consultation record for screenshot:', recordId);
-      } catch (error) {
-        console.error('[Room] Failed to create consultation record:', error);
-        setScreenshotMessage({
-          type: 'error',
-          text: '無法建立諮詢記錄',
-        });
-        setIsCapturingScreenshot(false);
-        return;
-      }
-    }
-
-    if (!recordId) {
+    // 每次截圖都創建一個新的 consultation record
+    if (!currentRoom?.client_id) {
       setScreenshotMessage({
         type: 'error',
         text: '此諮詢室未關聯客戶，無法儲存截圖',
+      });
+      setIsCapturingScreenshot(false);
+      return;
+    }
+
+    let recordId: string;
+    try {
+      const newRecord = await consultationRecordsAPI.createRecord(
+        currentRoom.client_id,
+        {
+          room_id: roomId,
+          client_id: currentRoom.client_id,
+          session_date: new Date().toISOString(),
+          topics: [],
+          follow_up_required: false,
+        }
+      );
+      recordId = newRecord.id;
+      console.log('[Room] Created consultation record for screenshot:', recordId);
+    } catch (error) {
+      console.error('[Room] Failed to create consultation record:', error);
+      setScreenshotMessage({
+        type: 'error',
+        text: '無法建立諮詢記錄',
       });
       setIsCapturingScreenshot(false);
       return;

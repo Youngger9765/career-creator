@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     supabase_anon_key: Optional[str] = None
     supabase_service_role_key: Optional[str] = None
 
+    # Storage Configuration
+    use_mock_storage: bool = True
+    gcs_bucket_name: str = "career-creator-screenshots"
+
     class Config:
         env_file = ".env"
         case_sensitive = False

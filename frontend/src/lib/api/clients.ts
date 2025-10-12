@@ -115,14 +115,26 @@ export const consultationRecordsAPI = {
   },
 
   /**
-   * Upload screenshot for consultation record
+   * Upload screenshot for consultation record with optional game state
    */
   uploadScreenshot: async (
     recordId: string,
-    file: File
+    file: File,
+    options?: {
+      gameState?: any;
+      gameRuleId?: string;
+    }
   ): Promise<{ url: string; record_id: string; total_screenshots: number }> => {
     const formData = new FormData();
     formData.append('file', file);
+
+    if (options?.gameState) {
+      formData.append('game_state', JSON.stringify(options.gameState));
+    }
+
+    if (options?.gameRuleId) {
+      formData.append('game_rule_id', options.gameRuleId);
+    }
 
     const response = await apiClient.post(
       `/api/clients/consultation-records/${recordId}/screenshots`,

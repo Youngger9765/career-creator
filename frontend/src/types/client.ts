@@ -67,6 +67,8 @@ export interface ConsultationRecord {
   client_id: string;
   room_id: string;
   counselor_id: string;
+  game_rule_id?: string;
+  game_rule_name?: string; // 玩法名稱
   session_date: string;
   duration_minutes?: number;
   // Visual records

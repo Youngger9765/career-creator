@@ -49,6 +49,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
   const [deletingRoom, setDeletingRoom] = useState<any>(null);
   const [clientRecords, setClientRecords] = useState<Record<string, ConsultationRecord[]>>({});
   const [loadingRecords, setLoadingRecords] = useState<Set<string>>(new Set());
+  const [expandedRecords, setExpandedRecords] = useState<Set<string>>(new Set());
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     loadClients();
@@ -198,6 +200,37 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
       alert('創建諮詢室失敗，請稍後再試');
     } finally {
       setSubmitLoading(false);
+    }
+  };
+
+  const handleToggleRecords = async (clientId: string) => {
+    const newExpanded = new Set(expandedRecords);
+
+    if (newExpanded.has(clientId)) {
+      // 收合
+      newExpanded.delete(clientId);
+      setExpandedRecords(newExpanded);
+    } else {
+      // 展開：如果還沒載入過記錄，先載入
+      newExpanded.add(clientId);
+      setExpandedRecords(newExpanded);
+
+      if (!clientRecords[clientId]) {
+        try {
+          setLoadingRecords((prev) => new Set(prev).add(clientId));
+          const records = await consultationRecordsAPI.getClientRecords(clientId);
+          setClientRecords((prev) => ({ ...prev, [clientId]: records }));
+        } catch (error) {
+          console.error('Failed to load consultation records:', error);
+          alert('載入諮詢記錄失敗');
+        } finally {
+          setLoadingRecords((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(clientId);
+            return newSet;
+          });
+        }
+      }
     }
   };
 
@@ -425,6 +458,21 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
+                                handleToggleRecords(client.id);
+                              }}
+                              className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors whitespace-nowrap"
+                              title="查看諮詢記錄"
+                            >
+                              {expandedRecords.has(client.id) ? (
+                                <ChevronDown className="w-3 h-3" />
+                              ) : (
+                                <ChevronRight className="w-3 h-3" />
+                              )}
+                              記錄
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setViewingClient(client);
                                 setIsEditMode(false);
                               }}
@@ -456,6 +504,88 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                           </div>
                         </td>
                       </tr>
+
+                      {/* Expanded Records Row */}
+                      {expandedRecords.has(client.id) && (
+                        <tr className="bg-gray-50 dark:bg-gray-800">
+                          <td colSpan={7} className="px-12 py-6">
+                            <div className="space-y-3">
+                              <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                <Activity className="w-4 h-4" />
+                                諮詢記錄
+                              </h4>
+
+                              {loadingRecords.has(client.id) ? (
+                                <div className="text-center py-4">
+                                  <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                  <p className="mt-2 text-sm text-gray-500">載入記錄中...</p>
+                                </div>
+                              ) : clientRecords[client.id] && clientRecords[client.id].length > 0 ? (
+                                <div className="space-y-2">
+                                  {clientRecords[client.id].map((record) => (
+                                    <div
+                                      key={record.id}
+                                      className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                                    >
+                                      <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                          <p className="text-xs text-gray-500 dark:text-gray-400">諮詢日期</p>
+                                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {formatDate(record.session_date)}
+                                          </p>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs text-gray-500 dark:text-gray-400">玩法</p>
+                                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {record.game_rule_name || '未指定'}
+                                          </p>
+                                        </div>
+                                      </div>
+
+                                      {record.screenshots && record.screenshots.length > 0 && (
+                                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">截圖</p>
+                                          <div className="flex gap-2 flex-wrap">
+                                            {record.screenshots.map((url, idx) => (
+                                              <button
+                                                key={idx}
+                                                onClick={() => setSelectedImage(url)}
+                                                className="relative group cursor-pointer"
+                                              >
+                                                <img
+                                                  src={url}
+                                                  alt={`Screenshot ${idx + 1}`}
+                                                  className="w-64 h-auto object-contain rounded border border-gray-300 dark:border-gray-600 hover:border-blue-500 transition-colors"
+                                                />
+                                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded flex items-center justify-center">
+                                                  <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                </div>
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {record.notes && (
+                                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">備註</p>
+                                          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                                            {record.notes}
+                                          </p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
+                                  尚無諮詢記錄
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
                     </React.Fragment>
                   );
                 })}
@@ -626,6 +756,30 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
           onClose={() => setDeletingRoom(null)}
           onSuccess={handleDeleteRoomSuccess}
         />
+      )}
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-full max-h-full">
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+              title="關閉"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <img
+              src={selectedImage}
+              alt="Full size screenshot"
+              className="max-w-full max-h-screen object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
       )}
     </div>
   );

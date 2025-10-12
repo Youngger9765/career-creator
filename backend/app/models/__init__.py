@@ -15,6 +15,11 @@ from .client import (
     ConsultationRecordResponse,
     RoomClient,
 )
+from .counselor_note import (
+    CounselorNote,
+    CounselorNoteResponse,
+    CounselorNoteUpdate,
+)
 from .game_rule import Card, CardDeck, GameRuleTemplate
 from .room import Room, RoomCreate, RoomResponse
 from .user import User, UserCreate, UserResponse
@@ -45,4 +50,7 @@ __all__ = [
     "ConsultationRecord",
     "ConsultationRecordCreate",
     "ConsultationRecordResponse",
+    "CounselorNote",
+    "CounselorNoteResponse",
+    "CounselorNoteUpdate",
 ]

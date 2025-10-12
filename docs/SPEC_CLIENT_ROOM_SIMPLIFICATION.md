@@ -10,11 +10,13 @@
 ## 🎯 目標
 
 ### 用戶需求
+
 - 前端顯示：**一個客戶 = 一個諮詢室**（簡化 UX）
 - 後端架構：保留 **一對多** 彈性（未來擴充）
 - 諮詢記錄：以 **截圖 + Snapshot** 方式儲存
 
 ### 技術目標
+
 - ✅ 不破壞現有資料庫架構
 - ✅ 最小化前端改動
 - ✅ 為 CRM 系統奠基
@@ -47,6 +49,7 @@ ConsultationRecord
 ```
 
 ### 現有限制
+
 1. ❌ Dashboard 顯示「房間列表」而非「客戶列表」
 2. ❌ 沒有「預設房間」概念
 3. ❌ ConsultationRecord 缺少截圖欄位
@@ -59,6 +62,7 @@ ConsultationRecord
 ### 頁面架構調整
 
 #### Before（現況）
+
 ```
 Dashboard
 ├── 房間列表
@@ -68,6 +72,7 @@ Dashboard
 ```
 
 #### After（目標）
+
 ```
 Dashboard
 ├── 客戶列表
@@ -809,6 +814,7 @@ test('完整諮詢流程', async ({ page }) => {
 ## 📅 實作計畫
 
 ### Phase 1: 後端基礎（Week 7）
+
 - [ ] Migration: 新增 screenshots/snapshot 欄位
 - [ ] Model: 更新 ConsultationRecord
 - [ ] API: GET /clients（含 default_room_id）
@@ -816,6 +822,7 @@ test('完整諮詢流程', async ({ page }) => {
 - [ ] 測試: 後端單元測試
 
 ### Phase 2: 前端 Dashboard（Week 7-8）
+
 - [ ] Dashboard: 改為客戶列表
 - [ ] Component: ClientCard
 - [ ] Component: CreateClientButton
@@ -823,6 +830,7 @@ test('完整諮詢流程', async ({ page }) => {
 - [ ] 測試: 前端單元測試
 
 ### Phase 3: 截圖功能（Week 8）
+
 - [ ] Hook: useScreenshot (html2canvas)
 - [ ] API: POST /consultation-records
 - [ ] API: POST /screenshots (upload)
@@ -830,6 +838,7 @@ test('完整諮詢流程', async ({ page }) => {
 - [ ] UI: 截圖按鈕與提示
 
 ### Phase 4: 測試與優化（Week 8）
+
 - [ ] E2E 測試
 - [ ] 效能測試（大量截圖）
 - [ ] UI/UX 調整

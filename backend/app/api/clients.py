@@ -641,7 +641,7 @@ async def create_consultation_record(
 
     # Create record
     record_dict = record_data.dict()
-    record_dict['counselor_id'] = counselor_id
+    record_dict["counselor_id"] = counselor_id
     record = ConsultationRecord(**record_dict)
     session.add(record)
     session.commit()
@@ -673,9 +673,9 @@ async def get_consultation_records(
     if isinstance(counselor_id, str):
         counselor_id = UUID(counselor_id)
 
-    if client.counselor_id != counselor_id and not current_user.get(
-        "roles", []
-    ).count("admin"):
+    if client.counselor_id != counselor_id and not current_user.get("roles", []).count(
+        "admin"
+    ):
         raise HTTPException(
             status_code=403,
             detail="You don't have permission to view this client's records",
@@ -685,8 +685,7 @@ async def get_consultation_records(
     records_with_rules = session.exec(
         select(ConsultationRecord, GameRuleTemplate.name)
         .outerjoin(
-            GameRuleTemplate,
-            ConsultationRecord.game_rule_id == GameRuleTemplate.id
+            GameRuleTemplate, ConsultationRecord.game_rule_id == GameRuleTemplate.id
         )
         .where(ConsultationRecord.client_id == client_id)
         .order_by(ConsultationRecord.session_date.desc())
@@ -698,7 +697,7 @@ async def get_consultation_records(
     result = []
     for record, game_rule_name in records_with_rules:
         record_dict = record.dict()
-        record_dict['game_rule_name'] = game_rule_name
+        record_dict["game_rule_name"] = game_rule_name
         result.append(ConsultationRecordResponse(**record_dict))
 
     return result
@@ -735,19 +734,15 @@ async def upload_consultation_screenshot(
 
     # Validate file type
     if not file.content_type or not file.content_type.startswith("image/"):
-        raise HTTPException(
-            status_code=400,
-            detail="Only image files are allowed"
-        )
+        raise HTTPException(status_code=400, detail="Only image files are allowed")
 
     # Upload to GCS
-    from app.services.storage import upload_screenshot
     import json
 
+    from app.services.storage import upload_screenshot
+
     public_url = await upload_screenshot(
-        file=file,
-        counselor_id=UUID(current_user["user_id"]),
-        record_id=record_id
+        file=file, counselor_id=UUID(current_user["user_id"]), record_id=record_id
     )
 
     # Update record with new screenshot URL

@@ -71,10 +71,7 @@ async def upload_screenshot(
 
         # Upload file
         file.file.seek(0)  # Reset file pointer
-        blob.upload_from_file(
-            file.file,
-            content_type=file.content_type or "image/png"
-        )
+        blob.upload_from_file(file.file, content_type=file.content_type or "image/png")
 
         # Make public
         blob.make_public()
@@ -99,9 +96,7 @@ async def upload_screenshot(
 
 
 async def upload_to_gcs(
-    file_content: BinaryIO,
-    file_path: str,
-    content_type: str = "image/png"
+    file_content: BinaryIO, file_path: str, content_type: str = "image/png"
 ) -> str:
     """
     Generic upload to GCS
@@ -172,7 +167,7 @@ def init_gcs_bucket() -> Optional[str]:
                 "origin": ["*"],
                 "method": ["GET", "POST"],
                 "responseHeader": ["Content-Type"],
-                "maxAgeSeconds": 3600
+                "maxAgeSeconds": 3600,
             }
         ]
         bucket.patch()

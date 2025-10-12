@@ -125,7 +125,7 @@ class ConsultationRecord(SQLModel, table=True):
     game_rule_id: Optional[UUID] = Field(
         default=None,
         foreign_key="game_rule_templates.id",
-        description="Game rule used in this session"
+        description="Game rule used in this session",
     )
     session_date: datetime = Field(description="Consultation session date and time")
     duration_minutes: Optional[int] = Field(
@@ -136,14 +136,14 @@ class ConsultationRecord(SQLModel, table=True):
     screenshots: List[str] = Field(
         default_factory=list,
         sa_column=Column(ARRAY(TEXT)),
-        description="Screenshot URLs from GCP Storage"
+        description="Screenshot URLs from GCP Storage",
     )
 
     # Data records: Game state snapshot
     game_state: Optional[Dict[str, Any]] = Field(
         default=None,
         sa_column=Column(JSON),
-        description="Game state snapshot (cards, positions, etc.)"
+        description="Game state snapshot (cards, positions, etc.)",
     )
 
     topics: List[str] = Field(

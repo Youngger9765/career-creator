@@ -237,6 +237,7 @@ class ConsultationRecordCreate(SQLModel):
 
     room_id: UUID
     client_id: UUID
+    game_rule_id: Optional[UUID] = Field(default=None)
     session_date: datetime
     duration_minutes: Optional[int] = Field(default=None)
     game_state: Optional[Dict[str, Any]] = Field(default=None)

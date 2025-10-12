@@ -314,6 +314,7 @@ export default function RoomPage() {
         {
           room_id: roomId,
           client_id: currentRoom.client_id,
+          game_rule_id: currentRoom.game_rule_id || undefined,
           session_date: new Date().toISOString(),
           topics: [],
           follow_up_required: false,

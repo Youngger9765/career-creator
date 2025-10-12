@@ -52,6 +52,7 @@ export interface Room extends BaseEntity {
   primary_client_name?: string;
   last_activity?: string;
   counselor_name?: string;
+  game_rule_id?: string;
 }
 
 export interface RoomCreate {

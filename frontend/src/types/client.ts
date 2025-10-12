@@ -97,6 +97,7 @@ export interface ConsultationRecord {
 export interface ConsultationRecordCreate {
   room_id: string;
   client_id: string;
+  game_rule_id?: string;
   session_date: string;
   duration_minutes?: number;
   game_state?: Record<string, any>;

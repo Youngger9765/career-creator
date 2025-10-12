@@ -17,6 +17,7 @@ export interface Room {
   client_id?: string;
   client_name?: string;
   last_activity?: string;
+  game_rule_id?: string;
 }
 
 export interface CreateRoomData {

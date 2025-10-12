@@ -83,5 +83,6 @@ class RoomResponse(RoomBase):
     created_at: datetime
     expires_at: Optional[datetime] = None
     session_count: int = 0
+    client_id: Optional[UUID] = None  # Associated client ID
     client_name: Optional[str] = None  # Associated client name
     counselor_name: Optional[str] = None  # Associated counselor name

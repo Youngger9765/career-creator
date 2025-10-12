@@ -294,16 +294,45 @@ export default function RoomPage() {
       return;
     }
 
-    if (!currentConsultationRecord) {
-      setScreenshotMessage({
-        type: 'error',
-        text: '尚未建立諮詢記錄，請稍候再試',
-      });
-      return;
-    }
-
     setIsCapturingScreenshot(true);
     setScreenshotMessage(null);
+
+    // 如果沒有 consultation record，先創建一個
+    let recordId = currentConsultationRecord?.id;
+    if (!recordId && currentRoom?.client_id) {
+      try {
+        const newRecord = await consultationRecordsAPI.createRecord(
+          currentRoom.client_id,
+          {
+            room_id: roomId,
+            client_id: currentRoom.client_id,
+            session_date: new Date().toISOString(),
+            topics: [],
+            follow_up_required: false,
+          }
+        );
+        setCurrentConsultationRecord(newRecord);
+        recordId = newRecord.id;
+        console.log('[Room] Created consultation record for screenshot:', recordId);
+      } catch (error) {
+        console.error('[Room] Failed to create consultation record:', error);
+        setScreenshotMessage({
+          type: 'error',
+          text: '無法建立諮詢記錄',
+        });
+        setIsCapturingScreenshot(false);
+        return;
+      }
+    }
+
+    if (!recordId) {
+      setScreenshotMessage({
+        type: 'error',
+        text: '此諮詢室未關聯客戶，無法儲存截圖',
+      });
+      setIsCapturingScreenshot(false);
+      return;
+    }
 
     try {
       // Capture the game area using html2canvas
@@ -330,7 +359,7 @@ export default function RoomPage() {
 
         // Upload to backend
         const result = await consultationRecordsAPI.uploadScreenshot(
-          currentConsultationRecord.id,
+          recordId,
           file
         );
 
@@ -410,17 +439,6 @@ export default function RoomPage() {
                   </svg>
                   切換遊戲模式
                 </button>
-
-                {/* 截圖按鈕 - 僅諮詢師在已選擇遊戲時顯示 */}
-                <button
-                  onClick={handleCaptureScreenshot}
-                  disabled={isCapturingScreenshot}
-                  className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="儲存諮詢畫面截圖"
-                >
-                  <Camera className="w-4 h-4" />
-                  {isCapturingScreenshot ? '處理中...' : '儲存截圖'}
-                </button>
               </>
             )}
 
@@ -476,25 +494,15 @@ export default function RoomPage() {
           roomId={roomId}
           isOpen={notesDrawerOpen}
           onToggle={() => setNotesDrawerOpen(!notesDrawerOpen)}
+          onCaptureScreenshot={handleCaptureScreenshot}
+          isCapturingScreenshot={isCapturingScreenshot}
+          screenshotMessage={screenshotMessage}
         />
       )}
 
       {(errorMessage || roomError) && (
         <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {errorMessage || roomError}
-        </div>
-      )}
-
-      {/* Screenshot message */}
-      {screenshotMessage && (
-        <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded shadow-lg ${
-            screenshotMessage.type === 'success'
-              ? 'bg-green-100 border border-green-400 text-green-700'
-              : 'bg-red-100 border border-red-400 text-red-700'
-          }`}
-        >
-          {screenshotMessage.text}
         </div>
       )}
 

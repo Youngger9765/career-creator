@@ -139,6 +139,8 @@ def create_room(
     session.refresh(room)
 
     # Link room to client if client_id provided
+    client_id_to_return = None
+    client_name_to_return = None
     if room_data.client_id:
         from app.models.client import Client, RoomClient
 
@@ -148,8 +150,16 @@ def create_room(
             room_client = RoomClient(room_id=room.id, client_id=room_data.client_id)
             session.add(room_client)
             session.commit()
+            client_id_to_return = room_data.client_id
+            client_name_to_return = client.name
 
-    return room
+    # Return room with client information
+    room_dict = room.model_dump()
+    if client_id_to_return:
+        room_dict["client_id"] = client_id_to_return
+        room_dict["client_name"] = client_name_to_return
+
+    return room_dict
 
 
 @router.get("/{room_id}", response_model=RoomResponse)
@@ -159,7 +169,19 @@ def get_room(room_id: UUID, session: Session = Depends(get_session)):
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
 
-    return room
+    # Get associated client_id if exists
+    room_dict = room.model_dump()
+    statement = select(RoomClient).where(RoomClient.room_id == room_id)
+    room_client = session.exec(statement).first()
+
+    if room_client:
+        room_dict["client_id"] = room_client.client_id
+        # Also fetch client name
+        client = session.get(Client, room_client.client_id)
+        if client:
+            room_dict["client_name"] = client.name
+
+    return room_dict
 
 
 @router.get("/by-code/{share_code}", response_model=RoomResponse)
@@ -171,7 +193,19 @@ def get_room_by_share_code(share_code: str, session: Session = Depends(get_sessi
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
 
-    return room
+    # Get associated client_id if exists
+    room_dict = room.model_dump()
+    statement = select(RoomClient).where(RoomClient.room_id == room.id)
+    room_client = session.exec(statement).first()
+
+    if room_client:
+        room_dict["client_id"] = room_client.client_id
+        # Also fetch client name
+        client = session.get(Client, room_client.client_id)
+        if client:
+            room_dict["client_name"] = client.name
+
+    return room_dict
 
 
 @router.get("/", response_model=List[RoomResponse])

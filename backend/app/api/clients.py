@@ -628,7 +628,11 @@ async def create_consultation_record(
         raise HTTPException(status_code=404, detail="Client not found")
 
     # Check if this client belongs to the current counselor
-    if client.counselor_id != str(current_user["user_id"]):
+    counselor_id = current_user.get("user_id")
+    if isinstance(counselor_id, str):
+        counselor_id = UUID(counselor_id)
+
+    if client.counselor_id != counselor_id:
         raise HTTPException(
             status_code=403,
             detail="You don't have permission to add records for this client",
@@ -638,7 +642,7 @@ async def create_consultation_record(
     record = ConsultationRecord(
         **record_data.dict(),
         client_id=client_id,
-        counselor_id=str(current_user["user_id"]),
+        counselor_id=counselor_id,
     )
     session.add(record)
     session.commit()
@@ -666,7 +670,11 @@ async def get_consultation_records(
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
 
-    if client.counselor_id != str(current_user["user_id"]) and not current_user.get(
+    counselor_id = current_user.get("user_id")
+    if isinstance(counselor_id, str):
+        counselor_id = UUID(counselor_id)
+
+    if client.counselor_id != counselor_id and not current_user.get(
         "roles", []
     ).count("admin"):
         raise HTTPException(

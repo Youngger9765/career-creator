@@ -2,14 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { apiClient } from '@/lib/api/client';
+import { Camera } from 'lucide-react';
 
 interface NotesDrawerProps {
   roomId: string;
   isOpen: boolean;
   onToggle: () => void;
+  onCaptureScreenshot?: () => void;
+  isCapturingScreenshot?: boolean;
+  screenshotMessage?: {
+    type: 'success' | 'error';
+    text: string;
+  } | null;
 }
 
-export function NotesDrawer({ roomId, isOpen, onToggle }: NotesDrawerProps) {
+export function NotesDrawer({ roomId, isOpen, onToggle, onCaptureScreenshot, isCapturingScreenshot, screenshotMessage }: NotesDrawerProps) {
   const [noteContent, setNoteContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -66,6 +73,7 @@ export function NotesDrawer({ roomId, isOpen, onToggle }: NotesDrawerProps) {
         className={`
           fixed
           right-0 top-0 bottom-0
+          pt-20
           w-80 md:w-96
           bg-white border-l shadow-lg
           transform transition-transform duration-300 ease-in-out
@@ -77,21 +85,45 @@ export function NotesDrawer({ roomId, isOpen, onToggle }: NotesDrawerProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b bg-gray-50">
           <h3 className="font-semibold text-gray-900">諮詢筆記</h3>
-          <button
-            onClick={onToggle}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
-            title="收合筆記"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {onCaptureScreenshot && (
+              <button
+                onClick={onCaptureScreenshot}
+                disabled={isCapturingScreenshot}
+                className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
+                title="儲存諮詢畫面截圖"
+              >
+                <Camera className="w-4 h-4" />
+                {isCapturingScreenshot ? '處理中...' : '儲存截圖'}
+              </button>
+            )}
+            <button
+              onClick={onToggle}
+              className="p-1 hover:bg-gray-200 rounded transition-colors"
+              title="收合筆記"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Screenshot Message */}
+        {screenshotMessage && (
+          <div className={`mx-4 mt-4 p-3 rounded-lg text-sm ${
+            screenshotMessage.type === 'success'
+              ? 'bg-green-50 text-green-800 border border-green-200'
+              : 'bg-red-50 text-red-800 border border-red-200'
+          }`}>
+            {screenshotMessage.text}
+          </div>
+        )}
 
         {/* Notes Area */}
         <div className="flex-1 flex flex-col p-4">

@@ -173,34 +173,31 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     );
   };
 
-  const toggleClientExpansion = async (clientId: string) => {
-    const isExpanding = !expandedClients.has(clientId);
+  const handleEnterRoom = async (client: Client) => {
+    // 如果已經有預設房間，直接進入
+    if (client.default_room_id) {
+      window.location.href = `/room/${client.default_room_id}`;
+      return;
+    }
 
-    setExpandedClients((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(clientId)) {
-        newSet.delete(clientId);
-      } else {
-        newSet.add(clientId);
-      }
-      return newSet;
-    });
+    // 否則創建一個預設房間
+    try {
+      setSubmitLoading(true);
+      const roomName = `${client.name} 的諮詢室`;
+      const roomsAPI = (await import('@/lib/api/rooms')).roomsAPI;
+      const newRoom = await roomsAPI.createRoom({
+        name: roomName,
+        description: '主要諮詢空間',
+        client_id: client.id,
+      });
 
-    // 如果是展開且尚未載入記錄，則查詢
-    if (isExpanding && !clientRecords[clientId]) {
-      setLoadingRecords((prev) => new Set(prev).add(clientId));
-      try {
-        const records = await consultationRecordsAPI.getClientRecords(clientId);
-        setClientRecords((prev) => ({ ...prev, [clientId]: records }));
-      } catch (error) {
-        console.error('Failed to load consultation records:', error);
-      } finally {
-        setLoadingRecords((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(clientId);
-          return newSet;
-        });
-      }
+      // 進入新創建的房間
+      window.location.href = `/room/${newRoom.id}`;
+    } catch (error) {
+      console.error('Failed to create room:', error);
+      alert('創建諮詢室失敗，請稍後再試');
+    } finally {
+      setSubmitLoading(false);
     }
   };
 
@@ -316,31 +313,11 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
               </thead>
               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {filteredClients.map((client) => {
-                  const isExpanded = expandedClients.has(client.id);
-                  const hasRooms = client.rooms && client.rooms.length > 0;
-
                   return (
                     <React.Fragment key={client.id}>
-                      <tr
-                        className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-                        onClick={() => toggleClientExpansion(client.id)}
-                      >
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td className="px-4 py-4">
                           <div className="flex items-start gap-3">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleClientExpansion(client.id);
-                              }}
-                              className="flex items-center justify-center w-7 h-7 rounded hover:bg-gray-200 transition-colors mt-0.5"
-                              title="展開/收合諮詢室"
-                            >
-                              <div
-                                className={`w-0 h-0 border-l-[8px] border-l-gray-600 border-y-[5px] border-y-transparent transform transition-transform ${
-                                  isExpanded ? 'rotate-90' : ''
-                                }`}
-                              />
-                            </button>
                             <div className="space-y-2">
                               <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                 {client.name}
@@ -433,19 +410,18 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                         </td>
                         <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                           <div className="flex flex-col items-center gap-1">
-                            {client.default_room_id && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.location.href = `/room/${client.default_room_id}`;
-                                }}
-                                className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors whitespace-nowrap"
-                                title="進入諮詢室"
-                              >
-                                <Home className="w-3 h-3" />
-                                進入諮詢室
-                              </button>
-                            )}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEnterRoom(client);
+                              }}
+                              className="flex items-center justify-center gap-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors whitespace-nowrap"
+                              title="進入諮詢室"
+                              disabled={submitLoading}
+                            >
+                              <Home className="w-3 h-3" />
+                              進入諮詢室
+                            </button>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -480,133 +456,6 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                           </div>
                         </td>
                       </tr>
-
-                      {/* Expanded rooms section */}
-                      {isExpanded && (
-                        <tr>
-                          <td colSpan={7} className="px-0 pb-2">
-                            <div className="ml-12 mr-6 border-l-2 border-gray-200 pl-6">
-                              <div className="">
-                                {hasRooms ? (
-                                  <>
-                                    <RoomListTable
-                                      rooms={client.rooms!.sort(
-                                        (a, b) =>
-                                          new Date(b.created_at).getTime() -
-                                          new Date(a.created_at).getTime()
-                                      )}
-                                      showClient={false}
-                                      emptyMessage="尚無諮詢室"
-                                      onDelete={(room) => setDeletingRoom(room)}
-                                    />
-
-                                    {/* Recent Screenshots Section */}
-                                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                      <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                                        <Camera className="w-4 h-4" />
-                                        最近諮詢截圖
-                                      </h4>
-                                      <div className="text-sm text-gray-500">
-                                        {loadingRecords.has(client.id) ? (
-                                          <div className="flex items-center gap-2 text-gray-400">
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-                                            載入中...
-                                          </div>
-                                        ) : (() => {
-                                          const records = clientRecords[client.id] || [];
-                                          const allScreenshots = records.flatMap((r) =>
-                                            (r.screenshots || []).map((url) => ({
-                                              url,
-                                              recordId: r.id,
-                                              date: r.session_date,
-                                            }))
-                                          );
-
-                                          if (allScreenshots.length === 0) {
-                                            return (
-                                              <p className="text-gray-400 italic">
-                                                前往諮詢室並點擊「儲存截圖」按鈕來記錄諮詢過程
-                                              </p>
-                                            );
-                                          }
-
-                                          return (
-                                            <div className="grid grid-cols-4 gap-2 mt-2">
-                                              {allScreenshots.slice(0, 8).map((screenshot, idx) => (
-                                                <div
-                                                  key={`${screenshot.recordId}-${idx}`}
-                                                  className="relative group"
-                                                >
-                                                  <img
-                                                    src={screenshot.url}
-                                                    alt={`諮詢截圖 ${new Date(screenshot.date).toLocaleDateString()}`}
-                                                    className="w-full h-24 object-cover rounded cursor-pointer hover:opacity-75 transition-opacity border border-gray-300"
-                                                    onClick={() => window.open(screenshot.url, '_blank')}
-                                                    onError={(e) => {
-                                                      (e.target as HTMLImageElement).src =
-                                                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle"%3E載入失敗%3C/text%3E%3C/svg%3E';
-                                                    }}
-                                                  />
-                                                  <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs px-1 py-0.5 rounded-b opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    {new Date(screenshot.date).toLocaleDateString()}
-                                                  </div>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          );
-                                        })()}
-                                      </div>
-                                    </div>
-
-                                    {/* 創建諮詢室按鈕 - 虛線框樣式 */}
-                                    <div className="mt-4">
-                                      <button
-                                        onClick={() => {
-                                          // 跳轉到創建諮詢室頁面，帶入客戶資訊
-                                          const clientInfo = encodeURIComponent(
-                                            JSON.stringify({
-                                              client_id: client.id,
-                                              client_name: client.name,
-                                              client_email: client.email,
-                                            })
-                                          );
-                                          window.location.href = `/rooms/create?client=${clientInfo}`;
-                                        }}
-                                        className="w-full flex items-center justify-center gap-2 px-4 py-5 border-2 border-dashed border-gray-200 rounded-lg text-gray-500 bg-gray-50 hover:bg-gray-100 hover:border-gray-300 hover:text-gray-600 transition-colors"
-                                      >
-                                        <Plus className="w-5 h-5" />
-                                        <span className="font-medium">創建諮詢室</span>
-                                      </button>
-                                    </div>
-                                  </>
-                                ) : (
-                                  /* 沒有房間時顯示創建按鈕 */
-                                  <div className="text-center py-6">
-                                    <p className="text-gray-400 text-sm mb-3">尚未創建任何諮詢室</p>
-                                    <button
-                                      onClick={() => {
-                                        // 跳轉到創建諮詢室頁面，帶入客戶資訊
-                                        const clientInfo = encodeURIComponent(
-                                          JSON.stringify({
-                                            client_id: client.id,
-                                            client_name: client.name,
-                                            client_email: client.email,
-                                          })
-                                        );
-                                        window.location.href = `/rooms/create?client=${clientInfo}`;
-                                      }}
-                                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                    >
-                                      <Plus className="w-5 h-5" />
-                                      <span className="font-medium">創建第一個諮詢室</span>
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
                     </React.Fragment>
                   );
                 })}

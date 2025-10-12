@@ -285,7 +285,7 @@ export default function RoomPage() {
   console.log('Will be read-only:', !isCounselor && !isVisitor);
 
   // Screenshot capture handler
-  const handleCaptureScreenshot = async () => {
+  const handleCaptureScreenshot = async (notes: string) => {
     if (!gameAreaRef.current) {
       setScreenshotMessage({
         type: 'error',
@@ -297,7 +297,7 @@ export default function RoomPage() {
     setIsCapturingScreenshot(true);
     setScreenshotMessage(null);
 
-    // 每次截圖都創建一個新的 consultation record
+    // 每次截圖都創建一個新的 consultation record，並包含當下筆記
     if (!currentRoom?.client_id) {
       setScreenshotMessage({
         type: 'error',
@@ -317,10 +317,11 @@ export default function RoomPage() {
           session_date: new Date().toISOString(),
           topics: [],
           follow_up_required: false,
+          notes: notes || undefined, // Include current notes
         }
       );
       recordId = newRecord.id;
-      console.log('[Room] Created consultation record for screenshot:', recordId);
+      console.log('[Room] Created consultation record with notes for screenshot:', recordId);
     } catch (error) {
       console.error('[Room] Failed to create consultation record:', error);
       setScreenshotMessage({

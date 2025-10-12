@@ -8,7 +8,7 @@ interface NotesDrawerProps {
   roomId: string;
   isOpen: boolean;
   onToggle: () => void;
-  onCaptureScreenshot?: () => void;
+  onCaptureScreenshot?: (notes: string) => void;
   isCapturingScreenshot?: boolean;
   screenshotMessage?: {
     type: 'success' | 'error';
@@ -88,7 +88,7 @@ export function NotesDrawer({ roomId, isOpen, onToggle, onCaptureScreenshot, isC
           <div className="flex items-center gap-2">
             {onCaptureScreenshot && (
               <button
-                onClick={onCaptureScreenshot}
+                onClick={() => onCaptureScreenshot(noteContent)}
                 disabled={isCapturingScreenshot}
                 className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
                 title="儲存諮詢畫面截圖"

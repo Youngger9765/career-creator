@@ -343,22 +343,24 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
           onClick={() => setSelectedRecord(null)}
         >
           <div
-            className="relative bg-white rounded-lg max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+            className="relative bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-              <div>
-                <h3 className="font-semibold text-gray-900">
-                  {(selectedRecord.game_state?.gameplay && GAMEPLAY_NAMES[selectedRecord.game_state.gameplay]) || selectedRecord.game_rule_name || '未知玩法'}
-                </h3>
-                <p className="text-xs text-gray-500 mt-1">
+            <div className="flex items-center justify-between p-6 border-b bg-gray-50">
+              <div className="flex items-center gap-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full">
+                  <span className="text-sm font-medium text-blue-700">
+                    {(selectedRecord.game_state?.gameplay && GAMEPLAY_NAMES[selectedRecord.game_state.gameplay]) || selectedRecord.game_rule_name || '未知玩法'}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600">
                   {formatDate(selectedRecord.session_date)}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedRecord(null)}
-                className="p-1 hover:bg-gray-200 rounded transition-colors"
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -366,44 +368,50 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
               </button>
             </div>
 
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {/* Screenshots */}
-              {selectedRecord.screenshots && selectedRecord.screenshots.length > 0 && (
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">截圖</h4>
-                  <div className="grid grid-cols-2 gap-3">
+            {/* Modal Content - Two Column Layout */}
+            <div className="flex-1 overflow-hidden flex">
+              {/* Left Column - Notes */}
+              <div className="w-1/2 border-r overflow-y-auto p-6">
+                <h4 className="text-base font-semibold text-gray-900 mb-3">筆記</h4>
+                {selectedRecord.notes ? (
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                      {selectedRecord.notes}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400 italic">無筆記</p>
+                )}
+              </div>
+
+              {/* Right Column - Screenshots */}
+              <div className="w-1/2 overflow-y-auto p-6">
+                <h4 className="text-base font-semibold text-gray-900 mb-3">截圖</h4>
+                {selectedRecord.screenshots && selectedRecord.screenshots.length > 0 ? (
+                  <div className="space-y-4">
                     {selectedRecord.screenshots.map((url, idx) => (
                       <button
                         key={idx}
                         onClick={() => setSelectedImage(url)}
-                        className="relative group cursor-pointer"
+                        className="relative group cursor-pointer w-full block rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all"
                       >
                         <img
                           src={url}
                           alt={`Screenshot ${idx + 1}`}
-                          className="w-full h-auto object-cover rounded border border-gray-300 hover:border-blue-500 transition-colors"
+                          className="w-full h-auto object-contain bg-gray-100"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity rounded flex items-center justify-center">
-                          <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <div className="bg-white/90 rounded-full p-3">
+                            <Camera className="w-6 h-6 text-gray-800" />
+                          </div>
                         </div>
                       </button>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {/* Notes */}
-              {selectedRecord.notes && (
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">筆記</h4>
-                  <div className="bg-gray-50 rounded p-3">
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                      {selectedRecord.notes}
-                    </p>
-                  </div>
-                </div>
-              )}
+                ) : (
+                  <p className="text-sm text-gray-400 italic">無截圖</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

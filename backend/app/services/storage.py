@@ -18,6 +18,12 @@ from app.core.config import settings
 GCS_BUCKET_NAME = settings.gcs_bucket_name
 USE_MOCK_STORAGE = settings.use_mock_storage
 
+# Set GOOGLE_APPLICATION_CREDENTIALS if specified
+if settings.google_application_credentials:
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = (
+        settings.google_application_credentials
+    )
+
 # Local storage configuration
 LOCAL_STORAGE_DIR = Path("uploads/screenshots")
 LOCAL_STORAGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -73,8 +79,8 @@ async def upload_screenshot(
         file.file.seek(0)  # Reset file pointer
         blob.upload_from_file(file.file, content_type=file.content_type or "image/png")
 
-        # Make public
-        blob.make_public()
+        # Note: Bucket has uniform bucket-level access with allUsers objectViewer role
+        # Files are automatically public, no need to call make_public()
 
         return blob.public_url
 
@@ -126,8 +132,8 @@ async def upload_to_gcs(
         file_content.seek(0)  # Reset file pointer
         blob.upload_from_file(file_content, content_type=content_type)
 
-        # Make public
-        blob.make_public()
+        # Note: Bucket has uniform bucket-level access with allUsers objectViewer role
+        # Files are automatically public, no need to call make_public()
 
         return blob.public_url
 

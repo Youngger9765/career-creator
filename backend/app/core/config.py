@@ -23,8 +23,9 @@ class Settings(BaseSettings):
     supabase_service_role_key: Optional[str] = None
 
     # Storage Configuration
-    use_mock_storage: bool = True
-    gcs_bucket_name: str = "career-creator-screenshots"
+    use_mock_storage: bool = False
+    gcs_bucket_name: str = "career-creator-472207-screenshots"
+    google_application_credentials: Optional[str] = None
 
     class Config:
         env_file = ".env"

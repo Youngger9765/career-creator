@@ -30,10 +30,11 @@ const GameInfoBar: React.FC<GameInfoBarProps> = ({
 }) => {
   return (
     <div
-      className={`bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-3 ${className}`}
+      className={`bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-6 py-2 sm:py-3 ${className}`}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-6 text-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        {/* Desktop: 水平排列 */}
+        <div className="hidden sm:flex items-center space-x-6 text-sm">
           <div className="flex items-center space-x-2">
             <span className="text-gray-500 dark:text-gray-400">模式:</span>
             <span className="font-medium text-gray-900 dark:text-gray-100">{mode}</span>
@@ -51,7 +52,21 @@ const GameInfoBar: React.FC<GameInfoBarProps> = ({
             <span className="font-medium text-gray-900 dark:text-gray-100">{deckName}</span>
           </div>
         </div>
-        <div className="text-xs text-gray-500 dark:text-gray-400">
+
+        {/* Mobile: 精簡顯示 */}
+        <div className="sm:hidden flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-900 dark:text-gray-100">{gameplay}</span>
+            <span className="text-gray-400">•</span>
+            <span className="text-gray-600 dark:text-gray-400">{deckName}</span>
+          </div>
+          <div className="text-gray-500 dark:text-gray-400">
+            {availableCards}/{totalCards}
+          </div>
+        </div>
+
+        {/* Card count - Desktop only */}
+        <div className="hidden sm:block text-xs text-gray-500 dark:text-gray-400">
           總卡片: {totalCards} 張 | 可用: {availableCards} 張
         </div>
       </div>

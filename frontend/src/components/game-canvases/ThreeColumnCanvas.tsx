@@ -142,7 +142,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
 
   return (
     <div className={`w-full h-full overflow-y-auto ${className}`}>
-      <div className="min-h-full grid grid-cols-3 gap-4 p-4">
+      <div className="min-h-full grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 p-3 md:p-4">
         {/* 喜歡欄位 */}
         <DropZone
           id="like-column"

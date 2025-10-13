@@ -116,27 +116,29 @@ export default function RoomsPage() {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">諮詢室管理</h1>
-              <p className="text-sm text-gray-600">歡迎回來，{user.full_name || user.email}</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">諮詢室管理</h1>
+              <p className="text-xs sm:text-sm text-gray-600">
+                歡迎回來，{user.full_name || user.email}
+              </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2 sm:space-x-4 w-full sm:w-auto">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                className="inline-flex items-center px-3 sm:px-4 py-2 bg-indigo-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors flex-1 sm:flex-none justify-center"
               >
                 儀表板
               </Link>
               <Link
                 href="/rooms/create"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center px-3 sm:px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex-1 sm:flex-none justify-center"
               >
-                + 創建諮詢室
+                + 創建
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 transition-colors px-2"
               >
                 登出
               </button>
@@ -231,52 +233,54 @@ export default function RoomsPage() {
                     )}
                   </div>
 
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Link
                       href={`/room/${room.id}`}
                       className="flex-1 text-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
                     >
                       進入諮詢室
                     </Link>
-                    <button
-                      onClick={() => copyShareLink(room.share_code)}
-                      className="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-                      title="複製分享連結"
-                    >
-                      📋
-                    </button>
-                    <button
-                      onClick={() => setQrModalRoom(room)}
-                      className="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-                      title="顯示 QR Code"
-                    >
-                      📱
-                    </button>
-                    {room.is_active && (
+                    <div className="flex gap-2">
                       <button
-                        onClick={() => setEditRoom(room)}
-                        className="px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
-                        title="編輯諮詢室"
+                        onClick={() => copyShareLink(room.share_code)}
+                        className="flex-1 sm:flex-none px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+                        title="複製分享連結"
                       >
-                        ✏️
+                        📋
                       </button>
-                    )}
-                    {room.is_active && (
                       <button
-                        onClick={() => handleCloseRoom(room.id, room.name)}
-                        className="px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
-                        title="結束諮詢室"
+                        onClick={() => setQrModalRoom(room)}
+                        className="flex-1 sm:flex-none px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+                        title="顯示 QR Code"
                       >
-                        結束
+                        📱
                       </button>
-                    )}
-                    <button
-                      onClick={() => setDeleteRoom(room)}
-                      className="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
-                      title="刪除諮詢室"
-                    >
-                      🗑️
-                    </button>
+                      {room.is_active && (
+                        <button
+                          onClick={() => setEditRoom(room)}
+                          className="flex-1 sm:flex-none px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-50 transition-colors"
+                          title="編輯諮詢室"
+                        >
+                          ✏️
+                        </button>
+                      )}
+                      {room.is_active && (
+                        <button
+                          onClick={() => handleCloseRoom(room.id, room.name)}
+                          className="flex-1 sm:flex-none px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors"
+                          title="結束諮詢室"
+                        >
+                          結束
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setDeleteRoom(room)}
+                        className="flex-1 sm:flex-none px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
+                        title="刪除諮詢室"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

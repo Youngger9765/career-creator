@@ -48,23 +48,75 @@ const GameLayout: React.FC<GameLayoutProps> = ({
   className = '',
   canvasClassName = '',
 }) => {
+  const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
+
   return (
     <div className={`h-full flex flex-col ${className}`}>
       {/* 遊戲資訊欄 */}
       <GameInfoBar {...infoBar} />
 
       {/* 主要遊戲區域 */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 左側卡片區（可選） */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Desktop: 左側卡片區（可選） */}
         {sidebar && sidebar.type !== 'none' && (
-          <CardSidebar
-            decks={sidebar.decks}
-            width={sidebar.width}
-            columns={sidebar.columns}
-            collapsible={sidebar.collapsible}
-            defaultCollapsed={sidebar.defaultCollapsed}
-            onCardDragStart={sidebar.onCardDragStart}
-          />
+          <>
+            {/* Desktop Sidebar */}
+            <div className="hidden md:block">
+              <CardSidebar
+                decks={sidebar.decks}
+                width={sidebar.width}
+                columns={sidebar.columns}
+                collapsible={sidebar.collapsible}
+                defaultCollapsed={sidebar.defaultCollapsed}
+                onCardDragStart={sidebar.onCardDragStart}
+              />
+            </div>
+
+            {/* Mobile: Bottom Drawer Toggle Button */}
+            <button
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              className="md:hidden fixed bottom-4 left-4 z-40 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors"
+              title="開啟卡片選單"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+
+            {/* Mobile: Bottom Drawer */}
+            {mobileSidebarOpen && (
+              <>
+                {/* Backdrop */}
+                <div
+                  className="md:hidden fixed inset-0 bg-black/50 z-40"
+                  onClick={() => setMobileSidebarOpen(false)}
+                />
+                {/* Drawer */}
+                <div className="md:hidden fixed inset-x-0 bottom-0 z-50 bg-white dark:bg-gray-900 rounded-t-2xl shadow-2xl max-h-[70vh] flex flex-col">
+                  {/* Handle Bar */}
+                  <div className="flex items-center justify-center py-3 border-b border-gray-200 dark:border-gray-700">
+                    <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full" />
+                  </div>
+                  {/* Sidebar Content */}
+                  <div className="flex-1 overflow-hidden">
+                    <CardSidebar
+                      decks={sidebar.decks}
+                      width="w-full"
+                      columns={2}
+                      collapsible={false}
+                      onCardDragStart={sidebar.onCardDragStart}
+                      className="border-0"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </>
         )}
 
         {/* 右側畫布區 */}

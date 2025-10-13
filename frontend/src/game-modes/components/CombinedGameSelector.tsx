@@ -167,12 +167,16 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">選擇遊戲模式</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">選擇適合的諮詢工具和玩法</p>
+        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
+          選擇遊戲模式
+        </h2>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+          選擇適合的諮詢工具和玩法
+        </p>
       </div>
 
-      {/* 三欄式分組顯示 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Desktop: 三欄式分組顯示 */}
+      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
         {orderedGroups.map(({ modeId, group }) => (
           <div key={modeId} className="space-y-3">
             {/* 模式標題 */}
@@ -261,28 +265,68 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
         ))}
       </div>
 
-      {/* 行動裝置快速選擇 */}
-      <div className="block lg:hidden space-y-2 pt-4 border-t">
-        <p className="text-sm text-gray-600 dark:text-gray-400 px-1 mb-2">快速選擇：</p>
-        <div className="space-y-2">
-          {gameOptions.map((option) => (
-            <Button
-              key={option.id}
-              variant={selectedOption === option.id ? 'default' : 'outline'}
-              className="w-full justify-start text-left"
-              onClick={() => handleOptionSelect(option)}
-              disabled={disabled}
-            >
-              <div className="flex items-center gap-2">
-                {option.icon}
-                <div>
-                  <div className="font-medium">{option.gameplayName}</div>
-                  <div className="text-xs text-gray-500">{option.modeName}</div>
-                </div>
-              </div>
-            </Button>
-          ))}
-        </div>
+      {/* Mobile: 列表式選擇 */}
+      <div className="md:hidden space-y-4">
+        {orderedGroups.map(({ modeId, group }) => (
+          <div key={modeId} className="space-y-2">
+            {/* 模式標題 */}
+            <div className="flex items-center gap-2 px-2">
+              <div className={`h-8 w-1 rounded-full bg-gradient-to-b ${getModeGradient(modeId)}`} />
+              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">
+                {group.modeName}
+              </h3>
+            </div>
+
+            {/* 該模式下的玩法按鈕 */}
+            <div className="space-y-2">
+              {group.options.map((option) => {
+                const isSelected = selectedOption === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => !disabled && handleOptionSelect(option)}
+                    disabled={disabled}
+                    className={`
+                      w-full p-4 rounded-lg border-2 transition-all text-left
+                      ${
+                        isSelected
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                      }
+                      ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'}
+                    `}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg text-white ${option.color} flex-shrink-0`}>
+                        {React.cloneElement(option.icon as React.ReactElement, {
+                          className: 'w-5 h-5',
+                        })}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base">
+                            {option.gameplayName}
+                          </h4>
+                          {isSelected && (
+                            <Badge
+                              variant="default"
+                              className="bg-blue-500 text-xs px-2 py-0.5 flex-shrink-0"
+                            >
+                              ✓
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
+                          {option.description}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

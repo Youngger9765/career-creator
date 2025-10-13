@@ -271,7 +271,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
         <div className="h-full flex flex-col">
           {/* 模式和玩法選擇器 - 顯示所有組合 */}
           {!gameStarted && !selectedGameplay && (
-            <div className="h-full overflow-y-auto px-6 py-8">
+            <div className="h-full overflow-y-auto px-3 sm:px-6 py-4 sm:py-8">
               <div className="max-w-7xl mx-auto">
                 {/* Owner 離線提示（訪客才顯示） */}
                 {isVisitor && !ownerOnline && (

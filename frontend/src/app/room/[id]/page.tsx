@@ -379,15 +379,20 @@ export default function RoomPage() {
     <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col overflow-hidden">
       {/* 頂部標題欄 - Fixed position */}
       <div className="sticky top-0 z-50 bg-white shadow-sm border-b">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center space-x-6">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-3 sm:px-6 py-3 sm:py-4 gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full lg:w-auto">
             {/* 退出按鈕 - 只在選擇遊戲模式時顯示 */}
             {!currentGameplay && (
               <button
                 onClick={() => setShowExitDialog(true)}
-                className="px-4 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2 font-medium"
+                className="px-3 py-1.5 sm:py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2 font-medium text-sm"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -395,17 +400,18 @@ export default function RoomPage() {
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   />
                 </svg>
-                退出諮詢室
+                <span className="hidden sm:inline">退出諮詢室</span>
+                <span className="sm:hidden">退出</span>
               </button>
             )}
 
             {currentRoom && (
-              <div>
-                <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+              <div className="flex-1">
+                <h1 className="text-base sm:text-xl font-bold text-gray-800 dark:text-gray-200">
                   {currentRoom.name}
                 </h1>
                 {currentRoom.description && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
                     {currentRoom.description}
                   </p>
                 )}
@@ -417,9 +423,14 @@ export default function RoomPage() {
               <>
                 <button
                   onClick={() => setCurrentGameplay('')}
-                  className="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+                  className="px-2 sm:px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-3 h-3 sm:w-4 sm:h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -427,7 +438,8 @@ export default function RoomPage() {
                       d="M10 19l-7-7m0 0l7-7m-7 7h18"
                     />
                   </svg>
-                  切換遊戲模式
+                  <span className="hidden sm:inline">切換遊戲模式</span>
+                  <span className="sm:hidden">切換</span>
                 </button>
               </>
             )}
@@ -437,18 +449,18 @@ export default function RoomPage() {
               participants={participants as any}
               onlineCount={onlineCount}
               isLoading={participantsLoading}
-              className="ml-6"
+              className="hidden sm:block"
             />
           </div>
 
-          <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-600">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:space-x-4 w-full lg:w-auto text-xs sm:text-sm">
+            <div className="text-gray-600 truncate max-w-full">
               {isVisitor
                 ? `訪客: ${visitorName || urlVisitorName}`
                 : `${user?.name} (${user?.roles?.join(', ')})`}
             </div>
             {currentRoom && (
-              <div className="text-sm text-gray-500">分享碼: {currentRoom.share_code}</div>
+              <div className="text-gray-500 hidden sm:block">分享碼: {currentRoom.share_code}</div>
             )}
             {/* 同步資訊圖標移到這裡 */}
             <div id="sync-status-container" className="relative"></div>
@@ -480,16 +492,30 @@ export default function RoomPage() {
 
       {/* Notes Drawer - Only for counselors and only during gameplay */}
       {isCounselor && currentGameplay && (
-        <NotesDrawer
-          roomId={roomId}
-          clientId={currentRoom?.client_id}
-          currentGameplay={currentGameplay}
-          isOpen={notesDrawerOpen}
-          onToggle={() => setNotesDrawerOpen(!notesDrawerOpen)}
-          onCaptureScreenshot={handleCaptureScreenshot}
-          isCapturingScreenshot={isCapturingScreenshot}
-          screenshotMessage={screenshotMessage}
-        />
+        <div className="hidden md:block">
+          <NotesDrawer
+            roomId={roomId}
+            clientId={currentRoom?.client_id}
+            currentGameplay={currentGameplay}
+            isOpen={notesDrawerOpen}
+            onToggle={() => setNotesDrawerOpen(!notesDrawerOpen)}
+            onCaptureScreenshot={handleCaptureScreenshot}
+            isCapturingScreenshot={isCapturingScreenshot}
+            screenshotMessage={screenshotMessage}
+          />
+        </div>
+      )}
+
+      {/* Mobile Screenshot Button - Only for counselors during gameplay */}
+      {isCounselor && currentGameplay && (
+        <button
+          onClick={() => handleCaptureScreenshot('')}
+          disabled={isCapturingScreenshot}
+          className="md:hidden fixed bottom-4 right-4 z-40 p-4 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          title="拍攝截圖"
+        >
+          <Camera className="w-6 h-6" />
+        </button>
       )}
 
       {(errorMessage || roomError) && (

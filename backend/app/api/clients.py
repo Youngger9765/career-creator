@@ -25,7 +25,6 @@ from app.models.client import (
     ConsultationRecordResponse,
     RoomClient,
 )
-from app.models.game_rule import GameRuleTemplate
 from app.models.room import Room
 
 # from app.models.user import User  # Not needed since using dict from JWT
@@ -681,24 +680,17 @@ async def get_consultation_records(
             detail="You don't have permission to view this client's records",
         )
 
-    # Get records with game rule name
-    records_with_rules = session.exec(
-        select(ConsultationRecord, GameRuleTemplate.name)
-        .outerjoin(
-            GameRuleTemplate, ConsultationRecord.game_rule_id == GameRuleTemplate.id
-        )
+    # Get consultation records
+    records = session.exec(
+        select(ConsultationRecord)
         .where(ConsultationRecord.client_id == client_id)
         .order_by(ConsultationRecord.session_date.desc())
         .offset(offset)
         .limit(limit)
     ).all()
 
-    # Build response with game rule names
-    result = []
-    for record, game_rule_name in records_with_rules:
-        record_dict = record.dict()
-        record_dict["game_rule_name"] = game_rule_name
-        result.append(ConsultationRecordResponse(**record_dict))
+    # Build response
+    result = [ConsultationRecordResponse(**record.dict()) for record in records]
 
     return result
 
@@ -708,7 +700,6 @@ async def upload_consultation_screenshot(
     record_id: UUID,
     file: UploadFile = File(...),
     game_state: Optional[str] = Form(None),
-    game_rule_id: Optional[str] = Form(None),
     session: Session = Depends(get_session),
     current_user: dict = Depends(get_current_user_from_token),
 ):
@@ -755,13 +746,6 @@ async def upload_consultation_screenshot(
         except json.JSONDecodeError:
             print(f"Invalid game_state JSON: {game_state}")
 
-    # Update game rule ID if provided
-    if game_rule_id:
-        try:
-            record.game_rule_id = UUID(game_rule_id)
-        except ValueError:
-            print(f"Invalid game_rule_id UUID: {game_rule_id}")
-
     record.updated_at = datetime.utcnow()
     session.add(record)
     session.commit()
@@ -771,5 +755,4 @@ async def upload_consultation_screenshot(
         "record_id": record_id,
         "total_screenshots": len(record.screenshots),
         "game_state_saved": game_state is not None,
-        "game_rule_saved": game_rule_id is not None,
     }

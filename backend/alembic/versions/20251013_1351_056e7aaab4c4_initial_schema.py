@@ -1,8 +1,8 @@
-"""initial schema with UUID counselor_id
+"""initial_schema
 
-Revision ID: 2b809c8b2d6f
+Revision ID: 056e7aaab4c4
 Revises:
-Create Date: 2025-10-06 21:41:09.511902
+Create Date: 2025-10-13 13:50:58.356114
 
 """
 
@@ -15,7 +15,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "2b809c8b2d6f"
+revision: str = "056e7aaab4c4"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -157,39 +157,6 @@ def upgrade() -> None:
         op.f("ix_rooms_counselor_id"), "rooms", ["counselor_id"], unique=False
     )
     op.create_table(
-        "card_events",
-        sa.Column("room_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
-        sa.Column(
-            "event_type",
-            sa.Enum(
-                "CARD_DEALT",
-                "CARD_FLIPPED",
-                "CARD_SELECTED",
-                "CARD_MOVED",
-                "CARD_ARRANGED",
-                "CARD_DISCUSSED",
-                "NOTES_ADDED",
-                "INSIGHT_RECORDED",
-                name="cardeventtype",
-            ),
-            nullable=False,
-        ),
-        sa.Column("card_id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.Column("event_data", sa.JSON(), nullable=True),
-        sa.Column("notes", sa.Text(), nullable=True),
-        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
-        sa.Column("performer_id", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.Column("performer_type", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-        sa.Column("performer_name", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-        sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.Column("sequence_number", sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(
-            ["room_id"],
-            ["rooms.id"],
-        ),
-        sa.PrimaryKeyConstraint("id"),
-    )
-    op.create_table(
         "consultation_records",
         sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
         sa.Column("room_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
@@ -197,10 +164,13 @@ def upgrade() -> None:
         sa.Column("counselor_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
         sa.Column("session_date", sa.DateTime(), nullable=False),
         sa.Column("duration_minutes", sa.Integer(), nullable=True),
+        sa.Column("screenshots", postgresql.ARRAY(sa.TEXT()), nullable=True),
+        sa.Column("game_state", sa.JSON(), nullable=True),
         sa.Column("topics", sa.JSON(), nullable=True),
         sa.Column("notes", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("follow_up_required", sa.Boolean(), nullable=False),
         sa.Column("follow_up_date", sa.Date(), nullable=True),
+        sa.Column("ai_summary", sqlmodel.sql.sqltypes.AutoString(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
@@ -234,6 +204,22 @@ def upgrade() -> None:
         "consultation_records",
         ["room_id"],
         unique=False,
+    )
+    op.create_table(
+        "counselor_notes",
+        sa.Column("id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
+        sa.Column("room_id", sqlmodel.sql.sqltypes.GUID(), nullable=False),
+        sa.Column("content", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["room_id"],
+            ["rooms.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_index(
+        op.f("ix_counselor_notes_room_id"), "counselor_notes", ["room_id"], unique=False
     )
     op.create_table(
         "room_clients",
@@ -283,6 +269,8 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_room_clients_room_id"), table_name="room_clients")
     op.drop_index(op.f("ix_room_clients_client_id"), table_name="room_clients")
     op.drop_table("room_clients")
+    op.drop_index(op.f("ix_counselor_notes_room_id"), table_name="counselor_notes")
+    op.drop_table("counselor_notes")
     op.drop_index(
         op.f("ix_consultation_records_room_id"), table_name="consultation_records"
     )
@@ -293,7 +281,6 @@ def downgrade() -> None:
         op.f("ix_consultation_records_client_id"), table_name="consultation_records"
     )
     op.drop_table("consultation_records")
-    op.drop_table("card_events")
     op.drop_index(op.f("ix_rooms_counselor_id"), table_name="rooms")
     op.drop_table("rooms")
     op.drop_table("cards")

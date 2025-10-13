@@ -122,11 +122,6 @@ class ConsultationRecord(SQLModel, table=True):
     counselor_id: UUID = Field(
         foreign_key="users.id", index=True, description="Counselor ID"
     )
-    game_rule_id: Optional[UUID] = Field(
-        default=None,
-        foreign_key="game_rule_templates.id",
-        description="Game rule used in this session",
-    )
     session_date: datetime = Field(description="Consultation session date and time")
     duration_minutes: Optional[int] = Field(
         default=None, description="Session duration in minutes"
@@ -237,7 +232,6 @@ class ConsultationRecordCreate(SQLModel):
 
     room_id: UUID
     client_id: UUID
-    game_rule_id: Optional[UUID] = Field(default=None)
     session_date: datetime
     duration_minutes: Optional[int] = Field(default=None)
     game_state: Optional[Dict[str, Any]] = Field(default=None)
@@ -254,8 +248,6 @@ class ConsultationRecordResponse(SQLModel):
     room_id: UUID
     client_id: UUID
     counselor_id: UUID
-    game_rule_id: Optional[UUID] = None
-    game_rule_name: Optional[str] = Field(default=None, description="Game rule name")
     session_date: datetime
     duration_minutes: Optional[int]
     screenshots: List[str] = Field(default_factory=list)

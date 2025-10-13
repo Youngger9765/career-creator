@@ -43,7 +43,8 @@ export default function RoomPage() {
     text: string;
   } | null>(null);
   const gameAreaRef = useRef<HTMLDivElement>(null);
-  const [currentConsultationRecord, setCurrentConsultationRecord] = useState<ConsultationRecord | null>(null);
+  const [currentConsultationRecord, setCurrentConsultationRecord] =
+    useState<ConsultationRecord | null>(null);
 
   // Game Session for state persistence
   const gameSession = useGameSession({
@@ -224,25 +225,20 @@ export default function RoomPage() {
         // 先嘗試獲取今天的記錄
         const records = await consultationRecordsAPI.getClientRecords(currentRoom.client_id!);
         const today = new Date().toISOString().split('T')[0];
-        const todayRecord = records.find((r) =>
-          r.session_date.startsWith(today)
-        );
+        const todayRecord = records.find((r) => r.session_date.startsWith(today));
 
         if (todayRecord) {
           setCurrentConsultationRecord(todayRecord);
           console.log('[Room] Found today consultation record:', todayRecord.id);
         } else {
           // 創建新的記錄
-          const newRecord = await consultationRecordsAPI.createRecord(
-            currentRoom.client_id!,
-            {
-              room_id: roomId,
-              client_id: currentRoom.client_id!,
-              session_date: new Date().toISOString(),
-              topics: [],
-              follow_up_required: false,
-            }
-          );
+          const newRecord = await consultationRecordsAPI.createRecord(currentRoom.client_id!, {
+            room_id: roomId,
+            client_id: currentRoom.client_id!,
+            session_date: new Date().toISOString(),
+            topics: [],
+            follow_up_required: false,
+          });
           setCurrentConsultationRecord(newRecord);
           console.log('[Room] Created new consultation record:', newRecord.id);
         }
@@ -309,21 +305,18 @@ export default function RoomPage() {
 
     let recordId: string;
     try {
-      const newRecord = await consultationRecordsAPI.createRecord(
-        currentRoom.client_id,
-        {
-          room_id: roomId,
-          client_id: currentRoom.client_id,
-          game_rule_id: currentRoom.game_rule_id || undefined,
-          session_date: new Date().toISOString(),
-          game_state: {
-            gameplay: currentGameplay || '', // Store current gameplay for filtering
-          },
-          topics: [],
-          follow_up_required: false,
-          notes: notes || undefined, // Include current notes
-        }
-      );
+      const newRecord = await consultationRecordsAPI.createRecord(currentRoom.client_id, {
+        room_id: roomId,
+        client_id: currentRoom.client_id,
+        game_rule_id: currentRoom.game_rule_id || undefined,
+        session_date: new Date().toISOString(),
+        game_state: {
+          gameplay: currentGameplay || '', // Store current gameplay for filtering
+        },
+        topics: [],
+        follow_up_required: false,
+        notes: notes || undefined, // Include current notes
+      });
       recordId = newRecord.id;
       console.log('[Room] Created consultation record with notes for screenshot:', recordId);
     } catch (error) {
@@ -353,17 +346,12 @@ export default function RoomPage() {
 
         // Create File object from blob
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const file = new File(
-          [blob],
-          `consultation-${currentRoom?.name}-${timestamp}.png`,
-          { type: 'image/png' }
-        );
+        const file = new File([blob], `consultation-${currentRoom?.name}-${timestamp}.png`, {
+          type: 'image/png',
+        });
 
         // Upload to backend
-        const result = await consultationRecordsAPI.uploadScreenshot(
-          recordId,
-          file
-        );
+        const result = await consultationRecordsAPI.uploadScreenshot(recordId, file);
 
         console.log('[Room] Screenshot uploaded:', result);
 

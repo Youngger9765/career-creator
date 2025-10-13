@@ -22,7 +22,17 @@ interface NotesDrawerProps {
   } | null;
 }
 
-export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggle, onCaptureScreenshot, onScreenshotSuccess, isCapturingScreenshot, screenshotMessage }: NotesDrawerProps) {
+export function NotesDrawer({
+  roomId,
+  clientId,
+  currentGameplay,
+  isOpen,
+  onToggle,
+  onCaptureScreenshot,
+  onScreenshotSuccess,
+  isCapturingScreenshot,
+  screenshotMessage,
+}: NotesDrawerProps) {
   const [noteContent, setNoteContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -47,12 +57,21 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
           const records = await consultationRecordsAPI.getClientRecords(clientId);
 
           console.log('[NotesDrawer] Current gameplay:', currentGameplay);
-          console.log('[NotesDrawer] All records:', records.map(r => ({ id: r.id, gameplay: r.game_state?.gameplay, screenshots: r.screenshots.length })));
+          console.log(
+            '[NotesDrawer] All records:',
+            records.map((r) => ({
+              id: r.id,
+              gameplay: r.game_state?.gameplay,
+              screenshots: r.screenshots.length,
+            }))
+          );
 
           // Filter records by current gameplay and sort by date descending
           const filtered = records
-            .filter(r => r.game_state?.gameplay === currentGameplay && r.screenshots.length > 0)
-            .sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
+            .filter((r) => r.game_state?.gameplay === currentGameplay && r.screenshots.length > 0)
+            .sort(
+              (a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime()
+            );
 
           console.log('[NotesDrawer] Filtered records:', filtered.length);
 
@@ -97,20 +116,26 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).replace(/\//g, '/').replace(',', '');
+    return date
+      .toLocaleDateString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+      .replace(/\//g, '/')
+      .replace(',', '');
   };
 
   // Refresh records and clear notes after screenshot
   const refreshAfterScreenshot = useCallback(async () => {
     if (!clientId || !currentGameplay) {
-      console.log('[NotesDrawer] Refresh skipped - clientId or currentGameplay missing:', { clientId, currentGameplay });
+      console.log('[NotesDrawer] Refresh skipped - clientId or currentGameplay missing:', {
+        clientId,
+        currentGameplay,
+      });
       return;
     }
 
@@ -119,10 +144,17 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
       const records = await consultationRecordsAPI.getClientRecords(clientId);
 
       console.log('[NotesDrawer Refresh] Current gameplay:', currentGameplay);
-      console.log('[NotesDrawer Refresh] All records:', records.map(r => ({ id: r.id, gameplay: r.game_state?.gameplay, screenshots: r.screenshots.length })));
+      console.log(
+        '[NotesDrawer Refresh] All records:',
+        records.map((r) => ({
+          id: r.id,
+          gameplay: r.game_state?.gameplay,
+          screenshots: r.screenshots.length,
+        }))
+      );
 
       const filtered = records
-        .filter(r => r.game_state?.gameplay === currentGameplay && r.screenshots.length > 0)
+        .filter((r) => r.game_state?.gameplay === currentGameplay && r.screenshots.length > 0)
         .sort((a, b) => new Date(b.session_date).getTime() - new Date(a.session_date).getTime());
 
       console.log('[NotesDrawer Refresh] Filtered records:', filtered.length);
@@ -205,11 +237,13 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
 
         {/* Screenshot Message */}
         {screenshotMessage && (
-          <div className={`mx-4 mt-4 p-3 rounded-lg text-sm ${
-            screenshotMessage.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}>
+          <div
+            className={`mx-4 mt-4 p-3 rounded-lg text-sm ${
+              screenshotMessage.type === 'success'
+                ? 'bg-green-50 text-green-800 border border-green-200'
+                : 'bg-red-50 text-red-800 border border-red-200'
+            }`}
+          >
             {screenshotMessage.text}
           </div>
         )}
@@ -233,7 +267,12 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
@@ -261,11 +300,24 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
                             {formatDate(record.session_date)}
                           </div>
                           <div className="text-sm font-medium text-gray-700">
-                            {(record.game_state?.gameplay && GAMEPLAY_NAMES[record.game_state.gameplay]) || record.game_rule_name || '未知玩法'}
+                            {(record.game_state?.gameplay &&
+                              GAMEPLAY_NAMES[record.game_state.gameplay]) ||
+                              record.game_rule_name ||
+                              '未知玩法'}
                           </div>
                         </div>
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <svg
+                          className="w-5 h-5 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
                         </svg>
                       </div>
                     </button>
@@ -351,19 +403,25 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
               <div className="flex items-center gap-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-full">
                   <span className="text-sm font-medium text-blue-700">
-                    {(selectedRecord.game_state?.gameplay && GAMEPLAY_NAMES[selectedRecord.game_state.gameplay]) || selectedRecord.game_rule_name || '未知玩法'}
+                    {(selectedRecord.game_state?.gameplay &&
+                      GAMEPLAY_NAMES[selectedRecord.game_state.gameplay]) ||
+                      selectedRecord.game_rule_name ||
+                      '未知玩法'}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">
-                  {formatDate(selectedRecord.session_date)}
-                </p>
+                <p className="text-sm text-gray-600">{formatDate(selectedRecord.session_date)}</p>
               </div>
               <button
                 onClick={() => setSelectedRecord(null)}
                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
@@ -429,7 +487,12 @@ export function NotesDrawer({ roomId, clientId, currentGameplay, isOpen, onToggl
               className="absolute -top-10 right-0 text-white hover:text-gray-300"
             >
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
             <img

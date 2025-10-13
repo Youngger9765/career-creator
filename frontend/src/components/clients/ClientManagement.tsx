@@ -515,7 +515,8 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                   <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                                   <p className="mt-2 text-sm text-gray-500">載入記錄中...</p>
                                 </div>
-                              ) : clientRecords[client.id] && clientRecords[client.id].length > 0 ? (
+                              ) : clientRecords[client.id] &&
+                                clientRecords[client.id].length > 0 ? (
                                 <div className="space-y-2">
                                   {clientRecords[client.id].map((record) => (
                                     <div
@@ -535,7 +536,10 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                             <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700 rounded-full">
                                               <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                                               <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                                                {(record.game_state?.gameplay && GAMEPLAY_NAMES[record.game_state.gameplay]) || record.game_rule_name || '未指定'}
+                                                {(record.game_state?.gameplay &&
+                                                  GAMEPLAY_NAMES[record.game_state.gameplay]) ||
+                                                  record.game_rule_name ||
+                                                  '未指定'}
                                               </span>
                                             </div>
                                           </div>

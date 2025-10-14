@@ -9,6 +9,7 @@ import { useRoomParticipants } from '@/hooks/use-room-participants';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
 import { ParticipantList } from '@/components/room/ParticipantList';
 import { NotesDrawer } from '@/components/room/NotesDrawer';
+import { MobileNotesModal } from '@/components/room/MobileNotesModal';
 import GameModeIntegration from './GameModeIntegration';
 import {
   Dialog,
@@ -45,6 +46,7 @@ export default function RoomPage() {
   const gameAreaRef = useRef<HTMLDivElement>(null);
   const [currentConsultationRecord, setCurrentConsultationRecord] =
     useState<ConsultationRecord | null>(null);
+  const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
 
   // Game Session for state persistence
   const gameSession = useGameSession({
@@ -280,53 +282,10 @@ export default function RoomPage() {
   console.log('Is visitor:', isVisitor);
   console.log('Will be read-only:', !isCounselor && !isVisitor);
 
-  // Screenshot capture handler
-  const handleCaptureScreenshot = async (notes: string) => {
+  // 只截圖畫布區域，返回 Blob（給 Mobile Modal 使用）
+  const captureCanvasScreenshot = async (): Promise<Blob | null> => {
     if (!gameAreaRef.current) {
-      setScreenshotMessage({
-        type: 'error',
-        text: '找不到遊戲區域',
-      });
-      return;
-    }
-
-    setIsCapturingScreenshot(true);
-    setScreenshotMessage(null);
-
-    // 每次截圖都創建一個新的 consultation record，並包含當下筆記
-    if (!currentRoom?.client_id) {
-      setScreenshotMessage({
-        type: 'error',
-        text: '此諮詢室未關聯客戶，無法儲存截圖',
-      });
-      setIsCapturingScreenshot(false);
-      return;
-    }
-
-    let recordId: string;
-    try {
-      const newRecord = await consultationRecordsAPI.createRecord(currentRoom.client_id, {
-        room_id: roomId,
-        client_id: currentRoom.client_id,
-        game_rule_id: currentRoom.game_rule_id || undefined,
-        session_date: new Date().toISOString(),
-        game_state: {
-          gameplay: currentGameplay || '', // Store current gameplay for filtering
-        },
-        topics: [],
-        follow_up_required: false,
-        notes: notes || undefined, // Include current notes
-      });
-      recordId = newRecord.id;
-      console.log('[Room] Created consultation record with notes for screenshot:', recordId);
-    } catch (error) {
-      console.error('[Room] Failed to create consultation record:', error);
-      setScreenshotMessage({
-        type: 'error',
-        text: '無法建立諮詢記錄',
-      });
-      setIsCapturingScreenshot(false);
-      return;
+      throw new Error('找不到遊戲區域');
     }
 
     try {
@@ -339,35 +298,92 @@ export default function RoomPage() {
       });
 
       // Convert canvas to blob
-      canvas.toBlob(async (blob) => {
-        if (!blob) {
-          throw new Error('無法生成截圖');
-        }
-
-        // Create File object from blob
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const file = new File([blob], `consultation-${currentRoom?.name}-${timestamp}.png`, {
-          type: 'image/png',
-        });
-
-        // Upload to backend
-        const result = await consultationRecordsAPI.uploadScreenshot(recordId, file);
-
-        console.log('[Room] Screenshot uploaded:', result);
-
-        setScreenshotMessage({
-          type: 'success',
-          text: `截圖已上傳 (共 ${result.total_screenshots} 張)`,
-        });
-
-        // Clear message after 3 seconds
-        setTimeout(() => setScreenshotMessage(null), 3000);
-      }, 'image/png');
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('無法生成截圖'));
+          }
+        }, 'image/png');
+      });
     } catch (error) {
       console.error('Screenshot capture error:', error);
+      throw error;
+    }
+  };
+
+  // Mobile: 送出筆記 + 截圖（創建 consultation record）
+  const handleMobileNotesSubmit = async (notes: string, screenshotBlob: Blob | null) => {
+    if (!currentRoom?.client_id) {
+      throw new Error('此諮詢室未關聯客戶，無法儲存記錄');
+    }
+
+    try {
+      // 創建 consultation record
+      const newRecord = await consultationRecordsAPI.createRecord(currentRoom.client_id, {
+        room_id: roomId,
+        client_id: currentRoom.client_id,
+        game_rule_id: currentRoom.game_rule_id || undefined,
+        session_date: new Date().toISOString(),
+        game_state: {
+          gameplay: currentGameplay || '',
+        },
+        topics: [],
+        follow_up_required: false,
+        notes: notes || undefined,
+      });
+
+      console.log('[Room] Created consultation record:', newRecord.id);
+
+      // 如果有截圖，上傳
+      if (screenshotBlob) {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const file = new File(
+          [screenshotBlob],
+          `consultation-${currentRoom?.name}-${timestamp}.png`,
+          {
+            type: 'image/png',
+          }
+        );
+
+        await consultationRecordsAPI.uploadScreenshot(newRecord.id, file);
+        console.log('[Room] Screenshot uploaded');
+      }
+
+      // 顯示成功訊息
+      setScreenshotMessage({
+        type: 'success',
+        text: '記錄已儲存',
+      });
+      setTimeout(() => setScreenshotMessage(null), 3000);
+    } catch (error) {
+      console.error('[Room] Failed to save consultation record:', error);
+      throw error;
+    }
+  };
+
+  // Desktop: 舊的截圖處理（保留給 NotesDrawer 使用）
+  const handleCaptureScreenshot = async (notes: string) => {
+    if (!gameAreaRef.current) {
       setScreenshotMessage({
         type: 'error',
-        text: '截圖上傳失敗，請稍後再試',
+        text: '找不到遊戲區域',
+      });
+      return;
+    }
+
+    setIsCapturingScreenshot(true);
+    setScreenshotMessage(null);
+
+    try {
+      const blob = await captureCanvasScreenshot();
+      await handleMobileNotesSubmit(notes, blob);
+    } catch (error) {
+      console.error('Screenshot error:', error);
+      setScreenshotMessage({
+        type: 'error',
+        text: '截圖失敗，請稍後再試',
       });
       setTimeout(() => setScreenshotMessage(null), 3000);
     } finally {
@@ -506,21 +522,52 @@ export default function RoomPage() {
         </div>
       )}
 
-      {/* Mobile Screenshot Button - Only for counselors during gameplay */}
+      {/* Mobile Notes Button - Only for counselors during gameplay */}
       {isCounselor && currentGameplay && (
         <button
-          onClick={() => handleCaptureScreenshot('')}
-          disabled={isCapturingScreenshot}
-          className="md:hidden fixed bottom-4 right-4 z-40 p-4 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-          title="拍攝截圖"
+          onClick={() => setMobileNotesOpen(true)}
+          className="md:hidden fixed bottom-4 right-4 z-40 px-4 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+          title="開始記錄"
         >
-          <Camera className="w-6 h-6" />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
+          <span className="text-sm">記錄</span>
         </button>
       )}
 
+      {/* Mobile Notes Modal */}
+      {isCounselor && currentGameplay && (
+        <MobileNotesModal
+          isOpen={mobileNotesOpen}
+          onClose={() => setMobileNotesOpen(false)}
+          onSubmit={handleMobileNotesSubmit}
+          onCapture={captureCanvasScreenshot}
+          isSubmitting={isCapturingScreenshot}
+        />
+      )}
+
+      {/* Error/Success Messages */}
       {(errorMessage || roomError) && (
-        <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="fixed bottom-4 left-4 md:bottom-4 md:right-4 md:left-auto bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg z-50">
           {errorMessage || roomError}
+        </div>
+      )}
+
+      {screenshotMessage && (
+        <div
+          className={`fixed bottom-20 right-4 md:bottom-4 px-4 py-3 rounded shadow-lg z-50 ${
+            screenshotMessage.type === 'success'
+              ? 'bg-green-100 border border-green-400 text-green-700'
+              : 'bg-red-100 border border-red-400 text-red-700'
+          }`}
+        >
+          {screenshotMessage.text}
         </div>
       )}
 

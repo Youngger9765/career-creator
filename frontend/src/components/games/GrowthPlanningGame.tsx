@@ -42,7 +42,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   const { state, draggedByOthers, handleCardMove, cardSync, updateCards } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.GROWTH_PLANNING,
-    storeKey: 'growth',
+    storeKey: GAMEPLAY_IDS.GROWTH_PLANNING,
     isRoomOwner,
     zones: ['skills', 'actions'], // 定義這個遊戲的區域
   });

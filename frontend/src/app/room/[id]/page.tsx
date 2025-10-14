@@ -276,12 +276,6 @@ export default function RoomPage() {
     );
   }
 
-  // Debug 資訊
-  console.log('User roles:', user?.roles);
-  console.log('Is counselor:', isCounselor);
-  console.log('Is visitor:', isVisitor);
-  console.log('Will be read-only:', !isCounselor && !isVisitor);
-
   // 只截圖畫布區域，返回 Blob（給 Mobile Modal 使用）
   const captureCanvasScreenshot = async (): Promise<Blob | null> => {
     if (!gameAreaRef.current) {

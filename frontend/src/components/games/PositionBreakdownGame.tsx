@@ -35,7 +35,7 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
     useUnifiedCardSync({
       roomId,
       gameType: GAMEPLAY_IDS.POSITION_BREAKDOWN,
-      storeKey: 'position',
+      storeKey: GAMEPLAY_IDS.POSITION_BREAKDOWN,
       isRoomOwner,
       zones: ['position'], // 定義這個遊戲的區域
     });

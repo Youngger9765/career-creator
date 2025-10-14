@@ -35,7 +35,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
     useUnifiedCardSync({
       roomId,
       gameType: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
-      storeKey: 'personality',
+      storeKey: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
       isRoomOwner,
       zones: ['like', 'neutral', 'dislike'], // 定義這個遊戲的區域
     });

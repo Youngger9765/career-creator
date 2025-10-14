@@ -12,6 +12,7 @@ import GameLayout from '../common/GameLayout';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import { useCardSync } from '@/hooks/use-card-sync';
 import { useGameState } from '@/stores/game-state-store';
+import { useGameplayStatePersistence } from '@/hooks/use-gameplay-state-persistence';
 import { GAMEPLAY_IDS } from '@/constants/game-modes';
 import CardTokenWidget from './CardTokenWidget';
 import {
@@ -59,8 +60,24 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
   const [mainDeck, setMainDeck] = useState<any>(null);
   const gameType = GAMEPLAY_IDS.LIFE_TRANSFORMATION;
 
-  // 使用 GameState Store
-  const { state, updateCards } = useGameState(roomId, 'life');
+  // 使用 GameState Store (統一使用 gameType 作為 storeKey)
+  const { state, updateCards: _updateCards } = useGameState(roomId, gameType);
+
+  // Backend persistence
+  const persistence = useGameplayStatePersistence({
+    roomId,
+    gameplayId: gameType,
+    enabled: isRoomOwner,
+  });
+
+  // Wrapper: updateCards + markDirty
+  const updateCards = useCallback(
+    (updates: any) => {
+      _updateCards(updates);
+      persistence.markDirty();
+    },
+    [_updateCards, persistence]
+  );
 
   // 從 state 中取得遊戲設定，如果沒有就使用預設值
   const maxCards = (state.cardPlacements as any).maxCards ?? 10;

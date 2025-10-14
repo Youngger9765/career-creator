@@ -9,6 +9,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useCardSync } from './use-card-sync';
 import { useAuthStore } from '@/stores/auth-store';
 import { useGameState } from '@/stores/game-state-store';
+import { useGameplayStatePersistence } from './use-gameplay-state-persistence';
 
 interface UseUnifiedCardSyncOptions {
   roomId: string;
@@ -29,6 +30,13 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
   // State
   const { state, updateCards } = useGameState(roomId, storeKey);
   const [draggedByOthers, setDraggedByOthers] = useState<Map<string, string>>(new Map());
+
+  // Persistence: backend for room owner, localStorage for visitor
+  const persistence = useGameplayStatePersistence({
+    roomId,
+    gameplayId: gameType,
+    enabled: isRoomOwner, // true=backend, false=localStorage
+  });
 
   /**
    * 核心：統一的卡片移動邏輯
@@ -58,7 +66,12 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       // 3. 更新狀態
       updateCards(currentPlacements);
 
-      // 4. 返回實際的 fromZone（用於廣播）
+      // 4. Mark as dirty for persistence (skip if from remote)
+      if (!skipBroadcast) {
+        persistence.markDirty();
+      }
+
+      // 5. 返回實際的 fromZone（用於廣播）
       let fromZone = 'deck';
       for (const zone of zones) {
         const key = `${zone}Cards`;
@@ -70,7 +83,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
       return fromZone;
     },
-    [state.cardPlacements, zones, updateCards]
+    [state.cardPlacements, zones, updateCards, isRoomOwner, persistence]
   );
 
   // 同步服務
@@ -157,6 +170,9 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       // 更新狀態
       updateCards(currentPlacements);
 
+      // Mark as dirty for persistence
+      persistence.markDirty();
+
       // Owner 儲存狀態（排序也需要同步）
       if (isRoomOwner) {
         const gameState = {
@@ -174,7 +190,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
         cardSync.saveGameState(gameState);
       }
     },
-    [state.cardPlacements, zones, updateCards, isRoomOwner, cardSync, gameType]
+    [state.cardPlacements, zones, updateCards, isRoomOwner, cardSync, gameType, persistence]
   );
 
   return {
@@ -186,5 +202,6 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     cardSync,
     userId,
     userName,
+    persistence, // Export persistence info
   };
 }

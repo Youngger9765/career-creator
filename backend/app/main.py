@@ -11,6 +11,7 @@ from app.api.auth import router as auth_router
 from app.api.clients import router as clients_router
 from app.api.counselor_notes import router as counselor_notes_router
 from app.api.game_rules import router as game_rules_router
+from app.api.gameplay_states import router as gameplay_states_router
 
 # from app.api.game_sessions import router as game_sessions_router  # Disabled for now
 from app.api.rooms import router as rooms_router
@@ -20,6 +21,7 @@ from app.core.config import settings
 # Import models to ensure they are registered with SQLModel
 # from app.models.card_event import CardEvent  # noqa: F401  # Disabled for now
 from app.models.game_rule import Card, CardDeck, GameRuleTemplate  # noqa: F401
+from app.models.gameplay_state import GameplayState  # noqa: F401
 
 # Disabled for now
 # from app.models.game_state import (  # noqa: F401
@@ -81,6 +83,7 @@ app.include_router(game_rules_router, prefix="/api/game-rules", tags=["game-rule
 app.include_router(admin_router)
 app.include_router(clients_router)
 app.include_router(counselor_notes_router, prefix="/api")
+app.include_router(gameplay_states_router, prefix="/api")
 
 # Mount static files for uploaded screenshots (development only)
 if os.path.exists("uploads"):

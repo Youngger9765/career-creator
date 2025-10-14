@@ -40,7 +40,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
   } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.VALUE_RANKING,
-    storeKey: 'value',
+    storeKey: GAMEPLAY_IDS.VALUE_RANKING,
     isRoomOwner,
     zones: ['rank1', 'rank2', 'rank3', 'others'], // 定義正確的區域：3個排名區域和1個其他區域
   });

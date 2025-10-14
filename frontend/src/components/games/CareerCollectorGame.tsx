@@ -35,7 +35,7 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
     useUnifiedCardSync({
       roomId,
       gameType: GAMEPLAY_IDS.CAREER_COLLECTOR,
-      storeKey: 'career',
+      storeKey: GAMEPLAY_IDS.CAREER_COLLECTOR,
       isRoomOwner,
       zones: ['collected'], // 定義這個遊戲的區域
     });

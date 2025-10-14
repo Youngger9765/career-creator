@@ -7,7 +7,6 @@
  */
 
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 
 // 遊戲狀態介面
 export interface GameState {
@@ -160,101 +159,79 @@ const getDefaultState = (gameType: string): GameState => {
 // 建立 Store Key
 const makeKey = (roomId: string, gameType: string) => `${roomId}:${gameType}`;
 
-// Zustand Store
-export const useGameStateStore = create<GameStateStore>()(
-  persist(
-    (set, get) => ({
-      states: new Map(),
+// Zustand Store (純 in-memory，不使用 localStorage persist)
+// Room owner 使用 backend，visitor 使用 useGameplayStatePersistence 的 localStorage 邏輯
+export const useGameStateStore = create<GameStateStore>()((set, get) => ({
+  states: new Map(),
 
-      getGameState: (roomId: string, gameType: string) => {
-        const key = makeKey(roomId, gameType);
-        const states = get().states;
+  getGameState: (roomId: string, gameType: string) => {
+    const key = makeKey(roomId, gameType);
+    const states = get().states;
 
-        // 如果有現有狀態，返回
-        if (states.has(key)) {
-          return states.get(key)!;
-        }
-
-        // 否則返回預設狀態
-        return getDefaultState(gameType);
-      },
-
-      setGameState: (roomId: string, gameType: string, state: Partial<GameState>) => {
-        const key = makeKey(roomId, gameType);
-
-        set((store) => {
-          const newStates = new Map(store.states);
-          const currentState = newStates.get(key) || getDefaultState(gameType);
-
-          // 合併狀態並更新元資料
-          const updatedState: GameState = {
-            ...currentState,
-            ...state,
-            cardPlacements: {
-              ...currentState.cardPlacements,
-              ...(state.cardPlacements || {}),
-            },
-            metadata: {
-              ...currentState.metadata,
-              ...(state.metadata || {}),
-              version: currentState.metadata.version + 1,
-              lastModified: Date.now(),
-            },
-          };
-
-          newStates.set(key, updatedState);
-          return { states: newStates };
-        });
-      },
-
-      clearGameState: (roomId: string, gameType: string) => {
-        const key = makeKey(roomId, gameType);
-
-        set((store) => {
-          const newStates = new Map(store.states);
-          const defaultState = getDefaultState(gameType);
-
-          newStates.set(key, defaultState);
-          return { states: newStates };
-        });
-      },
-
-      updateCardPlacement: (
-        roomId: string,
-        gameType: string,
-        placement: Partial<GameState['cardPlacements']>
-      ) => {
-        const current = get().getGameState(roomId, gameType);
-
-        get().setGameState(roomId, gameType, {
-          cardPlacements: {
-            ...current.cardPlacements,
-            ...placement,
-          },
-        });
-      },
-    }),
-    {
-      name: 'game-state-store',
-      storage: createJSONStorage(() => localStorage, {
-        reviver: (key, value) => {
-          // 處理 Map 的反序列化
-          if (key === 'states' && value && typeof value === 'object') {
-            return new Map(Object.entries(value));
-          }
-          return value;
-        },
-        replacer: (key, value) => {
-          // 處理 Map 的序列化
-          if (key === 'states' && value instanceof Map) {
-            return Object.fromEntries(value);
-          }
-          return value;
-        },
-      }),
+    // 如果有現有狀態，返回
+    if (states.has(key)) {
+      return states.get(key)!;
     }
-  )
-);
+
+    // 否則返回預設狀態
+    return getDefaultState(gameType);
+  },
+
+  setGameState: (roomId: string, gameType: string, state: Partial<GameState>) => {
+    const key = makeKey(roomId, gameType);
+
+    set((store) => {
+      const newStates = new Map(store.states);
+      const currentState = newStates.get(key) || getDefaultState(gameType);
+
+      // 合併狀態並更新元資料
+      const updatedState: GameState = {
+        ...currentState,
+        ...state,
+        cardPlacements: {
+          ...currentState.cardPlacements,
+          ...(state.cardPlacements || {}),
+        },
+        metadata: {
+          ...currentState.metadata,
+          ...(state.metadata || {}),
+          version: currentState.metadata.version + 1,
+          lastModified: Date.now(),
+        },
+      };
+
+      newStates.set(key, updatedState);
+      return { states: newStates };
+    });
+  },
+
+  clearGameState: (roomId: string, gameType: string) => {
+    const key = makeKey(roomId, gameType);
+
+    set((store) => {
+      const newStates = new Map(store.states);
+      const defaultState = getDefaultState(gameType);
+
+      newStates.set(key, defaultState);
+      return { states: newStates };
+    });
+  },
+
+  updateCardPlacement: (
+    roomId: string,
+    gameType: string,
+    placement: Partial<GameState['cardPlacements']>
+  ) => {
+    const current = get().getGameState(roomId, gameType);
+
+    get().setGameState(roomId, gameType, {
+      cardPlacements: {
+        ...current.cardPlacements,
+        ...placement,
+      },
+    });
+  },
+}));
 
 // Hook: 取得特定遊戲狀態
 export const useGameState = (roomId: string, gameType: string) => {

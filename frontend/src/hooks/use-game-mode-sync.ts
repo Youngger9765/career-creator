@@ -68,7 +68,6 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
         try {
           const parsed = JSON.parse(saved);
           setSyncedState(parsed);
-          console.log('[GameModeSync] Loaded owner state from localStorage:', parsed);
         } catch (err) {
           console.error('[GameModeSync] Failed to parse saved state:', err);
         }
@@ -109,9 +108,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
           event: 'mode_changed',
           payload: newState,
         })
-        .then(() => {
-          console.log('[GameModeSync] Broadcasted mode change:', newState);
-        })
+        .then(() => {})
         .catch((err) => {
           console.error('[GameModeSync] Failed to broadcast:', err);
           setError('無法同步遊戲模式');
@@ -135,7 +132,6 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
         payload: { timestamp: new Date().toISOString() },
       })
       .then(() => {
-        console.log('[GameModeSync] Game started');
         setGameStarted(true);
       })
       .catch((err) => {
@@ -148,28 +144,23 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
   useEffect(() => {
     if (!supabase || !roomId) return;
 
-    console.log('[GameModeSync] Setting up for room:', roomId, 'isOwner:', isOwner);
-
     // Create channel
     const gameChannel = supabase.channel(`room:${roomId}:gamemode`);
 
     // Listen for mode changes
     gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
-      console.log('[GameModeSync] Received mode change:', payload);
       setSyncedState(payload as GameModeState);
       onStateChange?.(payload as GameModeState);
     });
 
     // Listen for game start
     gameChannel.on('broadcast', { event: 'game_started' }, ({ payload }) => {
-      console.log('[GameModeSync] Game started by owner');
       setGameStarted(true);
     });
 
     // Request current state (for non-owners joining)
     gameChannel.on('broadcast', { event: 'request_state' }, ({ payload }) => {
       if (isOwner) {
-        console.log('[GameModeSync] Sending current state to new user');
         gameChannel.send({
           type: 'broadcast',
           event: 'current_state',
@@ -181,7 +172,6 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Receive current state (for non-owners)
     gameChannel.on('broadcast', { event: 'current_state' }, ({ payload }) => {
       if (!isOwner) {
-        console.log('[GameModeSync] Received current state:', payload);
         setSyncedState(payload as GameModeState);
         onStateChange?.(payload as GameModeState);
       }
@@ -193,7 +183,6 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       const users = Object.values(state).flat();
       const ownerExists = users.some((u: any) => u.role === 'owner');
       setOwnerOnline(ownerExists);
-      console.log('[GameModeSync] Owner online:', ownerExists);
     });
 
     // Subscribe to channel
@@ -203,7 +192,6 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
         setError('無法連接到遊戲同步服務');
         setIsConnected(false);
       } else if (status === 'SUBSCRIBED') {
-        console.log('[GameModeSync] Connected to game mode sync');
         setIsConnected(true);
         setError(null);
         setChannel(gameChannel);
@@ -224,7 +212,6 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     });
 
     return () => {
-      console.log('[GameModeSync] Cleaning up channel');
       gameChannel.unsubscribe();
     };
   }, [roomId, isOwner]); // Remove syncedState from deps to avoid loops

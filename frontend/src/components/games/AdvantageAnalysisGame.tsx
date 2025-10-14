@@ -35,7 +35,7 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
   const { state, draggedByOthers, handleCardMove, cardSync } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.ADVANTAGE_ANALYSIS,
-    storeKey: 'advantage',
+    storeKey: GAMEPLAY_IDS.ADVANTAGE_ANALYSIS, // 統一使用 gameType
     isRoomOwner,
     zones: ['advantage', 'disadvantage'], // 定義這個遊戲的區域
   });

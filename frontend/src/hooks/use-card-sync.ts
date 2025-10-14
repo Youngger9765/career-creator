@@ -128,7 +128,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
 
       try {
         localStorage.setItem(storageKey, JSON.stringify(state));
-        console.log('[CardSyncRT] Game state saved');
 
         // 同時廣播狀態給其他人
         if (channelRef.current) {
@@ -138,9 +137,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
               event: 'current_game_state',
               payload: state,
             })
-            .then(() => {
-              console.log('[CardSyncRT] Game state broadcasted');
-            })
+            .then(() => {})
             .catch((err) => {
               console.error('[CardSyncRT] Failed to broadcast game state:', err);
             });
@@ -185,9 +182,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
           event: 'card_moved',
           payload: event,
         })
-        .then(() => {
-          console.log('[CardSyncRT] Card move broadcasted:', cardId, '→', toZone);
-        })
+        .then(() => {})
         .catch((err) => {
           console.error('[CardSyncRT] Failed to broadcast move:', err);
           setError('無法同步牌卡移動');
@@ -218,9 +213,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
           event: 'drag_start',
           payload: info,
         })
-        .then(() => {
-          console.log('[CardSyncRT] Drag start broadcasted:', cardId);
-        })
+        .then(() => {})
         .catch((err) => {
           console.error('[CardSyncRT] Failed to broadcast drag start:', err);
         });
@@ -239,9 +232,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         event: 'drag_end',
         payload: { cardId },
       })
-      .then(() => {
-        console.log('[CardSyncRT] Drag end broadcasted:', cardId);
-      })
+      .then(() => {})
       .catch((err) => {
         console.error('[CardSyncRT] Failed to broadcast drag end:', err);
       });
@@ -251,15 +242,12 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   useEffect(() => {
     if (!supabase || !roomId) return;
 
-    console.log('[CardSyncRT] Setting up for room:', roomId, 'game:', gameType);
-
     // 建立頻道
     const channel = supabase.channel(`room:${roomId}:cards:${gameType}`);
 
     // 監聽牌卡移動
     channel.on('broadcast', { event: 'card_moved' }, ({ payload }) => {
       const event = payload as CardMoveEvent;
-      console.log('[CardSyncRT] Received card move:', event);
 
       // 如果是自己的操作，跳過（已在本地處理）
       if (event.performerId === userId) return;
@@ -275,8 +263,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
       // 如果是自己，跳過
       if (info.performerId === userId) return;
 
-      console.log('[CardSyncRT] Someone started dragging:', info);
-
       // 更新拖曳狀態
       setDraggedCards((prev) => {
         const next = new Map(prev);
@@ -290,8 +276,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     // 監聽拖曳結束
     channel.on('broadcast', { event: 'drag_end' }, ({ payload }) => {
       const { cardId } = payload;
-
-      console.log('[CardSyncRT] Drag ended:', cardId);
 
       // 移除拖曳狀態
       setDraggedCards((prev) => {
@@ -308,7 +292,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
       if (isOwner) {
         const state = loadGameState();
         if (state) {
-          console.log('[CardSyncRT] Sending game state to new user');
           channel.send({
             type: 'broadcast',
             event: 'current_game_state',
@@ -321,7 +304,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     // 接收完整狀態（新用戶）
     channel.on('broadcast', { event: 'current_game_state' }, ({ payload }) => {
       if (!isOwner) {
-        console.log('[CardSyncRT] Received game state from owner');
         const state = payload as CardGameState;
         onStateReceived?.(state);
       }
@@ -334,7 +316,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         setError('無法連接到牌卡同步服務');
         setIsConnected(false);
       } else if (status === 'SUBSCRIBED') {
-        console.log('[CardSyncRT] Connected to card sync');
         setIsConnected(true);
         setError(null);
         channelRef.current = channel;
@@ -351,7 +332,6 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     });
 
     return () => {
-      console.log('[CardSyncRT] Cleaning up channel');
       channel.unsubscribe();
       channelRef.current = null;
     };

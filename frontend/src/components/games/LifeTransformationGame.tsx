@@ -16,6 +16,21 @@ import { useGameplayStatePersistence } from '@/hooks/use-gameplay-state-persiste
 import { GAMEPLAY_IDS } from '@/constants/game-modes';
 import CardTokenWidget from './CardTokenWidget';
 import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
   Home,
   Heart,
   Briefcase,
@@ -59,6 +74,14 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
   const gameType = GAMEPLAY_IDS.LIFE_TRANSFORMATION;
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // 使用 GameState Store (統一使用 gameType 作為 storeKey)
   const { state, updateCards: _updateCards } = useGameState(roomId, gameType);
@@ -434,6 +457,65 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
   // 過濾出未使用的卡片
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
 
+  // 處理卡片拖曳排序
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (over && active.id !== over.id) {
+        const currentCardIds = Array.from(usedCardIds);
+        const oldIndex = currentCardIds.indexOf(active.id as string);
+        const newIndex = currentCardIds.indexOf(over.id as string);
+
+        const newCardIds = arrayMove(currentCardIds, oldIndex, newIndex);
+
+        // 重新構建 lifeAreas，保持原有的 tokens 數據
+        const currentLifeAreas = state.cardPlacements.lifeAreas || {};
+        const updatedAreas: Record<string, LifeArea> = {};
+
+        newCardIds.forEach((cardId) => {
+          updatedAreas[cardId] = currentLifeAreas[cardId];
+        });
+
+        updateCards({ lifeAreas: updatedAreas });
+
+        // 廣播更新
+        if (cardSync.isConnected && isRoomOwner) {
+          const gameStateData: any = {
+            cards: {},
+            settings: {
+              maxCards,
+              totalTokens,
+            },
+            lastUpdated: Date.now(),
+            gameType,
+          };
+
+          Object.entries(updatedAreas).forEach(([areaId, area]: [string, any]) => {
+            area.cards.forEach((cId: string) => {
+              gameStateData.cards[cId] = {
+                zone: `life_${areaId}`,
+                tokens: area.tokens || 0,
+              };
+            });
+          });
+
+          cardSync.saveGameState(gameStateData);
+        }
+      }
+    },
+    [
+      usedCardIds,
+      state.cardPlacements.lifeAreas,
+      updateCards,
+      cardSync,
+      isRoomOwner,
+      maxCards,
+      totalTokens,
+      gameType,
+    ]
+  );
+
   return (
     <GameLayout
       infoBar={{
@@ -557,36 +639,47 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
               )}
 
               {/* 動態生成的卡片籌碼分配器 */}
-              <div className="space-y-4 overflow-y-auto">
-                {Array.from(usedCardIds).map((cardId: string) => {
-                  const card = mainDeck?.cards?.find((c: any) => c.id === cardId);
-                  if (!card) return null;
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={Array.from(usedCardIds)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-4 overflow-y-auto">
+                    {Array.from(usedCardIds).map((cardId: string) => {
+                      const card = mainDeck?.cards?.find((c: any) => c.id === cardId);
+                      if (!card) return null;
 
-                  // 從該卡片的獨立領域中獲取token數量
-                  const cardArea = lifeAreas[cardId];
-                  const cardTokens = cardArea?.tokens || 0;
+                      // 從該卡片的獨立領域中獲取token數量
+                      const cardArea = lifeAreas[cardId];
+                      const cardTokens = cardArea?.tokens || 0;
 
-                  // 計算這張卡片可使用的最大籌碼數（當前值 + 剩餘籌碼）
-                  const maxTokensForCard = cardTokens + remainingTokens;
+                      // 計算這張卡片可使用的最大籌碼數（當前值 + 剩餘籌碼）
+                      const maxTokensForCard = cardTokens + remainingTokens;
 
-                  const allocation = {
-                    area: cardId,
-                    amount: cardTokens,
-                    percentage: totalTokens > 0 ? (cardTokens / totalTokens) * 100 : 0,
-                  };
+                      const allocation = {
+                        area: cardId,
+                        amount: cardTokens,
+                        percentage: totalTokens > 0 ? (cardTokens / totalTokens) * 100 : 0,
+                      };
 
-                  return (
-                    <CardTokenWidget
-                      key={cardId}
-                      card={card}
-                      allocation={allocation}
-                      maxTokens={maxTokensForCard}
-                      onAllocationChange={(amount) => handleTokenUpdate(cardId, amount)}
-                      onRemove={() => handleCardRemove(cardId)}
-                    />
-                  );
-                })}
-              </div>
+                      return (
+                        <CardTokenWidget
+                          key={cardId}
+                          card={card}
+                          allocation={allocation}
+                          maxTokens={maxTokensForCard}
+                          onAllocationChange={(amount) => handleTokenUpdate(cardId, amount)}
+                          onRemove={() => handleCardRemove(cardId)}
+                        />
+                      );
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </div>
 
             {/* 右側：視覺化圖表區 */}
@@ -598,13 +691,14 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
               {usedTokens > 0 ? (
                 <div className="space-y-6">
                   {/* 圓餅圖區域 */}
-                  <div className="relative h-64 flex items-center justify-center">
-                    <div className="relative w-48 h-48">
+                  <div className="relative h-80 flex items-center justify-center">
+                    <div className="relative w-full h-full max-w-md">
                       {/* 使用 CSS 實現簡單的圓餅圖 */}
-                      <svg viewBox="0 0 100 100" className="transform -rotate-90 w-full h-full">
+                      <svg viewBox="0 0 200 200" className="w-full h-full">
                         {(() => {
                           let currentAngle = 0;
                           const segments = [];
+                          const labels = [];
                           const colors = [
                             '#3B82F6',
                             '#10B981',
@@ -616,36 +710,97 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                             '#84CC16',
                           ];
 
-                          // 為每個有籌碼的卡片創建扇形
-                          Array.from(usedCardIds).forEach((cardId, index) => {
+                          // 為每張卡片生成固定顏色（基於 cardId）
+                          const getCardColor = (cardId: string) => {
+                            let hash = 0;
+                            for (let i = 0; i < cardId.length; i++) {
+                              hash = cardId.charCodeAt(i) + ((hash << 5) - hash);
+                            }
+                            return colors[Math.abs(hash) % colors.length];
+                          };
+
+                          // 為每個有籌碼的卡片創建扇形（按 cardId 排序以保持固定順序）
+                          const sortedCardIds = Array.from(usedCardIds).sort();
+                          sortedCardIds.forEach((cardId) => {
                             const cardArea = lifeAreas[cardId];
                             const tokens = cardArea?.tokens || 0;
                             if (tokens === 0) return;
 
+                            const card = mainDeck?.cards?.find((c: any) => c.id === cardId);
                             const percentage = (tokens / totalTokens) * 100;
                             const angle = (percentage / 100) * 360;
+                            const color = getCardColor(cardId);
 
                             // 計算路徑
                             const startAngle = currentAngle;
                             const endAngle = currentAngle + angle;
+                            const midAngle = startAngle + angle / 2;
                             currentAngle = endAngle;
 
                             const largeArcFlag = angle > 180 ? 1 : 0;
 
-                            const startX = 50 + 40 * Math.cos((startAngle * Math.PI) / 180);
-                            const startY = 50 + 40 * Math.sin((startAngle * Math.PI) / 180);
-                            const endX = 50 + 40 * Math.cos((endAngle * Math.PI) / 180);
-                            const endY = 50 + 40 * Math.sin((endAngle * Math.PI) / 180);
+                            const centerX = 100;
+                            const centerY = 100;
+                            const radius = 60;
+                            const labelRadius = 80;
+
+                            const startX =
+                              centerX + radius * Math.cos((startAngle * Math.PI) / 180);
+                            const startY =
+                              centerY + radius * Math.sin((startAngle * Math.PI) / 180);
+                            const endX = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
+                            const endY = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
+
+                            // 標籤位置
+                            const labelX =
+                              centerX + labelRadius * Math.cos((midAngle * Math.PI) / 180);
+                            const labelY =
+                              centerY + labelRadius * Math.sin((midAngle * Math.PI) / 180);
 
                             segments.push(
-                              <path
-                                key={cardId}
-                                d={`M 50 50 L ${startX} ${startY} A 40 40 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
-                                fill={colors[index % colors.length]}
-                                stroke="white"
-                                strokeWidth="1"
-                                className="transition-all duration-300 hover:opacity-80"
-                              />
+                              <g key={cardId}>
+                                <path
+                                  d={`M ${centerX} ${centerY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
+                                  fill={color}
+                                  stroke="white"
+                                  strokeWidth="2"
+                                  className="transition-all duration-300 hover:opacity-80"
+                                />
+                                {/* 標籤線條 */}
+                                <line
+                                  x1={centerX + radius * Math.cos((midAngle * Math.PI) / 180)}
+                                  y1={centerY + radius * Math.sin((midAngle * Math.PI) / 180)}
+                                  x2={labelX}
+                                  y2={labelY}
+                                  stroke={color}
+                                  strokeWidth="1.5"
+                                />
+                                {/* 標籤文字 */}
+                                <text
+                                  x={labelX}
+                                  y={labelY}
+                                  fill={color}
+                                  fontSize="8"
+                                  fontWeight="600"
+                                  textAnchor={labelX > centerX ? 'start' : 'end'}
+                                  dominantBaseline="middle"
+                                  className="pointer-events-none"
+                                >
+                                  {card?.title || cardId}
+                                </text>
+                                <text
+                                  x={labelX}
+                                  y={labelY + 8}
+                                  fill={color}
+                                  fontSize="7"
+                                  fontWeight="500"
+                                  textAnchor={labelX > centerX ? 'start' : 'end'}
+                                  dominantBaseline="middle"
+                                  className="pointer-events-none"
+                                >
+                                  {percentage.toFixed(1)}%
+                                </text>
+                              </g>
                             );
                           });
 
@@ -659,18 +814,24 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
 
                             const largeArcFlag = angle > 180 ? 1 : 0;
 
-                            const startX = 50 + 40 * Math.cos((startAngle * Math.PI) / 180);
-                            const startY = 50 + 40 * Math.sin((startAngle * Math.PI) / 180);
-                            const endX = 50 + 40 * Math.cos((endAngle * Math.PI) / 180);
-                            const endY = 50 + 40 * Math.sin((endAngle * Math.PI) / 180);
+                            const centerX = 100;
+                            const centerY = 100;
+                            const radius = 60;
+
+                            const startX =
+                              centerX + radius * Math.cos((startAngle * Math.PI) / 180);
+                            const startY =
+                              centerY + radius * Math.sin((startAngle * Math.PI) / 180);
+                            const endX = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
+                            const endY = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
 
                             segments.push(
                               <path
                                 key="remaining"
-                                d={`M 50 50 L ${startX} ${startY} A 40 40 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
+                                d={`M ${centerX} ${centerY} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
                                 fill="#E5E7EB"
                                 stroke="white"
-                                strokeWidth="1"
+                                strokeWidth="2"
                                 className="transition-all duration-300"
                               />
                             );
@@ -681,12 +842,18 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                       </svg>
 
                       {/* 中心文字 */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-center bg-white dark:bg-gray-100 rounded-full p-4">
-                          <div className="text-2xl font-bold text-gray-900 dark:text-gray-900">
-                            {usedTokens}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="text-center bg-white dark:bg-gray-100 rounded-full w-28 h-28 flex flex-col items-center justify-center shadow-sm">
+                          {/* 分數形式顯示 */}
+                          <div className="flex flex-col items-center leading-none">
+                            <div className="text-3xl font-bold text-gray-900 dark:text-gray-900">
+                              {usedTokens}
+                            </div>
+                            <div className="w-full h-0.5 bg-gray-400 dark:bg-gray-500 my-1"></div>
+                            <div className="text-lg font-medium text-gray-600 dark:text-gray-700">
+                              {totalTokens}
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-600">已分配</div>
                         </div>
                       </div>
                     </div>
@@ -694,41 +861,52 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
 
                   {/* 圖例 */}
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    {Array.from(usedCardIds).map((cardId, index) => {
-                      const card = mainDeck?.cards?.find((c: any) => c.id === cardId);
-                      const cardArea = lifeAreas[cardId];
-                      const tokens = cardArea?.tokens || 0;
-                      if (tokens === 0) return null;
+                    {Array.from(usedCardIds)
+                      .sort()
+                      .map((cardId) => {
+                        const card = mainDeck?.cards?.find((c: any) => c.id === cardId);
+                        const cardArea = lifeAreas[cardId];
+                        const tokens = cardArea?.tokens || 0;
+                        if (tokens === 0) return null;
 
-                      const colors = [
-                        '#3B82F6',
-                        '#10B981',
-                        '#F59E0B',
-                        '#EF4444',
-                        '#8B5CF6',
-                        '#EC4899',
-                        '#06B6D4',
-                        '#84CC16',
-                      ];
+                        const colors = [
+                          '#3B82F6',
+                          '#10B981',
+                          '#F59E0B',
+                          '#EF4444',
+                          '#8B5CF6',
+                          '#EC4899',
+                          '#06B6D4',
+                          '#84CC16',
+                        ];
 
-                      const percentage =
-                        totalTokens > 0 ? ((tokens / totalTokens) * 100).toFixed(1) : '0';
+                        // 使用相同的 hash 函數確保顏色一致
+                        const getCardColor = (id: string) => {
+                          let hash = 0;
+                          for (let i = 0; i < id.length; i++) {
+                            hash = id.charCodeAt(i) + ((hash << 5) - hash);
+                          }
+                          return colors[Math.abs(hash) % colors.length];
+                        };
 
-                      return (
-                        <div key={cardId} className="flex items-center space-x-2">
-                          <div
-                            className="w-3 h-3 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: colors[index % colors.length] }}
-                          />
-                          <div className="flex-1 truncate text-gray-700 dark:text-gray-700">
-                            {card?.title || '未知'}
+                        const percentage =
+                          totalTokens > 0 ? ((tokens / totalTokens) * 100).toFixed(1) : '0';
+
+                        return (
+                          <div key={cardId} className="flex items-center space-x-2">
+                            <div
+                              className="w-3 h-3 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: getCardColor(cardId) }}
+                            />
+                            <div className="flex-1 truncate text-gray-700 dark:text-gray-700">
+                              {card?.title || '未知'}
+                            </div>
+                            <div className="text-gray-900 dark:text-gray-900 font-medium">
+                              {percentage}%
+                            </div>
                           </div>
-                          <div className="text-gray-900 dark:text-gray-900 font-medium">
-                            {percentage}%
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
                   </div>
                 </div>
               ) : (

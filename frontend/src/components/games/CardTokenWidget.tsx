@@ -8,10 +8,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Minus, X, TrendingUp } from 'lucide-react';
+import { Plus, Minus, X, Eye, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card as CardData } from '@/game-modes/services/card-loader.service';
+import CardModal from '@/components/common/CardModal';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface TokenAllocation {
   area: string;
@@ -36,12 +39,17 @@ const CardTokenWidget: React.FC<CardTokenWidgetProps> = ({
 }) => {
   const currentAmount = allocation?.amount || 0;
   const [inputValue, setInputValue] = useState(currentAmount.toString());
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 處理滑桿變化
-  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 0;
-    onAllocationChange(value);
-    setInputValue(value.toString());
+  // Sortable setup
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: card.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
   };
 
   // 處理輸入框變化
@@ -63,111 +71,100 @@ const CardTokenWidget: React.FC<CardTokenWidgetProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-white rounded-lg border border-gray-200 dark:border-gray-300 p-3 shadow-sm">
-      {/* 卡片標題區 */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center space-x-2">
-          <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
-            <span className="text-green-600 text-xs font-bold">V</span>
-          </div>
-          <div className="min-w-0 flex-1">
+    <>
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="bg-white dark:bg-white rounded-lg border border-gray-200 dark:border-gray-300 p-3 shadow-sm"
+      >
+        {/* 卡片標題區 - 簡化版 */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2 flex-1">
+            {/* 拖曳手柄 */}
+            <button
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-1"
+            >
+              <GripVertical className="w-4 h-4" />
+            </button>
+
+            <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
+              <span className="text-green-600 text-xs font-bold">V</span>
+            </div>
             <h3 className="font-medium text-gray-900 text-sm">{card.title}</h3>
-            <p className="text-xs text-gray-600 line-clamp-1">{card.description}</p>
           </div>
 
-          {/* 快速調整按鈕移至標題旁 */}
-          <div className="flex space-x-1">
+          <div className="flex items-center space-x-2">
+            {/* 目前籌碼數 */}
+            <div className="text-right">
+              <div className="text-2xl font-bold text-blue-600">{currentAmount}</div>
+            </div>
+
+            {/* 查看大圖按鈕 */}
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => handleQuickAdjust(10)}
-              className="text-xs px-1.5 py-0.5 h-6 text-gray-700 dark:text-gray-700 bg-white dark:bg-white border-gray-300 dark:border-gray-300"
+              onClick={() => setIsModalOpen(true)}
+              className="text-gray-400 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500 bg-white dark:bg-white p-1"
+              title="查看卡片詳情"
             >
-              <TrendingUp className="w-2.5 h-2.5 mr-0.5" />
-              +10
+              <Eye className="w-4 h-4" />
             </Button>
+
+            {/* 移除按鈕 */}
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={() => handleQuickAdjust(20)}
-              className="text-xs px-1.5 py-0.5 h-6 text-gray-700 dark:text-gray-700 bg-white dark:bg-white border-gray-300 dark:border-gray-300"
+              onClick={onRemove}
+              className="text-gray-400 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-500 bg-white dark:bg-white p-1"
             >
-              +20
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickAdjust(-10)}
-              className="text-xs px-1.5 py-0.5 h-6 text-gray-700 dark:text-gray-700 bg-white dark:bg-white border-gray-300 dark:border-gray-300"
-              disabled={currentAmount < 10}
-            >
-              -10
+              <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <div className="text-right">
-            <div className="text-xl font-bold text-gray-900">{currentAmount}</div>
-            <div className="text-xs text-gray-500">{currentAmount}%</div>
-          </div>
+        {/* 籌碼控制區 - 移除 slider，只保留按鈕和輸入框 */}
+        <div className="flex items-center justify-center space-x-3">
+          {/* -10 按鈕 */}
           <Button
-            variant="ghost"
-            size="sm"
-            onClick={onRemove}
-            className="text-gray-400 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-500 bg-white dark:bg-white p-1"
+            variant="outline"
+            size="lg"
+            onClick={() => handleQuickAdjust(-10)}
+            disabled={currentAmount < 10}
+            className="h-12 px-6 text-lg font-semibold text-gray-700 dark:text-gray-700 bg-white dark:bg-white border-gray-300 dark:border-gray-300 hover:bg-gray-50"
           >
-            <X className="w-4 h-4" />
+            <Minus className="w-5 h-5 mr-1" />
+            10
+          </Button>
+
+          {/* 手動輸入 */}
+          <Input
+            type="number"
+            min="0"
+            max={maxTokens}
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-24 h-12 text-center text-xl font-bold text-gray-900 dark:text-gray-900 bg-white dark:bg-white border-gray-300 dark:border-gray-300"
+          />
+
+          {/* +10 按鈕 */}
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => handleQuickAdjust(10)}
+            disabled={currentAmount + 10 > maxTokens}
+            className="h-12 px-6 text-lg font-semibold text-gray-700 dark:text-gray-700 bg-white dark:bg-white border-gray-300 dark:border-gray-300 hover:bg-gray-50"
+          >
+            <Plus className="w-5 h-5 mr-1" />
+            10
           </Button>
         </div>
       </div>
 
-      {/* 籌碼控制區 */}
-      <div className="flex items-center space-x-3">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleQuickAdjust(-1)}
-          disabled={currentAmount <= 0}
-          className="w-7 h-7 p-0 text-gray-700 dark:text-gray-700 bg-white dark:bg-white border-gray-300 dark:border-gray-300"
-        >
-          <Minus className="w-3 h-3" />
-        </Button>
-
-        <div className="flex-1 relative">
-          <input
-            type="range"
-            min="0"
-            max={maxTokens}
-            value={currentAmount}
-            onChange={handleSliderChange}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-            style={{
-              background: `linear-gradient(to right, #22d3ee 0%, #22d3ee ${(currentAmount / maxTokens) * 100}%, #e5e7eb ${(currentAmount / maxTokens) * 100}%, #e5e7eb 100%)`,
-            }}
-          />
-        </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => handleQuickAdjust(1)}
-          disabled={currentAmount >= maxTokens}
-          className="w-7 h-7 p-0 text-gray-700 dark:text-gray-700 bg-white dark:bg-white border-gray-300 dark:border-gray-300"
-        >
-          <Plus className="w-3 h-3" />
-        </Button>
-
-        <Input
-          type="number"
-          min="0"
-          max={maxTokens}
-          value={inputValue}
-          onChange={handleInputChange}
-          className="w-14 h-7 text-center p-1 text-sm text-gray-900 dark:text-gray-900 bg-white dark:bg-white border-gray-300 dark:border-gray-300"
-        />
-      </div>
-    </div>
+      {/* 卡片詳情 Modal */}
+      <CardModal card={card} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+    </>
   );
 };
 

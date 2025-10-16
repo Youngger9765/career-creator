@@ -23,18 +23,18 @@ interface CardModalProps {
   card: CardData | null;
   isOpen: boolean;
   onClose: () => void;
-  showFlip?: boolean; // 是否顯示翻轉功能
+  showFlip?: boolean; // 是否顯示翻轉功能（已棄用，改為直接顯示兩面）
+  showBothSides?: boolean; // 是否同時顯示正反兩面
 }
 
-const CardModal: React.FC<CardModalProps> = ({ card, isOpen, onClose, showFlip = true }) => {
+const CardModal: React.FC<CardModalProps> = ({
+  card,
+  isOpen,
+  onClose,
+  showFlip = true,
+  showBothSides = true,
+}) => {
   const [isFlipped, setIsFlipped] = React.useState(false);
-
-  // 當 modal 關閉時重置翻轉狀態
-  React.useEffect(() => {
-    if (!isOpen) {
-      setIsFlipped(false);
-    }
-  }, [isOpen]);
 
   if (!card) return null;
 
@@ -66,6 +66,70 @@ const CardModal: React.FC<CardModalProps> = ({ card, isOpen, onClose, showFlip =
     return 'text-gray-600 dark:text-gray-400';
   };
 
+  // 同時顯示兩面的版本
+  if (showBothSides) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-5xl">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-semibold mb-6">卡片詳情</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-8 py-6">
+            {/* 正面 */}
+            <div className="flex flex-col">
+              <div className="text-base font-semibold text-gray-500 mb-4 text-center">正面</div>
+              <div
+                className={`${getCardBackground(card.id)} border-2 rounded-xl shadow-lg flex-1 flex flex-col p-10`}
+                style={{ minHeight: '600px' }}
+              >
+                {/* 分類標籤 */}
+                {card.category && (
+                  <div
+                    className={`text-lg font-semibold uppercase tracking-wider ${getCategoryColor(card.id)} mb-6`}
+                  >
+                    {card.category}
+                  </div>
+                )}
+                {/* 標題 */}
+                <div className="flex-1 flex items-center justify-center px-4">
+                  <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 text-center break-words leading-relaxed">
+                    {card.title}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 背面 */}
+            <div className="flex flex-col">
+              <div className="text-base font-semibold text-gray-500 mb-4 text-center">
+                背面 / 詳細說明
+              </div>
+              <div
+                className={`${getCardBackground(card.id)} border-2 rounded-xl shadow-lg flex-1 flex flex-col p-10`}
+                style={{ minHeight: '600px' }}
+              >
+                <div className="flex-1 flex flex-col justify-center">
+                  <div className="text-xl text-gray-700 dark:text-gray-300 text-center leading-relaxed px-4">
+                    {card.description || card.title}
+                  </div>
+                  {card.category && (
+                    <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-600">
+                      <div className="text-lg text-gray-500 dark:text-gray-400 text-center">
+                        分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // 原有的翻轉版本（保留向後兼容）
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">

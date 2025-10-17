@@ -200,6 +200,7 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
       <div
         className={`
           ${isCollapsed ? 'w-12' : width}
+          h-full
           border-r border-gray-200 dark:border-gray-700
           flex flex-col relative transition-all duration-300
           ${showGradientBg ? 'bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800' : ''}
@@ -272,7 +273,10 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
           {/* List 模式 */}
           {viewMode === 'list' && (
             <div className="flex-1 overflow-y-auto px-4 pb-4">
-              <div className={`grid grid-cols-${columns} gap-2`}>
+              <div
+                className="grid gap-2"
+                style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+              >
                 {deck.cards.map((card) => (
                   <div
                     key={card.id}
@@ -352,6 +356,7 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
     <div
       className={`
         ${isCollapsed ? 'w-12' : width}
+        h-full
         border-r border-gray-200 dark:border-gray-700
         flex flex-col relative transition-all duration-300
         ${showGradientBg ? 'bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800' : ''}
@@ -378,7 +383,8 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col h-full">
           <div className="px-4 pt-4">
             <TabsList
-              className={`grid w-full grid-cols-${decks.length} bg-gray-100 dark:bg-gray-800 p-1 rounded-lg`}
+              className="grid w-full bg-gray-100 dark:bg-gray-800 p-1 rounded-lg"
+              style={{ gridTemplateColumns: `repeat(${decks.length}, minmax(0, 1fr))` }}
             >
               {decks.map((deck) => (
                 <TabsTrigger
@@ -452,7 +458,10 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
                 {/* List 模式 */}
                 {viewMode === 'list' && (
                   <div className="flex-1 overflow-y-auto px-4 pb-4">
-                    <div className={`grid grid-cols-${columns} gap-2`}>
+                    <div
+                      className="grid gap-2"
+                      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+                    >
                       {deck.cards.map((card) => (
                         <div
                           key={card.id}

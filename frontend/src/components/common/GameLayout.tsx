@@ -61,7 +61,7 @@ const GameLayout: React.FC<GameLayoutProps> = ({
         {sidebar && sidebar.type !== 'none' && (
           <>
             {/* Desktop Sidebar */}
-            <div className="hidden md:block">
+            <div className="hidden md:block h-full">
               <CardSidebar
                 decks={sidebar.decks}
                 width={sidebar.width}

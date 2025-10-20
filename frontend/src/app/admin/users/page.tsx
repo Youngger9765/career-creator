@@ -206,7 +206,7 @@ export default function AdminUsersPage() {
               CSV 白名單匯入
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              上傳 CSV 檔案批次建立用戶（格式：email,password）
+              上傳 CSV 檔案批次建立/更新用戶（格式：email,password，自動覆蓋已存在帳號）
             </p>
           </div>
           <button

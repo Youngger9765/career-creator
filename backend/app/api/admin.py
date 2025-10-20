@@ -648,10 +648,10 @@ def import_whitelist(
     First row can be a header (email,password,...) which will be skipped.
 
     Returns:
-    - List of created users with their passwords
+    - List of created/updated users with their passwords
     - Users with provided passwords: no forced change
     - Users with auto-generated passwords: must change on first login
-    - Skips existing emails
+    - Automatically overwrites existing users (updates password + metadata)
     """
     if not file.filename.endswith(".csv"):
         raise HTTPException(
@@ -706,7 +706,22 @@ def import_whitelist(
                 ).first()
 
                 if existing_user:
-                    skipped += 1
+                    # Update existing user's password and metadata
+                    new_password = password or generate_random_password()
+                    existing_user.hashed_password = get_password_hash(new_password)
+                    existing_user.name = name
+                    existing_user.roles = roles
+                    existing_user.must_change_password = (
+                        False if password else True
+                    )  # Don't force change if password provided
+                    session.add(existing_user)
+                    session.flush()
+
+                    created += 1  # Count as "created" (updated)
+                    created_users.append({
+                        "email": email,
+                        "password": new_password,
+                    })
                     continue
 
                 # Use provided password or generate random one

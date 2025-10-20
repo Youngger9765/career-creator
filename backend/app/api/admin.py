@@ -478,6 +478,7 @@ def batch_create_users(
                 hashed_password=get_password_hash(new_password),
                 roles=["counselor"],
                 is_active=True,
+                must_change_password=True,  # Force password change on first login
             )
             session.add(new_user)
 

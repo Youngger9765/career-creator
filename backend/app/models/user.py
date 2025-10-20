@@ -30,6 +30,9 @@ class User(UserBase, table=True):
     is_active: bool = Field(default=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+    # Security: Force password change on first login for batch-created accounts
+    must_change_password: bool = Field(default=False)
+
     # Note: CRM relationships removed as counselor_id can be demo account
     # (not in users table)
 

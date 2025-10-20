@@ -78,6 +78,7 @@ def login(login_data: LoginRequest, session: Session = Depends(get_session)):
                 "roles": user.roles,
                 "is_active": user.is_active,
                 "created_at": user.created_at.isoformat(),
+                "must_change_password": user.must_change_password,  # Security flag
             },
         )
 
@@ -179,3 +180,51 @@ def initialize_demo_accounts(session: Session = Depends(get_session)):
         "created": created_accounts,
         "total_demo_accounts": len(DEMO_ACCOUNTS),
     }
+
+
+@router.post("/change-password")
+def change_password(
+    old_password: str,
+    new_password: str,
+    current_user: dict = Depends(get_current_user_from_token),
+    session: Session = Depends(get_session),
+):
+    """
+    Change user password
+
+    Security features:
+    - Verifies old password
+    - Clears must_change_password flag
+    - Enforces password complexity (8+ chars)
+    """
+    from uuid import UUID
+
+    # Get user from database
+    user = session.get(User, UUID(current_user["user_id"]))
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    # Verify old password
+    if not verify_password(old_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect current password",
+        )
+
+    # Validate new password
+    if len(new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 8 characters",
+        )
+
+    # Update password
+    user.hashed_password = get_password_hash(new_password)
+    user.must_change_password = False  # Clear the flag
+    session.add(user)
+    session.commit()
+
+    return {"message": "Password changed successfully"}

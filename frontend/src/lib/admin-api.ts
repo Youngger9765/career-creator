@@ -10,7 +10,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // Create axios instance with auth
 const createAuthClient = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('access_token'); // Fixed: use 'access_token' not 'token'
   return axios.create({
     baseURL: API_URL,
     headers: {

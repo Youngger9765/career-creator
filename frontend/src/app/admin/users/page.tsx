@@ -23,7 +23,10 @@ export default function AdminUsersPage() {
 
   // Parse and validate email list
   const parseEmails = (text: string) => {
-    const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+    const lines = text
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean);
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const valid = lines.filter((l) => emailRegex.test(l));
     const invalid = lines.filter((l) => !emailRegex.test(l));
@@ -87,9 +90,7 @@ export default function AdminUsersPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">用戶管理</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          批次建立 Beta 測試用戶帳號
-        </p>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">批次建立 Beta 測試用戶帳號</p>
       </div>
 
       {/* Main Form */}
@@ -111,9 +112,7 @@ export default function AdminUsersPage() {
               ✓ {valid.length} 個有效 Email
             </span>
             {invalid.length > 0 && (
-              <span className="text-red-600 dark:text-red-400">
-                ✗ {invalid.length} 個無效格式
-              </span>
+              <span className="text-red-600 dark:text-red-400">✗ {invalid.length} 個無效格式</span>
             )}
             {duplicates.length > 0 && (
               <span className="text-yellow-600 dark:text-yellow-400">

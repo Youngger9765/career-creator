@@ -3,15 +3,15 @@ Admin API endpoints for database management
 管理員 API 端點 - 資料庫管理
 """
 
-from typing import Any, Dict, List, Literal
+import re
 import secrets
 import string
-import re
+from typing import Any, Dict, List, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, field_validator
 from sqlalchemy import inspect, text
 from sqlmodel import Session, select
-from pydantic import BaseModel, field_validator
 
 from app.core.auth import get_current_user_from_token, get_password_hash
 from app.core.database import engine, get_session
@@ -34,6 +34,7 @@ def require_admin(
     Falls back to demo accounts if user not found in database.
     """
     from uuid import UUID
+
     from app.core.auth import DEMO_ACCOUNTS
 
     # Get user from database to verify current roles

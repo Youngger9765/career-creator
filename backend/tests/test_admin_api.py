@@ -11,10 +11,11 @@ Following TDD approach:
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, select
-from app.main import app
-from app.models.user import User
+
 from app.core.auth import create_access_token
 from app.core.database import engine, get_session
+from app.main import app
+from app.models.user import User
 
 
 @pytest.fixture(scope="function")
@@ -60,6 +61,7 @@ def db_session():
 @pytest.fixture
 def client(db_session):
     """Test client fixture with database session override"""
+
     def override_get_session():
         yield db_session
 
@@ -75,12 +77,13 @@ def client(db_session):
 def admin_token():
     """Generate admin JWT token using demo admin account"""
     from app.core.auth import DEMO_ACCOUNT_UUIDS
+
     return create_access_token(
         data={
             "sub": DEMO_ACCOUNT_UUIDS["demo.admin@example.com"],
             "email": "demo.admin@example.com",
             "roles": ["admin", "counselor"],
-            "name": "Test Admin"
+            "name": "Test Admin",
         }
     )
 
@@ -89,12 +92,13 @@ def admin_token():
 def counselor_token():
     """Generate counselor (non-admin) JWT token using demo counselor account"""
     from app.core.auth import DEMO_ACCOUNT_UUIDS
+
     return create_access_token(
         data={
             "sub": DEMO_ACCOUNT_UUIDS["demo.counselor@example.com"],
             "email": "demo.counselor@example.com",
             "roles": ["counselor"],
-            "name": "Test Counselor"
+            "name": "Test Counselor",
         }
     )
 
@@ -106,7 +110,7 @@ class TestAdminAuthentication:
         """RED: Test that batch create endpoint requires authentication"""
         response = client.post(
             "/api/admin/users/batch",
-            json={"emails": ["test@example.com"], "on_duplicate": "skip"}
+            json={"emails": ["test@example.com"], "on_duplicate": "skip"},
         )
         assert response.status_code == 401
         assert "detail" in response.json()
@@ -116,7 +120,7 @@ class TestAdminAuthentication:
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {counselor_token}"},
-            json={"emails": ["test@example.com"], "on_duplicate": "skip"}
+            json={"emails": ["test@example.com"], "on_duplicate": "skip"},
         )
         assert response.status_code == 403
         assert "admin" in response.json()["detail"].lower()
@@ -126,7 +130,7 @@ class TestAdminAuthentication:
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": ["newuser@example.com"], "on_duplicate": "skip"}
+            json={"emails": ["newuser@example.com"], "on_duplicate": "skip"},
         )
         # Should succeed (200) or return validation error, but not 401/403
         assert response.status_code != 401
@@ -141,10 +145,7 @@ class TestBatchUserCreation:
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={
-                "emails": ["newuser1@example.com"],
-                "on_duplicate": "skip"
-            }
+            json={"emails": ["newuser1@example.com"], "on_duplicate": "skip"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -156,15 +157,11 @@ class TestBatchUserCreation:
 
     def test_create_multiple_users(self, client, admin_token):
         """RED: Test creating multiple users"""
-        emails = [
-            "user1@example.com",
-            "user2@example.com",
-            "user3@example.com"
-        ]
+        emails = ["user1@example.com", "user2@example.com", "user3@example.com"]
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": emails, "on_duplicate": "skip"}
+            json={"emails": emails, "on_duplicate": "skip"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -178,7 +175,7 @@ class TestBatchUserCreation:
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": ["complex@example.com"], "on_duplicate": "skip"}
+            json={"emails": ["complex@example.com"], "on_duplicate": "skip"},
         )
         password = response.json()["success"][0]["password"]
 
@@ -210,10 +207,10 @@ class TestDuplicateHandling:
                 "emails": [
                     "duplicate@example.com",
                     "unique@example.com",
-                    "duplicate@example.com"  # Same as first
+                    "duplicate@example.com",  # Same as first
                 ],
-                "on_duplicate": "skip"
-            }
+                "on_duplicate": "skip",
+            },
         )
         assert response.status_code == 200
         data = response.json()
@@ -227,14 +224,14 @@ class TestDuplicateHandling:
         client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": [email], "on_duplicate": "skip"}
+            json={"emails": [email], "on_duplicate": "skip"},
         )
 
         # Try to create same user again with skip
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": [email], "on_duplicate": "skip"}
+            json={"emails": [email], "on_duplicate": "skip"},
         )
         data = response.json()
         assert len(data["existing"]) == 1
@@ -248,7 +245,7 @@ class TestDuplicateHandling:
         first_response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": [email], "on_duplicate": "skip"}
+            json={"emails": [email], "on_duplicate": "skip"},
         )
         first_password = first_response.json()["success"][0]["password"]
 
@@ -256,7 +253,7 @@ class TestDuplicateHandling:
         second_response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": [email], "on_duplicate": "reset_password"}
+            json={"emails": [email], "on_duplicate": "reset_password"},
         )
         data = second_response.json()
         assert len(data["existing"]) == 1
@@ -277,7 +274,7 @@ class TestEdgeCases:
             json={
                 "emails": ["valid@example.com", "invalid-email", "another@valid.com"],
                 "on_duplicate": "skip",
-            }
+            },
         )
         data = response.json()
         assert len(data["success"]) == 2
@@ -290,7 +287,7 @@ class TestEdgeCases:
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": [], "on_duplicate": "skip"}
+            json={"emails": [], "on_duplicate": "skip"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -304,7 +301,7 @@ class TestEdgeCases:
         response = client.post(
             "/api/admin/users/batch",
             headers={"Authorization": f"Bearer {admin_token}"},
-            json={"emails": [email], "on_duplicate": "skip"}
+            json={"emails": [email], "on_duplicate": "skip"},
         )
 
         # Verify from API response
@@ -314,6 +311,7 @@ class TestEdgeCases:
 
         # Get user info to verify role
         from app.core.database import get_session
+
         session = next(get_session())
         user = session.exec(select(User).where(User.email == email)).first()
         assert user is not None

@@ -44,6 +44,17 @@ export default function LoginPage() {
       console.log('Login successful:', response);
 
       // authAPI already stores token and user in localStorage
+      // Check if user must change password
+      const userData = localStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        if (user.must_change_password) {
+          // Redirect to change password page
+          window.location.href = '/change-password';
+          return;
+        }
+      }
+
       // Redirect to dashboard after successful login
       window.location.href = '/dashboard';
     } catch (err) {
@@ -135,8 +146,8 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center">
-            <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              還沒有帳號？立即註冊
+            <a href="/forgot-password" className="text-sm text-gray-600 hover:text-gray-900">
+              忘記密碼？
             </a>
           </div>
         </form>

@@ -38,6 +38,13 @@ export default function DashboardPage() {
 
       try {
         const userData = JSON.parse(userStr);
+
+        // Check if user must change password
+        if (userData.must_change_password) {
+          router.push('/change-password');
+          return false;
+        }
+
         // Check if user is counselor
         if (!userData.roles?.includes('counselor') && !userData.roles?.includes('admin')) {
           router.push('/');

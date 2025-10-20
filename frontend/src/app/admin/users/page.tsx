@@ -61,7 +61,7 @@ export default function AdminUsersPage() {
 
   const handleSubmit = async () => {
     if (valid.length === 0) {
-      setError('請至少輸入一個有效的 Email');
+      setError('請輸入有效的 Email');
       return;
     }
 
@@ -69,28 +69,34 @@ export default function AdminUsersPage() {
     setError(null);
 
     try {
-      // Deduplicate
-      const seen = new Set();
-      const uniqueUsers = parsed.filter((user) => {
-        if (seen.has(user.email)) return false;
-        seen.add(user.email);
-        return true;
-      });
+      // Single user input
+      const user = parsed[0];
+      if (!user.password || user.password.length < 8) {
+        setError('密碼至少需要 8 個字元');
+        setLoading(false);
+        return;
+      }
 
       const response = await adminAPI.batchCreateUsers({
-        users: uniqueUsers.map((u) => ({
-          email: u.email,
-          password: u.password,
-          name: u.name,
-          roles: u.roles,
-        })),
-        on_duplicate: duplicateAction,
+        users: [
+          {
+            email: user.email,
+            password: user.password,
+            name: user.name,
+            roles: user.roles,
+          },
+        ],
+        on_duplicate: 'reset_password', // Always overwrite for single user
       });
 
       setResults(response);
+      // Clear form on success
+      if (response.success.length > 0 || response.existing.length > 0) {
+        setEmailList('');
+      }
     } catch (err: any) {
       console.error('Batch create error:', err);
-      setError(err.response?.data?.detail || 'Failed to create users');
+      setError(err.response?.data?.detail || '建立/更新失敗');
     } finally {
       setLoading(false);
     }
@@ -344,56 +350,61 @@ export default function AdminUsersPage() {
       {/* Divider */}
       <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-      {/* CSV Format Input */}
+      {/* Single User Quick Add */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            CSV 格式輸入（含帳號密碼）
+            快速新增/重設單一用戶
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            輸入格式：email,password,name,roles （每行一組，支援覆蓋已存在帳號）
+            輸入單一帳號密碼，方便臨時新增或重設密碼
           </p>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            帳號清單 （CSV 格式）
-          </label>
-          <textarea
-            value={emailList}
-            onChange={(e) => setEmailList(e.target.value)}
-            placeholder="user1@example.com,password123,User 1,counselor&#10;user2@example.com,password456,User 2,counselor&#10;user3@example.com,password789,,&#10;user4@example.com,mypass123,,"
-            className="w-full h-48 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white font-mono text-sm"
-          />
 
-          {/* Validation Info */}
-          <div className="mt-2 flex flex-wrap gap-4 text-sm">
-            <span className="text-green-600 dark:text-green-400">
-              ✓ {valid.length} 個有效 Email
-            </span>
-            {invalid.length > 0 && (
-              <span className="text-red-600 dark:text-red-400">✗ {invalid.length} 個無效格式</span>
-            )}
-            {duplicates.length > 0 && (
-              <span className="text-yellow-600 dark:text-yellow-400">
-                ⚠ {duplicates.length} 個重複 Email（將自動去重）
-              </span>
-            )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={emailList.split(',')[0] || ''}
+              onChange={(e) => {
+                const parts = emailList.split(',');
+                parts[0] = e.target.value;
+                setEmailList(parts.join(','));
+              }}
+              placeholder="user@example.com"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              密碼
+            </label>
+            <input
+              type="text"
+              value={emailList.split(',')[1] || ''}
+              onChange={(e) => {
+                const parts = emailList.split(',');
+                parts[1] = e.target.value;
+                setEmailList(parts.join(','));
+              }}
+              placeholder="password123"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            />
           </div>
         </div>
 
-        {/* Duplicate Handling */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            重複 Email 處理方式
-          </label>
-          <select
-            value={duplicateAction}
-            onChange={(e) => setDuplicateAction(e.target.value as 'skip' | 'reset_password')}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-          >
-            <option value="skip">跳過已存在的用戶</option>
-            <option value="reset_password">覆蓋已存在用戶的密碼</option>
-          </select>
+        {/* Validation Info */}
+        <div className="mt-2 flex flex-wrap gap-4 text-sm">
+          {valid.length > 0 && (
+            <span className="text-green-600 dark:text-green-400">✓ Email 格式正確</span>
+          )}
+          {invalid.length > 0 && (
+            <span className="text-red-600 dark:text-red-400">✗ Email 格式錯誤</span>
+          )}
         </div>
 
         {/* Error Display */}
@@ -419,7 +430,7 @@ export default function AdminUsersPage() {
               處理中...
             </>
           ) : (
-            `建立/更新 ${valid.length} 個帳號`
+            '建立/更新用戶'
           )}
         </button>
       </div>

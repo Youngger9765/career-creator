@@ -10,16 +10,18 @@
 
 'use client';
 
-import { useState } from 'react';
-import { Copy, CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
-import { adminAPI, type BatchCreateUserResponse } from '@/lib/admin-api';
+import { useState, useRef } from 'react';
+import { Copy, CheckCircle, XCircle, AlertCircle, Download, Upload, FileText } from 'lucide-react';
+import { adminAPI, type BatchCreateUserResponse, type WhitelistImportResult } from '@/lib/admin-api';
 
 export default function AdminUsersPage() {
   const [emailList, setEmailList] = useState('');
   const [duplicateAction, setDuplicateAction] = useState<'skip' | 'reset_password'>('skip');
   const [results, setResults] = useState<BatchCreateUserResponse | null>(null);
+  const [importResults, setImportResults] = useState<WhitelistImportResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Parse and validate email list
   const parseEmails = (text: string) => {
@@ -66,6 +68,53 @@ export default function AdminUsersPage() {
     navigator.clipboard.writeText(text);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.csv')) {
+      setError('請上傳 CSV 檔案');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setImportResults(null);
+
+    try {
+      const result = await adminAPI.importWhitelist(file);
+      setImportResults(result);
+    } catch (err: any) {
+      console.error('Import whitelist error:', err);
+      setError(err.response?.data?.detail || '檔案匯入失敗');
+    } finally {
+      setLoading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const downloadTemplate = () => {
+    const csv = [
+      ['email', 'name', 'roles'],
+      ['user1@example.com', 'User 1', 'counselor'],
+      ['user2@example.com', 'User 2', 'counselor'],
+      ['user3@example.com', '', ''],
+    ]
+      .map((row) => row.join(','))
+      .join('\n');
+
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'whitelist_template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const downloadCSV = () => {
     if (!results) return;
 
@@ -85,6 +134,24 @@ export default function AdminUsersPage() {
     URL.revokeObjectURL(url);
   };
 
+  const downloadImportCSV = () => {
+    if (!importResults) return;
+
+    const rows = [
+      ['Email', 'Password'],
+      ...importResults.created_users.map((u) => [u.email, u.password]),
+    ];
+
+    const csv = rows.map((row) => row.map((cell) => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `whitelist_passwords_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -93,8 +160,168 @@ export default function AdminUsersPage() {
         <p className="text-gray-600 dark:text-gray-400 mt-2">批次建立 Beta 測試用戶帳號</p>
       </div>
 
+      {/* CSV Import Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              CSV 白名單匯入
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              上傳 CSV 檔案批次建立用戶（自動跳過已存在的 Email）
+            </p>
+          </div>
+          <button
+            onClick={downloadTemplate}
+            className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center gap-2"
+          >
+            <FileText className="w-4 h-4" />
+            下載 CSV 範本
+          </button>
+        </div>
+
+        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            className="hidden"
+            id="csv-upload"
+          />
+          <label
+            htmlFor="csv-upload"
+            className="flex flex-col items-center justify-center cursor-pointer"
+          >
+            <Upload className="w-12 h-12 text-gray-400 mb-3" />
+            <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">
+              點擊上傳 CSV 檔案
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              格式：email, name (選填), roles (選填)
+            </p>
+          </label>
+        </div>
+      </div>
+
+      {/* Import Results */}
+      {importResults && (
+        <div className="space-y-4">
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                <div>
+                  <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+                    {importResults.created}
+                  </p>
+                  <p className="text-sm text-green-700 dark:text-green-300">建立成功</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+                <div>
+                  <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
+                    {importResults.skipped}
+                  </p>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">已跳過</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <XCircle className="w-8 h-8 text-red-600 dark:text-red-400" />
+                <div>
+                  <p className="text-2xl font-bold text-red-900 dark:text-red-100">
+                    {importResults.errors.length}
+                  </p>
+                  <p className="text-sm text-red-700 dark:text-red-300">錯誤</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Download CSV */}
+          {importResults.created_users.length > 0 && (
+            <button
+              onClick={downloadImportCSV}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              下載帳密清單 (CSV)
+            </button>
+          )}
+
+          {/* Created Users */}
+          {importResults.created_users.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                建立成功 ({importResults.created_users.length})
+              </h3>
+              <div className="space-y-3">
+                {importResults.created_users.map((user, index) => (
+                  <div
+                    key={index}
+                    className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-between"
+                  >
+                    <div className="flex-1 font-mono text-sm">
+                      <p className="text-gray-900 dark:text-white font-medium">{user.email}</p>
+                      <p className="text-gray-600 dark:text-gray-400 mt-1">{user.password}</p>
+                    </div>
+                    <button
+                      onClick={() =>
+                        copyToClipboard(`Email: ${user.email}\nPassword: ${user.password}`)
+                      }
+                      className="ml-4 p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors"
+                      title="複製帳密"
+                    >
+                      <Copy className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Errors */}
+          {importResults.errors.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                錯誤 ({importResults.errors.length})
+              </h3>
+              <ul className="space-y-2">
+                {importResults.errors.map((error, index) => (
+                  <li
+                    key={index}
+                    className="text-sm text-red-600 dark:text-red-400 font-mono bg-red-50 dark:bg-red-900/20 p-2 rounded"
+                  >
+                    {error}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Divider */}
+      <div className="border-t border-gray-200 dark:border-gray-700"></div>
+
       {/* Main Form */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            手動輸入 Email
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            直接輸入 Email 列表批次建立用戶
+          </p>
+        </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Email 清單 （每行一個）

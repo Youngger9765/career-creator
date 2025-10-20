@@ -50,12 +50,35 @@ export interface ListUsersResponse {
   total: number;
 }
 
+export interface WhitelistImportResult {
+  total_rows: number;
+  created: number;
+  skipped: number;
+  errors: string[];
+  created_users: { email: string; password: string }[];
+}
+
 export const adminAPI = {
   /**
    * Batch create users from email list
    */
   async batchCreateUsers(data: BatchCreateUserRequest): Promise<BatchCreateUserResponse> {
     const response = await apiClient.post('/api/admin/users/batch', data);
+    return response.data;
+  },
+
+  /**
+   * Import whitelist from CSV file
+   */
+  async importWhitelist(file: File): Promise<WhitelistImportResult> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await apiClient.post('/api/admin/import-whitelist', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 

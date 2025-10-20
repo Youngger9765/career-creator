@@ -12,7 +12,11 @@
 
 import { useState, useRef } from 'react';
 import { Copy, CheckCircle, XCircle, AlertCircle, Download, Upload, FileText } from 'lucide-react';
-import { adminAPI, type BatchCreateUserResponse, type WhitelistImportResult } from '@/lib/admin-api';
+import {
+  adminAPI,
+  type BatchCreateUserResponse,
+  type WhitelistImportResult,
+} from '@/lib/admin-api';
 
 export default function AdminUsersPage() {
   const [emailList, setEmailList] = useState('');
@@ -202,9 +206,7 @@ export default function AdminUsersPage() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              CSV 白名單匯入
-            </h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">CSV 白名單匯入</h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               上傳 CSV 檔案批次建立/更新用戶（格式：email,password，自動覆蓋已存在帳號）
             </p>
@@ -232,12 +234,8 @@ export default function AdminUsersPage() {
             className="flex flex-col items-center justify-center cursor-pointer"
           >
             <Upload className="w-12 h-12 text-gray-400 mb-3" />
-            <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">
-              點擊上傳 CSV 檔案
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              格式：email,password
-            </p>
+            <p className="text-gray-700 dark:text-gray-300 font-medium mb-1">點擊上傳 CSV 檔案</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">格式：email,password</p>
           </label>
         </div>
       </div>

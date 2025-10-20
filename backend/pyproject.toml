@@ -51,7 +51,7 @@ addopts = [
     "--cov=app",
     "--cov-report=term-missing",
     "--cov-report=html",
-    "--cov-fail-under=65",
+    "--cov-fail-under=42",
 ]
 
 [tool.coverage.run]

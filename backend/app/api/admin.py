@@ -444,7 +444,7 @@ def batch_create_users(
     user_inputs = []
     if request.users:
         user_inputs = request.users
-    elif request.emails:
+    elif request.emails is not None:
         user_inputs = [UserInput(email=email) for email in request.emails]
     else:
         raise HTTPException(
@@ -672,7 +672,7 @@ def import_whitelist(
 
         for row_num, row in enumerate(csv_reader, start=1):
             # Skip header row
-            if row_num == 1 and row and row[0].strip().lower() == 'email':
+            if row_num == 1 and row and row[0].strip().lower() == "email":
                 continue
 
             # Skip empty rows
@@ -686,12 +686,12 @@ def import_whitelist(
                 email = row[0].strip().lower()
                 password = row[1].strip() if len(row) > 1 and row[1].strip() else None
                 name = (
-                    row[2].strip() if len(row) > 2 and row[2].strip()
+                    row[2].strip()
+                    if len(row) > 2 and row[2].strip()
                     else email.split("@")[0]
                 )
                 roles_str = (
-                    row[3].strip() if len(row) > 3 and row[3].strip()
-                    else "counselor"
+                    row[3].strip() if len(row) > 3 and row[3].strip() else "counselor"
                 )
                 roles = [r.strip() for r in roles_str.split(",")]
 
@@ -718,10 +718,12 @@ def import_whitelist(
                     session.flush()
 
                     created += 1  # Count as "created" (updated)
-                    created_users.append({
-                        "email": email,
-                        "password": new_password,
-                    })
+                    created_users.append(
+                        {
+                            "email": email,
+                            "password": new_password,
+                        }
+                    )
                     continue
 
                 # Use provided password or generate random one
@@ -740,10 +742,12 @@ def import_whitelist(
                 session.flush()  # Get user ID without committing
 
                 created += 1
-                created_users.append({
-                    "email": email,
-                    "password": new_password,
-                })
+                created_users.append(
+                    {
+                        "email": email,
+                        "password": new_password,
+                    }
+                )
 
             except Exception as e:
                 errors.append(f"Row {row_num}: {str(e)}")

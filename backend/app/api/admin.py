@@ -641,12 +641,16 @@ def import_whitelist(
 
     CSV format:
     - Column 1: Email (required)
-    - Column 2: Name (optional, defaults to email prefix)
-    - Column 3: Roles (optional, defaults to "counselor", comma-separated)
+    - Column 2: Password (optional, auto-generates if empty)
+    - Column 3: Name (optional, defaults to email prefix)
+    - Column 4: Roles (optional, defaults to "counselor", comma-separated)
+
+    First row can be a header (email,password,...) which will be skipped.
 
     Returns:
-    - List of created users with their one-time passwords
-    - Users must change password on first login
+    - List of created users with their passwords
+    - Users with provided passwords: no forced change
+    - Users with auto-generated passwords: must change on first login
     - Skips existing emails
     """
     if not file.filename.endswith(".csv"):
@@ -667,6 +671,10 @@ def import_whitelist(
         created_users = []
 
         for row_num, row in enumerate(csv_reader, start=1):
+            # Skip header row
+            if row_num == 1 and row and row[0].strip().lower() == 'email':
+                continue
+
             # Skip empty rows
             if not row or not row[0].strip():
                 continue
@@ -674,14 +682,15 @@ def import_whitelist(
             total_rows += 1
 
             try:
-                # Parse row
+                # Parse row: email, password, name (optional), roles (optional)
                 email = row[0].strip().lower()
+                password = row[1].strip() if len(row) > 1 and row[1].strip() else None
                 name = (
-                    row[1].strip() if len(row) > 1 and row[1].strip()
+                    row[2].strip() if len(row) > 2 and row[2].strip()
                     else email.split("@")[0]
                 )
                 roles_str = (
-                    row[2].strip() if len(row) > 2 and row[2].strip()
+                    row[3].strip() if len(row) > 3 and row[3].strip()
                     else "counselor"
                 )
                 roles = [r.strip() for r in roles_str.split(",")]
@@ -700,15 +709,17 @@ def import_whitelist(
                     skipped += 1
                     continue
 
-                # Create user with random password
-                new_password = generate_random_password()
+                # Use provided password or generate random one
+                new_password = password or generate_random_password()
                 new_user = User(
                     email=email,
                     name=name,
                     hashed_password=get_password_hash(new_password),
                     roles=roles,
                     is_active=True,
-                    must_change_password=True,  # Force password change
+                    must_change_password=(
+                        False if password else True
+                    ),  # Don't force change if password provided
                 )
                 session.add(new_user)
                 session.flush()  # Get user ID without committing

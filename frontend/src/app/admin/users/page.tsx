@@ -23,25 +23,45 @@ export default function AdminUsersPage() {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Parse and validate email list
-  const parseEmails = (text: string) => {
+  // Parse CSV format: email,password,name,roles
+  const parseCSV = (text: string) => {
     const lines = text
       .split('\n')
       .map((l) => l.trim())
       .filter(Boolean);
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const valid = lines.filter((l) => emailRegex.test(l));
-    const invalid = lines.filter((l) => !emailRegex.test(l));
-    const duplicates = valid.filter((e, i) => valid.indexOf(e) !== i);
 
-    return { valid, invalid, duplicates: [...new Set(duplicates)] };
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const parsed: { email: string; password?: string; name?: string; roles?: string[] }[] = [];
+    const invalid: string[] = [];
+
+    for (const line of lines) {
+      const parts = line.split(',').map((p) => p.trim());
+      const email = parts[0];
+
+      if (!emailRegex.test(email)) {
+        invalid.push(line);
+        continue;
+      }
+
+      const password = parts[1] || undefined;
+      const name = parts[2] || undefined;
+      const rolesStr = parts[3] || undefined;
+      const roles = rolesStr ? rolesStr.split(';').map((r) => r.trim()) : undefined;
+
+      parsed.push({ email, password, name, roles });
+    }
+
+    const emails = parsed.map((p) => p.email);
+    const duplicates = emails.filter((e, i) => emails.indexOf(e) !== i);
+
+    return { parsed, valid: emails, invalid, duplicates: [...new Set(duplicates)] };
   };
 
-  const { valid, invalid, duplicates } = parseEmails(emailList);
+  const { parsed, valid, invalid, duplicates } = parseCSV(emailList);
 
   const handleSubmit = async () => {
     if (valid.length === 0) {
-      setError('Please enter at least one valid email address');
+      setError('請至少輸入一個有效的 Email');
       return;
     }
 
@@ -49,9 +69,21 @@ export default function AdminUsersPage() {
     setError(null);
 
     try {
-      const uniqueEmails = [...new Set(valid)];
+      // Deduplicate
+      const seen = new Set();
+      const uniqueUsers = parsed.filter((user) => {
+        if (seen.has(user.email)) return false;
+        seen.add(user.email);
+        return true;
+      });
+
       const response = await adminAPI.batchCreateUsers({
-        emails: uniqueEmails,
+        users: uniqueUsers.map((u) => ({
+          email: u.email,
+          password: u.password,
+          name: u.name,
+          roles: u.roles,
+        })),
         on_duplicate: duplicateAction,
       });
 
@@ -312,24 +344,24 @@ export default function AdminUsersPage() {
       {/* Divider */}
       <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-      {/* Main Form */}
+      {/* CSV Format Input */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 space-y-4">
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            手動輸入 Email
+            CSV 格式輸入（含帳號密碼）
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            直接輸入 Email 列表批次建立用戶
+            輸入格式：email,password,name,roles （每行一組，支援覆蓋已存在帳號）
           </p>
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Email 清單 （每行一個）
+            帳號清單 （CSV 格式）
           </label>
           <textarea
             value={emailList}
             onChange={(e) => setEmailList(e.target.value)}
-            placeholder="user1@example.com&#10;user2@example.com&#10;user3@example.com"
+            placeholder="user1@example.com,password123,User 1,counselor&#10;user2@example.com,password456,User 2,counselor&#10;user3@example.com,password789,,&#10;user4@example.com,mypass123,,"
             className="w-full h-48 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white font-mono text-sm"
           />
 
@@ -360,7 +392,7 @@ export default function AdminUsersPage() {
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
           >
             <option value="skip">跳過已存在的用戶</option>
-            <option value="reset_password">重設已存在用戶的密碼</option>
+            <option value="reset_password">覆蓋已存在用戶的密碼</option>
           </select>
         </div>
 
@@ -384,10 +416,10 @@ export default function AdminUsersPage() {
           {loading ? (
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              建立中...
+              處理中...
             </>
           ) : (
-            `建立 ${valid.length} 個帳號`
+            `建立/更新 ${valid.length} 個帳號`
           )}
         </button>
       </div>

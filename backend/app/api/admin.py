@@ -328,17 +328,27 @@ def clear_table(
 # ========================================
 
 
+class UserInput(BaseModel):
+    """Single user input with optional password and metadata"""
+
+    email: str
+    password: str | None = None
+    name: str | None = None
+    roles: List[str] | None = None
+
+
 class BatchCreateRequest(BaseModel):
     """Request model for batch user creation"""
 
-    emails: List[str]
+    emails: List[str] | None = None  # Legacy: plain email list
+    users: List[UserInput] | None = None  # New: full user data with passwords
     on_duplicate: Literal["skip", "reset_password"] = "skip"
 
     @field_validator("emails")
     @classmethod
     def validate_emails(cls, v):
         """Validate email format"""
-        if not isinstance(v, list):
+        if v is not None and not isinstance(v, list):
             raise ValueError("emails must be a list")
         return v
 
@@ -413,29 +423,56 @@ def batch_create_users(
     session: Session = Depends(get_session),
 ):
     """
-    Batch create users from email list (Admin only)
+    Batch create users from email list or full user data (Admin only)
+
+    Supports two input formats:
+    1. emails: List of email strings (legacy, auto-generates passwords)
+    2. users: List of {email, password, name, roles} objects (new format)
 
     Creates users with:
-    - counselor role by default
-    - randomly generated secure passwords
-    - email prefix as username
+    - counselor role by default (if not specified)
+    - randomly generated secure passwords (if not provided)
+    - email prefix as username (if name not provided)
 
     Handles duplicates according to on_duplicate setting:
     - skip: Ignore existing users
-    - reset_password: Generate new password for existing users
+    - reset_password: Update password for existing users
     """
     results = {"success": [], "existing": [], "failed": []}
 
-    # Deduplicate input list
-    unique_emails = list(dict.fromkeys(request.emails))
+    # Normalize input: convert emails list to users list
+    user_inputs = []
+    if request.users:
+        user_inputs = request.users
+    elif request.emails:
+        user_inputs = [UserInput(email=email) for email in request.emails]
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either 'emails' or 'users' must be provided",
+        )
 
-    for email in unique_emails:
-        email = email.strip().lower()
+    # Deduplicate by email
+    seen = set()
+    unique_users = []
+    for user_input in user_inputs:
+        email = user_input.email.strip().lower()
+        if email not in seen:
+            seen.add(email)
+            unique_users.append(user_input)
+
+    for user_input in unique_users:
+        email = user_input.email.strip().lower()
 
         # Validate email format
         if not is_valid_email(email):
             results["failed"].append({"email": email, "reason": "Invalid email format"})
             continue
+
+        # Extract user data
+        provided_password = user_input.password
+        user_name = user_input.name or email.split("@")[0]
+        user_roles = user_input.roles or ["counselor"]
 
         # Check if user already exists
         existing_user = session.exec(select(User).where(User.email == email)).first()
@@ -457,9 +494,14 @@ def batch_create_users(
                 continue
 
             elif request.on_duplicate == "reset_password":
-                # Reset password for existing user
-                new_password = generate_random_password()
+                # Update existing user's password and metadata
+                new_password = provided_password or generate_random_password()
                 existing_user.hashed_password = get_password_hash(new_password)
+                existing_user.name = user_name
+                existing_user.roles = user_roles
+                existing_user.must_change_password = (
+                    False if provided_password else True
+                )  # Don't force change if password provided
                 session.add(existing_user)
 
                 results["existing"].append(
@@ -473,14 +515,16 @@ def batch_create_users(
 
         # Create new user
         try:
-            new_password = generate_random_password()
+            new_password = provided_password or generate_random_password()
             new_user = User(
                 email=email,
-                name=email.split("@")[0],  # Use email prefix as name
+                name=user_name,
                 hashed_password=get_password_hash(new_password),
-                roles=["counselor"],
+                roles=user_roles,
                 is_active=True,
-                must_change_password=True,  # Force password change on first login
+                must_change_password=(
+                    False if provided_password else True
+                ),  # Only force change if auto-generated
             )
             session.add(new_user)
 

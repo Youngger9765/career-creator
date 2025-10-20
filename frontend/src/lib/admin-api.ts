@@ -7,8 +7,16 @@
 
 import { apiClient } from './api';
 
+export interface UserInput {
+  email: string;
+  password?: string;
+  name?: string;
+  roles?: string[];
+}
+
 export interface BatchCreateUserRequest {
-  emails: string[];
+  emails?: string[]; // Legacy
+  users?: UserInput[]; // New format with passwords
   on_duplicate: 'skip' | 'reset_password';
 }
 

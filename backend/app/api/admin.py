@@ -3,27 +3,105 @@ Admin API endpoints for database management
 管理員 API 端點 - 資料庫管理
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Literal
+import secrets
+import string
+import re
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import inspect, text
-from sqlmodel import Session
+from sqlmodel import Session, select
+from pydantic import BaseModel, field_validator
 
-from app.core.auth import get_current_user_from_token
+from app.core.auth import get_current_user_from_token, get_password_hash
 from app.core.database import engine, get_session
 from app.core.seeds import run_all_seeds, run_test_seeds
+from app.models.user import User
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 
-def require_admin(current_user: dict = Depends(get_current_user_from_token)) -> dict:
-    """Require admin role for access"""
-    if "admin" not in (current_user.get("roles") or []):
+def require_admin(
+    current_user: dict = Depends(get_current_user_from_token),
+    session: Session = Depends(get_session),
+) -> dict:
+    """
+    Require admin role for access
+
+    Verifies admin role from database (not just JWT token)
+    to ensure real-time permission changes are enforced.
+
+    Falls back to demo accounts if user not found in database.
+    """
+    from uuid import UUID
+    from app.core.auth import DEMO_ACCOUNTS
+
+    # Get user from database to verify current roles
+    user_id = current_user.get("user_id")
+    if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token: missing user ID",
         )
-    return current_user
+
+    try:
+        # Query database for current user roles
+        db_user = session.exec(select(User).where(User.id == UUID(user_id))).first()
+
+        if db_user:
+            # User found in database - verify from DB
+            if not db_user.is_active:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="User account is inactive",
+                )
+
+            # Check admin role from database (not JWT token)
+            if "admin" not in db_user.roles:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Admin access required",
+                )
+
+            # Return verified user info from database
+            return {
+                "user_id": str(db_user.id),
+                "email": db_user.email,
+                "roles": db_user.roles,
+                "name": db_user.name,
+            }
+        else:
+            # User not in database - check if it's a demo account
+            demo_account = next(
+                (acc for acc in DEMO_ACCOUNTS if acc["id"] == user_id), None
+            )
+
+            if demo_account:
+                # Verify admin role for demo account
+                if "admin" not in demo_account["roles"]:
+                    raise HTTPException(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        detail="Admin access required",
+                    )
+
+                return {
+                    "user_id": demo_account["id"],
+                    "email": demo_account["email"],
+                    "roles": demo_account["roles"],
+                    "name": demo_account["name"],
+                }
+            else:
+                # Neither database user nor demo account
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="User not found",
+                )
+
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID format",
+        )
 
 
 @router.get("/db/status")
@@ -78,8 +156,8 @@ def list_tables(
         for table in tables:
             # Get row count for each table
             count_result = db.execute(
-                text(f"SELECT COUNT(*) FROM {table}")
-            )  # nosec B608
+                text(f"SELECT COUNT(*) FROM {table}")  # nosec B608
+            )
             row_count = count_result.scalar()
 
             # Get column count
@@ -121,8 +199,8 @@ def get_table_data(
 
         # Get total count
         count_result = db.execute(
-            text(f"SELECT COUNT(*) FROM {table_name}")
-        )  # nosec B608
+            text(f"SELECT COUNT(*) FROM {table_name}")  # nosec B608
+        )
         total_count = count_result.scalar()
 
         # Get columns
@@ -132,8 +210,8 @@ def get_table_data(
         # Get data with pagination
         data_result = db.execute(
             text(
-                f"SELECT * FROM {table_name} LIMIT :limit OFFSET :offset"
-            ),  # nosec B608
+                f"SELECT * FROM {table_name} LIMIT :limit OFFSET :offset"  # nosec B608
+            ),
             {"limit": limit, "offset": offset},
         )
         rows = data_result.fetchall()
@@ -240,3 +318,255 @@ def clear_table(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to clear table: {str(e)}",
         )
+
+
+# ========================================
+# User Management Endpoints
+# ========================================
+
+
+class BatchCreateRequest(BaseModel):
+    """Request model for batch user creation"""
+
+    emails: List[str]
+    on_duplicate: Literal["skip", "reset_password"] = "skip"
+
+    @field_validator("emails")
+    @classmethod
+    def validate_emails(cls, v):
+        """Validate email format"""
+        if not isinstance(v, list):
+            raise ValueError("emails must be a list")
+        return v
+
+
+class UserCreatedResponse(BaseModel):
+    """Response for successfully created user"""
+
+    email: str
+    password: str
+    created: bool = True
+
+
+class UserExistingResponse(BaseModel):
+    """Response for existing user"""
+
+    email: str
+    password: str | None = None
+    created_at: str | None = None
+    action: Literal["skipped", "password_reset"]
+
+
+class UserFailedResponse(BaseModel):
+    """Response for failed user creation"""
+
+    email: str
+    reason: str
+
+
+class BatchCreateResponse(BaseModel):
+    """Response model for batch user creation"""
+
+    success: List[UserCreatedResponse]
+    existing: List[UserExistingResponse]
+    failed: List[UserFailedResponse]
+
+
+def is_valid_email(email: str) -> bool:
+    """Validate email format using regex"""
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    return bool(re.match(pattern, email))
+
+
+def generate_random_password(length: int = 12) -> str:
+    """
+    Generate random password with guaranteed complexity
+
+    Requirements:
+    - At least one uppercase letter
+    - At least one lowercase letter
+    - At least one digit
+    - At least one special character
+    """
+    chars = string.ascii_letters + string.digits + "!@#$%^&*"
+
+    while True:
+        password = "".join(secrets.choice(chars) for _ in range(length))
+
+        # Check all requirements
+        has_lower = any(c.islower() for c in password)
+        has_upper = any(c.isupper() for c in password)
+        has_digit = any(c.isdigit() for c in password)
+        has_special = any(c in "!@#$%^&*" for c in password)
+
+        if has_lower and has_upper and has_digit and has_special:
+            return password
+
+
+@router.post("/users/batch", response_model=BatchCreateResponse)
+def batch_create_users(
+    request: BatchCreateRequest,
+    _: dict = Depends(require_admin),
+    session: Session = Depends(get_session),
+):
+    """
+    Batch create users from email list (Admin only)
+
+    Creates users with:
+    - counselor role by default
+    - randomly generated secure passwords
+    - email prefix as username
+
+    Handles duplicates according to on_duplicate setting:
+    - skip: Ignore existing users
+    - reset_password: Generate new password for existing users
+    """
+    results = {"success": [], "existing": [], "failed": []}
+
+    # Deduplicate input list
+    unique_emails = list(dict.fromkeys(request.emails))
+
+    for email in unique_emails:
+        email = email.strip().lower()
+
+        # Validate email format
+        if not is_valid_email(email):
+            results["failed"].append({"email": email, "reason": "Invalid email format"})
+            continue
+
+        # Check if user already exists
+        existing_user = session.exec(select(User).where(User.email == email)).first()
+
+        if existing_user:
+            if request.on_duplicate == "skip":
+                # Skip existing user
+                results["existing"].append(
+                    {
+                        "email": email,
+                        "created_at": (
+                            existing_user.created_at.isoformat()
+                            if existing_user.created_at
+                            else None
+                        ),
+                        "action": "skipped",
+                    }
+                )
+                continue
+
+            elif request.on_duplicate == "reset_password":
+                # Reset password for existing user
+                new_password = generate_random_password()
+                existing_user.hashed_password = get_password_hash(new_password)
+                session.add(existing_user)
+
+                results["existing"].append(
+                    {
+                        "email": email,
+                        "password": new_password,
+                        "action": "password_reset",
+                    }
+                )
+                continue
+
+        # Create new user
+        try:
+            new_password = generate_random_password()
+            new_user = User(
+                email=email,
+                name=email.split("@")[0],  # Use email prefix as name
+                hashed_password=get_password_hash(new_password),
+                roles=["counselor"],
+                is_active=True,
+            )
+            session.add(new_user)
+
+            results["success"].append(
+                {"email": email, "password": new_password, "created": True}
+            )
+        except Exception as e:
+            results["failed"].append(
+                {"email": email, "reason": f"Database error: {str(e)}"}
+            )
+
+    # Commit all changes
+    try:
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to commit changes: {str(e)}",
+        )
+
+    return results
+
+
+@router.get("/users")
+def list_all_users(
+    _: dict = Depends(require_admin),
+    session: Session = Depends(get_session),
+    skip: int = 0,
+    limit: int = 100,
+) -> Dict[str, Any]:
+    """
+    List all users (Admin only)
+
+    Returns paginated list of users with basic info.
+    """
+    users = session.exec(select(User).offset(skip).limit(limit)).all()
+
+    return {
+        "users": [
+            {
+                "id": str(user.id),
+                "email": user.email,
+                "name": user.name,
+                "roles": user.roles,
+                "is_active": user.is_active,
+                "created_at": (
+                    user.created_at.isoformat() if user.created_at else None
+                ),
+            }
+            for user in users
+        ],
+        "total": len(users),
+    }
+
+
+@router.put("/users/{user_id}/password")
+def reset_user_password(
+    user_id: str,
+    _: dict = Depends(require_admin),
+    session: Session = Depends(get_session),
+) -> Dict[str, Any]:
+    """
+    Reset user password (Admin only)
+
+    Generates new random password for specified user.
+    """
+    from uuid import UUID
+
+    try:
+        user_uuid = UUID(user_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid user ID format"
+        )
+
+    user = session.exec(select(User).where(User.id == user_uuid)).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    new_password = generate_random_password()
+    user.hashed_password = get_password_hash(new_password)
+    session.add(user)
+    session.commit()
+
+    return {
+        "email": user.email,
+        "password": new_password,
+        "reset_at": user.updated_at.isoformat() if user.updated_at else None,
+    }

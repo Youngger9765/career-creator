@@ -136,10 +136,10 @@ export default function AdminUsersPage() {
 
   const downloadTemplate = () => {
     const csv = [
-      ['email', 'name', 'roles'],
-      ['user1@example.com', 'User 1', 'counselor'],
-      ['user2@example.com', 'User 2', 'counselor'],
-      ['user3@example.com', '', ''],
+      ['email', 'password'],
+      ['user1@example.com', 'password123'],
+      ['user2@example.com', 'password456'],
+      ['user3@example.com', 'password789'],
     ]
       .map((row) => row.join(','))
       .join('\n');
@@ -206,7 +206,7 @@ export default function AdminUsersPage() {
               CSV 白名單匯入
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              上傳 CSV 檔案批次建立用戶（自動跳過已存在的 Email）
+              上傳 CSV 檔案批次建立用戶（格式：email,password）
             </p>
           </div>
           <button
@@ -236,7 +236,7 @@ export default function AdminUsersPage() {
               點擊上傳 CSV 檔案
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              格式：email, name (選填), roles (選填)
+              格式：email,password
             </p>
           </label>
         </div>

@@ -666,6 +666,26 @@
    - 替換動態 Tailwind class 為 inline style (CSS Grid)
    - 解決 sidebar 無法捲動的 bug
 
+#### Week 11 完成項目 (2025-10-18 ~ 10-21)
+
+**完成功能：**
+
+1. **白名單認證系統** ✅ (2025-10-18 ~ 10-21)
+   - ✅ 管理員後台介面（用戶列表、密碼重設）
+   - ✅ CSV 批量匯入用戶（支援自訂密碼、自動覆蓋）
+   - ✅ 單一用戶快速新增表單
+   - ✅ 強制修改密碼機制（must_change_password 欄位）
+   - ✅ 忘記/重設密碼流程（24小時過期 Token）
+   - ✅ 防止 Email 列舉攻擊的安全設計
+   - ✅ 前端認證頁面（change-password, forgot-password, reset-password）
+   - ✅ TDD 測試修復與事務隔離
+   - ✅ 隱藏公開註冊入口（白名單制）
+
+2. **資料庫 Schema 更新** ✅
+   - password_reset_tokens 表（Token 管理）
+   - users.must_change_password 欄位（安全標記）
+   - Alembic Migration 完成
+
 ### 第3個月：Beta 封測準備 (2025-11-01 ~ 11-30)
 
 > **目標**：11-12 月上線 Beta 測試，開放職涯諮詢師使用
@@ -679,20 +699,27 @@
    - ✅ 移除自動平衡 (commit 2269cd2)
    - ✅ 每張牌卡獨立設定 (commit 2269cd2)
 
-2. **白名單登入制** ⚠️
-   - KM 提供名單 → Young 建帳號
-   - 無註冊/忘密碼功能
-   - 負載測試：50 人同時上線
+2. **白名單登入制** ✅ (2025-10-21 完成)
+   - ✅ 管理員後台建立用戶功能
+   - ✅ CSV 批量匯入 + 單一快速新增
+   - ✅ 強制修改密碼 + 忘記/重設密碼
+   - ⚠️ 負載測試：50 人同時上線（待執行）
 
 3. **卡牌上架與測試** ⚠️
-   - 真實牌卡內容完整上架
+   - 真實牌卡內容完整上架（等 Hannah 提供）
    - 三版介面實作（小/中/大）
    - 內部測試驗證
 
-4. **Production 環境** ⚠️
-   - Staging → Production 推送流程
-   - 資料庫 Migration
-   - 監控與錯誤追蹤
+4. **Production 環境建置** ⚠️ (下週優先)
+   - ⚠️ 公司 GCP 環境建立（Career 360 Project）
+   - ⚠️ Cloud Run Service 部署（frontend + backend）
+   - ⚠️ Supabase Production Database 設定
+   - ⚠️ GCS Bucket 配置（screenshot storage）
+   - ⚠️ GitHub Actions CD Pipeline（自動部署至 Production）
+   - ⚠️ 環境變數與 Secret 管理
+   - ⚠️ 資料庫 Migration 流程驗證
+   - ⚠️ 監控與錯誤追蹤（Cloud Logging）
+   - ⚠️ 負載測試與效能調校
 
 **❌ 不納入第一階段：**
 
@@ -746,6 +773,11 @@
 
 ## 📝 版本紀錄
 
+- **v4.8** (2025-10-21): 更新 Week 11 完成進度與 Production 環境規劃
+  - ✅ 白名單認證系統完整實作（15 commits）
+  - ✅ 管理員後台、CSV 匯入、密碼重設機制
+  - ⚠️ 新增 Production 環境建置詳細規劃（公司 GCP）
+  - 更新 Beta 測試準備進度
 - **v4.7** (2025-10-17): 更新 Week 10 完成進度
   - ✅ 籌碼系統改版完整實作（commit 2269cd2）
   - ✅ Sidebar 捲動與 Grid 佈局修復（commit 40c7f39）

@@ -10,16 +10,65 @@ Following TDD approach:
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import select
+from sqlmodel import Session, select
 from app.main import app
 from app.models.user import User
 from app.core.auth import create_access_token
+from app.core.database import engine, get_session
+
+
+@pytest.fixture(scope="function")
+def db_session():
+    """
+    Database session fixture with transaction rollback
+    Each test runs in isolated transaction that gets rolled back
+    This ensures tests don't pollute the database
+    """
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = Session(bind=connection)
+
+    # Clean up any existing test users before test runs
+    test_emails = [
+        "newuser1@example.com",
+        "user1@example.com",
+        "user2@example.com",
+        "user3@example.com",
+        "duplicate@example.com",
+        "unique@example.com",
+        "invalid-email",
+        "roletest@example.com",
+        "complex@example.com",
+        "existing@example.com",
+        "valid@example.com",
+        "another@valid.com",
+        "reset@example.com",
+    ]
+    for email in test_emails:
+        existing = session.exec(select(User).where(User.email == email)).first()
+        if existing:
+            session.delete(existing)
+    session.commit()
+
+    yield session
+
+    session.close()
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture
-def client():
-    """Test client fixture"""
-    return TestClient(app)
+def client(db_session):
+    """Test client fixture with database session override"""
+    def override_get_session():
+        yield db_session
+
+    app.dependency_overrides[get_session] = override_get_session
+    test_client = TestClient(app)
+
+    yield test_client
+
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

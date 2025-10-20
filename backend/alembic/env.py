@@ -9,13 +9,14 @@ from alembic import context
 # Add the app directory to sys.path to import our models
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel  # noqa: E402
+from app.core.config import settings  # noqa: E402
 
 # Import models for Alembic auto-generation
-import app.models.client  # noqa: F401
-import app.models.room  # noqa: F401
-import app.models.user  # noqa: F401
-from app.core.config import settings
+import app.models.client  # noqa: E402, F401
+import app.models.password_reset  # noqa: E402, F401
+import app.models.room  # noqa: E402, F401
+import app.models.user  # noqa: E402, F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -3,12 +3,14 @@ Admin API endpoints for database management
 管理員 API 端點 - 資料庫管理
 """
 
+import csv
+import io
 import re
 import secrets
 import string
 from typing import Any, Dict, List, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from pydantic import BaseModel, field_validator
 from sqlalchemy import inspect, text
 from sqlmodel import Session, select
@@ -572,3 +574,126 @@ def reset_user_password(
         "password": new_password,
         "reset_at": user.updated_at.isoformat() if user.updated_at else None,
     }
+
+
+class WhitelistImportResult(BaseModel):
+    """Result of whitelist import operation"""
+
+    total_rows: int
+    created: int
+    skipped: int
+    errors: List[str]
+    created_users: List[Dict[str, str]]  # email, password pairs
+
+
+@router.post("/import-whitelist", response_model=WhitelistImportResult)
+def import_whitelist(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(require_admin),
+    session: Session = Depends(get_session),
+):
+    """
+    Import whitelist users from CSV file
+
+    CSV format:
+    - Column 1: Email (required)
+    - Column 2: Name (optional, defaults to email prefix)
+    - Column 3: Roles (optional, defaults to "counselor", comma-separated)
+
+    Returns:
+    - List of created users with their one-time passwords
+    - Users must change password on first login
+    - Skips existing emails
+    """
+    if not file.filename.endswith(".csv"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only CSV files are supported",
+        )
+
+    try:
+        # Read CSV content
+        contents = file.file.read().decode("utf-8-sig")  # Handle BOM
+        csv_reader = csv.reader(io.StringIO(contents))
+
+        total_rows = 0
+        created = 0
+        skipped = 0
+        errors = []
+        created_users = []
+
+        for row_num, row in enumerate(csv_reader, start=1):
+            # Skip empty rows
+            if not row or not row[0].strip():
+                continue
+
+            total_rows += 1
+
+            try:
+                # Parse row
+                email = row[0].strip().lower()
+                name = (
+                    row[1].strip() if len(row) > 1 and row[1].strip()
+                    else email.split("@")[0]
+                )
+                roles_str = (
+                    row[2].strip() if len(row) > 2 and row[2].strip()
+                    else "counselor"
+                )
+                roles = [r.strip() for r in roles_str.split(",")]
+
+                # Validate email format
+                if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+                    errors.append(f"Row {row_num}: Invalid email format '{email}'")
+                    continue
+
+                # Check if user exists
+                existing_user = session.exec(
+                    select(User).where(User.email == email)
+                ).first()
+
+                if existing_user:
+                    skipped += 1
+                    continue
+
+                # Create user with random password
+                new_password = generate_random_password()
+                new_user = User(
+                    email=email,
+                    name=name,
+                    hashed_password=get_password_hash(new_password),
+                    roles=roles,
+                    is_active=True,
+                    must_change_password=True,  # Force password change
+                )
+                session.add(new_user)
+                session.flush()  # Get user ID without committing
+
+                created += 1
+                created_users.append({
+                    "email": email,
+                    "password": new_password,
+                })
+
+            except Exception as e:
+                errors.append(f"Row {row_num}: {str(e)}")
+                continue
+
+        # Commit all changes
+        session.commit()
+
+        return WhitelistImportResult(
+            total_rows=total_rows,
+            created=created,
+            skipped=skipped,
+            errors=errors,
+            created_users=created_users,
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to process CSV file: {str(e)}",
+        )
+    finally:
+        file.file.close()

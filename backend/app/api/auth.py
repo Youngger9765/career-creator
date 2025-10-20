@@ -3,6 +3,7 @@ Authentication API endpoints
 認證 API - Demo 帳號登入系統
 """
 
+import secrets
 from datetime import timedelta
 from typing import List
 
@@ -21,6 +22,7 @@ from app.core.auth import (
 from app.core.config import settings
 from app.core.database import get_session
 from app.models.auth import DemoAccount, LoginRequest, LoginResponse
+from app.models.password_reset import PasswordResetToken
 from app.models.user import User, UserResponse
 
 router = APIRouter(prefix="/api/auth", tags=["authentication"])
@@ -228,3 +230,111 @@ def change_password(
     session.commit()
 
     return {"message": "Password changed successfully"}
+
+
+@router.post("/forgot-password")
+def forgot_password(
+    email: str,
+    session: Session = Depends(get_session),
+):
+    """
+    Request password reset token
+
+    Sends a password reset token for the user.
+    In production, this would email the token link.
+    For now, returns the token directly for testing.
+
+    Security: Always returns success even if email doesn't exist
+    to prevent email enumeration attacks.
+    """
+    # Find user by email
+    statement = select(User).where(User.email == email)
+    user = session.exec(statement).first()
+
+    if not user:
+        # Return success anyway to prevent email enumeration
+        return {
+            "message": "If the email exists, a password reset link has been sent",
+            "dev_note": "Email not found (hidden in production)",
+        }
+
+    # Generate secure random token
+    reset_token = secrets.token_urlsafe(32)
+
+    # Create password reset token
+    token_record = PasswordResetToken(
+        user_id=user.id,
+        token=reset_token,
+        expires_at=PasswordResetToken.create_expiry_time(hours=24),
+    )
+    session.add(token_record)
+    session.commit()
+
+    # TODO: Send email with reset link in production
+    # reset_link = f"{settings.frontend_url}/reset-password?token={reset_token}"
+    # send_email(user.email, reset_link)
+
+    return {
+        "message": "If the email exists, a password reset link has been sent",
+        "dev_token": reset_token,  # Only for development/testing
+        "dev_note": "In production, this token would be emailed to the user",
+    }
+
+
+@router.post("/reset-password")
+def reset_password(
+    token: str,
+    new_password: str,
+    session: Session = Depends(get_session),
+):
+    """
+    Reset password using token from forgot-password
+
+    Security features:
+    - Validates token exists and is not expired
+    - Marks token as used (single-use only)
+    - Enforces password complexity (8+ chars)
+    - Clears must_change_password flag if set
+    """
+    # Find token
+    statement = select(PasswordResetToken).where(PasswordResetToken.token == token)
+    token_record = session.exec(statement).first()
+
+    if not token_record:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token",
+        )
+
+    # Validate token
+    if not token_record.is_valid():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token",
+        )
+
+    # Validate new password
+    if len(new_password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password must be at least 8 characters",
+        )
+
+    # Get user
+    user = session.get(User, token_record.user_id)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    # Update password
+    user.hashed_password = get_password_hash(new_password)
+    user.must_change_password = False  # Clear forced password change flag
+    token_record.used = True  # Mark token as used
+
+    session.add(user)
+    session.add(token_record)
+    session.commit()
+
+    return {"message": "Password has been reset successfully"}

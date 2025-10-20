@@ -2,22 +2,10 @@
  * Admin API Client
  *
  * API client for admin-only endpoints
+ * Uses the centralized apiClient from lib/api/client.ts
  */
 
-import axios from 'axios';
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-// Create axios instance with auth
-const createAuthClient = () => {
-  const token = localStorage.getItem('access_token'); // Fixed: use 'access_token' not 'token'
-  return axios.create({
-    baseURL: API_URL,
-    headers: {
-      Authorization: token ? `Bearer ${token}` : '',
-    },
-  });
-};
+import { apiClient } from './api';
 
 export interface BatchCreateUserRequest {
   emails: string[];
@@ -67,8 +55,7 @@ export const adminAPI = {
    * Batch create users from email list
    */
   async batchCreateUsers(data: BatchCreateUserRequest): Promise<BatchCreateUserResponse> {
-    const client = createAuthClient();
-    const response = await client.post('/api/admin/users/batch', data);
+    const response = await apiClient.post('/api/admin/users/batch', data);
     return response.data;
   },
 
@@ -76,8 +63,7 @@ export const adminAPI = {
    * List all users
    */
   async listUsers(skip: number = 0, limit: number = 100): Promise<ListUsersResponse> {
-    const client = createAuthClient();
-    const response = await client.get('/api/admin/users', {
+    const response = await apiClient.get('/api/admin/users', {
       params: { skip, limit },
     });
     return response.data;
@@ -87,8 +73,7 @@ export const adminAPI = {
    * Reset user password
    */
   async resetUserPassword(userId: string): Promise<{ email: string; password: string }> {
-    const client = createAuthClient();
-    const response = await client.put(`/api/admin/users/${userId}/password`);
+    const response = await apiClient.put(`/api/admin/users/${userId}/password`);
     return response.data;
   },
 };

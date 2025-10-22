@@ -145,8 +145,11 @@ backend/app/core/seeds/
     - 創建 `frontend/src/hooks/useCardManagement.ts`
     - 創建 12 個單元測試 (100% 通過)
     - ConsultationArea.tsx: 1216 行 → 1101 行
-  - [ ] 步驟 3: 提取 useTokenManagement hook (減少 100+ 行)
-  - [ ] 預期效果：主組件從 1262 行減少到 ~400 行 (目前已減至 1101 行)
+  - [x] ✅ 步驟 3: 提取 useTokenManagement hook (已完成 - 減少 24 行)
+    - 創建 `frontend/src/hooks/useTokenManagement.ts`
+    - 創建 13 個單元測試 (100% 通過)
+    - ConsultationArea.tsx: 1101 行 → 1077 行
+  - [ ] 預期效果：主組件從 1262 行減少到 ~400 行 (目前已減至 1077 行，-435 行，-28.8%)
 
 ### Phase 2: 高優先級（下週）
 

@@ -19,6 +19,7 @@ import { DroppableGameArea } from './DroppableGameArea';
 import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
 import { CardEventType } from '@/lib/api/card-events';
 import { useCardSync } from '@/hooks/use-card-sync';
+import { useCardManagement } from '@/hooks/useCardManagement';
 import { GameStatus } from '@/lib/api/game-sessions';
 import { mockCardsData } from '@/data/mockCards';
 
@@ -264,12 +265,24 @@ export function ConsultationArea({
   const [cardNotes, setCardNotes] = useState<Record<string, string[]>>({});
   const [activeDragItem, setActiveDragItem] = useState<any>(null);
 
-  // 牌卡瀏覽狀態
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [selectedAuxCardId, setSelectedAuxCardId] = useState<string | null>(null);
-
-  // 已使用的卡片ID列表（從列表中移除）
-  const [usedCardIds, setUsedCardIds] = useState<Set<string>>(new Set());
+  // Use card management hook
+  const {
+    selectedCardId,
+    selectedAuxCardId,
+    setSelectedCardId,
+    setSelectedAuxCardId,
+    getCurrentCards,
+    getAuxiliaryCards,
+    getSelectedCard,
+    getSelectedAuxCard,
+    shouldShowAuxiliaryCards,
+    handleDealCard: handleDealCardFromHook,
+  } = useCardManagement({
+    selectedDeck,
+    selectedGameRule,
+    onCardEvent,
+    isReadOnly,
+  });
 
   // 籌碼狀態
   const [gameTokens, setGameTokens] = useState<
@@ -283,81 +296,8 @@ export function ConsultationArea({
     }>
   >([]);
 
-  // Mock 牌卡數據 - 從獨立檔案引入
+  // Mock 牌卡數據 - now managed by useCardManagement hook
   const mockCards = useMemo(() => mockCardsData, []);
-
-  // 輔助卡數據（解釋卡）
-  const auxiliaryCards = useMemo(
-    () => ({
-      六大性格分析: [
-        {
-          id: 'aux-r',
-          title: 'R - 實務型',
-          description: '喜歡具體操作和實際工作',
-          category: 'personality',
-        },
-        {
-          id: 'aux-i',
-          title: 'I - 研究型',
-          description: '喜歡分析研究和思考',
-          category: 'personality',
-        },
-        {
-          id: 'aux-a',
-          title: 'A - 藝術型',
-          description: '喜歡創作和藝術表達',
-          category: 'personality',
-        },
-        {
-          id: 'aux-s',
-          title: 'S - 社會型',
-          description: '喜歡幫助他人和社交',
-          category: 'personality',
-        },
-        {
-          id: 'aux-e',
-          title: 'E - 企業型',
-          description: '喜歡領導和說服他人',
-          category: 'personality',
-        },
-        {
-          id: 'aux-c',
-          title: 'C - 事務型',
-          description: '喜歡有序和規範的工作',
-          category: 'personality',
-        },
-      ],
-    }),
-    []
-  );
-
-  // 取得當前牌卡數據（排除已使用的卡片）
-  const getCurrentCards = useCallback(() => {
-    const allCards = mockCards[selectedDeck as keyof typeof mockCards] || [];
-    return allCards.filter((card) => !usedCardIds.has(card.id));
-  }, [selectedDeck, usedCardIds, mockCards]);
-
-  // 取得輔助卡數據
-  const getAuxiliaryCards = useCallback(() => {
-    return auxiliaryCards[selectedGameRule as keyof typeof auxiliaryCards] || [];
-  }, [selectedGameRule, auxiliaryCards]);
-
-  // 取得選中的卡片
-  const getSelectedCard = () => {
-    const cards = getCurrentCards();
-    return cards.find((card) => card.id === selectedCardId) || cards[0];
-  };
-
-  // 取得選中的輔助卡
-  const getSelectedAuxCard = () => {
-    const auxCards = getAuxiliaryCards();
-    return auxCards.find((card) => card.id === selectedAuxCardId) || auxCards[0];
-  };
-
-  // 檢查是否需要顯示輔助卡
-  const shouldShowAuxiliaryCards = () => {
-    return selectedGameRule === '六大性格分析' && selectedDeck === '職游旅人卡';
-  };
 
   // 新增籌碼到畫布
   const addTokenToCanvas = useCallback(
@@ -385,7 +325,7 @@ export function ConsultationArea({
     setActiveCard(null);
     setActiveDropZone(null);
     setCardNotes({});
-    setUsedCardIds(new Set()); // 清空已使用卡片列表
+    // Used cards are managed by useCardManagement hook
   }, []);
 
   // 當牌卡或玩法改變時，重置桌面
@@ -393,20 +333,7 @@ export function ConsultationArea({
     resetGameArea();
   }, [selectedDeck, selectedGameRule, resetGameArea]);
 
-  // 初始化選中卡片
-  useEffect(() => {
-    const cards = getCurrentCards();
-    if (cards.length > 0 && !selectedCardId) {
-      setSelectedCardId(cards[0].id);
-    }
-  }, [getCurrentCards, selectedCardId]);
-
-  useEffect(() => {
-    const auxCards = getAuxiliaryCards();
-    if (auxCards.length > 0 && !selectedAuxCardId) {
-      setSelectedAuxCardId(auxCards[0].id);
-    }
-  }, [getAuxiliaryCards, selectedAuxCardId]);
+  // Card selection is now managed by useCardManagement hook
 
   // 玩法與卡片類型的映射關係
   const gameRuleCardMapping = {
@@ -450,35 +377,10 @@ export function ConsultationArea({
 
       setCards((prev) => [...prev, newCard]);
 
-      // 將卡片ID加入已使用列表
-      setUsedCardIds((prev) => {
-        const newSet = new Set(prev);
-        newSet.add(cardData.id);
-        return newSet;
-      });
-
-      // 自動選擇下一張可用卡片
-      const allCards = mockCards[selectedDeck as keyof typeof mockCards] || [];
-      const remainingCards = allCards.filter(
-        (card) => card.id !== cardData.id && !usedCardIds.has(card.id)
-      );
-      if (remainingCards.length > 0) {
-        setSelectedCardId(remainingCards[0].id);
-      } else {
-        setSelectedCardId(null);
-      }
-
-      // Sync card dealt event
-      if (!isReadOnly) {
-        // syncCardEvent disabled for single-machine mode
-        onCardEvent?.(newCard.id, 'card_dealt' as CardEventType, {
-          position: newCard.position,
-          card_data: cardData,
-          from_deck: true,
-        });
-      }
+      // Use hook to manage card state (used cards, selection, etc.)
+      handleDealCardFromHook(cardData);
     },
-    [cards.length, isReadOnly, onCardEvent, selectedDeck, usedCardIds, mockCards]
+    [cards.length, handleDealCardFromHook]
   );
 
   const handleCardFlip = useCallback(
@@ -549,23 +451,8 @@ export function ConsultationArea({
 
           setCards((prev) => [...prev, newCard]);
 
-          // Add to used cards list
-          setUsedCardIds((prev) => {
-            const newSet = new Set(prev);
-            newSet.add(cardData.id);
-            return newSet;
-          });
-
-          // Auto select next card
-          const allCards = mockCards[selectedDeck as keyof typeof mockCards] || [];
-          const remainingCards = allCards.filter(
-            (card) => card.id !== cardData.id && !usedCardIds.has(card.id)
-          );
-          if (remainingCards.length > 0) {
-            setSelectedCardId(remainingCards[0].id);
-          } else {
-            setSelectedCardId(null);
-          }
+          // Use hook to manage card state
+          handleDealCardFromHook(cardData);
         }
         return;
       }
@@ -748,9 +635,7 @@ export function ConsultationArea({
       isReadOnly,
       onCardEvent,
       selectedGameRule,
-      selectedDeck,
-      usedCardIds,
-      mockCards,
+      handleDealCardFromHook,
     ]
   );
 

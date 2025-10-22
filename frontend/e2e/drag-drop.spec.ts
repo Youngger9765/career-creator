@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-// TODO: These tests are outdated and need to be updated to work with the new game mode selection flow
-// The tests assume cards are immediately available, but now users must first select a game mode and gameplay
+// TODO: These tests need complete rewrite for new game flow
+// See refactoring-smoke-test.spec.ts for working tests
 test.describe.skip('Drag and Drop Functionality', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to a test room
@@ -12,6 +12,19 @@ test.describe.skip('Drag and Drop Functionality', () => {
 
     // Wait for game mode selection to appear
     await page.waitForSelector('text=選擇遊戲模式', { timeout: 5000 });
+
+    // Select a game mode and gameplay to enter the game
+    // First, click the 職游旅人卡 tab
+    const careerTab = page.locator('text=職游旅人卡').first();
+    await careerTab.click();
+    await page.waitForTimeout(500);
+
+    // Then click the 六大性格分析 gameplay card
+    const personalityCard = page.locator('div:has-text("六大性格分析")').locator('..').locator('button:has-text("選擇此玩法")').first();
+    await personalityCard.click();
+
+    // Wait for the game interface to load
+    await page.waitForTimeout(2000);
   });
 
   test('should display cards in the card list', async ({ page }) => {

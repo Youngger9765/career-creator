@@ -158,9 +158,15 @@ backend/app/core/seeds/
     - 創建 `frontend/src/hooks/useClientManagement.ts`
     - 創建 17 個單元測試
     - ClientManagement.tsx: 978 行 → 877 行
-  - [ ] 步驟 2: 拆分 ClientTableRow 組件 (Desktop 視圖)
-  - [ ] 步驟 3: 拆分 ClientMobileCard 組件 (Mobile 視圖)
-  - [ ] 預期效果：從 978 行減少到 ~300 行 (目前已減至 877 行)
+  - [x] ✅ 步驟 2: 拆分 ClientTableRow 組件 (Desktop 視圖) (已完成 - 減少 136 行)
+    - 創建 `frontend/src/components/clients/ClientTableRow.tsx`
+    - 創建 16 個單元測試 (100% 通過)
+    - ClientManagement.tsx: 877 行 → 741 行
+  - [x] ✅ 步驟 3: 拆分 ClientMobileCard 組件 (Mobile 視圖) (已完成 - 減少 92 行)
+    - 創建 `frontend/src/components/clients/ClientMobileCard.tsx`
+    - 創建 13 個單元測試 (100% 通過)
+    - ClientManagement.tsx: 741 行 → 649 行
+  - [ ] 預期效果：從 978 行減少到 ~300 行 (目前已減至 649 行，-329 行，-33.6%)
 
 ### Phase 3: 持續改進（兩週內）
 

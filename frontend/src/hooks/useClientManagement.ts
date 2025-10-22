@@ -27,6 +27,7 @@ export function useClientManagement() {
   // Load clients on mount
   useEffect(() => {
     loadClients();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadClients = useCallback(async () => {

@@ -89,18 +89,7 @@ export function NotesDrawer({
     }
   }, [roomId, clientId, currentGameplay, isOpen]);
 
-  // Auto-save with debounce
-  useEffect(() => {
-    const saveTimer = setTimeout(async () => {
-      if (noteContent !== undefined && noteContent !== null) {
-        await saveNote();
-      }
-    }, 1000); // 1 second debounce
-
-    return () => clearTimeout(saveTimer);
-  }, [noteContent]);
-
-  const saveNote = async () => {
+  const saveNote = useCallback(async () => {
     setIsSaving(true);
     try {
       await apiClient.put(`/api/rooms/${roomId}/notes`, {
@@ -112,7 +101,18 @@ export function NotesDrawer({
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [roomId, noteContent]);
+
+  // Auto-save with debounce
+  useEffect(() => {
+    const saveTimer = setTimeout(async () => {
+      if (noteContent !== undefined && noteContent !== null) {
+        await saveNote();
+      }
+    }, 1000); // 1 second debounce
+
+    return () => clearTimeout(saveTimer);
+  }, [noteContent, saveNote]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

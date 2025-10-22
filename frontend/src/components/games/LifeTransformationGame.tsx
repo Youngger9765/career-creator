@@ -233,39 +233,6 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
     [cardSync]
   );
 
-  // 處理拖放到畫布
-  const handleCanvasDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      const cardId = e.dataTransfer.getData('cardId');
-      const lifeAreas = state.cardPlacements.lifeAreas || {};
-
-      // 檢查是否已經有這張卡片
-      const hasCard = Object.values(lifeAreas).some(
-        (area: any) => area.cards && area.cards.includes(cardId)
-      );
-
-      if (cardId && !hasCard) {
-        // 檢查是否達到最大卡片數
-        const usedCardIds = new Set<string>();
-        Object.values(lifeAreas).forEach((area: any) => {
-          if (area.cards) {
-            area.cards.forEach((id: string) => usedCardIds.add(id));
-          }
-        });
-
-        if (usedCardIds.size < maxCards) {
-          handleCardAdd(cardId);
-        }
-      }
-    },
-    [state.cardPlacements.lifeAreas, maxCards]
-  );
-
-  const handleCanvasDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-  }, []);
-
   // 處理卡片添加 - 每張卡片創建獨立的生活領域
   const handleCardAdd = useCallback(
     (cardId: string) => {
@@ -326,6 +293,39 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
       gameType,
     ]
   );
+
+  // 處理拖放到畫布
+  const handleCanvasDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      const cardId = e.dataTransfer.getData('cardId');
+      const lifeAreas = state.cardPlacements.lifeAreas || {};
+
+      // 檢查是否已經有這張卡片
+      const hasCard = Object.values(lifeAreas).some(
+        (area: any) => area.cards && area.cards.includes(cardId)
+      );
+
+      if (cardId && !hasCard) {
+        // 檢查是否達到最大卡片數
+        const usedCardIds = new Set<string>();
+        Object.values(lifeAreas).forEach((area: any) => {
+          if (area.cards) {
+            area.cards.forEach((id: string) => usedCardIds.add(id));
+          }
+        });
+
+        if (usedCardIds.size < maxCards) {
+          handleCardAdd(cardId);
+        }
+      }
+    },
+    [state.cardPlacements.lifeAreas, maxCards, handleCardAdd]
+  );
+
+  const handleCanvasDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+  }, []);
 
   // 處理卡片移除
   const handleCardRemove = useCallback(
@@ -439,7 +439,11 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
   );
 
   // 計算已使用的卡片和籌碼
-  const lifeAreas = state.cardPlacements.lifeAreas || {};
+  const lifeAreas = useMemo(
+    () => state.cardPlacements.lifeAreas || {},
+    [state.cardPlacements.lifeAreas]
+  );
+
   const usedCardIds = useMemo(() => {
     const ids = new Set<string>();
     Object.values(lifeAreas).forEach((area: any) => {

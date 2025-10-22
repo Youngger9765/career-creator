@@ -27,6 +27,7 @@ export function usePresence(roomId: string | undefined) {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
+  const prevCountRef = useRef(0);
 
   // 取得當前用戶資訊
   const { user } = useAuthStore();
@@ -111,12 +112,12 @@ export function usePresence(roomId: string | undefined) {
                 users.push(...presences);
               }
             });
-            const prevCount = onlineUsers.length;
-            setOnlineUsers(users);
             // Only log when user count changes
-            if (users.length !== prevCount) {
+            if (users.length !== prevCountRef.current) {
               console.log('[usePresence] 在線用戶更新:', users.length, '人');
+              prevCountRef.current = users.length;
             }
+            setOnlineUsers(users);
           })
           .on('presence', { event: 'join' }, ({ key, newPresences }) => {
             console.log('[usePresence] 用戶加入:', key);

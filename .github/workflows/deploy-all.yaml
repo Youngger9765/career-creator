@@ -24,7 +24,7 @@ on:
           - production
 
 env:
-  PROJECT_ID: career-creator-472207
+  PROJECT_ID: career-creator-card
   REGION: asia-east1
 
 jobs:

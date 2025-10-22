@@ -13,10 +13,10 @@ on:
         options: ['1', '2', '3', '5']
 
 env:
-  PROJECT_ID: career-creator-472207
+  PROJECT_ID: career-creator-card
   REGION: us
-  FRONTEND_IMAGE: gcr.io/career-creator-472207/career-creator-frontend
-  BACKEND_IMAGE: gcr.io/career-creator-472207/career-creator-backend
+  FRONTEND_IMAGE: gcr.io/career-creator-card/career-creator-frontend
+  BACKEND_IMAGE: gcr.io/career-creator-card/career-creator-backend
 
 jobs:
   cleanup:

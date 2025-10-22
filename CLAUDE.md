@@ -232,7 +232,7 @@ gcloud config list
 **Expected configuration:**
 
 - **Active configuration**: `career-creator`
-- **Project**: `career-creator-472207`
+- **Project**: `career-creator-card`
 - **Region**: `asia-east1`
 
 ### Cloud Run Services

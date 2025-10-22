@@ -20,6 +20,7 @@ import { GameCard, CardData, DEFAULT_CAREER_CARDS } from '@/types/cards';
 import { CardEventType } from '@/lib/api/card-events';
 import { useCardSync } from '@/hooks/use-card-sync';
 import { useCardManagement } from '@/hooks/useCardManagement';
+import { useTokenManagement } from '@/hooks/useTokenManagement';
 import { GameStatus } from '@/lib/api/game-sessions';
 import { mockCardsData } from '@/data/mockCards';
 
@@ -284,49 +285,27 @@ export function ConsultationArea({
     isReadOnly,
   });
 
-  // 籌碼狀態
-  const [gameTokens, setGameTokens] = useState<
-    Array<{
-      id: string;
-      type: 'chip' | 'marker';
-      color: string;
-      value?: number;
-      position: { x: number; y: number };
-      zIndex: number;
-    }>
-  >([]);
+  // Use token management hook
+  const {
+    tokens: gameTokens,
+    addToken: addTokenToCanvas,
+    updateTokenPosition,
+    clearTokens,
+    getToken,
+  } = useTokenManagement();
 
   // Mock 牌卡數據 - now managed by useCardManagement hook
   const mockCards = useMemo(() => mockCardsData, []);
 
-  // 新增籌碼到畫布
-  const addTokenToCanvas = useCallback(
-    (tokenType: 'chip' | 'marker', color: string, value?: number) => {
-      const newToken = {
-        id: `token-${Date.now()}-${Math.random()}`,
-        type: tokenType,
-        color,
-        value,
-        position: {
-          x: 200 + Math.random() * 200,
-          y: 200 + Math.random() * 200,
-        },
-        zIndex: 1,
-      };
-      setGameTokens((prev) => [...prev, newToken]);
-    },
-    []
-  );
-
   // 清空桌面的函數
   const resetGameArea = useCallback(() => {
     setCards([]);
-    setGameTokens([]);
+    clearTokens();
     setActiveCard(null);
     setActiveDropZone(null);
     setCardNotes({});
     // Used cards are managed by useCardManagement hook
-  }, []);
+  }, [clearTokens]);
 
   // 當牌卡或玩法改變時，重置桌面
   useEffect(() => {
@@ -459,7 +438,7 @@ export function ConsultationArea({
 
       // Check if it's a token being dragged
       if (draggedId.startsWith('token-')) {
-        const draggedToken = gameTokens.find((token) => token.id === draggedId);
+        const draggedToken = getToken(draggedId);
         if (!draggedToken) return;
 
         const newPosition = {
@@ -467,11 +446,7 @@ export function ConsultationArea({
           y: draggedToken.position.y + delta.y,
         };
 
-        setGameTokens((prev) =>
-          prev.map((token) =>
-            token.id === draggedId ? { ...token, position: newPosition } : token
-          )
-        );
+        updateTokenPosition(draggedId, newPosition);
         return;
       }
 
@@ -631,11 +606,12 @@ export function ConsultationArea({
     },
     [
       cards,
-      gameTokens,
       isReadOnly,
       onCardEvent,
       selectedGameRule,
       handleDealCardFromHook,
+      getToken,
+      updateTokenPosition,
     ]
   );
 

@@ -141,9 +141,12 @@ backend/app/core/seeds/
   - [x] ✅ 步驟 1: 拆出 mockCards 數據到獨立檔案 (已完成 - 減少 296 行)
     - 創建 `frontend/src/data/mockCards.ts`
     - ConsultationArea.tsx: 1512 行 → 1216 行
-  - [ ] 步驟 2: 提取 useCardManagement hook (減少 200+ 行)
+  - [x] ✅ 步驟 2: 提取 useCardManagement hook (已完成 - 減少 115 行)
+    - 創建 `frontend/src/hooks/useCardManagement.ts`
+    - 創建 12 個單元測試 (100% 通過)
+    - ConsultationArea.tsx: 1216 行 → 1101 行
   - [ ] 步驟 3: 提取 useTokenManagement hook (減少 100+ 行)
-  - [ ] 預期效果：主組件從 1262 行減少到 ~400 行
+  - [ ] 預期效果：主組件從 1262 行減少到 ~400 行 (目前已減至 1101 行)
 
 ### Phase 2: 高優先級（下週）
 

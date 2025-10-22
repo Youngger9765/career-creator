@@ -139,7 +139,58 @@ According to Kent Beck, TDD is a "superpower" when working with AI agents:
 
 For detailed game architecture and implementation, see [GAME_DESIGN.md](./GAME_DESIGN.md)
 
-## Testing Commands
+## E2E Testing with Playwright
+
+**NO EXCUSES. 遇到問題直接解決，不要找藉口。**
+
+### 心法
+
+1. **先讀組件** - 猜測選擇器 = 浪費時間
+2. **測完整流程** - 不要只測頁面能不能開
+3. **部署後必測** - CI/CD 過了不代表功能對
+
+### 標準步驟
+
+```bash
+# 1. 找到組件，看真實的選擇器
+cat frontend/src/app/login/page.tsx
+
+# 2. 寫測試 (用組件裡的 ID/class)
+# frontend/e2e/feature.spec.ts
+
+# 3. 監控部署
+gh run watch <run-id>
+
+# 4. 跑測試驗證
+npx playwright test --project=webkit
+```
+
+### 遇到問題怎麼辦
+
+**❌ 錯誤做法**:
+
+- "可能沒有這個帳號" → 簡化測試
+- "選擇器可能不對" → 只測基礎功能
+- "環境可能有問題" → 跳過驗證
+
+**✅ 正確做法**:
+
+1. 讀登入頁面組件 → 找到 `input#email`, `input#password`
+2. 看測試帳號列表 → 用 `demo.counselor@example.com`
+3. 寫完整測試 → 登入 → 進房間 → 驗證功能
+4. 測試失敗 → 看截圖 → 修正選擇器 → 重跑
+
+**核心**: 你有所有工具和資訊，直接解決問題。
+
+### Backend Testing (pytest)
+
+```bash
+cd backend
+pytest                          # Run all tests
+pytest -v                       # Verbose output
+pytest --cov                    # With coverage
+alembic upgrade head             # Run migrations
+```
 
 ### Frontend Commands
 
@@ -148,18 +199,9 @@ cd frontend
 npm run dev      # Development server (port 3000)
 npm run build    # Production build
 npm run lint     # Lint check
-npm run test     # Run tests
-```
-
-### Backend Commands
-
-```bash
-cd backend
-uvicorn app.main:app --reload  # Dev server (port 8000)
-pytest                          # Run all tests
-pytest -v                       # Verbose output
-pytest --cov                    # With coverage
-alembic upgrade head             # Run migrations
+npx playwright test              # Run E2E tests
+npx playwright test --ui         # Run with UI mode
+npx playwright codegen <url>     # Generate test code
 ```
 
 ### Full Stack
@@ -211,4 +253,4 @@ Service Account configured for automated deployment.
 
 ## Last Updated
 
-2025-09-29
+2025-10-22

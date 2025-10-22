@@ -151,12 +151,16 @@ backend/app/core/seeds/
     - ConsultationArea.tsx: 1101 行 → 1077 行
   - [ ] 預期效果：主組件從 1262 行減少到 ~400 行 (目前已減至 1077 行，-435 行，-28.8%)
 
-### Phase 2: 高優先級（下週）
+### Phase 2: 高優先級（本週）
 
 - [ ] **ClientManagement.tsx**
-  - [ ] 拆分 Desktop/Mobile 視圖為獨立組件
-  - [ ] 提取諮詢記錄為獨立組件
-  - [ ] 預期效果：從 978 行減少到 ~300 行
+  - [x] ✅ 步驟 1: 提取 useClientManagement hook (已完成 - 減少 101 行)
+    - 創建 `frontend/src/hooks/useClientManagement.ts`
+    - 創建 17 個單元測試
+    - ClientManagement.tsx: 978 行 → 877 行
+  - [ ] 步驟 2: 拆分 ClientTableRow 組件 (Desktop 視圖)
+  - [ ] 步驟 3: 拆分 ClientMobileCard 組件 (Mobile 視圖)
+  - [ ] 預期效果：從 978 行減少到 ~300 行 (目前已減至 877 行)
 
 ### Phase 3: 持續改進（兩週內）
 

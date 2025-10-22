@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import GameLayout from '../common/GameLayout';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import { useCardSync } from '@/hooks/use-card-sync';
@@ -440,17 +440,25 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
 
   // 計算已使用的卡片和籌碼
   const lifeAreas = state.cardPlacements.lifeAreas || {};
-  const usedCardIds = new Set<string>();
-  let usedTokens = 0;
+  const usedCardIds = useMemo(() => {
+    const ids = new Set<string>();
+    Object.values(lifeAreas).forEach((area: any) => {
+      if (area.cards) {
+        area.cards.forEach((cardId: string) => ids.add(cardId));
+      }
+    });
+    return ids;
+  }, [lifeAreas]);
 
-  Object.values(lifeAreas).forEach((area: any) => {
-    if (area.cards) {
-      area.cards.forEach((cardId: string) => usedCardIds.add(cardId));
-    }
-    if (area.tokens) {
-      usedTokens += area.tokens;
-    }
-  });
+  const usedTokens = useMemo(() => {
+    let tokens = 0;
+    Object.values(lifeAreas).forEach((area: any) => {
+      if (area.tokens) {
+        tokens += area.tokens;
+      }
+    });
+    return tokens;
+  }, [lifeAreas]);
 
   const remainingTokens = totalTokens - usedTokens;
 

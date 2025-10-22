@@ -66,7 +66,7 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
     } finally {
       setIsLoading(false);
     }
-  }, [roomId, gameRuleSlug]);
+  }, [roomId]);
 
   // Save game state to session
   const saveGameState = useCallback(
@@ -108,7 +108,7 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
         },
       });
     },
-    [saveGameState]
+    [saveGameState, gameState.cardPositions]
   );
 
   // Toggle card flip state
@@ -122,7 +122,7 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
         flippedCards: newFlippedCards,
       });
     },
-    [saveGameState]
+    [saveGameState, gameState.flippedCards]
   );
 
   // Update deck and game rule
@@ -185,7 +185,7 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
     if (autoLoad && roomId) {
       initializeSession();
     }
-  }, [autoLoad, roomId]); // Remove initializeSession from dependencies
+  }, [autoLoad, roomId, initializeSession]);
 
   return {
     session,

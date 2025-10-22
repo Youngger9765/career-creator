@@ -83,7 +83,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
       return fromZone;
     },
-    [state.cardPlacements, zones, updateCards, isRoomOwner, persistence]
+    [state.cardPlacements, zones, updateCards, persistence]
   );
 
   // 同步服務

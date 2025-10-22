@@ -7,7 +7,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GrowthPlanCanvas from '../game-canvases/GrowthPlanCanvas';
 import GameLayout from '../common/GameLayout';
@@ -77,7 +77,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         setPlanText(savedState.settings.planText);
       }
     }
-  }, [gameSync.isConnected]);
+  }, [gameSync]);
 
   // 載入牌組
   useEffect(() => {
@@ -110,12 +110,24 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   };
 
   // 計算已使用的卡片 (注意：zone name + Cards)
-  const skillCardsInUse = state.cardPlacements.skillsCards || [];
-  const actionCardsInUse = state.cardPlacements.actionsCards || [];
-  const usedCardIds = new Set([...skillCardsInUse, ...actionCardsInUse]);
+  const skillCardsInUse = useMemo(
+    () => state.cardPlacements.skillsCards || [],
+    [state.cardPlacements.skillsCards]
+  );
+  const actionCardsInUse = useMemo(
+    () => state.cardPlacements.actionsCards || [],
+    [state.cardPlacements.actionsCards]
+  );
+  const usedCardIds = useMemo(
+    () => new Set([...skillCardsInUse, ...actionCardsInUse]),
+    [skillCardsInUse, actionCardsInUse]
+  );
 
   // 合併所有卡片供查找使用
-  const allCards = [...(skillDeck?.cards || []), ...(actionDeck?.cards || [])];
+  const allCards = useMemo(
+    () => [...(skillDeck?.cards || []), ...(actionDeck?.cards || [])],
+    [skillDeck?.cards, actionDeck?.cards]
+  );
 
   // 建立卡片前綴文字
   const getCardPrefix = useCallback(() => {
@@ -212,8 +224,6 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   }, [
     skillCardsInUse,
     actionCardsInUse,
-    skillDeck,
-    actionDeck,
     isRoomOwner,
     getCardPrefix,
     handlePlanTextChange,

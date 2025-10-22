@@ -157,7 +157,7 @@ export default function RoomPage() {
         loading: participantsLoading,
       });
     }
-  }, [participantCount, onlineCount]);
+  }, [participantCount, onlineCount, participantsLoading]);
 
   // 簡單的認證檢查
   useEffect(() => {
@@ -205,7 +205,7 @@ export default function RoomPage() {
       setIsChecking(false);
       setIsReady(true);
     }, 100);
-  }, [isVisitor, router, isAuthenticated]);
+  }, [isVisitor, urlVisitorName, router, isAuthenticated]);
 
   // 加入諮詢室
   useEffect(() => {

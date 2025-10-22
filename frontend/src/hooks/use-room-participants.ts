@@ -180,12 +180,12 @@ export function useRoomParticipants(
     return () => {
       clearInterval(interval);
     };
-  }, [updateInterval]); // Remove refreshParticipants from deps to prevent re-creating interval
+  }, [updateInterval, refreshParticipants]);
 
   // Separate effect for initial load when dependencies change
   useEffect(() => {
     refreshParticipants();
-  }, [roomId]); // Only refresh when roomId changes
+  }, [roomId, refreshParticipants]);
 
   // 整合 Presence 在線狀態與參與者列表
   const mergedParticipants = useMemo(() => {

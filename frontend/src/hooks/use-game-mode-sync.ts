@@ -214,7 +214,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     return () => {
       gameChannel.unsubscribe();
     };
-  }, [roomId, isOwner]); // Remove syncedState from deps to avoid loops
+  }, [roomId, isOwner, onStateChange, syncedState]); // Add onStateChange and syncedState
 
   // Determine if room can be interacted with
   const canInteract = isOwner || ownerOnline;

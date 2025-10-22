@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -622,15 +622,15 @@ export function ConsultationArea({
   };
 
   // 取得當前牌卡數據（排除已使用的卡片）
-  const getCurrentCards = () => {
+  const getCurrentCards = useCallback(() => {
     const allCards = mockCards[selectedDeck as keyof typeof mockCards] || [];
     return allCards.filter((card) => !usedCardIds.has(card.id));
-  };
+  }, [selectedDeck, usedCardIds]);
 
   // 取得輔助卡數據
-  const getAuxiliaryCards = () => {
+  const getAuxiliaryCards = useCallback(() => {
     return auxiliaryCards[selectedGameRule as keyof typeof auxiliaryCards] || [];
-  };
+  }, [selectedGameRule]);
 
   // 取得選中的卡片
   const getSelectedCard = () => {
@@ -689,14 +689,14 @@ export function ConsultationArea({
     if (cards.length > 0 && !selectedCardId) {
       setSelectedCardId(cards[0].id);
     }
-  }, [selectedDeck, selectedCardId]);
+  }, [getCurrentCards, selectedCardId]);
 
   useEffect(() => {
     const auxCards = getAuxiliaryCards();
     if (auxCards.length > 0 && !selectedAuxCardId) {
       setSelectedAuxCardId(auxCards[0].id);
     }
-  }, [selectedGameRule, selectedAuxCardId]);
+  }, [getAuxiliaryCards, selectedAuxCardId]);
 
   // 玩法與卡片類型的映射關係
   const gameRuleCardMapping = {
@@ -1032,7 +1032,16 @@ export function ConsultationArea({
         });
       }
     },
-    [cards, gameTokens, isReadOnly, onCardEvent, onCardEvent, selectedDeck, usedCardIds, mockCards]
+    [
+      cards,
+      gameTokens,
+      isReadOnly,
+      onCardEvent,
+      selectedGameRule,
+      selectedDeck,
+      usedCardIds,
+      mockCards,
+    ]
   );
 
   const handleCardEvent = useCallback(

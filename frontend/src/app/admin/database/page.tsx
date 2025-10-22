@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface DBStatus {
   status: string;
@@ -38,7 +40,6 @@ export default function DatabaseManagementPage() {
   const [error, setError] = useState<string | null>(null);
 
   const pageSize = 50;
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
   // Get auth token
   const getAuthToken = () => {
@@ -46,7 +47,7 @@ export default function DatabaseManagementPage() {
   };
 
   // Fetch database status
-  const fetchDBStatus = async () => {
+  const fetchDBStatus = useCallback(async () => {
     try {
       const token = getAuthToken();
       if (!token) {
@@ -67,10 +68,10 @@ export default function DatabaseManagementPage() {
         setError('無法連接到資料庫');
       }
     }
-  };
+  }, [router]);
 
   // Fetch tables list
-  const fetchTables = async () => {
+  const fetchTables = useCallback(async () => {
     try {
       const token = getAuthToken();
       const response = await axios.get(`${API_BASE_URL}/api/admin/db/tables`, {
@@ -80,7 +81,7 @@ export default function DatabaseManagementPage() {
     } catch (err) {
       console.error('Failed to fetch tables:', err);
     }
-  };
+  }, []);
 
   // Fetch table data
   const fetchTableData = async (tableName: string, page: number = 1) => {
@@ -158,7 +159,7 @@ export default function DatabaseManagementPage() {
       setLoading(false);
     };
     init();
-  }, []);
+  }, [fetchDBStatus, fetchTables]);
 
   // Handle table selection
   const handleTableSelect = (tableName: string) => {

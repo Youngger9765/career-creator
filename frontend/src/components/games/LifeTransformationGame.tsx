@@ -617,9 +617,9 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
           </div>
 
           {/* 主要內容區 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
             {/* 左側：卡片籌碼分配區 */}
-            <div className="space-y-4">
+            <div className="space-y-4 min-h-[400px]">
               {/* 拖曳提示區 */}
               {usedCardIds.size === 0 && (
                 <div className="h-full flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-100">
@@ -683,8 +683,8 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
             </div>
 
             {/* 右側：視覺化圖表區 */}
-            <div className="bg-white dark:bg-gray-100 rounded-lg border border-gray-200 dark:border-gray-300 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-900 mb-6">
+            <div className="bg-white dark:bg-gray-100 rounded-lg border border-gray-200 dark:border-gray-300 p-4 md:p-6 min-h-[500px]">
+              <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-900 mb-4 md:mb-6">
                 生活平衡分配圖
               </h3>
 
@@ -780,7 +780,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                                   x={labelX}
                                   y={labelY}
                                   fill={color}
-                                  fontSize="8"
+                                  fontSize="10"
                                   fontWeight="600"
                                   textAnchor={labelX > centerX ? 'start' : 'end'}
                                   dominantBaseline="middle"
@@ -790,9 +790,9 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                                 </text>
                                 <text
                                   x={labelX}
-                                  y={labelY + 8}
+                                  y={labelY + 10}
                                   fill={color}
-                                  fontSize="7"
+                                  fontSize="9"
                                   fontWeight="500"
                                   textAnchor={labelX > centerX ? 'start' : 'end'}
                                   dominantBaseline="middle"
@@ -843,14 +843,14 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
 
                       {/* 中心文字 */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="text-center bg-white dark:bg-gray-100 rounded-full w-28 h-28 flex flex-col items-center justify-center shadow-sm">
+                        <div className="text-center bg-white dark:bg-gray-100 rounded-full w-32 h-32 md:w-36 md:h-36 flex flex-col items-center justify-center shadow-sm">
                           {/* 分數形式顯示 */}
                           <div className="flex flex-col items-center leading-none">
-                            <div className="text-3xl font-bold text-gray-900 dark:text-gray-900">
+                            <div className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-900">
                               {usedTokens}
                             </div>
-                            <div className="w-full h-0.5 bg-gray-400 dark:bg-gray-500 my-1"></div>
-                            <div className="text-lg font-medium text-gray-600 dark:text-gray-700">
+                            <div className="w-full h-0.5 bg-gray-400 dark:bg-gray-500 my-1.5"></div>
+                            <div className="text-xl md:text-2xl font-medium text-gray-600 dark:text-gray-700">
                               {totalTokens}
                             </div>
                           </div>
@@ -860,7 +860,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                   </div>
 
                   {/* 圖例 */}
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
                     {Array.from(usedCardIds)
                       .sort()
                       .map((cardId) => {
@@ -893,15 +893,18 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                           totalTokens > 0 ? ((tokens / totalTokens) * 100).toFixed(1) : '0';
 
                         return (
-                          <div key={cardId} className="flex items-center space-x-2">
+                          <div
+                            key={cardId}
+                            className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50"
+                          >
                             <div
-                              className="w-3 h-3 rounded-full flex-shrink-0"
+                              className="w-4 h-4 md:w-5 md:h-5 rounded-full flex-shrink-0"
                               style={{ backgroundColor: getCardColor(cardId) }}
                             />
-                            <div className="flex-1 truncate text-gray-700 dark:text-gray-700">
+                            <div className="flex-1 truncate text-gray-700 dark:text-gray-700 font-medium">
                               {card?.title || '未知'}
                             </div>
-                            <div className="text-gray-900 dark:text-gray-900 font-medium">
+                            <div className="text-gray-900 dark:text-gray-900 font-semibold text-base md:text-lg">
                               {percentage}%
                             </div>
                           </div>

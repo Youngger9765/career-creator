@@ -345,7 +345,7 @@ export function NotesDrawer({
             onChange={(e) => setNoteContent(e.target.value)}
             placeholder="記錄觀察、計畫、重要資訊..."
             disabled={isCapturingScreenshot}
-            className={`flex-1 w-full p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+            className={`flex-1 w-full p-3 border rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
               isCapturingScreenshot ? 'bg-gray-100 cursor-not-allowed' : ''
             }`}
           />

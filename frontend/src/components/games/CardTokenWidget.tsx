@@ -89,16 +89,16 @@ const CardTokenWidget: React.FC<CardTokenWidgetProps> = ({
               <GripVertical className="w-4 h-4" />
             </button>
 
-            <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
-              <span className="text-green-600 text-xs font-bold">V</span>
+            <div className="w-7 h-7 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
+              <span className="text-green-600 text-sm font-bold">V</span>
             </div>
-            <h3 className="font-medium text-gray-900 text-sm">{card.title}</h3>
+            <h3 className="font-semibold text-gray-900 text-base md:text-lg">{card.title}</h3>
           </div>
 
           <div className="flex items-center space-x-2">
             {/* 目前籌碼數 */}
             <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">{currentAmount}</div>
+              <div className="text-2xl md:text-3xl font-bold text-blue-600">{currentAmount}</div>
             </div>
 
             {/* 查看大圖按鈕 */}

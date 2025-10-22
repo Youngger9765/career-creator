@@ -1,8 +1,15 @@
 import { test, expect } from '@playwright/test';
 
+// Use environment variable or default to localhost
+const BASE_URL = process.env.TEST_URL || 'http://localhost:3000';
 const STAGING_URL = 'https://career-creator-frontend-staging-990202338378.asia-east1.run.app';
 
+// Skip these tests in local dev (they require full auth flow and deployed backend)
+const isLocalDev = BASE_URL.includes('localhost');
+
 test.describe('UI Fixes Verification', () => {
+  test.skip(isLocalDev, 'Skipped in local development (requires deployed backend)');
+
   test('Login page should load correctly', async ({ page }) => {
     await page.goto(`${STAGING_URL}/login`);
 

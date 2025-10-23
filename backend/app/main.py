@@ -45,12 +45,12 @@ app = FastAPI(
 # Configure CORS based on environment
 if settings.environment == "production":
     origins = [
-        "https://career-creator-frontend-production-990202338378.asia-east1.run.app",
+        "https://career-creator-frontend-production-x43mdhfwsq-de.a.run.app",
     ]
     allow_credentials = True
 elif settings.environment == "staging":
     origins = [
-        "https://career-creator-frontend-staging-990202338378.asia-east1.run.app",
+        "https://career-creator-frontend-staging-x43mdhfwsq-de.a.run.app",
         "http://localhost:3000",  # Allow local development
         "http://localhost:3001",  # Alternative dev port
     ]

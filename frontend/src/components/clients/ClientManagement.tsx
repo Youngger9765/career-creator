@@ -136,7 +136,6 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     }
   };
 
-
   const getRoomStatusBadge = (isActive: boolean, expiresAt?: string) => {
     if (!isActive) {
       return (

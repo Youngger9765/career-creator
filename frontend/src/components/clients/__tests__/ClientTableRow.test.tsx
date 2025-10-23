@@ -242,11 +242,7 @@ describe('ClientTableRow', () => {
       render(
         <table>
           <tbody>
-            <ClientTableRow
-              client={mockClient}
-              {...mockHandlers}
-              isRecordsExpanded={false}
-            />
+            <ClientTableRow client={mockClient} {...mockHandlers} isRecordsExpanded={false} />
           </tbody>
         </table>
       );
@@ -260,11 +256,7 @@ describe('ClientTableRow', () => {
       render(
         <table>
           <tbody>
-            <ClientTableRow
-              client={mockClient}
-              {...mockHandlers}
-              isRecordsExpanded={true}
-            />
+            <ClientTableRow client={mockClient} {...mockHandlers} isRecordsExpanded={true} />
           </tbody>
         </table>
       );

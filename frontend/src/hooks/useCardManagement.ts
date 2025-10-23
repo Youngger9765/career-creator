@@ -88,10 +88,7 @@ export function useCardManagement({
   const mockCards = useMemo(() => mockCardsData, []);
 
   // Auxiliary cards (RIASEC personality cards)
-  const auxiliaryCards = useMemo(
-    () => auxiliaryCardsData,
-    []
-  );
+  const auxiliaryCards = useMemo(() => auxiliaryCardsData, []);
 
   // Get current available cards (excluding used cards)
   const getCurrentCards = useCallback(() => {

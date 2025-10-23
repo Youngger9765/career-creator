@@ -252,7 +252,10 @@ describe('useClientManagement', () => {
   describe('deleteClient', () => {
     it('should archive a client', async () => {
       // Mock window.confirm
-      vi.stubGlobal('confirm', vi.fn(() => true));
+      vi.stubGlobal(
+        'confirm',
+        vi.fn(() => true)
+      );
 
       const archivedClient: Client = {
         ...mockClients[0],
@@ -278,7 +281,10 @@ describe('useClientManagement', () => {
     });
 
     it('should not delete if user cancels confirmation', async () => {
-      vi.stubGlobal('confirm', vi.fn(() => false));
+      vi.stubGlobal(
+        'confirm',
+        vi.fn(() => false)
+      );
 
       const { result } = renderHook(() => useClientManagement());
 

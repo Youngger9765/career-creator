@@ -80,9 +80,7 @@ describe('ClientMobileCard', () => {
     render(<ClientMobileCard client={mockClient} {...mockHandlers} />);
     // The button has icon but we can find by the button that calls onToggleRecords
     const buttons = screen.getAllByRole('button');
-    const recordsButton = buttons.find((btn) =>
-      btn.className.includes('bg-gray-100')
-    );
+    const recordsButton = buttons.find((btn) => btn.className.includes('bg-gray-100'));
     if (recordsButton) {
       fireEvent.click(recordsButton);
       expect(mockHandlers.onToggleRecords).toHaveBeenCalledWith('client-1');
@@ -92,8 +90,8 @@ describe('ClientMobileCard', () => {
   it('should call onViewClient when view button clicked', () => {
     render(<ClientMobileCard client={mockClient} {...mockHandlers} />);
     const buttons = screen.getAllByRole('button');
-    const viewButton = buttons.find((btn) =>
-      btn.className.includes('text-gray-600') && btn.className.includes('w-8')
+    const viewButton = buttons.find(
+      (btn) => btn.className.includes('text-gray-600') && btn.className.includes('w-8')
     );
     if (viewButton) {
       fireEvent.click(viewButton);
@@ -104,8 +102,8 @@ describe('ClientMobileCard', () => {
   it('should call onEditClient when edit button clicked', () => {
     render(<ClientMobileCard client={mockClient} {...mockHandlers} />);
     const buttons = screen.getAllByRole('button');
-    const editButton = buttons.find((btn) =>
-      btn.className.includes('text-blue-600') && btn.className.includes('w-8')
+    const editButton = buttons.find(
+      (btn) => btn.className.includes('text-blue-600') && btn.className.includes('w-8')
     );
     if (editButton) {
       fireEvent.click(editButton);
@@ -116,8 +114,8 @@ describe('ClientMobileCard', () => {
   it('should call onDeleteClient when delete button clicked', () => {
     render(<ClientMobileCard client={mockClient} {...mockHandlers} />);
     const buttons = screen.getAllByRole('button');
-    const deleteButton = buttons.find((btn) =>
-      btn.className.includes('text-red-600') && btn.className.includes('w-8')
+    const deleteButton = buttons.find(
+      (btn) => btn.className.includes('text-red-600') && btn.className.includes('w-8')
     );
     if (deleteButton) {
       fireEvent.click(deleteButton);
@@ -126,26 +124,14 @@ describe('ClientMobileCard', () => {
   });
 
   it('should show expanded icon when records are expanded', () => {
-    render(
-      <ClientMobileCard
-        client={mockClient}
-        {...mockHandlers}
-        isRecordsExpanded={true}
-      />
-    );
+    render(<ClientMobileCard client={mockClient} {...mockHandlers} isRecordsExpanded={true} />);
     // ChevronDown should be present (expanded state)
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBeGreaterThan(0);
   });
 
   it('should disable enter button when loading', () => {
-    render(
-      <ClientMobileCard
-        client={mockClient}
-        {...mockHandlers}
-        submitLoading={true}
-      />
-    );
+    render(<ClientMobileCard client={mockClient} {...mockHandlers} submitLoading={true} />);
     const enterButton = screen.getByText('進入諮詢室');
     expect(enterButton).toBeDisabled();
   });

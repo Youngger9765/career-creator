@@ -220,17 +220,14 @@ describe('useCardManagement', () => {
 
   describe('reset functionality', () => {
     it('should reset used cards when deck changes', () => {
-      const { result, rerender } = renderHook(
-        (props) => useCardManagement(props),
-        {
-          initialProps: {
-            selectedDeck: '職游旅人卡',
-            selectedGameRule: '優劣勢分析',
-            onCardEvent: mockOnCardEvent,
-            isReadOnly: false,
-          },
-        }
-      );
+      const { result, rerender } = renderHook((props) => useCardManagement(props), {
+        initialProps: {
+          selectedDeck: '職游旅人卡',
+          selectedGameRule: '優劣勢分析',
+          onCardEvent: mockOnCardEvent,
+          isReadOnly: false,
+        },
+      });
 
       // Deal a card
       act(() => {

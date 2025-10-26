@@ -10,7 +10,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 from sqlmodel import Session, func, or_, select
 
-from app.core.auth import get_current_user_from_token
+from app.core.auth import get_current_user_from_token, get_password_hash
 from app.core.database import get_session
 from app.core.roles import Permission, has_permission
 from app.models.client import (
@@ -26,8 +26,7 @@ from app.models.client import (
     RoomClient,
 )
 from app.models.room import Room
-
-# from app.models.user import User  # Not needed since using dict from JWT
+from app.models.user import User
 
 router = APIRouter(prefix="/api/clients", tags=["clients"])
 
@@ -38,6 +37,34 @@ def check_counselor_permission(current_user: dict):
         raise HTTPException(
             status_code=403, detail="Only counselors can perform this action"
         )
+
+
+# Helper function to ensure user exists in database (for demo accounts)
+def ensure_user_exists(session: Session, current_user: dict) -> UUID:
+    """
+    Ensure user exists in database, create if missing (for demo accounts).
+    Returns user_id as UUID.
+    """
+    user_id = UUID(current_user["user_id"])
+
+    # Check if user exists
+    existing_user = session.get(User, user_id)
+    if existing_user:
+        return user_id
+
+    # User doesn't exist (likely demo account), create it
+    new_user = User(
+        id=user_id,
+        email=current_user.get("email", f"user_{user_id}@example.com"),
+        name=current_user.get("email", "Demo User").split("@")[0],
+        hashed_password=get_password_hash("demo123"),  # Demo password
+        roles=current_user.get("roles", ["counselor"]),
+        is_active=True,
+    )
+    session.add(new_user)
+    session.flush()
+
+    return user_id
 
 
 @router.get("", response_model=List[ClientResponse])
@@ -125,8 +152,6 @@ async def get_my_clients(
         rooms_data = []
         for room in rooms:
             # Get counselor name from database
-            from app.models.user import User
-
             counselor = session.get(User, room.counselor_id)
             counselor_name = counselor.name if counselor else "諮詢師"
 
@@ -190,11 +215,14 @@ async def create_client(
     """
     check_counselor_permission(current_user)
 
+    # Ensure user exists in database (important for demo accounts)
+    counselor_id = ensure_user_exists(session, current_user)
+
     # Check if this counselor already has a client with this email (if email provided)
     if client_data.email:
         existing_client = session.exec(
             select(Client).where(
-                Client.counselor_id == str(current_user["user_id"]),
+                Client.counselor_id == counselor_id,
                 Client.email == client_data.email,
             )
         ).first()
@@ -207,7 +235,7 @@ async def create_client(
 
     # Create new client for this counselor
     client = Client(
-        counselor_id=str(current_user["user_id"]),
+        counselor_id=counselor_id,
         email=client_data.email,
         name=client_data.name,
         phone=client_data.phone,
@@ -222,7 +250,7 @@ async def create_client(
     # Auto-create first room for this client
     client_display_name = client.name or "Anonymous"
     default_room = Room(
-        counselor_id=str(current_user["user_id"]),
+        counselor_id=counselor_id,
         name=f"{client_display_name} 的諮詢室",
         description="主要諮詢空間",
         is_active=True,

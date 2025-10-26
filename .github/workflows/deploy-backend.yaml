@@ -138,6 +138,14 @@ jobs:
 
           echo "✅ Migrations completed successfully"
 
+      - name: Seed demo users
+        run: |
+          echo "Seeding demo user accounts..."
+          export DATABASE_URL="${{ env.DATABASE_POOLER_URL }}"
+          cd backend
+          python -c "from app.core.seeds import seed_demo_users; seed_demo_users()"
+          echo "✅ Demo users seeded successfully"
+
       - name: Run health check
         run: |
           echo "Waiting for service to be ready..."

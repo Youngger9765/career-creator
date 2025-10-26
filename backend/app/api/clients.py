@@ -62,7 +62,8 @@ def ensure_user_exists(session: Session, current_user: dict) -> UUID:
         is_active=True,
     )
     session.add(new_user)
-    session.flush()
+    session.commit()  # Commit the new user immediately
+    session.refresh(new_user)
 
     return user_id
 

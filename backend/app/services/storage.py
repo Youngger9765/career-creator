@@ -75,11 +75,15 @@ async def upload_screenshot(
         bucket = client.bucket(GCS_BUCKET_NAME)
         blob = bucket.blob(f"screenshots/{relative_path}")
 
+        # Set cache control for CDN optimization (1 year, immutable)
+        # Safe because filenames are UUIDs and never reused
+        blob.cache_control = "public, max-age=31536000, immutable"
+
         # Upload file
         file.file.seek(0)  # Reset file pointer
         blob.upload_from_file(file.file, content_type=file.content_type or "image/png")
 
-        # Return public URL
+        # Return public URL (GCS has built-in CDN)
         # Bucket has allUsers objectViewer role for public access
         return blob.public_url
 
@@ -127,11 +131,15 @@ async def upload_to_gcs(
         bucket = client.bucket(GCS_BUCKET_NAME)
         blob = bucket.blob(file_path)
 
+        # Set cache control for CDN optimization (1 year, immutable)
+        # Safe because filenames are UUIDs and never reused
+        blob.cache_control = "public, max-age=31536000, immutable"
+
         # Upload file
         file_content.seek(0)  # Reset file pointer
         blob.upload_from_file(file_content, content_type=content_type)
 
-        # Return public URL
+        # Return public URL (GCS has built-in CDN)
         # Bucket has allUsers objectViewer role for public access
         return blob.public_url
 

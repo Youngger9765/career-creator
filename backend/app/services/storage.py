@@ -69,6 +69,8 @@ async def upload_screenshot(
 
     # Real GCS upload
     try:
+        from datetime import timedelta
+
         from google.cloud import storage
 
         client = storage.Client()
@@ -79,10 +81,15 @@ async def upload_screenshot(
         file.file.seek(0)  # Reset file pointer
         blob.upload_from_file(file.file, content_type=file.content_type or "image/png")
 
-        # Note: Bucket has uniform bucket-level access with allUsers objectViewer role
-        # Files are automatically public, no need to call make_public()
+        # Generate signed URL (valid for 7 days)
+        # More secure than public URLs - prevents DDoS and unauthorized access
+        signed_url = blob.generate_signed_url(
+            version="v4",
+            expiration=timedelta(days=7),
+            method="GET",
+        )
 
-        return blob.public_url
+        return signed_url
 
     except Exception as e:
         # Log error and fall back to local storage in development
@@ -122,6 +129,8 @@ async def upload_to_gcs(
 
     # Real GCS upload
     try:
+        from datetime import timedelta
+
         from google.cloud import storage
 
         client = storage.Client()
@@ -132,10 +141,15 @@ async def upload_to_gcs(
         file_content.seek(0)  # Reset file pointer
         blob.upload_from_file(file_content, content_type=content_type)
 
-        # Note: Bucket has uniform bucket-level access with allUsers objectViewer role
-        # Files are automatically public, no need to call make_public()
+        # Generate signed URL (valid for 7 days)
+        # More secure than public URLs - prevents DDoS and unauthorized access
+        signed_url = blob.generate_signed_url(
+            version="v4",
+            expiration=timedelta(days=7),
+            method="GET",
+        )
 
-        return blob.public_url
+        return signed_url
 
     except Exception as e:
         # Log error and fall back to mock URL in development

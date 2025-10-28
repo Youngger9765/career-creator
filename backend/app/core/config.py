@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # Storage Configuration
     use_mock_storage: bool = False
-    gcs_bucket_name: str = "career-creator-472207-screenshots"
+    gcs_bucket_name: str = "career-creator-screenshots-staging"
     google_application_credentials: Optional[str] = None
 
     class Config:

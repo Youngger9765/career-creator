@@ -13,6 +13,7 @@
 **背景**：從個人 GCP 專案遷移到公司專案
 
 **完成項目**：
+
 - 新 GCP 專案建立（`career-creator-card`）
 - 前後端服務部署（Production + Staging）
 - 資料庫遷移（Supabase Production）
@@ -20,6 +21,7 @@
 - 舊專案完整清理
 
 **影響**：
+
 - ✅ **成本控管**：從個人帳單轉為公司專案
 - ✅ **權限管理**：團隊成員統一管理
 - ✅ **環境穩定**：Production/Staging 分離運作
@@ -32,6 +34,7 @@
 ### 1. 大型組件重構（2階段完成）
 
 **Phase 1 - 諮詢室組件拆分**：
+
 - 將 1000+ 行的 `ConsultationArea` 拆解
 - 提取 3 個獨立 hooks：
   - `useCardManagement`（牌卡操作）
@@ -39,6 +42,7 @@
   - `mockCards`（資料分離）
 
 **Phase 2 - 客戶管理組件拆分**：
+
 - 將 800+ 行的 `ClientManagement` 拆解
 - 提取 3 個獨立組件：
   - `useClientManagement`（資料邏輯）
@@ -46,6 +50,7 @@
   - `ClientMobileCard`（手機版卡片）
 
 **效益**：
+
 - ✅ **可維護性**：組件從 1000+ 行降至 200-300 行
 - ✅ **可測試性**：邏輯獨立，方便單元測試
 - ✅ **可重用性**：Hook 可在其他組件使用
@@ -53,11 +58,13 @@
 ### 2. 測試覆蓋完善
 
 **新增測試**：
+
 - E2E 測試重組（Playwright）
 - API 層測試（auth, rooms, visitors）
 - 重構後煙霧測試
 
 **修復問題**：
+
 - React Hooks 依賴警告全部解決
 - 測試選擇器更新
 - 過時測試清理
@@ -71,6 +78,7 @@
 **問題**：Demo 帳號登入後無法建立客戶（缺少 user 記錄）
 
 **解決**：
+
 - 後端自動檢查並建立 user 記錄
 - 支援 demo.counselor / demo.admin 兩種角色
 - 確保 demo 帳號完整可用
@@ -80,6 +88,7 @@
 **問題**：Migration 檔案命名錯誤導致部署失敗
 
 **解決**：
+
 - 修正 Alembic migration 檔案順序
 - 移除錯誤的 gameplay_states 刪除語句
 - 部署流程恢復正常
@@ -129,11 +138,13 @@
 ## 💬 需要協助
 
 **KM**：
+
 1. Beta 測試用戶清單（50 人 Email）
 2. 確認 Beta 測試啟動時間
 3. 協調 Hannah 提供牌卡素材進度
 
 **Hannah**：
+
 1. 三種牌卡圖片與文案
 2. 建議優先提供一種牌卡完整測試
 

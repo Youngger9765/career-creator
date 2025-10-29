@@ -710,22 +710,57 @@
    - 三版介面實作（小/中/大）
    - 內部測試驗證
 
-4. **Production 環境建置** ⚠️ (下週優先)
-   - ⚠️ 公司 GCP 環境建立（Career 360 Project）
-   - ⚠️ Cloud Run Service 部署（frontend + backend）
-   - ⚠️ Supabase Production Database 設定
-   - ⚠️ GCS Bucket 配置（screenshot storage）
-   - ⚠️ GitHub Actions CD Pipeline（自動部署至 Production）
-   - ⚠️ 環境變數與 Secret 管理
-   - ⚠️ 資料庫 Migration 流程驗證
-   - ⚠️ 監控與錯誤追蹤（Cloud Logging）
-   - ⚠️ 負載測試與效能調校
+4. **Production 環境建置** ✅ (2025-10-24 完成)
+   - ✅ 公司 GCP 專案建立（career-creator-card）
+   - ✅ Cloud Run Service 部署（frontend + backend）
+   - ✅ Supabase Production Database 設定
+   - ✅ GCS Bucket 配置（CDN 1年快取）
+   - ✅ GitHub Actions CD Pipeline（自動部署至 Production）
+   - ✅ 環境變數與 Secret 管理
+   - ✅ 資料庫 Migration 流程驗證
+   - ✅ 舊專案完整清理（career-creator-472207）
+   - ⚠️ 監控與錯誤追蹤（Cloud Logging）待完善
+   - ⚠️ 負載測試與效能調校（延至 Week 12）
 
 **❌ 不納入第一階段：**
 
 - AI 報告生成（延至第三階段）
 - A+B=C Pattern 邏輯（視產能決定）
 - 註冊流程（第二階段）
+
+#### Week 12 完成項目 (2025-10-22 ~ 10-28)
+
+**完成功能：**
+
+1. **Production 環境遷移** ✅ (2025-10-24)
+   - GCP 專案從個人遷移至公司（career-creator-card）
+   - Production + Staging 雙環境部署
+   - GCS CDN 優化（1年快取）
+   - 舊專案清理（career-creator-472207 已刪除）
+
+2. **程式碼重構（Phase 1 & 2）** ✅ (2025-10-22)
+   - ConsultationArea 拆分：提取 3 個 hooks
+   - ClientManagement 拆分：提取 3 個組件
+   - 組件從 1000+ 行降至 200-300 行
+
+3. **測試覆蓋完善** ✅ (2025-10-22)
+   - E2E 測試重組（Playwright）
+   - API 層測試新增
+   - React Hooks 警告全部解決
+
+4. **Bug 修復** ✅ (2025-10-27)
+   - Demo 用戶自動建立
+   - Migration 檔案命名修復
+
+#### Week 13 計畫 (2025-10-29 ~ 11-04)
+
+**P0 優先：**
+- 負載測試（50 人同時上線）
+- 牌卡內容上架（等 Hannah 提供素材）
+
+**P1 次要：**
+- Cloud Logging 監控設定
+- 效能調校優化
 
 #### Week 13-14：Beta 測試啟動
 
@@ -773,6 +808,14 @@
 
 ## 📝 版本紀錄
 
+- **v4.9** (2025-10-28): 更新 Week 12 完成進度（Production 環境遷移與程式碼品質提升）
+  - ✅ Production 環境遷移完成（career-creator-card 專案）
+  - ✅ 舊專案清理（career-creator-472207 已刪除）
+  - ✅ GCS CDN 優化（1年快取設定）
+  - ✅ 大型組件重構完成（Phase 1 & 2）
+  - ✅ Demo 用戶自動建立修復
+  - ✅ 測試覆蓋完善（E2E + API 層）
+  - ⚠️ 負載測試與牌卡上架延至下週
 - **v4.8** (2025-10-21): 更新 Week 11 完成進度與 Production 環境規劃
   - ✅ 白名單認證系統完整實作（15 commits）
   - ✅ 管理員後台、CSV 匯入、密碼重設機制

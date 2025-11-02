@@ -1,0 +1,28 @@
+{
+  "test_config": {
+    "num_users": 50,
+    "duration_sec": 120,
+    "room_id": "test-room-1762075167"
+  },
+  "connections": {
+    "success": 50,
+    "failed": 0,
+    "success_rate": "50/50",
+    "avg_connection_time_ms": 816.17
+  },
+  "messages": {
+    "sent": 2400,
+    "received": 0,
+    "avg_latency_ms": 0,
+    "p50_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "p99_latency_ms": 0
+  },
+  "broadcast": {
+    "avg_delivery_rate": "0%",
+    "total_broadcasts": 2400,
+    "expected_receivers_per_msg": 49
+  },
+  "errors": {},
+  "test_duration_actual_sec": 123.99
+}

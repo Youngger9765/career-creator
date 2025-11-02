@@ -144,8 +144,8 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
   useEffect(() => {
     if (!supabase || !roomId) return;
 
-    // Create channel
-    const gameChannel = supabase.channel(`room:${roomId}:gamemode`);
+    // Create channel (必須使用 realtime: 前綴)
+    const gameChannel = supabase.channel(`realtime:room:${roomId}:gamemode`);
 
     // Listen for mode changes
     gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {

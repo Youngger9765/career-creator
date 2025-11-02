@@ -242,8 +242,8 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   useEffect(() => {
     if (!supabase || !roomId) return;
 
-    // 建立頻道
-    const channel = supabase.channel(`room:${roomId}:cards:${gameType}`);
+    // 建立頻道 (必須使用 realtime: 前綴)
+    const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
 
     // 監聽牌卡移動
     channel.on('broadcast', { event: 'card_moved' }, ({ payload }) => {

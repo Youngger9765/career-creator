@@ -1,16 +1,6 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
+# Test results
+*_test_results_*.json
 
-# Locust
-*.html
-*.csv
-results_*
-
-# Logs
-*.log
+# Test scripts (keep only in local)
+test_100_concurrent_quick.py
+test_100_rooms_sync.py

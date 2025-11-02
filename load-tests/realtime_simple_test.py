@@ -63,26 +63,23 @@ async def main():
 
     # 測試不同的 topic 格式
     topics_to_test = [
-        # 1. 原始格式 (自訂 topic)
-        "room:test-123:cards:game1",
+        # Frontend actual format (from use-card-sync.ts)
+        "realtime:room:test-123:cards:personality_analysis",
 
-        # 2. Realtime 官方格式 (realtime: 前綴)
+        # Short format that worked before
         "realtime:room:test-123",
 
-        # 3. 資料庫表格格式 (public: schema)
+        # Without cards/gameType
+        "room:test-123:cards:game1",
+
+        # Database table format
         "public:rooms",
 
-        # 4. 簡單的 broadcast channel
+        # Simple broadcast
         "broadcast:test",
 
-        # 5. 只用一個名稱
+        # Single name
         "test",
-
-        # 6. 使用 presence 前綴
-        "presence:test",
-
-        # 7. 官方文檔範例格式
-        "public:messages",
     ]
 
     results = {}

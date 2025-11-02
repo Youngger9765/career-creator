@@ -5,7 +5,7 @@ TEMPORARY ENDPOINT - 僅用於初始化 Production 環境
 
 import os
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from sqlmodel import Session, select
 
 from app.core.database import get_session
@@ -19,7 +19,7 @@ TEMP_INIT_SECRET = os.getenv("TEMP_INIT_SECRET", "")
 
 
 @router.post("/init-admin")
-def init_admin(secret: str, db: Session = Depends(get_session)):
+def init_admin(secret: str = Body(..., embed=True), db: Session = Depends(get_session)):
     """
     臨時端點：建立 admin 帳號
 
@@ -61,7 +61,11 @@ def init_admin(secret: str, db: Session = Depends(get_session)):
 
 
 @router.post("/create-test-users")
-def create_test_users(secret: str, count: int, db: Session = Depends(get_session)):
+def create_test_users(
+    secret: str = Body(...),
+    count: int = Body(...),
+    db: Session = Depends(get_session),
+):
     """
     臨時端點：批次建立測試使用者
 
@@ -110,7 +114,9 @@ def create_test_users(secret: str, count: int, db: Session = Depends(get_session
 
 
 @router.delete("/cleanup-test-users")
-def cleanup_test_users(secret: str, db: Session = Depends(get_session)):
+def cleanup_test_users(
+    secret: str = Body(..., embed=True), db: Session = Depends(get_session)
+):
     """
     臨時端點：清理所有測試使用者
 

@@ -17,7 +17,13 @@ from app.core.config import settings
 # bcrypt rounds: 10 (default 12) - reduces CPU time per hash by ~3x
 # 10 rounds = ~100ms, 12 rounds = ~300ms
 # Still secure per OWASP recommendations (min 10 rounds)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=10)
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__default_rounds=10,
+    bcrypt__min_rounds=10,
+    bcrypt__max_rounds=12,
+)
 
 # Token security
 security = HTTPBearer(auto_error=False)

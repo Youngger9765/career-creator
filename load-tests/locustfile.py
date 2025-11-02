@@ -1,22 +1,25 @@
 """
 Locust Load Testing for Career Creator Platform
 
-Test scenarios:
-1. User login (50 concurrent users)
-2. Room creation and joining
-3. WebSocket connections
-4. Card drag operations
-5. Note creation
-6. Screenshot upload
+Simulates sustained load with mixed operations (Counselor and Visitor workflows)
 
-Usage:
-    locust -f load-tests/locustfile.py --host=https://career-creator-frontend-staging-x43mdhfwsq-de.a.run.app
+Usage Examples:
+    # Web UI (interactive)
+    locust -f load-tests/locustfile.py
 
-Run with Web UI:
-    locust -f load-tests/locustfile.py --host=https://career-creator-frontend-staging-x43mdhfwsq-de.a.run.app --web-host=0.0.0.0
+    # Headless - smoke test (10 users, 2 min)
+    locust -f load-tests/locustfile.py --headless -u 10 -r 5 -t 2m
 
-Run headless (50 users, 10 spawn rate):
-    locust -f load-tests/locustfile.py --host=https://career-creator-frontend-staging-x43mdhfwsq-de.a.run.app --headless -u 50 -r 10 -t 5m
+    # Headless - medium test (50 users, 5 min)
+    locust -f load-tests/locustfile.py --headless -u 50 -r 10 -t 5m
+
+    # Headless - large test (100 users, 10 min)
+    locust -f load-tests/locustfile.py --headless -u 100 -r 10 -t 10m
+
+Note: This test uses config.py for settings. Update config.py to change:
+    - API endpoints
+    - Test user credentials
+    - Success criteria
 """
 
 import json
@@ -25,15 +28,16 @@ import time
 from locust import HttpUser, task, between, events
 from locust.contrib.fasthttp import FastHttpUser
 import logging
+from config import STAGING_API, DEFAULT_TEST_PASSWORD
 
-# Test user credentials
+# Test user credentials (100 users available)
 TEST_USERS = [
-    {"email": f"test.user{i}@example.com", "password": "TestPassword123!"}
-    for i in range(1, 51)
+    {"email": f"test.user{i}@example.com", "password": DEFAULT_TEST_PASSWORD}
+    for i in range(1, 101)
 ]
 
 # Backend API base URL
-BACKEND_API = "https://career-creator-backend-staging-x43mdhfwsq-de.a.run.app"
+BACKEND_API = STAGING_API
 
 
 class CounselorUser(FastHttpUser):

@@ -4,9 +4,11 @@ Concurrent Rooms Load Test
 Configurable test for N counselors each creating a room with 1 visitor
 
 Usage:
-  python test_concurrent_rooms.py                    # Default: 100 rooms
-  python test_concurrent_rooms.py --rooms 50         # Test 50 rooms
-  python test_concurrent_rooms.py --rooms 200 --local  # Test 200 rooms on local
+  python test_concurrent_rooms.py                       # Default: medium config
+  python test_concurrent_rooms.py --config smoke        # Quick smoke test (10 rooms)
+  python test_concurrent_rooms.py --config large        # Large test (200 rooms)
+  python test_concurrent_rooms.py --rooms 50            # Custom room count
+  python test_concurrent_rooms.py --rooms 200 --local   # Local backend
 """
 
 import asyncio
@@ -15,6 +17,15 @@ import requests
 import time
 from datetime import datetime
 import json
+import sys
+import os
+
+# Add parent directory to path for config import
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import (
+    STAGING_API, LOCAL_API, DEFAULT_TEST_PASSWORD,
+    get_scenario_config, SCENARIOS
+)
 
 class TestMetrics:
     def __init__(self):
@@ -85,7 +96,7 @@ async def test_single_room(api_url: str, counselor_num: int, metrics: TestMetric
             f"{api_url}/api/auth/login",
             json={
                 "email": f"test.user{counselor_num}@example.com",
-                "password": "TestPassword123!"
+                "password": DEFAULT_TEST_PASSWORD
             },
             timeout=30
         )
@@ -167,13 +178,36 @@ async def test_single_room(api_url: str, counselor_num: int, metrics: TestMetric
         print(f"❌ [Room {counselor_num}] Visitor join error: {str(e)[:50]}")
 
 async def main():
-    parser = argparse.ArgumentParser(description='Concurrent Rooms Load Test')
-    parser.add_argument('--rooms', type=int, default=100, help='Number of rooms to test (default: 100)')
+    parser = argparse.ArgumentParser(
+        description='Concurrent Rooms Load Test',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s --config smoke     # Quick test: 10 rooms
+  %(prog)s --config medium    # Medium test: 100 rooms (default)
+  %(prog)s --config large     # Large test: 200 rooms
+  %(prog)s --rooms 150        # Custom: 150 rooms
+  %(prog)s --local            # Test local backend
+        """
+    )
+    parser.add_argument('--config', type=str, choices=['smoke', 'small', 'medium', 'large', 'stress'],
+                       help='Test configuration preset')
+    parser.add_argument('--rooms', type=int, help='Number of rooms (overrides --config)')
     parser.add_argument('--local', action='store_true', help='Test against local backend')
     args = parser.parse_args()
 
-    num_rooms = args.rooms
-    api_url = "http://localhost:8000" if args.local else "https://career-creator-backend-staging-x43mdhfwsq-de.a.run.app"
+    # Determine number of rooms
+    if args.rooms:
+        num_rooms = args.rooms
+    elif args.config:
+        config = get_scenario_config('concurrent_rooms', args.config)
+        num_rooms = config['rooms']
+    else:
+        # Default to medium config
+        config = get_scenario_config('concurrent_rooms', 'medium')
+        num_rooms = config['rooms']
+
+    api_url = LOCAL_API if args.local else STAGING_API
     env = "Local" if args.local else "Staging"
 
     print("=" * 80)

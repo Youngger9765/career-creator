@@ -148,6 +148,15 @@ jobs:
           python -c "from app.core.seeds import seed_demo_users; seed_demo_users()"
           echo "✅ Demo users seeded successfully"
 
+      - name: Rehash test user passwords
+        if: env.ENVIRONMENT == 'staging'
+        run: |
+          echo "Rehashing test user passwords with bcrypt 10 rounds..."
+          export DATABASE_URL=$(echo "${{ env.DATABASE_POOLER_URL }}" | sed 's/:5432/:6543/g')
+          cd backend
+          python rehash_passwords.py
+          echo "✅ Test users rehashed successfully"
+
       - name: Run health check
         run: |
           echo "Waiting for service to be ready..."

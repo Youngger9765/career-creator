@@ -1,6 +1,7 @@
 # Realtime 50人並發測試 - 最終結果
 
 ## 測試日期
+
 2025-11-02
 
 ## 測試結論
@@ -12,12 +13,14 @@
 ## 最終測試結果
 
 ### 連接性能
+
 - ✅ **成功連接**: 50/50 (100%)
 - ✅ **失敗連接**: 0
 - ✅ **平均連接時間**: 576ms
 - ✅ **連接穩定性**: 完美
 
 ### Broadcast 訊息傳遞
+
 - ✅ **訊息發送**: 2,400 條
 - ✅ **訊息接收**: 117,600 條 (2,400 × 49)
 - ✅ **送達率**: **100%** 🎉
@@ -26,6 +29,7 @@
 - ✅ **P99 延遲**: 494ms
 
 ### 測試場景
+
 - 50 個使用者同時連接到同一個房間
 - 每個使用者發送 48 條訊息 (移動牌卡)
 - 測試時長: 2 分鐘
@@ -44,12 +48,14 @@
 ### 解決方案
 
 **錯誤格式**:
+
 ```typescript
 // ❌ 不正確
 const channel = supabase.channel(`room:${roomId}:cards:${gameType}`);
 ```
 
 **正確格式**:
+
 ```typescript
 // ✅ 正確 (必須以 realtime: 開頭)
 const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
@@ -58,12 +64,14 @@ const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
 ### 修正的檔案
 
 1. **frontend/src/hooks/use-card-sync.ts**
+
    ```diff
    - const channel = supabase.channel(`room:${roomId}:cards:${gameType}`);
    + const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
    ```
 
 2. **frontend/src/hooks/use-game-mode-sync.ts**
+
    ```diff
    - const gameChannel = supabase.channel(`room:${roomId}:gamemode`);
    + const gameChannel = supabase.channel(`realtime:room:${roomId}:gamemode`);
@@ -83,6 +91,7 @@ const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
 | P99 延遲 | 494ms | ✅ 可接受 |
 
 **解讀**:
+
 - 50% 的訊息在 174ms 內送達
 - 95% 的訊息在 390ms 內送達
 - 99% 的訊息在 500ms 內送達
@@ -101,12 +110,15 @@ const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
 ## 容量評估
 
 ### Supabase 免費版限制
+
 - **並發連接數上限**: 200
 - **當前使用**: 50
 - **剩餘容量**: 150 (75%)
 
 ### 結論
+
 ✅ **免費版足夠支援 Beta 測試**
+
 - 可以支援最多 200 個同時在線用戶
 - 50 人測試僅使用 25% 容量
 - **無需升級付費方案**
@@ -116,17 +128,20 @@ const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
 ## 測試環境
 
 ### 系統配置
+
 - **Supabase 專案**: nnjdyxiiyhawwbkfyhtr
 - **Region**: Asia East 1 (台灣)
 - **測試時間**: 2025-11-02 17:54-17:56
 - **測試時長**: 2 分鐘
 
 ### 測試工具
+
 - Python 3.10
 - websockets 15.0.1
 - asyncio (50 並發任務)
 
 ### 測試腳本
+
 - `realtime_websocket_test.py` - 完整 50 人測試
 - `realtime_quick_test.py` - 快速 5 人驗證
 - `realtime_simple_test.py` - Topic 格式測試
@@ -149,6 +164,7 @@ const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
    - 其他人即時看到更新
 
 3. **訊息廣播流程**
+
    ```
    User A 移動牌卡
      ↓
@@ -298,6 +314,7 @@ wss://PROJECT.supabase.co/realtime/v1/websocket?apikey=XXX&vsn=1.0.0
 ✅ **Realtime 功能已完全準備好支援 50 人並發使用**
 
 ### 關鍵成果
+
 - ✅ 100% 連接成功率
 - ✅ 100% 訊息送達率
 - ✅ 平均延遲 195ms
@@ -305,6 +322,7 @@ wss://PROJECT.supabase.co/realtime/v1/websocket?apikey=XXX&vsn=1.0.0
 - ✅ 無需付費升級
 
 ### 下一步
+
 1. ✅ 代碼已修正 (加上 `realtime:` 前綴)
 2. ⏳ 部署到 staging 環境
 3. ⏳ 進行實際用戶測試

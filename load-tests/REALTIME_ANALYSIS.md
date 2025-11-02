@@ -1,9 +1,11 @@
 # Realtime 功能負載測試分析報告
 
 ## 測試日期
+
 2025-11-02
 
 ## 測試目標
+
 驗證系統的 Supabase Realtime (Broadcast) 功能能否支援 **50 人同時在線**使用。
 
 ---
@@ -11,11 +13,13 @@
 ## 測試結果總結
 
 ### ✅ 連接測試: 成功
+
 - **50/50 使用者成功建立 WebSocket 連接**
 - 平均連接時間: **816ms**
 - 連接成功率: **100%**
 
 ### ⚠️ Broadcast 測試: 受限於 Supabase 配置
+
 - 所有 broadcast 訊息返回 **"unmatched topic"** 錯誤
 - 原因: Supabase Realtime 需要在後台啟用 Broadcast authorization
 - 訊息送達率: **0%** (因配置問題，非系統容量問題)
@@ -41,6 +45,7 @@ Supabase Realtime Server
 ### 關鍵發現
 
 1. **Channel Topics 結構**
+
    ```typescript
    // 遊戲模式同步
    room:{roomId}:gamemode
@@ -50,6 +55,7 @@ Supabase Realtime Server
    ```
 
 2. **Broadcast 訊息格式**
+
    ```json
    {
      "topic": "room:xxx:cards:personality_analysis",
@@ -78,18 +84,22 @@ Supabase Realtime Server
 ## Supabase Realtime 限制
 
 ### 免費版限制 (Free Tier)
+
 - **同時連接數**: 200 connections
 - **訊息頻率**: 無明確限制，但有 rate limiting
 - **Channels**: 無數量限制
 - **Broadcast**: 需手動啟用
 
 ### Pro 版限制 ($25/月)
+
 - **同時連接數**: 500 connections
 - **訊息頻率**: 更高 rate limit
 - **優先支援**: 技術支援優先
 
 ### 結論
+
 以 **50 人同時在線** 而言:
+
 - ✅ 免費版 200 connections **足夠** (50 < 200)
 - ✅ 無需升級付費方案
 
@@ -125,11 +135,13 @@ Supabase Realtime Server
 Supabase Realtime 有兩種授權模式:
 
 #### 1. Database Realtime (PostgreSQL Changes)
+
 - 自動監聽資料庫表格變更
 - 需要在 Supabase Dashboard 啟用表格的 Realtime
 - 有 RLS 規則保護
 
 #### 2. Broadcast / Presence (任意 Topic)
+
 - 允許自定義 topic 名稱
 - **預設關閉**，需要手動啟用
 - 需要設定授權規則
@@ -143,6 +155,7 @@ Supabase Realtime 有兩種授權模式:
 ### 方案 A: 啟用 Supabase Broadcast (推薦)
 
 **步驟**:
+
 1. 前往 Supabase Dashboard
 2. 選擇專案 `nnjdyxiiyhawwbkfyhtr`
 3. 進入 `Settings` → `API` → `Realtime`
@@ -150,11 +163,13 @@ Supabase Realtime 有兩種授權模式:
 5. 設定 Authorization 規則 (可設為允許所有 authenticated users)
 
 **優點**:
+
 - ✅ 無需修改代碼
 - ✅ 最簡單快速
 - ✅ 支援當前架構
 
 **缺點**:
+
 - ⚠️ 需要有 Supabase Dashboard 存取權限
 
 ### 方案 B: 改用 Database Realtime
@@ -162,11 +177,13 @@ Supabase Realtime 有兩種授權模式:
 將狀態儲存在 PostgreSQL，使用 Database Changes 監聽。
 
 **優點**:
+
 - ✅ 自動授權 (基於 RLS)
 - ✅ 狀態持久化 (存在資料庫)
 - ✅ 可回溯歷史
 
 **缺點**:
+
 - ❌ 需大幅修改代碼
 - ❌ 每次牌卡移動都寫入資料庫 (性能問題)
 - ❌ 開發時間長 (估計 1-2 週)
@@ -176,10 +193,12 @@ Supabase Realtime 有兩種授權模式:
 使用 Socket.IO 或 native WebSocket 自建即時服務。
 
 **優點**:
+
 - ✅ 完全控制
 - ✅ 無第三方限制
 
 **缺點**:
+
 - ❌ 需要額外維護
 - ❌ 部署成本高
 - ❌ 開發時間長 (估計 2-3 週)
@@ -196,6 +215,7 @@ Supabase Realtime 有兩種授權模式:
    - 效益: 高
 
 2. **重新運行負載測試**
+
    ```bash
    cd load-tests
    python3 realtime_websocket_test.py
@@ -228,16 +248,19 @@ Supabase Realtime 有兩種授權模式:
 ### 測試腳本說明
 
 #### 1. `realtime_websocket_test.py` (完整測試)
+
 - 50 並發使用者
 - 2 分鐘測試時間
 - 完整指標收集
 
 #### 2. `realtime_quick_test.py` (快速驗證)
+
 - 5 並發使用者
 - 30 秒測試時間
 - 詳細 debug 日誌
 
 #### 3. `realtime_test.py` (架構說明)
+
 - Locust 基礎框架
 - 需改用 WebSocket 工具
 

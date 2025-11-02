@@ -76,3 +76,9 @@ backend/create_test_user.py
 test-screenshot.js
 debug-screenshot.png
 100_rooms_test_results_*.json
+
+# Test results
+test-results/
+*_test_results_*.json
+*_test_*.json
+*.log

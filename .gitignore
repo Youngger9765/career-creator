@@ -75,3 +75,4 @@ backend/create_test_user.py
 # Playwright test files
 test-screenshot.js
 debug-screenshot.png
+100_rooms_test_results_*.json

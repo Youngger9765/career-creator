@@ -142,7 +142,8 @@ jobs:
       - name: Seed demo users
         run: |
           echo "Seeding demo user accounts..."
-          export DATABASE_URL="${{ env.DATABASE_POOLER_URL }}"
+          # Use transaction pooler (port 6543) for better concurrency
+          export DATABASE_URL=$(echo "${{ env.DATABASE_POOLER_URL }}" | sed 's/:5432/:6543/g')
           cd backend
           python -c "from app.core.seeds import seed_demo_users; seed_demo_users()"
           echo "✅ Demo users seeded successfully"

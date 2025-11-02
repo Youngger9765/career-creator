@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
 """
-100 Rooms Concurrent Test
-Tests 100 counselors each with 1 visitor (200 total users, 100 rooms)
+Concurrent Rooms Load Test
+Configurable test for N counselors each creating a room with 1 visitor
+
+Usage:
+  python test_concurrent_rooms.py                    # Default: 100 rooms
+  python test_concurrent_rooms.py --rooms 50         # Test 50 rooms
+  python test_concurrent_rooms.py --rooms 200 --local  # Test 200 rooms on local
 """
 
 import asyncio
+import argparse
 import requests
 import time
 from datetime import datetime
 import json
-
-API_URL = "https://career-creator-backend-staging-x43mdhfwsq-de.a.run.app"
-NUM_COUNSELORS = 100
 
 class TestMetrics:
     def __init__(self):
@@ -44,7 +47,7 @@ class TestMetrics:
             if error:
                 self.errors[error] = self.errors.get(error, 0) + 1
 
-    def get_summary(self):
+    def get_summary(self, num_rooms):
         total_time = time.time() - self.start_time
 
         def calc_stats(data):
@@ -60,10 +63,10 @@ class TestMetrics:
 
         return {
             "test_config": {
-                "num_counselors": NUM_COUNSELORS,
-                "num_visitors": NUM_COUNSELORS,
-                "total_users": NUM_COUNSELORS * 2,
-                "total_rooms": NUM_COUNSELORS
+                "num_counselors": num_rooms,
+                "num_visitors": num_rooms,
+                "total_users": num_rooms * 2,
+                "total_rooms": num_rooms
             },
             "counselor_logins": calc_stats(self.counselor_logins),
             "room_creations": calc_stats(self.room_creations),
@@ -72,16 +75,14 @@ class TestMetrics:
             "total_duration_sec": round(total_time, 1)
         }
 
-metrics = TestMetrics()
-
-async def test_single_room(counselor_num: int):
+async def test_single_room(api_url: str, counselor_num: int, metrics: TestMetrics):
     """Test one counselor creating room + one visitor joining"""
 
     # 1. Counselor login
     start = time.time()
     try:
         response = requests.post(
-            f"{API_URL}/api/auth/login",
+            f"{api_url}/api/auth/login",
             json={
                 "email": f"test.user{counselor_num}@example.com",
                 "password": "TestPassword123!"
@@ -98,12 +99,11 @@ async def test_single_room(counselor_num: int):
         data = response.json()
         if "access_token" not in data:
             metrics.record_login(False, duration)
-            print(f"❌ [Room {counselor_num}] Login response missing token: {data}")
+            print(f"❌ [Room {counselor_num}] Login response missing token")
             return
 
         metrics.record_login(True, duration)
         token = data["access_token"]
-        print(f"✅ [Room {counselor_num}] Logged in, token: {token[:30]}...")
 
     except Exception as e:
         duration = (time.time() - start) * 1000
@@ -115,7 +115,7 @@ async def test_single_room(counselor_num: int):
     start = time.time()
     try:
         response = requests.post(
-            f"{API_URL}/api/rooms/",  # Add trailing slash
+            f"{api_url}/api/rooms/",  # Trailing slash required
             headers={"Authorization": f"Bearer {token}"},
             json={"name": f"Test Room {counselor_num}"},
             timeout=30
@@ -124,7 +124,7 @@ async def test_single_room(counselor_num: int):
 
         if response.status_code != 201:
             metrics.record_room(False, duration)
-            print(f"❌ [Room {counselor_num}] Create room failed: HTTP {response.status_code} - {response.text[:100]}")
+            print(f"❌ [Room {counselor_num}] Create room failed: HTTP {response.status_code}")
             return
 
         metrics.record_room(True, duration)
@@ -141,7 +141,7 @@ async def test_single_room(counselor_num: int):
     try:
         session_id = f"session-{int(time.time() * 1000)}-{counselor_num}"
         response = requests.post(
-            f"{API_URL}/api/visitors/join-room/{share_code}",
+            f"{api_url}/api/visitors/join-room/{share_code}",
             json={
                 "name": f"Visitor-{counselor_num}",
                 "session_id": session_id
@@ -157,7 +157,8 @@ async def test_single_room(counselor_num: int):
             return
 
         metrics.record_visitor(True, duration)
-        print(f"✅ [Room {counselor_num}] Complete (Login: {counselor_num}ms, Room: {duration:.0f}ms, Visitor: {duration:.0f}ms)")
+        if counselor_num % 10 == 0:  # Only print every 10th room
+            print(f"✅ [Room {counselor_num}] Complete")
 
     except Exception as e:
         duration = (time.time() - start) * 1000
@@ -166,18 +167,30 @@ async def test_single_room(counselor_num: int):
         print(f"❌ [Room {counselor_num}] Visitor join error: {str(e)[:50]}")
 
 async def main():
+    parser = argparse.ArgumentParser(description='Concurrent Rooms Load Test')
+    parser.add_argument('--rooms', type=int, default=100, help='Number of rooms to test (default: 100)')
+    parser.add_argument('--local', action='store_true', help='Test against local backend')
+    args = parser.parse_args()
+
+    num_rooms = args.rooms
+    api_url = "http://localhost:8000" if args.local else "https://career-creator-backend-staging-x43mdhfwsq-de.a.run.app"
+    env = "Local" if args.local else "Staging"
+
     print("=" * 80)
-    print(f"100 Rooms Concurrent Test")
-    print(f"100 Counselors + 100 Visitors = 200 Total Users")
+    print(f"{num_rooms} Rooms Concurrent Test ({env})")
+    print(f"{num_rooms} Counselors + {num_rooms} Visitors = {num_rooms * 2} Total Users")
+    print(f"API: {api_url}")
     print("=" * 80)
     print()
 
+    metrics = TestMetrics()
+
     # Run all rooms concurrently
-    tasks = [test_single_room(i + 1) for i in range(NUM_COUNSELORS)]
+    tasks = [test_single_room(api_url, i + 1, metrics) for i in range(num_rooms)]
     await asyncio.gather(*tasks)
 
     # Print results
-    summary = metrics.get_summary()
+    summary = metrics.get_summary(num_rooms)
 
     print()
     print("=" * 80)
@@ -198,13 +211,13 @@ async def main():
 
     # Overall pass/fail
     all_success = (
-        summary['counselor_logins']['success'] == NUM_COUNSELORS and
-        summary['room_creations']['success'] == NUM_COUNSELORS and
-        summary['visitor_joins']['success'] == NUM_COUNSELORS
+        summary['counselor_logins']['success'] == num_rooms and
+        summary['room_creations']['success'] == num_rooms and
+        summary['visitor_joins']['success'] == num_rooms
     )
 
     if all_success:
-        print(f"✅ PASS: All {NUM_COUNSELORS} rooms working perfectly!")
+        print(f"✅ PASS: All {num_rooms} rooms working perfectly!")
     else:
         print(f"⚠️  PARTIAL: Some operations failed")
 
@@ -212,7 +225,7 @@ async def main():
 
     # Save results
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"100_rooms_test_results_{timestamp}.json"
+    filename = f"concurrent_rooms_test_{num_rooms}rooms_{env.lower()}_{timestamp}.json"
     with open(filename, 'w') as f:
         json.dump(summary, f, indent=2)
     print(f"\nResults saved to: {filename}")

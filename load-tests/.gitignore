@@ -1,6 +1,6 @@
-# Test results
+# Test results JSON files
 *_test_results_*.json
+concurrent_rooms_test_*.json
 
-# Test scripts (keep only in local)
-test_100_concurrent_quick.py
-test_100_rooms_sync.py
+# Test user data
+test_users.csv

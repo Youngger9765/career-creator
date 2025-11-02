@@ -14,7 +14,10 @@ import websockets
 
 # Configuration
 SUPABASE_URL = "https://nnjdyxiiyhawwbkfyhtr.supabase.co"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uamR5eGlpeWhhd3dia2Z5aHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NDY3MDksImV4cCI6MjA3MzMyMjcwOX0.NPPt7gA4BJ9S5DxJKdFM3Z9jaWwPAY6cpFNoBdo-usI"
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+
+if not SUPABASE_ANON_KEY:
+    raise ValueError("SUPABASE_ANON_KEY environment variable is required")
 
 NUM_USERS = 5
 TEST_DURATION_SEC = 30

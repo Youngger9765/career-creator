@@ -1,0 +1,9 @@
+{
+  "connections_success": 50,
+  "connections_fail": 50,
+  "messages_sent": 0,
+  "duration_sec": 1.2,
+  "errors": {
+    "TypeError": 50
+  }
+}

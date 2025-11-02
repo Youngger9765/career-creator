@@ -11,8 +11,11 @@ from realtime import AsyncRealtimeClient
 import os
 
 API_URL = "https://career-creator-backend-staging-x43mdhfwsq-de.a.run.app"
-SUPABASE_URL = "wss://nnjdyxiiyhawwbkfyhtr.supabase.co/realtime/v1/websocket"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uamR5eGlpeWhhd3dia2Z5aHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NDY3MDksImV4cCI6MjA3MzMyMjcwOX0.NPPt7gA4BJ9S5DxJKdFM3Z9jaWwPAY6cpFNoBdo-usI"
+SUPABASE_URL = os.getenv("SUPABASE_REALTIME_URL", "wss://nnjdyxiiyhawwbkfyhtr.supabase.co/realtime/v1/websocket")
+SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
+
+if not SUPABASE_KEY:
+    raise ValueError("SUPABASE_ANON_KEY environment variable is required")
 
 class RealtimeMetrics:
     def __init__(self):

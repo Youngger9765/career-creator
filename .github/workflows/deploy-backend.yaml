@@ -112,8 +112,9 @@ jobs:
         run: |
           echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
 
-          # Use session pooler URL (port 5432) - IPv4 compatible for GitHub Actions
-          export DATABASE_URL="${{ env.DATABASE_POOLER_URL }}"
+          # Use transaction pooler (port 6543) - supports more concurrent connections
+          # Session pooler (port 5432) has MaxClientsInSessionMode limit (~15 connections)
+          export DATABASE_URL=$(echo "${{ env.DATABASE_POOLER_URL }}" | sed 's/:5432/:6543/g')
 
           # Debug: Show connection details (mask password)
           echo "🔍 DEBUG: Database connection info:"
@@ -122,11 +123,11 @@ jobs:
           echo "  - Port: $(echo $DATABASE_URL | grep -oP '(?<=:)[0-9]+(?=/)' || echo 'Could not extract')"
           echo "  - Database: $(echo $DATABASE_URL | grep -oP '(?<=/)[^?]+' || echo 'Could not extract')"
 
-          # Check if using session pooler (port 5432) for IPv4 compatibility
-          if echo "$DATABASE_URL" | grep -q "pooler.supabase.com:5432"; then
-            echo "✅ Using session pooler (IPv4 compatible)"
+          # Check if using transaction pooler (port 6543) for better concurrency
+          if echo "$DATABASE_URL" | grep -q "pooler.supabase.com:6543"; then
+            echo "✅ Using transaction pooler (supports more concurrent connections)"
           else
-            echo "⚠️  WARNING: Not using expected session pooler URL!"
+            echo "⚠️  WARNING: Not using expected transaction pooler URL!"
           fi
 
           # Install backend dependencies (includes alembic, sqlmodel, pydantic-settings, etc.)

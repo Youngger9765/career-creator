@@ -24,8 +24,8 @@ import requests
 
 # Configuration
 API_BASE_URL = os.getenv("API_URL", "https://career-creator-backend-staging-x43mdhfwsq-de.a.run.app")
-NUM_USERS = 50
-TEST_DURATION_SEC = 60  # 5 minutes
+NUM_USERS = int(os.getenv("NUM_USERS", "100"))
+TEST_DURATION_SEC = 60
 SAVE_INTERVAL_SEC = 30
 
 # Game types to test

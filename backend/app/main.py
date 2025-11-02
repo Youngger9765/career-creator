@@ -15,6 +15,7 @@ from app.api.gameplay_states import router as gameplay_states_router
 
 # from app.api.game_sessions import router as game_sessions_router  # Disabled for now
 from app.api.rooms import router as rooms_router
+from app.api.temp_init import router as temp_init_router  # TEMPORARY - Remove after use
 from app.api.visitors import router as visitors_router
 from app.core.config import settings
 
@@ -84,6 +85,7 @@ app.include_router(admin_router)
 app.include_router(clients_router)
 app.include_router(counselor_notes_router, prefix="/api")
 app.include_router(gameplay_states_router, prefix="/api")
+app.include_router(temp_init_router)  # TEMPORARY - Remove after use
 
 # Mount static files for uploaded screenshots (development only)
 if os.path.exists("uploads"):

@@ -1,0 +1,2 @@
+# Locust Load Testing Dependencies
+locust==2.20.0

@@ -13,8 +13,11 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing - optimized for concurrent load
+# bcrypt rounds: 10 (default 12) - reduces CPU time per hash by ~3x
+# 10 rounds = ~100ms, 12 rounds = ~300ms
+# Still secure per OWASP recommendations (min 10 rounds)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=10)
 
 # Token security
 security = HTTPBearer(auto_error=False)

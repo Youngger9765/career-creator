@@ -44,6 +44,7 @@ def init_admin(secret: str = Body(..., embed=True), db: Session = Depends(get_se
     # 建立 admin 帳號
     admin_user = User(
         email="demo.admin@example.com",
+        name="Demo Admin",
         hashed_password=get_password_hash("demo123"),
         roles=["admin", "counselor"],
     )
@@ -97,6 +98,7 @@ def create_test_users(
         # 建立使用者
         user = User(
             email=email,
+            name=f"Test User {i}",
             hashed_password=get_password_hash("TestPassword123!"),
             roles=["counselor"],
         )

@@ -257,10 +257,12 @@ Examples:
 
     print("=" * 80)
 
-    # Save results
+    # Save results to load-tests directory
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     filename = f"concurrent_rooms_test_{num_rooms}rooms_{env.lower()}_{timestamp}.json"
-    with open(filename, 'w') as f:
+    filepath = os.path.join(script_dir, filename)
+    with open(filepath, 'w') as f:
         json.dump(summary, f, indent=2)
     print(f"\nResults saved to: {filename}")
 

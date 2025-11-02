@@ -32,7 +32,7 @@
 
 系統使用 **Supabase Realtime Broadcast**，架構如下:
 
-```
+```text
 Frontend (Next.js)
   ↓ WebSocket (Supabase Client)
   ↓
@@ -286,7 +286,7 @@ Supabase Realtime 有兩種授權模式:
 
 ---
 
-## 結論
+## 總結
 
 ### 系統容量評估
 

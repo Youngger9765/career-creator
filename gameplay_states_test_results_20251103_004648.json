@@ -1,0 +1,30 @@
+{
+  "test_config": {
+    "num_users": 50,
+    "duration_sec": 60,
+    "save_interval_sec": 30
+  },
+  "saves": {
+    "attempted": 130,
+    "succeeded": 130,
+    "failed": 0,
+    "success_rate": "100.00%",
+    "avg_time_ms": 601.81,
+    "p95_time_ms": 711.47
+  },
+  "loads": {
+    "attempted": 49,
+    "succeeded": 49,
+    "failed": 0,
+    "success_rate": "100.00%",
+    "avg_time_ms": 355.08,
+    "p95_time_ms": 452.46
+  },
+  "data_integrity": {
+    "valid": 0,
+    "invalid": 49,
+    "integrity_rate": "0.00%"
+  },
+  "errors": {},
+  "test_duration_actual_sec": 144.53
+}

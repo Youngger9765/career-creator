@@ -266,7 +266,7 @@ Supabase Realtime 有兩種授權模式:
 
 ### WebSocket 連接流程
 
-```
+```text
 1. Connect to wss://nnjdyxiiyhawwbkfyhtr.supabase.co/realtime/v1/websocket
    ↓
 2. Send phx_join message

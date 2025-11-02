@@ -165,7 +165,7 @@ const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
 
 3. **訊息廣播流程**
 
-   ```
+   ```text
    User A 移動牌卡
      ↓
    發送 broadcast 到 Supabase

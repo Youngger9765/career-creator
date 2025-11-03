@@ -3,15 +3,15 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import settings
 
-# Create engine with connection pool sized for 100+ concurrent users
+# Create engine with connection pool sized for high concurrent visitors
 # Supabase transaction pooler (port 6543): supports 200+ connections
-# Tested and validated: 100 rooms (200 users) concurrent test passed with pool_size=60
+# Optimized for 50+ concurrent visitor joins per room
 engine: Engine = create_engine(
     settings.database_url,
     echo=settings.environment == "development",  # Log SQL queries in dev
-    pool_size=30,  # Base pool sized for 100+ concurrent users
-    max_overflow=30,  # Allow burst up to 60 total connections
-    pool_timeout=30,  # Wait up to 30s for a connection
+    pool_size=50,  # Increased for high concurrent visitor joins
+    max_overflow=50,  # Allow burst up to 100 total connections
+    pool_timeout=10,  # Reduced timeout for faster failure detection
     pool_recycle=3600,  # Recycle connections after 1 hour
     pool_pre_ping=True,  # Verify connections before using
 )

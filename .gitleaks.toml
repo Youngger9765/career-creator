@@ -26,7 +26,8 @@ regexes = [
     '''http://127\.0\.0\.1''',
     '''example\.com''',
     '''test@example\.com''',
-    '''demo123''', # Demo password used in examples
+    # Note: Do NOT allowlist passwords like demo123 or TestPassword
+    # Always use environment variables for passwords
 ]
 
 # Additional custom rules for your project
@@ -57,6 +58,21 @@ description = "Private Key"
 regex = '''-----BEGIN (RSA|DSA|EC|OPENSSH) PRIVATE KEY-----'''
 tags = ["key", "private"]
 severity = "CRITICAL"
+
+[[rules]]
+id = "hardcoded-password-in-docs"
+description = "Hardcoded password in documentation"
+regex = '''(?i)(密碼|password|pwd)\s*[:：]\s*["`']?[a-zA-Z0-9!@#$%^&*()_+=\-\[\]{};':"\\|,.<>?/]{8,}["`']?'''
+tags = ["password", "documentation"]
+paths = ['''\.md$''', '''\.txt$''', '''\.rst$''']
+severity = "HIGH"
+
+[[rules]]
+id = "test-password-pattern"
+description = "Test password that should use env vars"
+regex = '''(TestPassword|DemoPassword|test_password)[0-9!@#$%]{3,}'''
+tags = ["password", "test"]
+severity = "MEDIUM"
 
 # Entropy checks for high-entropy strings that might be secrets
 [entropy]

@@ -1,7 +1,7 @@
 # Career Creator 負載測試報告 - Production 環境
 
 **測試日期**: 2025-11-03
-**測試環境**: Production (career-creator-backend-production-849078733818.asia-east1.run.app)
+**測試環境**: Production
 **資料庫**: Supabase PostgreSQL (Production)
 **測試目標**: 驗證系統可支援 50 位諮詢師同時使用（Beta 測試目標）
 
@@ -160,9 +160,9 @@
 
 ### 測試帳號
 
-- **Admin**: <demo.admin@example.com> (已存在)
-- **測試用戶**: <test.user0@example.com> ~ <test.user99@example.com> (100 個)
-- **密碼**: TestPassword123!
+- **Admin**: `demo.admin@example.com` (已存在)
+- **測試用戶**: `test.user0@example.com` ~ `test.user99@example.com` (100 個)
+- **密碼**: (僅供測試期間使用，測試後將刪除)
 
 ---
 

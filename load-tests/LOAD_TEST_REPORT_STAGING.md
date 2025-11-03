@@ -1,7 +1,7 @@
 # Career Creator 負載測試報告 - Staging 環境
 
 **測試日期**: 2025-11-03
-**測試環境**: Staging (career-creator-backend-staging-x43mdhfwsq-de.a.run.app)
+**測試環境**: Staging
 **資料庫**: Supabase PostgreSQL (Staging)
 **測試目標**: 驗證系統可支援 50 位諮詢師同時使用（Beta 測試目標）
 

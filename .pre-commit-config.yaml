@@ -73,7 +73,11 @@ repos:
       - id: bandit
         files: ^backend/.*\.py$
         exclude: ^(backend/alembic/|backend/tests/|backend/scripts/)
-        args: [-ll, --skip, B101]
+        args:
+          - -ll  # Only report medium/high severity
+          - --skip=B101  # Skip assert warnings
+          - -r  # Recursive
+          - --ini=.bandit
 
   - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
     rev: v1.3.3
@@ -86,6 +90,13 @@ repos:
     rev: v8.18.2
     hooks:
       - id: gitleaks
+
+  # Security checks - Detect hardcoded secrets (additional layer)
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        exclude: (package-lock.json|\.secrets\.baseline|backend/alembic/versions/)
 
   # Security checks - Frontend npm audit
   - repo: local

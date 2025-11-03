@@ -82,3 +82,4 @@ test-results/
 *_test_results_*.json
 *_test_*.json
 *.log
+.secrets.baseline

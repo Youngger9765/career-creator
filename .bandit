@@ -1,0 +1,34 @@
+[bandit]
+# Bandit security configuration
+# https://bandit.readthedocs.io/
+
+exclude_dirs = [
+    '/backend/alembic/versions',
+    '/backend/tests',
+    '/backend/scripts',
+    '/backend/.venv',
+    '/backend/venv'
+]
+
+# Security checks to skip
+skips = [
+    'B101',  # assert_used - OK in tests
+]
+
+# Severity levels: LOW, MEDIUM, HIGH
+# Confidence levels: LOW, MEDIUM, HIGH
+
+[bandit.assert_used]
+# Skip assert warnings - we use them intentionally in tests
+
+[bandit.hardcoded_password_string]
+# Detect hardcoded passwords
+# HIGH severity
+
+[bandit.hardcoded_sql_expressions]
+# Detect SQL injection risks
+# MEDIUM severity
+
+[bandit.request_without_timeout]
+# Detect requests without timeout
+# MEDIUM severity

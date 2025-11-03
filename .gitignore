@@ -30,6 +30,7 @@ htmlcov/
 .pytest_cache/
 playwright-report/
 test-results/
+!test-results/*.md
 
 # Environment
 .env

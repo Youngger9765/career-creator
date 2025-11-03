@@ -127,7 +127,7 @@ class RoomOwner:
 
     def __init__(self):
         self.email = "test.user1@example.com"
-        self.password = "TestPassword123!"
+        self.password = "TestPassword123!"  # pragma: allowlist secret
         self.token = None
         self.room_id = None
         self.share_code = None
@@ -225,7 +225,8 @@ class Visitor:
             else:
                 error = f"HTTP {response.status_code}"
                 metrics.record_join(False, duration_ms, error=error)
-                logger.error(f"[{self.name}] ✗ Join failed: {error}")
+                error_detail = response.text[:200] if response.text else "No error details"
+                logger.error(f"[{self.name}] ✗ Join failed: {error} - {error_detail}")
                 return False
 
         except Exception as e:

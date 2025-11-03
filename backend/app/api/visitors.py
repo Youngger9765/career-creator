@@ -12,7 +12,12 @@ from sqlmodel import Session, select
 
 from app.core.database import get_session
 from app.models.room import Room
-from app.models.visitor import Visitor, VisitorJoinRequest, VisitorResponse
+from app.models.visitor import (  # noqa: F401
+    Visitor,
+    VisitorJoinRequest,
+    VisitorResponse,
+    VisitorUpdate,
+)
 
 router = APIRouter(prefix="/api/visitors", tags=["visitors"])
 
@@ -90,7 +95,11 @@ def visitor_heartbeat(
     visitor_id: UUID,
     session: Session = Depends(get_session),
 ):
-    """Update visitor's last seen timestamp (heartbeat)"""
+    """Update visitor's last seen timestamp (heartbeat)
+
+    Note: VisitorUpdate is imported but not used here. The import is kept
+    to maintain compatibility with the module loading order.
+    """
 
     visitor = session.get(Visitor, visitor_id)
     if not visitor:

@@ -752,17 +752,29 @@
    - Demo 用戶自動建立
    - Migration 檔案命名修復
 
-#### Week 13 計畫 (2025-10-29 ~ 11-04)
+#### Week 13 完成項目 (2025-10-29 ~ 11-04)
 
-**P0 優先：**
+**完成功能：**
 
-- 負載測試（50 人同時上線）
-- 牌卡內容上架（等 Hannah 提供素材）
+1. **負載測試與資料庫優化** ✅ (2025-10-29 ~ 11-04)
+   - ✅ 建立完整負載測試框架（Python ThreadPoolExecutor 真併發測試）
+   - ✅ 50 併發訪客加入壓力測試（Staging + Production）
+   - ✅ 修復 Staging Session pooler 瓶頸（port 5432 → 6543）
+   - ✅ 修復 Production 連線池不足（60 → 100 connections）
+   - ✅ 實現 100% 成功率（Staging: 0% → 100%, Production: 28% → 100%）
+   - ✅ 響應時間優化（Staging: 60s+ → 1.9s, Production: ~5s → 4.6s）
+   - ✅ 診斷工具建置（/debug/db-pool, /debug/db-test）
+   - ✅ 測試報告生成（FINAL_REPORT_STAGING.md, FINAL_REPORT_PRODUCTION.md）
 
-**P1 次要：**
+2. **安全性強化** ✅ (2025-10-29 ~ 11-04)
+   - ✅ 強化 gitleaks 密碼偵測規則
+   - ✅ 移除所有 hardcoded Supabase keys
+   - ✅ 臨時測試 endpoint SECRET 保護
 
-- Cloud Logging 監控設定
-- 效能調校優化
+**待完成項目**：
+
+- ⚠️ 牌卡內容上架（等 Hannah 提供素材）
+- ⚠️ Cloud Logging 監控設定（延至 Beta 測試啟動後）
 
 #### Week 13-14：Beta 測試啟動
 
@@ -810,6 +822,14 @@
 
 ## 📝 版本紀錄
 
+- **v5.0** (2025-11-04): 更新 Week 13 完成進度（負載測試與資料庫連線池優化）
+  - ✅ 50 併發訪客負載測試完成（Staging + Production 100% 成功率）
+  - ✅ 修復 Staging Session pooler 瓶頸（改用 Transaction pooler）
+  - ✅ 修復 Production 連線池不足（60 → 100 connections）
+  - ✅ 響應時間大幅優化（Staging: -97%, Production: -8%）
+  - ✅ 建立負載測試基礎建設（測試框架、報告生成、診斷工具）
+  - ✅ 安全性強化（gitleaks 規則、移除 hardcoded keys）
+  - ⚠️ 牌卡內容上架與監控設定延至下週
 - **v4.9** (2025-10-28): 更新 Week 12 完成進度（Production 環境遷移與程式碼品質提升）
   - ✅ Production 環境遷移完成（career-creator-card 專案）
   - ✅ 舊專案清理（career-creator-472207 已刪除）

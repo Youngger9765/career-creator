@@ -142,7 +142,7 @@ class GameplayUser:
     def __init__(self, user_id: int):
         self.user_id = user_id
         self.email = f"test.user{user_id}@example.com"
-        self.password = "TestPassword123!"
+        self.password = "TestPassword123!"  # pragma: allowlist secret
         self.token = None
         self.room_id = None
         self.game_type = GAME_TYPES[user_id % len(GAME_TYPES)]
@@ -287,7 +287,8 @@ class GameplayUser:
 
                 # 驗證資料完整性
                 data = response.json()
-                game_state = data.get("game_state", {})
+                # API 返回格式: {id, gameplay_id, state: {...}, room_id, ...}
+                game_state = data.get("state", {})
 
                 # 檢查必要欄位
                 has_cards = "cards" in game_state or "settings" in game_state

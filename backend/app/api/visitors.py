@@ -3,6 +3,7 @@ Visitor API endpoints
 訪客 API - 匿名用戶加入諮詢室
 """
 
+from datetime import datetime
 from typing import List
 from uuid import UUID
 
@@ -11,12 +12,7 @@ from sqlmodel import Session, select
 
 from app.core.database import get_session
 from app.models.room import Room
-from app.models.visitor import (
-    Visitor,
-    VisitorJoinRequest,
-    VisitorResponse,
-    VisitorUpdate,
-)
+from app.models.visitor import Visitor, VisitorJoinRequest, VisitorResponse
 
 router = APIRouter(prefix="/api/visitors", tags=["visitors"])
 
@@ -92,7 +88,6 @@ def list_room_visitors(room_id: UUID, session: Session = Depends(get_session)):
 @router.put("/{visitor_id}/heartbeat", response_model=VisitorResponse)
 def visitor_heartbeat(
     visitor_id: UUID,
-    update_data: VisitorUpdate,
     session: Session = Depends(get_session),
 ):
     """Update visitor's last seen timestamp (heartbeat)"""
@@ -104,8 +99,8 @@ def visitor_heartbeat(
     if not visitor.is_active:
         raise HTTPException(status_code=400, detail="Visitor is inactive")
 
-    # Update last seen
-    visitor.last_seen = update_data.last_seen
+    # Update last seen to current time
+    visitor.last_seen = datetime.utcnow()
 
     session.add(visitor)
     session.commit()

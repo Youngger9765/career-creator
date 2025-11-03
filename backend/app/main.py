@@ -102,3 +102,25 @@ async def health_check():
         "environment": settings.environment,
         "admin_loaded": True,
     }
+
+
+@app.get("/debug/db-pool")
+async def debug_db_pool():
+    """Diagnose database connection pool status (staging only)"""
+    if settings.environment not in ["staging", "development"]:
+        return {"error": "Only available in staging/development"}
+
+    from app.core.database import engine
+
+    try:
+        pool = engine.pool
+        return {
+            "pool_size": pool.size(),
+            "checked_in": pool.checkedin(),
+            "checked_out": pool.checkedout(),
+            "overflow": pool.overflow(),
+            "max_overflow": engine.pool._max_overflow,
+            "total_capacity": pool.size() + engine.pool._max_overflow,
+        }
+    except Exception as e:
+        return {"error": str(e)}

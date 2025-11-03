@@ -38,7 +38,10 @@ jobs:
           if [ "${{ github.ref_name }}" = "staging" ]; then
             echo "ENVIRONMENT=staging" >> $GITHUB_ENV
             echo "SERVICE_NAME=career-creator-backend-staging" >> $GITHUB_ENV
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL_STAGING }}" >> $GITHUB_ENV
+            # Use transaction pooler (port 6543) for better concurrency (200+ connections)
+            # Convert :5432 to :6543 in DATABASE_POOLER_URL
+            DATABASE_URL_FIXED=$(echo "${{ secrets.DATABASE_POOLER_URL_STAGING }}" | sed 's/:5432/:6543/g')
+            echo "DATABASE_URL=$DATABASE_URL_FIXED" >> $GITHUB_ENV
             echo "DATABASE_POOLER_URL=${{ secrets.DATABASE_POOLER_URL_STAGING }}" >> $GITHUB_ENV
             echo "JWT_SECRET=${{ secrets.JWT_SECRET_STAGING }}" >> $GITHUB_ENV
             echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_STAGING }}" >> $GITHUB_ENV
@@ -48,7 +51,10 @@ jobs:
           elif [ "${{ github.ref_name }}" = "main" ]; then
             echo "ENVIRONMENT=production" >> $GITHUB_ENV
             echo "SERVICE_NAME=career-creator-backend-production" >> $GITHUB_ENV
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL_PRODUCTION }}" >> $GITHUB_ENV
+            # Use transaction pooler (port 6543) for better concurrency (200+ connections)
+            # Convert :5432 to :6543 in DATABASE_POOLER_URL
+            DATABASE_URL_FIXED=$(echo "${{ secrets.DATABASE_POOLER_URL_PRODUCTION }}" | sed 's/:5432/:6543/g')
+            echo "DATABASE_URL=$DATABASE_URL_FIXED" >> $GITHUB_ENV
             echo "DATABASE_POOLER_URL=${{ secrets.DATABASE_POOLER_URL_PRODUCTION }}" >> $GITHUB_ENV
             echo "JWT_SECRET=${{ secrets.JWT_SECRET_PRODUCTION }}" >> $GITHUB_ENV
             echo "SUPABASE_URL=${{ secrets.SUPABASE_URL_PRODUCTION }}" >> $GITHUB_ENV

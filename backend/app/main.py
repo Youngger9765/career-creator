@@ -124,3 +124,37 @@ async def debug_db_pool():
         }
     except Exception as e:
         return {"error": str(e)}
+
+
+@app.get("/debug/db-test")
+async def debug_db_test():
+    """Test actual database connection (staging only)"""
+    if settings.environment not in ["staging", "development"]:
+        return {"error": "Only available in staging/development"}
+
+    import time
+    import traceback
+
+    from app.core.database import engine
+
+    start = time.time()
+    try:
+        # Try to execute a simple query
+        with engine.connect() as conn:
+            result = conn.execute("SELECT 1 as test")
+            row = result.fetchone()
+            duration = time.time() - start
+            return {
+                "status": "success",
+                "query_result": row[0] if row else None,
+                "duration_ms": round(duration * 1000, 2),
+            }
+    except Exception as e:
+        duration = time.time() - start
+        return {
+            "status": "failed",
+            "error": str(e),
+            "error_type": type(e).__name__,
+            "duration_ms": round(duration * 1000, 2),
+            "traceback": traceback.format_exc(),
+        }

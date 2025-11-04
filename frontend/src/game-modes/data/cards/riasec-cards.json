@@ -1,103 +1,89 @@
 {
   "deck": {
     "id": "riasec_explanation",
-    "name": "職游旅人卡 - 解說卡",
-    "description": "Holland Code 六大職業性格類型解釋卡",
+    "name": "RIASEC 六大性格說明卡",
+    "description": "Holland 職業性格分析六大類型說明卡片",
     "type": "explanation",
-    "version": "2.0.0"
+    "version": "1.0.0"
   },
   "cards": [
     {
-      "id": "realistic",
-      "code": "R",
-      "category": "REALISTIC",
-      "title": "實踐者",
-      "shortTitle": "實踐者",
-      "description": "實踐者注重實際行動，常獨自完成任務。喜歡機械或可操作的工具，喜歡戶外活動、肢體運動和各種冒險探索。面對問題時，比起討論或空想，更喜歡直接嘗試。在生涯選擇上，喜歡能產生具體作品或成果的工作。",
-      "keywords": ["機械電子", "農林漁牧", "建築工藝", "運動"],
-      "strengths": ["機械與設備操作", "對工具運用、設備操作、廚藝手工與動物育成有天賦"],
-      "careers": ["機械電子", "農林漁牧", "運動", "建築工藝等領域"],
-      "color": "#795548",
-      "icon": "🔧",
-      "card_avatar": "/images/personality/realistic.jpg"
+      "id": "riasec-realistic",
+      "key": "realistic",
+      "title": "實作型 (Realistic)",
+      "description": "喜歡實際動手操作，偏好使用工具、機器或設備完成具體任務。適合從事技術性、機械性或戶外工作。",
+      "category": "personality",
+      "riasecCode": "R",
+      "traits": ["務實", "動手能力強", "喜歡具體成果", "偏好戶外或實體工作"],
+      "imageUrl": {
+        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-L-front-zhtw.png",
+        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-L-back-zhtw.png"
+      }
     },
     {
-      "id": "investigative",
-      "code": "I",
-      "category": "INVESTIGATIVE",
-      "title": "思考者",
-      "shortTitle": "思考者",
-      "description": "思考者好奇心強，喜歡分析、思考與解決複雜問題。擅長觀察、構想、追尋真理並提出各種假設。常接觸人文科學或科技領域的資訊，在資料分析與理論建構方面，是不可多得的人才。在生涯選擇上，喜歡需要思考與研究的專業工作。",
-      "keywords": ["統計分析", "人文科學", "理工研究", "生醫研發"],
-      "strengths": ["理解、解決科學或數學問題", "研究分析與解釋資料，構想與理解抽象思考"],
-      "careers": ["理工生醫", "人文科學領域"],
-      "color": "#2196F3",
-      "icon": "🔬",
-      "card_avatar": "/images/personality/investigative.jpg"
+      "id": "riasec-investigative",
+      "key": "investigative",
+      "title": "研究型 (Investigative)",
+      "description": "喜歡思考、分析和解決抽象問題。偏好科學研究、數據分析等需要邏輯推理的工作。",
+      "category": "personality",
+      "riasecCode": "I",
+      "traits": ["好奇心強", "邏輯思考", "喜歡探索真相", "偏好獨立工作"],
+      "imageUrl": {
+        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-L-front-zhtw.png",
+        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-L-back-zhtw.png"
+      }
     },
     {
-      "id": "artistic",
-      "code": "A",
-      "category": "ARTISTIC",
-      "title": "創造者",
-      "shortTitle": "創造者",
-      "description": "創造者充滿創意與想像力，總是有很多新穎的想法。喜歡設計、戲劇、文學、舞蹈、音樂等活動。具有強大的直覺與靈感，對美的追求更勝於科學。在生涯選擇上，喜歡待在充滿變化與挑戰的環境，讓自己的獨特性能充分發揮。",
-      "keywords": ["造型設計", "建築設計", "藝術家", "導演"],
-      "strengths": [
-        "運用想像力與創造力產生靈感",
-        "做事創新、彈性而靈活",
-        "善於設計與創造，具有文藝天賦"
-      ],
-      "careers": ["藝術", "設計等領域"],
-      "color": "#9C27B0",
-      "icon": "🎨",
-      "card_avatar": "/images/personality/artistic.jpg"
+      "id": "riasec-artistic",
+      "key": "artistic",
+      "title": "藝術型 (Artistic)",
+      "description": "喜歡創作、設計和藝術表現。偏好自由發揮、富有創意的工作環境。",
+      "category": "personality",
+      "riasecCode": "A",
+      "traits": ["創意豐富", "美感敏銳", "喜歡自我表達", "偏好彈性工作"],
+      "imageUrl": {
+        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-L-front-zhtw.png",
+        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-L-back-zhtw.png"
+      }
     },
     {
-      "id": "social",
-      "code": "S",
-      "category": "SOCIAL",
-      "title": "助人者",
-      "shortTitle": "助人者",
-      "description": "助人者個性友善且極具包容力，喜歡和人互動與幫助他人。關懷社會、生態或周遭的人群，經常教導、協助、照顧別人，解決他人的困難。懂得傾聽和溝通，擅長解決人際衝突。在生涯選擇上，適合與人互動、協助他人和教導培訓等工作。",
-      "keywords": ["社工心理", "教育", "醫護", "宗教"],
-      "strengths": ["協調人際活動，發現與解決他人問題", "優秀的人際與情緒管理能力"],
-      "careers": ["教育", "社工心理", "醫護", "宗教等教導領域"],
-      "color": "#4CAF50",
-      "icon": "👥",
-      "card_avatar": "/images/personality/social.jpg"
+      "id": "riasec-social",
+      "key": "social",
+      "title": "社會型 (Social)",
+      "description": "喜歡與人互動、幫助他人成長。適合從事教育、諮商、醫療等服務性工作。",
+      "category": "personality",
+      "riasecCode": "S",
+      "traits": ["同理心強", "善於溝通", "喜歡助人", "偏好團隊合作"],
+      "imageUrl": {
+        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-L-front-zhtw.png",
+        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-L-back-zhtw.png"
+      }
     },
     {
-      "id": "enterprising",
-      "code": "E",
-      "category": "ENTERPRISING",
-      "title": "影響者",
-      "shortTitle": "影響者",
-      "description": "影響者自信果敢且充滿精力，勇於競爭與冒險。喜歡商業活動與決策，擅長運用自己的資源與能力影響或說服別人，讓別人贊同自己的想法或執行方式。適合當企業家、鼓舞他人合作並發起計劃。在生涯選擇上，會追求聲望地位較高的工作。",
-      "keywords": ["企管領導", "行銷企劃", "法律", "政治"],
-      "strengths": ["能找出商業或獲利機會", "適合管理與監督工作", "具有銷售與說服技巧的潛力"],
-      "careers": ["企管領導", "行銷企劃", "法律", "政治等領域"],
-      "color": "#FF9800",
-      "icon": "💼",
-      "card_avatar": "/images/personality/enterprising.jpg"
+      "id": "riasec-enterprising",
+      "key": "enterprising",
+      "title": "企業型 (Enterprising)",
+      "description": "喜歡領導、說服和管理。適合從事業務、管理、創業等需要影響力的工作。",
+      "category": "personality",
+      "riasecCode": "E",
+      "traits": ["領導力強", "說服力佳", "喜歡競爭", "偏好目標導向"],
+      "imageUrl": {
+        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-L-front-zhtw.png",
+        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-L-back-zhtw.png"
+      }
     },
     {
-      "id": "conventional",
-      "code": "C",
-      "category": "CONVENTIONAL",
-      "title": "組織者",
-      "shortTitle": "組織者",
-      "description": "組織者喜歡有系統、組織和效率的SOP工作方式，無法接受混亂、沒有秩序的環境。在平事情的精確細節並一絲不苟。在生涯選擇上，偏好規則清楚且明確的環境，善於透過行政處理讓事情順利運轉。",
-      "keywords": ["財務金融", "特助秘書", "會計", "行政"],
-      "strengths": [
-        "善於數字運算",
-        "資訊處理、組織、規劃與統整",
-        "文書、行政方面具備精確的處理技巧"
-      ],
-      "careers": ["財務金融", "特助秘書", "會計", "行政等領域"],
-      "color": "#607D8B",
-      "icon": "📊",
-      "card_avatar": "/images/personality/conventional.jpg"
+      "id": "riasec-conventional",
+      "key": "conventional",
+      "title": "事務型 (Conventional)",
+      "description": "喜歡有系統、有規則的工作。適合從事行政、會計、數據處理等需要精確性的工作。",
+      "category": "personality",
+      "riasecCode": "C",
+      "traits": ["細心謹慎", "組織能力強", "喜歡規律", "偏好結構化工作"],
+      "imageUrl": {
+        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-L-front-zhtw.png",
+        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-L-back-zhtw.png"
+      }
     }
   ]
 }

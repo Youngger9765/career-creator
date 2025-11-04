@@ -18,6 +18,7 @@ export interface Card {
   description: string;
   category?: string;
   icon?: string;
+  imageUrl?: string | { front: string; back: string }; // 支援單張或雙面圖片
   [key: string]: any; // 允許額外屬性
 }
 

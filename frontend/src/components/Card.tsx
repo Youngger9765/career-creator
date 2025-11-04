@@ -39,6 +39,8 @@ export function Card({
   hasNotes = false,
 }: CardProps) {
   const [isFlipping, setIsFlipping] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   const {
     attributes,
@@ -80,6 +82,22 @@ export function Card({
     onAddNote?.(card.id);
   };
 
+  // Determine if card has image
+  const hasImage = card.imageUrl && !imageLoadError;
+  const imageUrls =
+    typeof card.imageUrl === 'object'
+      ? card.imageUrl
+      : { front: card.imageUrl, back: card.imageUrl };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const handleImageError = () => {
+    setImageLoadError(true);
+    setImageLoading(false);
+  };
+
   const cardStyle = {
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0) scale(${scale}) rotate(${rotation}deg)`
@@ -117,14 +135,33 @@ export function Card({
         `}
       >
         {/* Card Back */}
-        <div className="card-face back absolute inset-0 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center">
-          <div className="text-center text-white">
-            <div className="text-xl font-bold mb-2">Career</div>
-            <div className="text-sm opacity-75">Consultation</div>
-            <div className="mt-4 w-8 h-8 mx-auto border-2 border-white rounded-full flex items-center justify-center">
-              <div className="w-3 h-3 bg-white rounded-full"></div>
+        <div className="card-face back absolute inset-0 rounded-lg overflow-hidden">
+          {hasImage && imageUrls.back ? (
+            <>
+              <img
+                src={imageUrls.back}
+                alt={`${card.title} - 背面`}
+                className="w-full h-full object-cover"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+              {imageLoading && (
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center">
+                  <div className="animate-pulse text-white">載入中...</div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="bg-gradient-to-br from-indigo-600 to-purple-700 w-full h-full flex items-center justify-center">
+              <div className="text-center text-white">
+                <div className="text-xl font-bold mb-2">Career</div>
+                <div className="text-sm opacity-75">Consultation</div>
+                <div className="mt-4 w-8 h-8 mx-auto border-2 border-white rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Flip button on back */}
           <button onClick={handleFlip} className="card-flip-button" title="翻牌">
@@ -145,37 +182,58 @@ export function Card({
         </div>
 
         {/* Card Front */}
-        <div className="card-face front absolute inset-0 rounded-lg bg-white p-3 flex flex-col">
-          {/* Category badge */}
-          <div
-            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white mb-2 self-start ${categoryInfo.color}`}
-          >
-            {categoryInfo.name}
-          </div>
+        <div className="card-face front absolute inset-0 rounded-lg overflow-hidden">
+          {hasImage && imageUrls.front ? (
+            <>
+              <img
+                src={imageUrls.front}
+                alt={card.title}
+                className="w-full h-full object-cover"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+              {imageLoading && (
+                <div className="absolute inset-0 bg-white flex items-center justify-center">
+                  <div className="animate-pulse text-gray-600">載入中...</div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="bg-white p-3 flex flex-col h-full">
+              {/* Category badge */}
+              <div
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white mb-2 self-start ${categoryInfo.color}`}
+              >
+                {categoryInfo.name}
+              </div>
 
-          {/* Title */}
-          <h3 className="font-bold text-gray-800 text-sm mb-2 leading-tight">{card.title}</h3>
+              {/* Title */}
+              <h3 className="font-bold text-gray-800 text-sm mb-2 leading-tight">{card.title}</h3>
 
-          {/* Description */}
-          <p className="text-xs text-gray-600 flex-1 leading-relaxed mb-3">{card.description}</p>
+              {/* Description */}
+              <p className="text-xs text-gray-600 flex-1 leading-relaxed mb-3">
+                {card.description}
+              </p>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1 mb-2">
-            {card.tags &&
-              card.tags.slice(0, 2).map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
-                >
-                  {tag}
-                </span>
-              ))}
-            {card.tags && card.tags.length > 2 && (
-              <span className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
-                +{card.tags.length - 2}
-              </span>
-            )}
-          </div>
+              {/* Tags */}
+              <div className="flex flex-wrap gap-1 mb-2">
+                {card.tags &&
+                  card.tags.slice(0, 2).map((tag, index) => (
+                    <span
+                      key={index}
+                      className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                {card.tags && card.tags.length > 2 && (
+                  <span className="inline-block px-1.5 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
+                    +{card.tags.length - 2}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Action buttons on front */}
           <button onClick={handleFlip} className="card-flip-button" title="翻牌">

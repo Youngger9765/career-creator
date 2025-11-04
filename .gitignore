@@ -66,6 +66,11 @@ postgres_data/
 # Uploads
 backend/uploads/
 
+# Card Images (stored in GCS)
+card-image/*.png
+card-image/*.jpg
+card-image/*.jpeg
+
 # Service Account Keys
 backend/keys/
 

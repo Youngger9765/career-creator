@@ -96,7 +96,7 @@ const CardModal: React.FC<CardModalProps> = ({
                   <img
                     src={imageUrls.front}
                     alt={card.title}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain p-4"
                   />
                 ) : (
                   <div className="p-10 flex flex-col h-full">
@@ -132,7 +132,7 @@ const CardModal: React.FC<CardModalProps> = ({
                   <img
                     src={imageUrls.back}
                     alt={`${card.title} - 背面`}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain p-4"
                   />
                 ) : (
                   <div className="p-10 flex-1 flex flex-col justify-center">

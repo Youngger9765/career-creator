@@ -16,6 +16,7 @@ interface CardData {
   title: string;
   description?: string;
   category?: string;
+  imageUrl?: string | { front: string; back: string };
   [key: string]: any;
 }
 
@@ -66,6 +67,14 @@ const CardModal: React.FC<CardModalProps> = ({
     return 'text-gray-600 dark:text-gray-400';
   };
 
+  // Get image URLs
+  const imageUrls =
+    typeof card.imageUrl === 'object'
+      ? card.imageUrl
+      : card.imageUrl
+        ? { front: card.imageUrl, back: card.imageUrl }
+        : null;
+
   // 同時顯示兩面的版本
   if (showBothSides) {
     return (
@@ -80,23 +89,33 @@ const CardModal: React.FC<CardModalProps> = ({
             <div className="flex flex-col">
               <div className="text-base font-semibold text-gray-500 mb-4 text-center">正面</div>
               <div
-                className={`${getCardBackground(card.id)} border-2 rounded-xl shadow-lg flex-1 flex flex-col p-10`}
+                className={`${getCardBackground(card.id)} border-2 rounded-xl shadow-lg flex-1 flex flex-col overflow-hidden`}
                 style={{ minHeight: '600px' }}
               >
-                {/* 分類標籤 */}
-                {card.category && (
-                  <div
-                    className={`text-lg font-semibold uppercase tracking-wider ${getCategoryColor(card.id)} mb-6`}
-                  >
-                    {card.category}
+                {imageUrls?.front ? (
+                  <img
+                    src={imageUrls.front}
+                    alt={card.title}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="p-10 flex flex-col h-full">
+                    {/* 分類標籤 */}
+                    {card.category && (
+                      <div
+                        className={`text-lg font-semibold uppercase tracking-wider ${getCategoryColor(card.id)} mb-6`}
+                      >
+                        {card.category}
+                      </div>
+                    )}
+                    {/* 標題 */}
+                    <div className="flex-1 flex items-center justify-center px-4">
+                      <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 text-center break-words leading-relaxed">
+                        {card.title}
+                      </div>
+                    </div>
                   </div>
                 )}
-                {/* 標題 */}
-                <div className="flex-1 flex items-center justify-center px-4">
-                  <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 text-center break-words leading-relaxed">
-                    {card.title}
-                  </div>
-                </div>
               </div>
             </div>
 
@@ -106,21 +125,29 @@ const CardModal: React.FC<CardModalProps> = ({
                 背面 / 詳細說明
               </div>
               <div
-                className={`${getCardBackground(card.id)} border-2 rounded-xl shadow-lg flex-1 flex flex-col p-10`}
+                className={`${getCardBackground(card.id)} border-2 rounded-xl shadow-lg flex-1 flex flex-col overflow-hidden`}
                 style={{ minHeight: '600px' }}
               >
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="text-xl text-gray-700 dark:text-gray-300 text-center leading-relaxed px-4">
-                    {card.description || card.title}
-                  </div>
-                  {card.category && (
-                    <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-600">
-                      <div className="text-lg text-gray-500 dark:text-gray-400 text-center">
-                        分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
-                      </div>
+                {imageUrls?.back ? (
+                  <img
+                    src={imageUrls.back}
+                    alt={`${card.title} - 背面`}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="p-10 flex-1 flex flex-col justify-center">
+                    <div className="text-xl text-gray-700 dark:text-gray-300 text-center leading-relaxed px-4">
+                      {card.description || card.title}
                     </div>
-                  )}
-                </div>
+                    {card.category && (
+                      <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-600">
+                        <div className="text-lg text-gray-500 dark:text-gray-400 text-center">
+                          分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>

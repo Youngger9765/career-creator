@@ -89,7 +89,7 @@ const CardModal: React.FC<CardModalProps> = ({
             <div className="flex flex-col">
               <div className="text-base font-semibold text-gray-500 mb-4 text-center">正面</div>
               <div
-                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col p-4`}
+                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 pt-4`}
                 style={{ minHeight: '600px' }}
               >
                 {imageUrls?.front ? (
@@ -125,7 +125,7 @@ const CardModal: React.FC<CardModalProps> = ({
                 背面 / 詳細說明
               </div>
               <div
-                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col p-4`}
+                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 pt-4`}
                 style={{ minHeight: '600px' }}
               >
                 {imageUrls?.back ? (

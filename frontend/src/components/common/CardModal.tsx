@@ -89,14 +89,14 @@ const CardModal: React.FC<CardModalProps> = ({
             <div className="flex flex-col">
               <div className="text-base font-semibold text-gray-500 mb-4 text-center">正面</div>
               <div
-                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 pt-4`}
+                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 overflow-hidden`}
                 style={{ minHeight: '600px' }}
               >
                 {imageUrls?.front ? (
                   <img
                     src={imageUrls.front}
                     alt={card.title}
-                    className="w-full h-full object-contain rounded-lg"
+                    className="w-full h-full object-contain"
                   />
                 ) : (
                   <div className="p-10 flex flex-col h-full">
@@ -125,14 +125,14 @@ const CardModal: React.FC<CardModalProps> = ({
                 背面 / 詳細說明
               </div>
               <div
-                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 pt-4`}
+                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 overflow-hidden`}
                 style={{ minHeight: '600px' }}
               >
                 {imageUrls?.back ? (
                   <img
                     src={imageUrls.back}
                     alt={`${card.title} - 背面`}
-                    className="w-full h-full object-contain rounded-lg"
+                    className="w-full h-full object-contain"
                   />
                 ) : (
                   <div className="p-10 flex-1 flex flex-col justify-center">

@@ -80,11 +80,7 @@ const CardModal: React.FC<CardModalProps> = ({
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="max-w-5xl">
-          <DialogHeader>
-            <DialogTitle className="text-center text-xl font-semibold mb-6">卡片詳情</DialogTitle>
-          </DialogHeader>
-
-          <div className="grid grid-cols-2 gap-8 py-6">
+          <div className="grid grid-cols-2 gap-8">
             {/* 正面 */}
             <div className="flex flex-col">
               <div className="text-base font-semibold text-gray-500 mb-4 text-center">正面</div>
@@ -96,7 +92,7 @@ const CardModal: React.FC<CardModalProps> = ({
                   <img
                     src={imageUrls.front}
                     alt={card.title}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain rounded-xl"
                   />
                 ) : (
                   <div className="p-10 flex flex-col h-full">
@@ -132,7 +128,7 @@ const CardModal: React.FC<CardModalProps> = ({
                   <img
                     src={imageUrls.back}
                     alt={`${card.title} - 背面`}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain rounded-xl"
                   />
                 ) : (
                   <div className="p-10 flex-1 flex flex-col justify-center">

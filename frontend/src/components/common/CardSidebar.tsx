@@ -50,6 +50,14 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
     return 'text-gray-600 dark:text-gray-400';
   };
 
+  // Get image URLs - use M size for BigCard in sidebar
+  const imageUrls =
+    typeof card.imageUrl === 'object'
+      ? card.imageUrl.M || card.imageUrl
+      : card.imageUrl
+        ? { front: card.imageUrl, back: card.imageUrl }
+        : null;
+
   return (
     <div className="relative w-full h-full">
       {/* 背景卡片層 - 創造堆疊效果（3層，向左上平移） */}
@@ -62,7 +70,7 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
 
       {/* 主卡片 */}
       <div
-        className={`${getCardBackground()} border-2 rounded-lg shadow-2xl h-full w-full flex flex-col relative z-10`}
+        className={`${getCardBackground()} border-2 rounded-lg shadow-2xl h-full w-full flex flex-col relative z-10 overflow-hidden`}
       >
         {/* 翻轉按鈕 */}
         <button
@@ -70,57 +78,69 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
             e.stopPropagation();
             setIsFlipped(!isFlipped);
           }}
-          className="absolute bottom-3 left-3 right-3 px-3 py-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-md flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-gray-700 transition-colors z-20 border border-gray-200 dark:border-gray-600 shadow-sm"
+          className="absolute bottom-3 left-3 right-3 px-3 py-2 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-2 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors z-20 border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
           title="翻轉卡片"
         >
-          <RotateCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">翻轉</span>
+          <RotateCw className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-200">翻轉</span>
         </button>
 
         {/* 卡片內容 */}
-        <div className="p-5 pb-16 flex flex-col h-full">
-          {!isFlipped ? (
-            // 正面
-            <>
-              {/* 分類標籤 */}
-              {card.category && (
-                <div
-                  className={`text-sm font-semibold uppercase tracking-wider ${getCategoryColor()} mb-3`}
-                >
-                  {card.category}
-                </div>
-              )}
-              {/* 標題 */}
-              <div className="flex-1 flex items-center justify-center px-2">
-                <div className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center break-words leading-relaxed">
-                  {card.title}
-                </div>
-              </div>
-              {/* 描述 */}
-              {card.description && (
-                <div className="text-sm text-gray-600 dark:text-gray-300 mt-3 text-center leading-relaxed">
-                  {card.description}
-                </div>
-              )}
-            </>
+        <div className="flex flex-col h-full overflow-hidden">
+          {imageUrls ? (
+            // 有圖片時顯示圖片
+            <img
+              src={isFlipped ? imageUrls.back : imageUrls.front}
+              alt={isFlipped ? `${card.title} - 背面` : card.title}
+              className="w-full h-full object-contain rounded-lg"
+            />
           ) : (
-            // 背面 - 顯示詳細說明
-            <div className="flex flex-col h-full">
-              <div className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 text-center">
-                詳細說明
-              </div>
-              <div className="flex-1 flex flex-col justify-center">
-                <div className="text-base text-gray-700 dark:text-gray-300 text-center leading-relaxed px-2">
-                  {card.description || card.title}
-                </div>
-                {card.category && (
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
-                      分類: <span className={getCategoryColor()}>{card.category}</span>
+            <div className="p-5 pb-16 flex flex-col h-full">
+              {/* 沒有圖片時顯示文字卡片 */}
+              {!isFlipped ? (
+                // 正面
+                <>
+                  {/* 分類標籤 */}
+                  {card.category && (
+                    <div
+                      className={`text-sm font-semibold uppercase tracking-wider ${getCategoryColor()} mb-3`}
+                    >
+                      {card.category}
+                    </div>
+                  )}
+                  {/* 標題 */}
+                  <div className="flex-1 flex items-center justify-center px-2">
+                    <div className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center break-words leading-relaxed">
+                      {card.title}
                     </div>
                   </div>
-                )}
-              </div>
+                  {/* 描述 */}
+                  {card.description && (
+                    <div className="text-sm text-gray-600 dark:text-gray-300 mt-3 text-center leading-relaxed">
+                      {card.description}
+                    </div>
+                  )}
+                </>
+              ) : (
+                // 背面 - 顯示詳細說明
+                <div className="flex flex-col h-full">
+                  <div className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 text-center">
+                    詳細說明
+                  </div>
+                  <div className="flex-1 flex flex-col justify-center">
+                    <div className="text-base text-gray-700 dark:text-gray-300 text-center leading-relaxed px-2">
+                      {card.description || card.title}
+                    </div>
+                    {card.category && (
+                      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                          分類: <span className={getCategoryColor()}>{card.category}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -311,8 +331,8 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
 
                 {/* 大卡片 - 直接渲染放大版，添加 padding 以顯示3層堆疊效果（左上方向） */}
                 <div
-                  className="w-64 h-96 flex-shrink-0 cursor-move"
-                  style={{ padding: '20px 8px 8px 20px' }}
+                  className="w-72 flex-shrink-0 cursor-move"
+                  style={{ padding: '20px 8px 8px 20px', aspectRatio: '3/4' }}
                   draggable
                   onDragStart={(e) => handleDragStart(e, deck.cards[currentCardIndex].id)}
                 >
@@ -493,8 +513,8 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
                       </div>
 
                       <div
-                        className="w-64 h-96 flex-shrink-0 cursor-move"
-                        style={{ padding: '20px 8px 8px 20px' }}
+                        className="w-72 flex-shrink-0 cursor-move"
+                        style={{ padding: '20px 8px 8px 20px', aspectRatio: '3/4' }}
                         draggable
                         onDragStart={(e) => handleDragStart(e, deck.cards[currentCardIndex].id)}
                       >

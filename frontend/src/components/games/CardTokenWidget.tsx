@@ -163,7 +163,7 @@ const CardTokenWidget: React.FC<CardTokenWidgetProps> = ({
       </div>
 
       {/* 卡片詳情 Modal */}
-      <CardModal card={card} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CardModal card={card as any} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
 };

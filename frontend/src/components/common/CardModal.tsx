@@ -67,13 +67,18 @@ const CardModal: React.FC<CardModalProps> = ({
     return 'text-gray-600 dark:text-gray-400';
   };
 
-  // Get image URLs
-  const imageUrls =
-    typeof card.imageUrl === 'object'
-      ? card.imageUrl
+  // Get image URLs - use L size for modal
+  const imageUrls: { front: string; back: string } | null = (
+    typeof card.imageUrl === 'object' && card.imageUrl !== null
+      ? 'L' in card.imageUrl
+        ? card.imageUrl.L || null
+        : 'front' in card.imageUrl
+          ? card.imageUrl
+          : null
       : card.imageUrl
         ? { front: card.imageUrl, back: card.imageUrl }
-        : null;
+        : null
+  ) as { front: string; back: string } | null;
 
   // 同時顯示兩面的版本
   if (showBothSides) {

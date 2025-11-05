@@ -93,8 +93,8 @@ const DropZone: React.FC<DropZoneProps> = ({
   headerClassName = '',
   contentClassName = '',
   dragOverColor = 'border-blue-500 bg-blue-50 dark:bg-blue-900/20',
-  cardWidth = '90px',
-  cardHeight = '160px',
+  cardWidth = '180px',
+  cardHeight = '240px',
   showCardNumbers = true,
   showRemoveButton = true,
   allowReorder = true,
@@ -332,81 +332,100 @@ const DropZone: React.FC<DropZoneProps> = ({
 
         {/* 卡片內容 - 直立長方形 */}
         <div
-          className={`${getCardBackground(card.id)} border rounded-lg shadow-sm hover:shadow-lg transition-all cursor-move flex flex-col relative`}
-          style={{ height: typeof cardHeight === 'number' ? `${cardHeight}px` : cardHeight }}
+          className={`rounded-lg shadow-sm hover:shadow-lg transition-all cursor-move flex flex-col relative overflow-hidden`}
+          style={{ aspectRatio: '461/771' }}
         >
-          {/* 卡片正面/背面內容 */}
-          <div className="p-3 pb-12 flex flex-col h-full relative">
-            {/* 底部按鈕組 - 查看大卡 & 翻轉 */}
-            <div className="absolute bottom-2 left-3 right-3 flex gap-1.5 z-20">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setViewingCard(card);
-                }}
-                className="flex-1 px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600 shadow-sm"
-                title="查看大卡"
-              >
-                <Eye className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                  查看
-                </span>
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleCardFlip(card.id);
-                }}
-                className="flex-1 px-2 py-1 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-600 shadow-sm"
-                title="翻轉卡片"
-              >
-                <RotateCw className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                  翻轉
-                </span>
-              </button>
-            </div>
-            {!isFlipped ? (
-              // 正面
-              <>
-                {/* 分類標籤 */}
-                {card.category && (
-                  <div
-                    className={`text-[10px] font-semibold uppercase tracking-wider ${getCategoryColor(card.id)} mb-2`}
-                  >
-                    {card.category}
-                  </div>
-                )}
-                <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-center break-words flex-1 flex items-center justify-center px-1">
-                  {card.title}
-                </div>
-                {card.description && (
-                  <div className="text-[11px] text-gray-600 dark:text-gray-300 mt-2 line-clamp-3 text-center">
-                    {card.description}
-                  </div>
-                )}
-              </>
-            ) : (
-              // 背面 - 顯示更詳細的說明或其他內容
-              <div className="flex flex-col h-full">
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 text-center">
-                  詳細說明
-                </div>
-                <div className="flex-1 flex flex-col justify-center">
-                  <div className="text-xs text-gray-700 dark:text-gray-300 text-center leading-relaxed px-2">
-                    {card.description || card.title}
-                  </div>
-                  {card.category && (
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                      <div className="text-[10px] text-gray-500 dark:text-gray-400 text-center">
-                        分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+          {/* 底部按鈕組 - 查看大卡 & 翻轉 */}
+          <div className="absolute bottom-2 left-2 right-2 flex gap-1.5 z-20">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setViewingCard(card);
+              }}
+              className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
+              title="查看大卡"
+            >
+              <Eye className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
+              <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">查看</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleCardFlip(card.id);
+              }}
+              className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
+              title="翻轉卡片"
+            >
+              <RotateCw className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
+              <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">翻轉</span>
+            </button>
           </div>
+          {(() => {
+            // Get image URLs - use M size for dropzone cards
+            const imageUrls =
+              typeof card.imageUrl === 'object'
+                ? card.imageUrl?.M || card.imageUrl
+                : card.imageUrl
+                  ? { front: card.imageUrl, back: card.imageUrl }
+                  : null;
+
+            if (imageUrls) {
+              // 有圖片時顯示圖片
+              return (
+                <img
+                  src={isFlipped ? imageUrls.back : imageUrls.front}
+                  alt={isFlipped ? `${card.title} - 背面` : card.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              );
+            }
+
+            // 沒有圖片時顯示文字卡片
+            return (
+              <div className="p-3 pb-12 flex flex-col h-full">
+                {!isFlipped ? (
+                  // 正面
+                  <>
+                    {/* 分類標籤 */}
+                    {card.category && (
+                      <div
+                        className={`text-[10px] font-semibold uppercase tracking-wider ${getCategoryColor(card.id)} mb-2`}
+                      >
+                        {card.category}
+                      </div>
+                    )}
+                    <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-center break-words flex-1 flex items-center justify-center px-1">
+                      {card.title}
+                    </div>
+                    {card.description && (
+                      <div className="text-[11px] text-gray-600 dark:text-gray-300 mt-2 line-clamp-3 text-center">
+                        {card.description}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // 背面 - 顯示更詳細的說明或其他內容
+                  <div className="flex flex-col h-full">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 text-center">
+                      詳細說明
+                    </div>
+                    <div className="flex-1 flex flex-col justify-center">
+                      <div className="text-xs text-gray-700 dark:text-gray-300 text-center leading-relaxed px-2">
+                        {card.description || card.title}
+                      </div>
+                      {card.category && (
+                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                          <div className="text-[10px] text-gray-500 dark:text-gray-400 text-center">
+                            分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         {/* 最後一張卡片後的插入線 */}

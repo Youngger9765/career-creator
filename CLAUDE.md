@@ -251,6 +251,323 @@ Service Account configured for automated deployment.
 
 ---
 
+# Security Guidelines
+
+## Pre-commit Security Checks
+
+本專案使用多層次的安全檢查來防止敏感資訊洩漏和程式碼安全漏洞。
+
+### 🔒 Secrets Detection (雙層防護)
+
+1. **Gitleaks** - 掃描 git history 和 staged files
+   - 檢測 API keys, tokens, passwords
+   - 檢測 AWS, GCP, Azure credentials
+   - 檢測 Private keys (RSA, SSH, etc.)
+
+2. **Detect-Secrets** (Yelp) - 額外的 secret 偵測層
+   - AWS Access Keys
+   - GitHub Tokens
+   - Basic Authentication
+   - High Entropy Strings (Base64, Hex)
+   - 排除誤報: Alembic revision IDs
+
+### 🐍 Python Security (Bandit)
+
+**嚴格度**: Medium/High only (`-ll`)
+
+檢測項目：
+
+- **硬編碼密碼** (HIGH severity)
+- **SQL Injection 風險** (MEDIUM severity)
+- **Request without timeout** (MEDIUM severity)
+- **使用不安全的函式** (pickle, eval, exec)
+- **弱加密演算法** (MD5, SHA1)
+
+配置檔: `.bandit`
+
+### 📦 Dependency Vulnerabilities
+
+1. **Python Safety** - 檢查 Python 套件已知漏洞
+   - 掃描 `requirements.txt`
+   - 來源: Safety DB
+
+2. **npm audit** - 檢查 Node.js 套件已知漏洞
+   - 等級: HIGH and above
+   - 掃描 `package.json`
+
+### 🔑 Private Key Detection
+
+自動偵測並阻止 commit：
+
+- RSA private keys
+- SSH private keys
+- PGP private keys
+
+## Testing Security Checks
+
+```bash
+# 測試所有安全檢查
+pre-commit run --all-files
+
+# 只測試 secrets detection
+pre-commit run gitleaks --all-files
+pre-commit run detect-secrets --all-files
+
+# 只測試 Python security
+pre-commit run bandit --all-files
+
+# 只測試依賴套件
+pre-commit run python-safety-dependencies-check --all-files
+pre-commit run npm-audit --all-files
+```
+
+## If Secret is Found
+
+### ❌ Already Committed Secret
+
+1. **Immediately replace** that secret/password/key
+2. **Remove from git history**:
+
+   ```bash
+   # Use BFG Repo-Cleaner
+   java -jar bfg.jar --delete-files YOUR_SECRET_FILE
+   git reflog expire --expire=now --all
+   git gc --prune=now --aggressive
+   ```
+
+3. **Force push** (Careful!)
+
+   ```bash
+   git push --force
+   ```
+
+### ✅ Uncommitted Secret (Pre-commit intercepted)
+
+1. Remove secret from code
+2. Move secret to environment variables or secrets manager
+3. Re-commit
+
+## False Positives
+
+If confirmed not a secret, mark as allowlist:
+
+```python
+# Use pragma comment to mark false positive
+some_value = "EXAMPLE-ONLY"  # pragma: allowlist secret
+```
+
+## Reporting Security Issues
+
+If you discover a security vulnerability, please contact the project maintainer privately. **Do not create a public issue.**
+
+## Security Best Practices
+
+1. ✅ **Always use environment variables** to store sensitive information
+2. ✅ **Regularly update dependencies** (`pip-audit`, `npm audit`)
+3. ✅ **Code Review** - Pay special attention to security issues
+4. ✅ **Principle of least privilege** - Only grant necessary permissions
+5. ❌ **Never commit** `.env`, `credentials.json`, private keys
+6. ❌ **Never use `--no-verify`** to skip pre-commit hooks
+
+---
+
+# Technical Debt Tracking
+
+## 🔴 High Priority (Critical Issues)
+
+### 1. **ConsultationArea.tsx** (1512 lines)
+
+**Actual Status**:
+
+- **ConsultationArea component body**: 1262 lines (L250-1512) 🔴🔴🔴
+  - Contains: 10+ useState, useMemo, useCallback
+  - Contains: 300+ lines of mockCards data
+  - Contains: Large amounts of drag/drop logic, card management, token management
+  - Contains: Complex JSX (multiple game mode rendering)
+
+**Refactoring Priority**: ⭐️⭐️⭐️⭐️⭐️ (Highest - Core game component)
+
+**Impact Scope**: Core game logic, main consultation area component
+
+**Suggested Refactoring**:
+
+```typescript
+// Split into multiple files
+ConsultationArea/
+├── index.tsx                    // Main component (< 100 lines)
+├── hooks/
+│   ├── useCardManagement.ts     // Card management logic
+│   ├── useGameRules.ts          // Game rules logic
+│   └── useDragAndDrop.ts        // Drag/drop logic
+├── components/
+│   ├── CardSelector.tsx         // Card selector
+│   ├── GameArea.tsx             // Game area
+│   └── AuxiliaryCards.tsx       // Auxiliary cards
+└── utils/
+    ├── cardFilters.ts           // Card filter functions
+    └── validation.ts            // Validation logic
+```
+
+### 2. **ClientManagement.tsx** (978 lines)
+
+**Actual Status**:
+
+- Largest function only 35 lines (getRoomStatusBadge)
+- All functions < 50 lines, code is healthy
+- **Real issue**: Component itself too large (978 lines JSX + logic mixed)
+
+**Refactoring Priority**: ⭐️⭐️⭐️ (Medium)
+
+**Suggested Refactoring**:
+
+```typescript
+ClientManagement/
+├── index.tsx                    // Main component (< 200 lines)
+├── components/
+│   ├── ClientTable.tsx          // Desktop table view
+│   ├── ClientCard.tsx           // Mobile card view
+│   ├── ClientRecords.tsx        // Consultation records expand
+│   └── ClientModal.tsx          // View/edit modal
+└── hooks/
+    └── useClientData.ts         // Data fetching logic
+```
+
+### 3. **LifeTransformationGame.tsx** (944 lines)
+
+**Problem Functions:**
+
+- 🔴 **availableCards**: 195 lines (L470-664)
+- 🔴 **getDeck**: 150 lines (L176-325)
+- 🔴 **card render**: 138 lines (L741-878)
+
+**Refactoring Priority**: ⭐️⭐️⭐️⭐️
+
+**Suggestion**:
+
+- Split card render logic into independent component `GameCard.tsx`
+- Move deck logic to service or hook
+
+### 4. **backend/app/core/seeds.py** (1147 lines)
+
+**Problem Functions:**
+
+- 🔴 **seed_crm_data**: 313 lines
+- 🔴 **seed_career_cards**: 291 lines
+- 🔴 **seed_value_cards**: 169 lines
+- 🔴 **seed_skill_cards**: 169 lines
+
+**Refactoring Priority**: ⭐️⭐️⭐️
+
+**Suggested Refactoring**:
+
+```python
+backend/app/core/seeds/
+├── __init__.py
+├── users.py          # seed_demo_users, seed_test_users
+├── cards/
+│   ├── __init__.py
+│   ├── career.py     # seed_career_cards
+│   ├── value.py      # seed_value_cards
+│   └── skill.py      # seed_skill_cards
+└── crm.py            # seed_crm_data
+```
+
+## 🟡 Medium Priority
+
+### 5. **backend/app/api/clients.py** (758 lines)
+
+**Status**: Large file but functions are fine (< 50 lines)
+
+**Suggestion**: Consider splitting into multiple router files
+
+## 📊 Statistics Summary
+
+| File | Total Lines | Largest Function | Status |
+|------|-------------|------------------|--------|
+| ConsultationArea.tsx | 1512 | 433 | 🔴 Critical |
+| ClientManagement.tsx | 978 | 742 | 🔴 Critical |
+| LifeTransformationGame.tsx | 944 | 195 | 🔴 Critical |
+| seeds.py | 1147 | 313 | 🔴 Critical |
+| clients.py | 758 | < 50 | 🟡 Acceptable |
+
+## ✅ Refactoring Action Plan
+
+### Phase 1: Immediate (This week)
+
+- [ ] **ConsultationArea.tsx** - Highest priority
+  - [x] ✅ Step 1: Extract mockCards data to separate file (Completed - reduced 296 lines)
+    - Created `frontend/src/data/mockCards.ts`
+    - ConsultationArea.tsx: 1512 lines → 1216 lines
+  - [x] ✅ Step 2: Extract useCardManagement hook (Completed - reduced 115 lines)
+    - Created `frontend/src/hooks/useCardManagement.ts`
+    - Created 12 unit tests (100% passed)
+    - ConsultationArea.tsx: 1216 lines → 1101 lines
+  - [x] ✅ Step 3: Extract useTokenManagement hook (Completed - reduced 24 lines)
+    - Created `frontend/src/hooks/useTokenManagement.ts`
+    - Created 13 unit tests (100% passed)
+    - ConsultationArea.tsx: 1101 lines → 1077 lines
+  - [ ] Expected: Reduce main component from 1262 lines to ~400 lines (Currently reduced to 1077 lines, -435 lines, -28.8%)
+
+### Phase 2: High Priority (This week)
+
+- [ ] **ClientManagement.tsx**
+  - [x] ✅ Step 1: Extract useClientManagement hook (Completed - reduced 101 lines)
+    - Created `frontend/src/hooks/useClientManagement.ts`
+    - Created 17 unit tests
+    - ClientManagement.tsx: 978 lines → 877 lines
+  - [x] ✅ Step 2: Split ClientTableRow component (Desktop view) (Completed - reduced 136 lines)
+    - Created `frontend/src/components/clients/ClientTableRow.tsx`
+    - Created 16 unit tests (100% passed)
+    - ClientManagement.tsx: 877 lines → 741 lines
+  - [x] ✅ Step 3: Split ClientMobileCard component (Mobile view) (Completed - reduced 92 lines)
+    - Created `frontend/src/components/clients/ClientMobileCard.tsx`
+    - Created 13 unit tests (100% passed)
+    - ClientManagement.tsx: 741 lines → 649 lines
+  - [ ] Expected: Reduce from 978 lines to ~300 lines (Currently reduced to 649 lines, -329 lines, -33.6%)
+
+### Phase 3: Continuous Improvement (Within 2 weeks)
+
+- [ ] **LifeTransformationGame.tsx**
+  - [ ] Split card render logic
+  - [ ] Refactor deck management
+
+- [ ] **backend/app/core/seeds.py**
+  - [ ] Split into multiple files
+  - [ ] Each seed as independent module
+
+## 📝 Refactoring Principles
+
+1. **Single Responsibility Principle**
+   - Each function does one thing
+   - Function lines recommended < 50 lines
+
+2. **Component Splitting Principle**
+   - Main component < 100 lines
+   - Complex logic moved to hooks
+   - UI logic split into sub-components
+
+3. **File Size Principle**
+   - Component files < 300 lines
+   - API files < 500 lines
+   - Utils files < 200 lines
+
+## ⚠️ Important Notes
+
+**Before refactoring must**:
+
+1. ✅ Ensure all existing tests pass
+2. ✅ Add tests for parts to be refactored (TDD)
+3. ✅ Refactor one file at a time
+4. ✅ Run tests after each refactoring to confirm no broken functionality
+
+**Do not**:
+
+- ❌ Refactor multiple files at once
+- ❌ Add new features during refactoring
+- ❌ Refactor without tests
+
+---
+
 ## Last Updated
 
-2025-10-22
+2025-11-07

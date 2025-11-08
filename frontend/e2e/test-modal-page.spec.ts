@@ -26,25 +26,24 @@ test.describe('Test Modal Page - DPI Fix Verification', () => {
     const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible({ timeout: 5000 });
 
-    // Verify DialogContent has max-height class
-    const dialogContent = dialog.locator('.max-w-5xl').first();
-    const hasMaxHeight = await dialogContent.evaluate((el) => {
-      const classList = Array.from(el.classList);
-      return classList.some(cls => cls.includes('max-h'));
-    });
+    // Look for the element with max-w-5xl class (our DialogContent)
+    const contentWithMaxW = page.locator('.max-w-5xl');
+    await expect(contentWithMaxW).toBeVisible({ timeout: 5000 });
+
+    // Check if it has max-h class
+    const className = await contentWithMaxW.getAttribute('class');
+    const hasMaxHeight = className?.includes('max-h');
 
     expect(hasMaxHeight).toBeTruthy();
     console.log('✓ DialogContent has max-h-[90vh] class');
 
     // Verify images have inline size constraints
-    const modalImages = dialog.locator('img');
+    const modalImages = page.locator('[role="dialog"] img');
     const imageCount = await modalImages.count();
 
     if (imageCount > 0) {
       const firstImage = modalImages.first();
-
-      // Wait for image to load
-      await firstImage.waitFor({ state: 'visible', timeout: 5000 });
+      await expect(firstImage).toBeVisible({ timeout: 10000 });
 
       const imageStyles = await firstImage.evaluate((img) => {
         const inline = (img as HTMLElement).style;

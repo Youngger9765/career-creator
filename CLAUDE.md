@@ -22,20 +22,16 @@
       - DO NOT STOP and wait for user
       - IMMEDIATELY run: gh run list --branch <branch> --limit 1
       - IMMEDIATELY run: gh run watch <run-id>
-      - If fails: read logs, fix, push again
-      - If succeeds: get URL, run Playwright tests
+      - Get fresh URL from logs (URLs change!)
+      - If fails: read logs, auto-fix if possible, push again
+      - If succeeds: report deployment URL to user
       - NEVER say "pushed successfully" and move on
-
-   ✅ DEPLOYMENT VERIFICATION:
-      - Always get fresh URL from logs (URLs change!)
-      - Test actual deployed feature with Playwright
-      - Report full results to user
 
    ❌ NEVER:
       - Push without user testing
       - Push and forget
       - Use cached/old URLs
-      - Skip deployment verification
+      - Auto-run tests without context (user decides what tests to run)
    ```
 
 3. **Then proceed with the user's request**
@@ -53,39 +49,36 @@
    gh run watch <run-id>
    ```
 
-2. **Verify deployment success**:
+2. **Get fresh deployment URL**:
 
    ```bash
-   gh run list --branch <branch> --limit 1 --json status,conclusion
-   ```
-
-3. **Test on actual staging URL** (not hardcoded old URLs):
-
-   ```bash
-   # Get actual URL from deployment logs
    gh run view <run-id> --log | grep "Service URL:"
-
-   # Run Playwright tests against staging
-   npx playwright test <test-file> --project=chromium
    ```
 
-4. **If deployment fails**:
+3. **If deployment fails**:
    - Read the error logs: `gh run view <run-id> --log`
-   - Fix the issue
-   - Never leave broken deployments
+   - Auto-fix ONLY safe errors: linting, formatting, missing imports
+   - For complex errors (logic, tests, build config): report to user
+   - Push fix immediately (only for auto-fixable errors)
+   - After 2 auto-fix attempts: stop and report to user
+
+4. **If deployment succeeds**:
+   - Report the fresh URL to user
+   - Let user decide what testing is needed
 
 **DO NOT:**
 
 - ❌ Push and forget
-- ❌ Assume CI/CD success means the feature works
-- ❌ Use old/cached URLs for testing
-- ❌ Skip verification tests
+- ❌ Use old/cached URLs
+- ❌ Auto-run tests without understanding context
+- ❌ Auto-fix complex errors (logic, build config, tests)
+- ❌ Use hacky fixes (@ts-ignore, commenting out code, etc.)
 
 **REMEMBER:**
 
 - Staging URL changes with each service redeployment
 - Always get fresh URL from deployment logs
-- Test the actual deployed feature, not just build success
+- Only auto-fix safe, obvious errors (linting, formatting, imports)
 
 ---
 

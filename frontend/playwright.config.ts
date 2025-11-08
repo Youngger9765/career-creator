@@ -8,18 +8,33 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'https://career-creator-frontend-staging-990202338378.asia-east1.run.app',
+    baseURL: process.env.TEST_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
   projects: [
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: ['**/auth.setup.ts', '**/ui-fixes.spec.ts'],
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      testIgnore: ['**/auth.setup.ts', '**/ui-fixes.spec.ts'],
+    },
+    {
+      name: 'chromium-authenticated',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
+      testMatch: ['**/ui-fixes.spec.ts'],
     },
   ],
 });

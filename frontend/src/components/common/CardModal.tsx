@@ -84,20 +84,21 @@ const CardModal: React.FC<CardModalProps> = ({
   if (showBothSides) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-5xl">
+        <DialogContent className="max-w-5xl max-h-[90vh]">
           <div className="grid grid-cols-2 gap-8">
             {/* 正面 */}
             <div className="flex flex-col">
               <div className="text-base font-semibold text-gray-500 mb-4 text-center">正面</div>
               <div
                 className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 overflow-hidden`}
-                style={{ minHeight: '600px' }}
+                style={{ minHeight: '400px', maxHeight: 'calc(90vh - 100px)' }}
               >
                 {imageUrls?.front ? (
                   <img
                     src={imageUrls.front}
                     alt={card.title}
                     className="w-full h-full object-contain rounded-xl"
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                 ) : (
                   <div className="p-10 flex flex-col h-full">
@@ -127,13 +128,14 @@ const CardModal: React.FC<CardModalProps> = ({
               </div>
               <div
                 className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 overflow-hidden`}
-                style={{ minHeight: '600px' }}
+                style={{ minHeight: '400px', maxHeight: 'calc(90vh - 100px)' }}
               >
                 {imageUrls?.back ? (
                   <img
                     src={imageUrls.back}
                     alt={`${card.title} - 背面`}
                     className="w-full h-full object-contain rounded-xl"
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                 ) : (
                   <div className="p-10 flex-1 flex flex-col justify-center">

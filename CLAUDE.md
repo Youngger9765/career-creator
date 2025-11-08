@@ -1,5 +1,52 @@
 # CLAUDE.md - Project Guidelines
 
+## ⚠️ CI/CD Deployment Protocol (CRITICAL)
+
+**AFTER EVERY `git push`, YOU MUST:**
+
+1. **Monitor deployment immediately**:
+
+   ```bash
+   gh run list --branch <branch> --limit 1
+   gh run watch <run-id>
+   ```
+
+2. **Verify deployment success**:
+
+   ```bash
+   gh run list --branch <branch> --limit 1 --json status,conclusion
+   ```
+
+3. **Test on actual staging URL** (not hardcoded old URLs):
+
+   ```bash
+   # Get actual URL from deployment logs
+   gh run view <run-id> --log | grep "Service URL:"
+
+   # Run Playwright tests against staging
+   npx playwright test <test-file> --project=chromium
+   ```
+
+4. **If deployment fails**:
+   - Read the error logs: `gh run view <run-id> --log`
+   - Fix the issue
+   - Never leave broken deployments
+
+**DO NOT:**
+
+- ❌ Push and forget
+- ❌ Assume CI/CD success means the feature works
+- ❌ Use old/cached URLs for testing
+- ❌ Skip verification tests
+
+**REMEMBER:**
+
+- Staging URL changes with each service redeployment
+- Always get fresh URL from deployment logs
+- Test the actual deployed feature, not just build success
+
+---
+
 ## Project Overview
 
 Building an online card consultation system for career counselors and their visitors.
@@ -237,7 +284,19 @@ gcloud config list
 
 ### Cloud Run Services
 
-- **Staging**: `https://career-creator-frontend-staging-990202338378.asia-east1.run.app`
+**⚠️ WARNING: URLs may change after service redeployment.**
+**Always get fresh URL from deployment logs.**
+
+To get current staging URL:
+
+```bash
+gh run list --branch staging --limit 1
+gh run view <run-id> --log | grep "Service URL:"
+```
+
+Latest known URLs (verify before use):
+
+- **Staging**: `https://career-creator-frontend-staging-849078733818.asia-east1.run.app`
 - **Production**: `https://career-creator-frontend-production-990202338378.asia-east1.run.app`
 
 ### GitHub Actions Deployment

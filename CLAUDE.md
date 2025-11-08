@@ -1,5 +1,47 @@
 # CLAUDE.md - Project Guidelines
 
+---
+
+## 🚨 AT THE START OF EVERY SESSION (CRITICAL)
+
+**WHEN YOU START A NEW CONVERSATION, YOU MUST:**
+
+1. **Read this CLAUDE.md file**
+
+2. **Print the following rules to remind yourself**:
+
+   ```text
+   📋 SESSION RULES CHECKLIST:
+
+   ✅ BEFORE ANY COMMIT:
+      - User must test the feature first
+      - NEVER auto-commit without user approval
+      - Ask: "Have you tested this? Ready to commit?"
+
+   ✅ AFTER EVERY `git push`:
+      - DO NOT STOP and wait for user
+      - IMMEDIATELY run: gh run list --branch <branch> --limit 1
+      - IMMEDIATELY run: gh run watch <run-id>
+      - If fails: read logs, fix, push again
+      - If succeeds: get URL, run Playwright tests
+      - NEVER say "pushed successfully" and move on
+
+   ✅ DEPLOYMENT VERIFICATION:
+      - Always get fresh URL from logs (URLs change!)
+      - Test actual deployed feature with Playwright
+      - Report full results to user
+
+   ❌ NEVER:
+      - Push without user testing
+      - Push and forget
+      - Use cached/old URLs
+      - Skip deployment verification
+   ```
+
+3. **Then proceed with the user's request**
+
+---
+
 ## ⚠️ CI/CD Deployment Protocol (CRITICAL)
 
 **AFTER EVERY `git push`, YOU MUST:**

@@ -9,6 +9,7 @@
   "cards": [
     {
       "id": "riasec-realistic",
+      "deck_id": "riasec_explanation",
       "key": "realistic",
       "title": "實踐者 (Realistic)",
       "description": "喜歡實際動手操作，偏好使用工具、機器或設備完成具體任務。適合從事技術性、機械性或戶外工作。",
@@ -28,6 +29,7 @@
     },
     {
       "id": "riasec-investigative",
+      "deck_id": "riasec_explanation",
       "key": "investigative",
       "title": "思考者 (Investigative)",
       "description": "喜歡思考、分析和解決抽象問題。偏好科學研究、數據分析等需要邏輯推理的工作。",
@@ -47,6 +49,7 @@
     },
     {
       "id": "riasec-artistic",
+      "deck_id": "riasec_explanation",
       "key": "artistic",
       "title": "創造者 (Artistic)",
       "description": "喜歡創作、設計和藝術表現。偏好自由發揮、富有創意的工作環境。",
@@ -66,6 +69,7 @@
     },
     {
       "id": "riasec-social",
+      "deck_id": "riasec_explanation",
       "key": "social",
       "title": "助人者 (Social)",
       "description": "喜歡與人互動、幫助他人成長。適合從事教育、諮商、醫療等服務性工作。",
@@ -85,6 +89,7 @@
     },
     {
       "id": "riasec-enterprising",
+      "deck_id": "riasec_explanation",
       "key": "enterprising",
       "title": "影響者 (Enterprising)",
       "description": "喜歡領導、說服和管理。適合從事業務、管理、創業等需要影響力的工作。",
@@ -104,6 +109,7 @@
     },
     {
       "id": "riasec-conventional",
+      "deck_id": "riasec_explanation",
       "key": "conventional",
       "title": "組織者 (Conventional)",
       "description": "喜歡有系統、有規則的工作。適合從事行政、會計、數據處理等需要精確性的工作。",

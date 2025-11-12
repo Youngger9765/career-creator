@@ -82,13 +82,15 @@ export function ClientTableRow({
                 <span className="text-sm dark:text-gray-200 truncate" title={client.email}>
                   {client.email}
                 </span>
-                {client.email_verified ? (
+                {/* Email verification icons - Hidden for now */}
+                {false && client.email_verified ? (
                   <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                ) : (
+                ) : false ? (
                   <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                )}
+                ) : null}
               </div>
-              {!client.email_verified && (
+              {/* Email verification button - Hidden for now */}
+              {false && !client.email_verified && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

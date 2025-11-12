@@ -18,12 +18,12 @@ describe.skip('Card Data Integrity', () => {
 
   describe('Career Cards (職業卡)', () => {
     it('should have exactly 100 career cards', async () => {
-      const cards = await CardLoaderService.getCards('career_cards_100');
+      const cards = await CardLoaderService.getCards('profession-collector');
       expect(cards).toHaveLength(100);
     });
 
     it('should have valid RIASEC categories for all career cards', async () => {
-      const cards = await CardLoaderService.getCards('career_cards_100');
+      const cards = await CardLoaderService.getCards('profession-collector');
       const validCategories = ['R', 'I', 'A', 'S', 'E', 'C'];
 
       cards.forEach((card) => {
@@ -32,7 +32,7 @@ describe.skip('Card Data Integrity', () => {
     });
 
     it('should have unique IDs for all career cards', async () => {
-      const cards = await CardLoaderService.getCards('career_cards_100');
+      const cards = await CardLoaderService.getCards('profession-collector');
       const ids = cards.map((card) => card.id);
       const uniqueIds = new Set(ids);
 
@@ -40,7 +40,7 @@ describe.skip('Card Data Integrity', () => {
     });
 
     it('should have required properties for each career card', async () => {
-      const cards = await CardLoaderService.getCards('career_cards_100');
+      const cards = await CardLoaderService.getCards('profession-collector');
 
       cards.forEach((card) => {
         expect(card.id).toBeDefined();
@@ -162,7 +162,7 @@ describe.skip('Card Data Integrity', () => {
   describe('Card Deck Validation', () => {
     it('should validate all decks successfully', async () => {
       const deckIds = [
-        'career_cards_100',
+        'profession-collector',
         'skill_cards_52',
         'value_cards_36',
         'riasec_explanation',
@@ -202,8 +202,8 @@ describe.skip('Card Data Integrity', () => {
     });
 
     it('should get random cards', async () => {
-      const randomCards1 = await CardLoaderService.getRandomCards('career_cards_100', 5);
-      const randomCards2 = await CardLoaderService.getRandomCards('career_cards_100', 5);
+      const randomCards1 = await CardLoaderService.getRandomCards('profession-collector', 5);
+      const randomCards2 = await CardLoaderService.getRandomCards('profession-collector', 5);
 
       expect(randomCards1).toHaveLength(5);
       expect(randomCards2).toHaveLength(5);
@@ -215,7 +215,7 @@ describe.skip('Card Data Integrity', () => {
     });
 
     it('should get cards by category', async () => {
-      const rCards = await CardLoaderService.getCardsByCategory('career_cards_100', 'R');
+      const rCards = await CardLoaderService.getCardsByCategory('profession-collector', 'R');
       expect(rCards.length).toBeGreaterThan(0);
 
       rCards.forEach((card) => {

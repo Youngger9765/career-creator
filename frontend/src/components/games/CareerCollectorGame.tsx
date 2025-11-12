@@ -25,7 +25,7 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
   roomId,
   isRoomOwner,
   mode = 'career',
-  deckType = 'career_cards_100',
+  deckType = 'profession-collector',
 }) => {
   const [mainDeck, setMainDeck] = useState<any>(null);
   const [maxCards, setMaxCards] = useState(15);

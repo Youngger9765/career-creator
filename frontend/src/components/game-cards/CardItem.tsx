@@ -43,13 +43,13 @@ const CardItem: React.FC<CardItemProps> = ({
   // 根據卡片類型或ID前綴決定背景色
   const getCardBackground = () => {
     if (type === 'skill' || id.startsWith('skill_')) {
-      return 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700';
+      return 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/60 dark:to-indigo-900/60 border-blue-200 dark:border-blue-700';
     } else if (type === 'action' || id.startsWith('action_')) {
-      return 'bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-orange-200 dark:border-orange-700';
+      return 'bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/60 dark:to-amber-900/60 border-orange-200 dark:border-orange-700';
     } else if (type === 'value' || id.startsWith('value_')) {
-      return 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700';
+      return 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/60 dark:to-emerald-900/60 border-green-200 dark:border-green-700';
     } else if (type === 'career' || id.startsWith('career_')) {
-      return 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 border-purple-200 dark:border-purple-700';
+      return 'bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/60 dark:to-violet-900/60 border-purple-200 dark:border-purple-700';
     }
     return 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700';
   };

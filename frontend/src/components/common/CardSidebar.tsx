@@ -52,8 +52,12 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
 
   // Get image URLs - use M size for BigCard in sidebar
   const imageUrls =
-    typeof card.imageUrl === 'object'
-      ? card.imageUrl.M || card.imageUrl
+    typeof card.imageUrl === 'object' && card.imageUrl !== null
+      ? 'M' in card.imageUrl
+        ? card.imageUrl.M || null // M size
+        : 'front' in card.imageUrl
+          ? card.imageUrl // Direct { front, back } object
+          : null
       : card.imageUrl
         ? { front: card.imageUrl, back: card.imageUrl }
         : null;

@@ -77,8 +77,12 @@ const CardItem: React.FC<CardItemProps> = ({
 
   // Get image URLs - use M size for card items
   const imageUrls =
-    typeof imageUrl === 'object'
-      ? imageUrl.M || imageUrl // Try M first, fallback to direct URLs
+    typeof imageUrl === 'object' && imageUrl !== null
+      ? 'M' in imageUrl
+        ? imageUrl.M || null // M size
+        : 'front' in imageUrl
+          ? imageUrl // Direct { front, back } object
+          : null
       : imageUrl
         ? { front: imageUrl, back: imageUrl }
         : null;

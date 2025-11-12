@@ -93,7 +93,7 @@ const CardItem: React.FC<CardItemProps> = ({
         relative group
         ${getCardBackground()}
         border
-        rounded-lg shadow-sm hover:shadow-lg
+        rounded-xl shadow-sm hover:shadow-lg
         transition-all duration-200
         w-full aspect-[3/4]
         ${isDraggable ? 'cursor-move' : 'cursor-default'}
@@ -144,7 +144,7 @@ const CardItem: React.FC<CardItemProps> = ({
           <img
             src={isFlipped ? imageUrls.back : imageUrls.front}
             alt={isFlipped ? `${title} - 背面` : title}
-            className="w-full h-full object-contain rounded-lg"
+            className="w-full h-full object-contain rounded-xl"
           />
         ) : (
           // 沒有圖片時顯示原本的文字卡片

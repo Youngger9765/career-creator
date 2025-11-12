@@ -96,7 +96,7 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
             <img
               src={isFlipped ? imageUrls.back : imageUrls.front}
               alt={isFlipped ? `${card.title} - 背面` : card.title}
-              className="w-full h-full object-contain rounded-lg"
+              className="w-full h-full object-contain rounded-xl"
             />
           ) : (
             <div className="p-5 pb-16 flex flex-col h-full">

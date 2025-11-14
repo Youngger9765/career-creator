@@ -271,8 +271,7 @@ const DropZone: React.FC<DropZoneProps> = ({
     return (
       <div
         key={card.id}
-        className="relative group"
-        style={{ width: typeof cardWidth === 'number' ? `${cardWidth}px` : cardWidth }}
+        className="relative group w-full"
         draggable={allowReorder}
         onDragStart={(e) => allowReorder && handleCardDragStart(e, card.id, index)}
         onDragEnd={() => allowReorder && handleCardDragEnd(card.id)}
@@ -680,7 +679,13 @@ const DropZone: React.FC<DropZoneProps> = ({
             defaultRenderEmpty()
           )
         ) : (
-          <div className={viewMode === 'compact' ? 'flex flex-col gap-2' : 'flex flex-wrap gap-2'}>
+          <div
+            className={
+              viewMode === 'compact'
+                ? 'flex flex-col gap-2'
+                : 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2'
+            }
+          >
             {placedCardIds.map((cardId, index) => {
               const card = cards.find((c) => c.id === cardId);
               if (!card) return null;

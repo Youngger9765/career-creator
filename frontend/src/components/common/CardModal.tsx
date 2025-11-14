@@ -83,6 +83,9 @@ const CardModal: React.FC<CardModalProps> = ({
   // Check if card has back image
   const hasBackImage = imageUrls?.back !== undefined;
 
+  // Check if card has different front/back images (explanation cards)
+  const hasDistinctSides = imageUrls && imageUrls.front !== imageUrls.back;
+
   // 同時顯示兩面的版本
   if (showBothSides) {
     return (
@@ -104,7 +107,7 @@ const CardModal: React.FC<CardModalProps> = ({
                   <img
                     src={imageUrls.front}
                     alt={card.title}
-                    className="w-full h-full object-contain rounded-xl"
+                    className={`w-full h-full ${hasDistinctSides ? 'object-contain scale-105' : 'object-cover'} rounded-xl`}
                     style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                 ) : (
@@ -142,7 +145,7 @@ const CardModal: React.FC<CardModalProps> = ({
                     <img
                       src={imageUrls.back}
                       alt={`${card.title} - 背面`}
-                      className="w-full h-full object-contain rounded-xl"
+                      className={`w-full h-full ${hasDistinctSides ? 'object-contain scale-105' : 'object-cover'} rounded-xl`}
                       style={{ maxWidth: '100%', maxHeight: '100%' }}
                     />
                   ) : (

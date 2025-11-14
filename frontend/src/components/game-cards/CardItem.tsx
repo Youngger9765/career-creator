@@ -98,7 +98,7 @@ const CardItem: React.FC<CardItemProps> = ({
         border
         rounded-xl shadow-sm hover:shadow-lg
         transition-all duration-200
-        w-full aspect-[3/4]
+        w-full aspect-[2/3]
         ${isDraggable ? 'cursor-move' : 'cursor-default'}
         ${isUsed ? 'opacity-40 pointer-events-none' : ''}
         ${className}

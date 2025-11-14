@@ -97,14 +97,14 @@ const CardModal: React.FC<CardModalProps> = ({
                 {hasBackImage ? '正面' : ''}
               </div>
               <div
-                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 overflow-hidden`}
+                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col overflow-hidden`}
                 style={{ minHeight: '400px', maxHeight: 'calc(90vh - 100px)' }}
               >
                 {imageUrls?.front ? (
                   <img
                     src={imageUrls.front}
                     alt={card.title}
-                    className="w-full h-full object-cover scale-100 rounded-xl"
+                    className="w-full h-full object-contain rounded-xl"
                     style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                 ) : (
@@ -135,14 +135,14 @@ const CardModal: React.FC<CardModalProps> = ({
                   背面 / 詳細說明
                 </div>
                 <div
-                  className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col px-4 overflow-hidden`}
+                  className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col overflow-hidden`}
                   style={{ minHeight: '400px', maxHeight: 'calc(90vh - 100px)' }}
                 >
                   {imageUrls?.back ? (
                     <img
                       src={imageUrls.back}
                       alt={`${card.title} - 背面`}
-                      className="w-full h-full object-cover scale-100 rounded-xl"
+                      className="w-full h-full object-contain rounded-xl"
                       style={{ maxWidth: '100%', maxHeight: '100%' }}
                     />
                   ) : (

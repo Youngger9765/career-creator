@@ -66,15 +66,15 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
     <div className="relative w-full h-full">
       {/* 背景卡片層 - 創造堆疊效果（3層，向左上平移） */}
       <div
-        className={`${getCardBackground()} border-2 rounded-lg shadow-md absolute top-0 left-0 right-0 bottom-0 -translate-x-4 -translate-y-4 opacity-25`}
+        className={`${getCardBackground()} border-2 rounded-xl shadow-md absolute top-0 left-0 right-0 bottom-0 -translate-x-4 -translate-y-4 opacity-25`}
       />
       <div
-        className={`${getCardBackground()} border-2 rounded-lg shadow-lg absolute top-0 left-0 right-0 bottom-0 -translate-x-2 -translate-y-2 opacity-45`}
+        className={`${getCardBackground()} border-2 rounded-xl shadow-lg absolute top-0 left-0 right-0 bottom-0 -translate-x-2 -translate-y-2 opacity-45`}
       />
 
       {/* 主卡片 */}
       <div
-        className={`${getCardBackground()} border-2 rounded-lg shadow-2xl h-full w-full flex flex-col relative z-10 overflow-hidden`}
+        className={`${getCardBackground()} border-2 rounded-xl shadow-2xl h-full w-full flex flex-col relative z-10 overflow-hidden`}
       >
         {/* 翻轉按鈕 */}
         <button
@@ -96,7 +96,7 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
             <img
               src={isFlipped ? imageUrls.back : imageUrls.front}
               alt={isFlipped ? `${card.title} - 背面` : card.title}
-              className="w-full h-full object-contain rounded-xl"
+              className="w-full h-full object-cover rounded-xl"
             />
           ) : (
             <div className="p-5 pb-16 flex flex-col h-full">

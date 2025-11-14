@@ -144,7 +144,7 @@ const CardItem: React.FC<CardItemProps> = ({
           <img
             src={isFlipped ? imageUrls.back : imageUrls.front}
             alt={isFlipped ? `${title} - 背面` : title}
-            className="w-full h-full object-contain rounded-xl"
+            className="w-full h-full object-cover rounded-xl"
           />
         ) : (
           // 沒有圖片時顯示原本的文字卡片

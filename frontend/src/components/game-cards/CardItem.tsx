@@ -95,7 +95,7 @@ const CardItem: React.FC<CardItemProps> = ({
         border
         rounded-xl shadow-sm hover:shadow-lg
         transition-all duration-200
-        w-full aspect-[2/3]
+        w-full
         ${isDraggable ? 'cursor-move' : 'cursor-default'}
         ${isUsed ? 'opacity-40 pointer-events-none' : ''}
         ${className}
@@ -125,7 +125,7 @@ const CardItem: React.FC<CardItemProps> = ({
 
       {/* 卡片內容 - 直立長方形格式 */}
       <div
-        className={`${imageUrls ? '' : 'p-3 pb-10'} space-y-1 flex flex-col h-full relative overflow-hidden rounded-xl`}
+        className={`${imageUrls ? '' : 'p-3 pb-10'} space-y-1 flex flex-col ${imageUrls ? '' : 'h-full'} relative overflow-hidden rounded-xl`}
       >
         {/* 翻面按鈕 - 在卡片內容底部 */}
         {!isUsed && imageUrls && (
@@ -146,7 +146,7 @@ const CardItem: React.FC<CardItemProps> = ({
           <img
             src={isFlipped ? imageUrls.back : imageUrls.front}
             alt={isFlipped ? `${title} - 背面` : title}
-            className="w-full h-full object-cover"
+            className="w-full h-auto rounded-xl"
           />
         ) : (
           // 沒有圖片時顯示原本的文字卡片

@@ -24,6 +24,10 @@
         "M": {
           "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-M-front-zhtw.png",
           "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-S-back-zhtw.png"
         }
       }
     },
@@ -44,6 +48,10 @@
         "M": {
           "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-M-front-zhtw.png",
           "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-S-back-zhtw.png"
         }
       }
     },
@@ -64,6 +72,10 @@
         "M": {
           "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-M-front-zhtw.png",
           "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-S-back-zhtw.png"
         }
       }
     },
@@ -84,6 +96,10 @@
         "M": {
           "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-M-front-zhtw.png",
           "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-S-back-zhtw.png"
         }
       }
     },
@@ -104,6 +120,10 @@
         "M": {
           "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-M-front-zhtw.png",
           "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-S-back-zhtw.png"
         }
       }
     },
@@ -124,6 +144,10 @@
         "M": {
           "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-M-front-zhtw.png",
           "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-S-back-zhtw.png"
         }
       }
     }

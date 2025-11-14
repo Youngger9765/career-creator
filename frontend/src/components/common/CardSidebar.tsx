@@ -62,9 +62,6 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
         ? { front: card.imageUrl, back: card.imageUrl }
         : null;
 
-  // Check if card has different front/back images (explanation cards)
-  const hasDistinctSides = imageUrls && imageUrls.front !== imageUrls.back;
-
   return (
     <div className="relative w-full h-full">
       {/* 背景卡片層 - 創造堆疊效果（3層，向左上平移） */}
@@ -99,7 +96,7 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
             <img
               src={isFlipped ? imageUrls.back : imageUrls.front}
               alt={isFlipped ? `${card.title} - 背面` : card.title}
-              className={`w-full h-full ${hasDistinctSides ? 'object-contain scale-105' : 'object-cover'}`}
+              className="w-full h-full object-cover"
             />
           ) : (
             <div className="p-5 pb-16 flex flex-col h-full">

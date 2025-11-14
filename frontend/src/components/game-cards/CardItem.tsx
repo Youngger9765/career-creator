@@ -87,9 +87,6 @@ const CardItem: React.FC<CardItemProps> = ({
         ? { front: imageUrl, back: imageUrl }
         : null;
 
-  // Check if card has different front/back images (explanation cards)
-  const hasDistinctSides = imageUrls && imageUrls.front !== imageUrls.back;
-
   return (
     <div
       className={`
@@ -149,7 +146,7 @@ const CardItem: React.FC<CardItemProps> = ({
           <img
             src={isFlipped ? imageUrls.back : imageUrls.front}
             alt={isFlipped ? `${title} - 背面` : title}
-            className={`w-full h-full ${hasDistinctSides ? 'object-contain scale-105' : 'object-cover'}`}
+            className="w-full h-full object-cover"
           />
         ) : (
           // 沒有圖片時顯示原本的文字卡片

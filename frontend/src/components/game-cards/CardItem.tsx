@@ -127,9 +127,11 @@ const CardItem: React.FC<CardItemProps> = ({
       )}
 
       {/* 卡片內容 - 直立長方形格式 */}
-      <div className="p-3 pb-10 space-y-1 flex flex-col h-full relative overflow-hidden">
+      <div
+        className={`${imageUrls ? '' : 'p-3 pb-10'} space-y-1 flex flex-col h-full relative overflow-hidden rounded-xl`}
+      >
         {/* 翻面按鈕 - 在卡片內容底部 */}
-        {!isUsed && (
+        {!isUsed && imageUrls && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -147,7 +149,7 @@ const CardItem: React.FC<CardItemProps> = ({
           <img
             src={isFlipped ? imageUrls.back : imageUrls.front}
             alt={isFlipped ? `${title} - 背面` : title}
-            className={`w-full h-full ${hasDistinctSides ? 'object-contain' : 'object-cover'} rounded-xl`}
+            className={`w-full h-full ${hasDistinctSides ? 'object-contain scale-105' : 'object-cover'}`}
           />
         ) : (
           // 沒有圖片時顯示原本的文字卡片

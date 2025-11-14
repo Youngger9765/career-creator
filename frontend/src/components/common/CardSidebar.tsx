@@ -93,13 +93,13 @@ const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
         </button>
 
         {/* 卡片內容 */}
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden rounded-xl">
           {imageUrls ? (
             // 有圖片時顯示圖片
             <img
               src={isFlipped ? imageUrls.back : imageUrls.front}
               alt={isFlipped ? `${card.title} - 背面` : card.title}
-              className={`w-full h-full ${hasDistinctSides ? 'object-contain' : 'object-cover'} rounded-xl`}
+              className={`w-full h-full ${hasDistinctSides ? 'object-contain scale-105' : 'object-cover'}`}
             />
           ) : (
             <div className="p-5 pb-16 flex flex-col h-full">

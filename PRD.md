@@ -712,7 +712,13 @@
    - 三版介面實作（小/中/大）
    - 內部測試驗證
 
-4. **Production 環境建置** ✅ (2025-10-24 完成)
+4. **資料庫搬遷** ❌ (待執行)
+   - ❌ 將 Staging 資料庫搬遷至公司 Supabase
+   - ❌ 將 Production 資料庫搬遷至公司 Supabase
+   - ❌ 更新所有環境變數與連線設定
+   - ❌ 驗證資料完整性與功能正常運作
+
+5. **Production 環境建置** ✅ (2025-10-24 完成)
    - ✅ 公司 GCP 專案建立（career-creator-card）
    - ✅ Cloud Run Service 部署（frontend + backend）
    - ✅ Supabase Production Database 設定

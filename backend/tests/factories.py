@@ -139,7 +139,7 @@ class VisitorFactory:
         return visitor
 
 
-class TestDataBuilder:
+class DataBuilder:
     """測試資料建構器 - 用於創建完整的測試場景"""
 
     def __init__(self, session: Session):
@@ -148,19 +148,19 @@ class TestDataBuilder:
         self.room: Optional[Room] = None
         self.visitors: List[Visitor] = []
 
-    def with_counselor(self, **kwargs: Any) -> "TestDataBuilder":
+    def with_counselor(self, **kwargs: Any) -> "DataBuilder":
         """添加諮詢師"""
         self.counselor = UserFactory.create_counselor(self.session, **kwargs)
         return self
 
-    def with_room(self, **kwargs: Any) -> "TestDataBuilder":
+    def with_room(self, **kwargs: Any) -> "DataBuilder":
         """添加諮詢室"""
         if self.counselor is None:
             self.with_counselor()
         self.room = RoomFactory.create(self.session, counselor=self.counselor, **kwargs)
         return self
 
-    def with_visitors(self, count: int = 1, **kwargs: Any) -> "TestDataBuilder":
+    def with_visitors(self, count: int = 1, **kwargs: Any) -> "DataBuilder":
         """添加訪客"""
         if self.room is None:
             self.with_room()

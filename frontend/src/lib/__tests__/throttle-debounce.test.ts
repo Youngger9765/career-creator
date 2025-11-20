@@ -58,6 +58,27 @@ describe('throttle', () => {
     expect(fn).toHaveBeenCalledWith('first');
     expect(fn).toHaveBeenCalledWith('third');
   });
+
+  it('should cancel pending calls when cancel() is called', () => {
+    const fn = vi.fn();
+    const throttled = throttle(fn, 300);
+
+    throttled('first');
+    expect(fn).toHaveBeenCalledTimes(1);
+
+    throttled('second');
+    throttled('third');
+
+    // Cancel before delayed call executes
+    throttled.cancel();
+
+    // Fast forward time - should NOT execute delayed call
+    vi.advanceTimersByTime(300);
+
+    // Should still only have 1 call (the immediate one)
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith('first');
+  });
 });
 
 describe('debounce', () => {
@@ -117,5 +138,22 @@ describe('debounce', () => {
 
     expect(fn).toHaveBeenCalledTimes(1);
     expect(fn).toHaveBeenCalledWith('third');
+  });
+
+  it('should cancel pending execution when cancel() is called', () => {
+    const fn = vi.fn();
+    const debounced = debounce(fn, 500);
+
+    debounced('first');
+    debounced('second');
+
+    // Cancel before execution
+    debounced.cancel();
+
+    // Fast forward time - should NOT execute
+    vi.advanceTimersByTime(500);
+
+    // Should never be called
+    expect(fn).not.toHaveBeenCalled();
   });
 });

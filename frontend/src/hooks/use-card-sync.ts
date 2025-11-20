@@ -151,6 +151,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   );
 
   // Create throttled broadcast for card_moved (300ms throttle)
+  // Note: Empty deps OK - channelRef.current is mutable, always gets latest value
   const throttledBroadcastMove = useMemo(
     () =>
       throttle((event: CardMoveEvent) => {
@@ -360,6 +361,10 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     return () => {
       channel.unsubscribe();
       channelRef.current = null;
+
+      // Cleanup pending throttled/debounced calls to prevent memory leaks
+      throttledBroadcastMove.cancel();
+      debouncedBroadcastDragEnd.cancel();
     };
   }, [
     roomId,
@@ -371,6 +376,8 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     onDragEnd,
     onStateReceived,
     loadGameState,
+    throttledBroadcastMove,
+    debouncedBroadcastDragEnd,
   ]);
 
   return {

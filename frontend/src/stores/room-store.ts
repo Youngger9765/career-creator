@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 import { Room, CreateRoomData } from '@/lib/api/rooms';
 import { roomsAPI } from '@/lib/api/rooms';
-// TODO: Import Visitor and CardEvent types when implemented
+import type { Visitor, CardEvent } from '@/types/api';
 
 interface RoomState {
   // Current room data

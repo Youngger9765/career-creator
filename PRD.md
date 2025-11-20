@@ -20,8 +20,10 @@
 
 ## 📚 相關文件
 
-- [第一個月報告](https://docs.google.com/document/d/1p327JR-X3XeUxIKgkRZZfVXEWid_lTG4_rq0rVTAVuQ/edit) - 2025-09-01 ~ 09-30
-- [第二個月需求](https://docs.google.com/document/d/1vSz-w5ST-hQKcZ85ALZlOF-AcxHzVt6bSWvzitH4_X4/edit) - 2025-10-01 ~ 10-31
+- [第一個月報告](https://docs.google.com/document/d/1p327JR-X3XeUxIKgkRZZfVXEWid_lTG4_rq0rVTAVuQ/edit)
+  (2025-09-01 ~ 09-30)
+- [第二個月需求](https://docs.google.com/document/d/1vSz-w5ST-hQKcZ85ALZlOF-AcxHzVt6bSWvzitH4_X4/edit)
+  (2025-10-01 ~ 10-31)
 
 ---
 
@@ -225,21 +227,23 @@
 
 ### 三大模式架構
 
-**1. 職游旅人卡**
+#### 1. 職游旅人卡
 
-- **六大性格分析**: RIASEC 6 張解釋卡 + 100 張職業卡，三欄分類（喜歡/中立/討厭）
+- **六大性格分析**: RIASEC 6 張解釋卡 + 100 張職業卡，
+  三欄分類（喜歡/中立/討厭）
 - **職業收藏家**: 從 100 張職業卡精選最多 15 張
 
-**2. 職能盤點卡**
+#### 2. 職能盤點卡
 
 - **優劣勢分析**: 雙區畫布（優勢/劣勢各 5 張）
 - **成長計畫**: A 職能卡 + B 技能卡，三區畫布
 - **職位拆解**: 自由排列 + JD 截圖上傳
 
-**3. 價值導航卡**
+#### 3. 價值導航卡
 
 - **價值觀排序**: 36 張核心價值卡，分層排序（前三名 + 其他）
-- **生活改造王**: 籌碼分配系統（100 點能量），滿意度量表 + 投資分配
+- **生活改造王**: 籌碼分配系統（100 點能量），
+  滿意度量表 + 投資分配
 
 ### 基礎操作
 

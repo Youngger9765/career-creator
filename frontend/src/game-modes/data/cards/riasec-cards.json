@@ -9,6 +9,7 @@
   "cards": [
     {
       "id": "riasec-realistic",
+      "deck_id": "riasec_explanation",
       "key": "realistic",
       "title": "實踐者 (Realistic)",
       "description": "喜歡實際動手操作，偏好使用工具、機器或設備完成具體任務。適合從事技術性、機械性或戶外工作。",
@@ -16,12 +17,23 @@
       "riasecCode": "R",
       "traits": ["務實", "動手能力強", "喜歡具體成果", "偏好戶外或實體工作"],
       "imageUrl": {
-        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-L-front-zhtw.png",
-        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-L-back-zhtw.png"
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-realistic-S-back-zhtw.png"
+        }
       }
     },
     {
       "id": "riasec-investigative",
+      "deck_id": "riasec_explanation",
       "key": "investigative",
       "title": "思考者 (Investigative)",
       "description": "喜歡思考、分析和解決抽象問題。偏好科學研究、數據分析等需要邏輯推理的工作。",
@@ -29,12 +41,23 @@
       "riasecCode": "I",
       "traits": ["好奇心強", "邏輯思考", "喜歡探索真相", "偏好獨立工作"],
       "imageUrl": {
-        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-L-front-zhtw.png",
-        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-L-back-zhtw.png"
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-investigative-S-back-zhtw.png"
+        }
       }
     },
     {
       "id": "riasec-artistic",
+      "deck_id": "riasec_explanation",
       "key": "artistic",
       "title": "創造者 (Artistic)",
       "description": "喜歡創作、設計和藝術表現。偏好自由發揮、富有創意的工作環境。",
@@ -42,12 +65,23 @@
       "riasecCode": "A",
       "traits": ["創意豐富", "美感敏銳", "喜歡自我表達", "偏好彈性工作"],
       "imageUrl": {
-        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-L-front-zhtw.png",
-        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-L-back-zhtw.png"
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-artistic-S-back-zhtw.png"
+        }
       }
     },
     {
       "id": "riasec-social",
+      "deck_id": "riasec_explanation",
       "key": "social",
       "title": "助人者 (Social)",
       "description": "喜歡與人互動、幫助他人成長。適合從事教育、諮商、醫療等服務性工作。",
@@ -55,12 +89,23 @@
       "riasecCode": "S",
       "traits": ["同理心強", "善於溝通", "喜歡助人", "偏好團隊合作"],
       "imageUrl": {
-        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-L-front-zhtw.png",
-        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-L-back-zhtw.png"
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-social-S-back-zhtw.png"
+        }
       }
     },
     {
       "id": "riasec-enterprising",
+      "deck_id": "riasec_explanation",
       "key": "enterprising",
       "title": "影響者 (Enterprising)",
       "description": "喜歡領導、說服和管理。適合從事業務、管理、創業等需要影響力的工作。",
@@ -68,12 +113,23 @@
       "riasecCode": "E",
       "traits": ["領導力強", "說服力佳", "喜歡競爭", "偏好目標導向"],
       "imageUrl": {
-        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-L-front-zhtw.png",
-        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-L-back-zhtw.png"
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-enterprising-S-back-zhtw.png"
+        }
       }
     },
     {
       "id": "riasec-conventional",
+      "deck_id": "riasec_explanation",
       "key": "conventional",
       "title": "組織者 (Conventional)",
       "description": "喜歡有系統、有規則的工作。適合從事行政、會計、數據處理等需要精確性的工作。",
@@ -81,8 +137,18 @@
       "riasecCode": "C",
       "traits": ["細心謹慎", "組織能力強", "喜歡規律", "偏好結構化工作"],
       "imageUrl": {
-        "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-L-front-zhtw.png",
-        "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-L-back-zhtw.png"
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/personality-riasec-conventional-S-back-zhtw.png"
+        }
       }
     }
   ]

@@ -18,7 +18,10 @@ export interface Card {
   description: string;
   category?: string;
   icon?: string;
-  imageUrl?: string | { front: string; back: string }; // 支援單張或雙面圖片
+  imageUrl?:
+    | string
+    | { front: string; back?: string }
+    | { L?: { front: string; back?: string }; M?: { front: string; back?: string } }; // 支援單張、雙面圖片、或多尺寸圖片
   [key: string]: any; // 允許額外屬性
 }
 
@@ -48,7 +51,7 @@ export class CardLoaderService {
       cards: riasecCards.cards,
     } as CardDeck);
 
-    this.cache.set('career_cards_100', {
+    this.cache.set('profession-collector', {
       ...careerCards.deck,
       type: careerCards.deck.type as 'main',
       cards: careerCards.cards,
@@ -240,13 +243,13 @@ export class CardLoaderService {
     switch (gameplayId) {
       case 'personality_analysis':
         return {
-          main: (await this.getDeck('career_cards_100')) || undefined,
+          main: (await this.getDeck('profession-collector')) || undefined,
           explanation: (await this.getDeck('riasec_explanation')) || undefined,
         };
 
       case 'career_collector':
         return {
-          main: (await this.getDeck('career_cards_100')) || undefined,
+          main: (await this.getDeck('profession-collector')) || undefined,
         };
 
       case 'advantage_analysis':

@@ -93,7 +93,7 @@ jobs:
             --cpu 1 \
             --min-instances 0 \
             --max-instances 10 \
-            --set-env-vars NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXT_PUBLIC_API_URL=${{ env.API_URL }} \
+            --set-env-vars NODE_ENV=production,NEXT_TELEMETRY_DISABLED=1,NEXT_PUBLIC_API_URL=${{ env.API_URL }},NEXT_PUBLIC_SUPABASE_URL=${{ env.SUPABASE_URL }},NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ env.SUPABASE_KEY }} \
             --timeout 300s \
             --project ${{ env.PROJECT_ID }}
 
@@ -113,6 +113,14 @@ jobs:
           sleep 30
           curl -f ${{ steps.get-url.outputs.SERVICE_URL }} || exit 1
           echo "✅ Health check passed"
+
+      - name: Run E2E tests
+        run: |
+          cd frontend
+          npm ci
+          npx playwright install --with-deps webkit
+          TEST_URL=${{ steps.get-url.outputs.SERVICE_URL }} npx playwright test --project=webkit
+          echo "✅ E2E tests passed on ${{ env.ENVIRONMENT }}"
 
       - name: Clean up old images
         if: success()

@@ -21,7 +21,8 @@ export default function LoginPage() {
     } else {
       setCheckingAuth(false);
     }
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (checkingAuth) {
     return (

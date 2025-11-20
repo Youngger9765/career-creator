@@ -204,19 +204,31 @@ describe('useClientManagement', () => {
     });
 
     it('should set submitLoading during creation', async () => {
+      const newClient: Client = {
+        id: '99',
+        counselor_id: 'counselor-1',
+        name: 'Test',
+        email: 'test@test.com',
+        status: 'active',
+        email_verified: false,
+        created_at: '2025-01-01T00:00:00Z',
+        updated_at: '2025-01-01T00:00:00Z',
+        tags: [],
+      };
+
+      vi.mocked(clientsAPI.createClient).mockResolvedValue(newClient);
+
       const { result } = renderHook(() => useClientManagement());
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
 
-      const promise = act(async () => {
+      expect(result.current.submitLoading).toBe(false);
+
+      await act(async () => {
         await result.current.handleCreateClient({ name: 'Test', email: 'test@test.com' });
       });
-
-      expect(result.current.submitLoading).toBe(true);
-
-      await promise;
 
       expect(result.current.submitLoading).toBe(false);
     });

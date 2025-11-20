@@ -60,7 +60,7 @@ export function useRoomParticipants(
   const {
     roomId,
     currentUser,
-    updateInterval = 10000, // 10 seconds
+    updateInterval = 30000, // 30 seconds (reduced from 10s to save bandwidth - we have Presence for realtime)
     offlineThreshold = 60000, // 1 minute
   } = options;
 
@@ -167,25 +167,22 @@ export function useRoomParticipants(
     }
   }, [roomId, currentUser, offlineThreshold]);
 
-  // Set up periodic refresh
+  // Set up periodic refresh and reload on dependency changes
   useEffect(() => {
     // Initial load
     refreshParticipants();
 
-    // Set up interval
-    const interval = setInterval(() => {
-      refreshParticipants();
-    }, updateInterval);
+    // Set up interval only if updateInterval > 0
+    if (updateInterval > 0) {
+      const interval = setInterval(() => {
+        refreshParticipants();
+      }, updateInterval);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [updateInterval, refreshParticipants]);
-
-  // Separate effect for initial load when dependencies change
-  useEffect(() => {
-    refreshParticipants();
-  }, [roomId, refreshParticipants]);
+      return () => {
+        clearInterval(interval);
+      };
+    }
+  }, [roomId, updateInterval, refreshParticipants]);
 
   // 整合 Presence 在線狀態與參與者列表
   const mergedParticipants = useMemo(() => {

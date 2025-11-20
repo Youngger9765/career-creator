@@ -153,21 +153,14 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
                 id="email"
                 value={formData.email}
                 onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-100 dark:disabled:bg-gray-700 disabled:text-gray-500 dark:disabled:text-gray-400 ${
-                  client?.email_verified
-                    ? 'border-green-300 dark:border-green-600 pr-10'
-                    : client?.email
-                      ? 'border-yellow-300 dark:border-yellow-600 pr-10'
-                      : 'border-gray-300 dark:border-gray-600'
-                }`}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder={'請輸入 Email 地址 (選填)'}
-                disabled={!!client?.email_verified}
               />
 
-              {/* Verification status icon */}
-              {client?.email && (
+              {/* Verification status icon - Hidden for now */}
+              {false && client?.email && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  {client.email_verified ? (
+                  {client?.email_verified ? (
                     <CheckCircle className="w-5 h-5 text-green-500" />
                   ) : (
                     <AlertTriangle className="w-5 h-5 text-yellow-500" />
@@ -176,12 +169,12 @@ export function ClientForm({ client, onSubmit, onClose, loading = false }: Clien
               )}
             </div>
 
-            {/* Status messages and verify button */}
-            {client && (
+            {/* Status messages and verify button - Hidden for now */}
+            {false && client && (
               <div className="mt-1 flex items-center justify-between">
-                {!client.email ? (
+                {!client?.email ? (
                   <p className="text-xs text-gray-500 dark:text-gray-400">尚未設定 Email</p>
-                ) : client.email_verified ? (
+                ) : client?.email_verified ? (
                   <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                     <CheckCircle className="w-3 h-3" />
                     Email 已驗證無法修改

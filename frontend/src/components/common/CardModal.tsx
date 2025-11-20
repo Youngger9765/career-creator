@@ -67,36 +67,45 @@ const CardModal: React.FC<CardModalProps> = ({
     return 'text-gray-600 dark:text-gray-400';
   };
 
-  // Get image URLs
-  const imageUrls =
-    typeof card.imageUrl === 'object'
-      ? card.imageUrl
+  // Get image URLs - use L size for modal
+  const imageUrls: { front: string; back?: string } | null = (
+    typeof card.imageUrl === 'object' && card.imageUrl !== null
+      ? 'L' in card.imageUrl
+        ? card.imageUrl.L || null
+        : 'front' in card.imageUrl
+          ? card.imageUrl
+          : null
       : card.imageUrl
         ? { front: card.imageUrl, back: card.imageUrl }
-        : null;
+        : null
+  ) as { front: string; back?: string } | null;
+
+  // Check if card has back image
+  const hasBackImage = imageUrls?.back !== undefined;
 
   // 同時顯示兩面的版本
   if (showBothSides) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-5xl">
-          <DialogHeader>
-            <DialogTitle className="text-center text-xl font-semibold mb-6">卡片詳情</DialogTitle>
-          </DialogHeader>
-
-          <div className="grid grid-cols-2 gap-8 py-6">
+        <DialogContent
+          className={hasBackImage ? 'max-w-5xl max-h-[90vh]' : 'max-w-3xl max-h-[90vh]'}
+        >
+          <div className={hasBackImage ? 'grid grid-cols-2 gap-8' : 'flex justify-center'}>
             {/* 正面 */}
             <div className="flex flex-col">
-              <div className="text-base font-semibold text-gray-500 mb-4 text-center">正面</div>
+              <div className="text-base font-semibold text-gray-500 mb-4 text-center">
+                {hasBackImage ? '正面' : ''}
+              </div>
               <div
                 className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col overflow-hidden`}
-                style={{ minHeight: '600px' }}
+                style={{ minHeight: '400px', maxHeight: 'calc(90vh - 100px)' }}
               >
                 {imageUrls?.front ? (
                   <img
                     src={imageUrls.front}
                     alt={card.title}
-                    className="w-full h-full object-contain px-6 pb-8"
+                    className="w-full h-full object-contain rounded-xl"
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                 ) : (
                   <div className="p-10 flex flex-col h-full">
@@ -119,37 +128,40 @@ const CardModal: React.FC<CardModalProps> = ({
               </div>
             </div>
 
-            {/* 背面 */}
-            <div className="flex flex-col">
-              <div className="text-base font-semibold text-gray-500 mb-4 text-center">
-                背面 / 詳細說明
-              </div>
-              <div
-                className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col overflow-hidden`}
-                style={{ minHeight: '600px' }}
-              >
-                {imageUrls?.back ? (
-                  <img
-                    src={imageUrls.back}
-                    alt={`${card.title} - 背面`}
-                    className="w-full h-full object-contain px-6 pb-8"
-                  />
-                ) : (
-                  <div className="p-10 flex-1 flex flex-col justify-center">
-                    <div className="text-xl text-gray-700 dark:text-gray-300 text-center leading-relaxed px-4">
-                      {card.description || card.title}
-                    </div>
-                    {card.category && (
-                      <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-600">
-                        <div className="text-lg text-gray-500 dark:text-gray-400 text-center">
-                          分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
-                        </div>
+            {/* 背面 - 只在有背面圖片時顯示 */}
+            {hasBackImage && (
+              <div className="flex flex-col">
+                <div className="text-base font-semibold text-gray-500 mb-4 text-center">
+                  背面 / 詳細說明
+                </div>
+                <div
+                  className={`${getCardBackground(card.id)} rounded-xl flex-1 flex flex-col overflow-hidden`}
+                  style={{ minHeight: '400px', maxHeight: 'calc(90vh - 100px)' }}
+                >
+                  {imageUrls?.back ? (
+                    <img
+                      src={imageUrls.back}
+                      alt={`${card.title} - 背面`}
+                      className="w-full h-full object-contain rounded-xl"
+                      style={{ maxWidth: '100%', maxHeight: '100%' }}
+                    />
+                  ) : (
+                    <div className="p-10 flex-1 flex flex-col justify-center">
+                      <div className="text-xl text-gray-700 dark:text-gray-300 text-center leading-relaxed px-4">
+                        {card.description || card.title}
                       </div>
-                    )}
-                  </div>
-                )}
+                      {card.category && (
+                        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-600">
+                          <div className="text-lg text-gray-500 dark:text-gray-400 text-center">
+                            分類: <span className={getCategoryColor(card.id)}>{card.category}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -181,7 +193,7 @@ const CardModal: React.FC<CardModalProps> = ({
 
             {/* 卡片內容 */}
             <div
-              className={`${getCardBackground(card.id)} rounded-xl h-full flex flex-col relative`}
+              className={`${getCardBackground(card.id)} rounded-xl h-full flex flex-col relative overflow-hidden`}
             >
               <div className="p-8 pb-20 flex flex-col h-full relative">
                 {!isFlipped ? (

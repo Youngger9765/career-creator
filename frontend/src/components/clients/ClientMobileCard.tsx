@@ -73,11 +73,12 @@ export function ClientMobileCard({
           <div className="flex items-center gap-2">
             <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
             <span className="text-gray-700 dark:text-gray-300 truncate flex-1">{client.email}</span>
-            {client.email_verified ? (
+            {/* Email verification icons - Hidden for now */}
+            {false && client.email_verified ? (
               <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-            ) : (
+            ) : false ? (
               <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
-            )}
+            ) : null}
           </div>
         ) : null}
         {client.phone && (

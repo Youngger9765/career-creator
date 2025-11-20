@@ -1,5 +1,87 @@
 # CLAUDE.md - Project Guidelines
 
+---
+
+## 🚨 AT THE START OF EVERY SESSION (CRITICAL)
+
+**WHEN YOU START A NEW CONVERSATION, YOU MUST:**
+
+1. **Read this CLAUDE.md file**
+
+2. **Print the following rules to remind yourself**:
+
+   ```text
+   📋 SESSION RULES CHECKLIST:
+
+   ✅ BEFORE ANY COMMIT:
+      - User must test the feature first
+      - NEVER auto-commit without user approval
+      - Ask: "Have you tested this? Ready to commit?"
+
+   ✅ AFTER EVERY `git push`:
+      - DO NOT STOP and wait for user
+      - IMMEDIATELY run: gh run list --branch <branch> --limit 1
+      - IMMEDIATELY run: gh run watch <run-id>
+      - Get fresh URL from logs (URLs change!)
+      - If fails: read logs, auto-fix if possible, push again
+      - If succeeds: report deployment URL to user
+      - NEVER say "pushed successfully" and move on
+
+   ❌ NEVER:
+      - Push without user testing
+      - Push and forget
+      - Use cached/old URLs
+      - Auto-run tests without context (user decides what tests to run)
+   ```
+
+3. **Then proceed with the user's request**
+
+---
+
+## ⚠️ CI/CD Deployment Protocol (CRITICAL)
+
+**AFTER EVERY `git push`, YOU MUST:**
+
+1. **Monitor deployment immediately**:
+
+   ```bash
+   gh run list --branch <branch> --limit 1
+   gh run watch <run-id>
+   ```
+
+2. **Get fresh deployment URL**:
+
+   ```bash
+   gh run view <run-id> --log | grep "Service URL:"
+   ```
+
+3. **If deployment fails**:
+   - Read the error logs: `gh run view <run-id> --log`
+   - Auto-fix ONLY safe errors: linting, formatting, missing imports
+   - For complex errors (logic, tests, build config): report to user
+   - Push fix immediately (only for auto-fixable errors)
+   - After 2 auto-fix attempts: stop and report to user
+
+4. **If deployment succeeds**:
+   - Report the fresh URL to user
+   - Let user decide what testing is needed
+
+**DO NOT:**
+
+- ❌ Push and forget
+- ❌ Use old/cached URLs
+- ❌ Auto-run tests without understanding context
+- ❌ Auto-fix complex errors (logic, build config, tests)
+- ❌ Use hacky fixes (@ts-ignore, commenting out code, etc.)
+
+**REMEMBER:**
+
+- Staging URL changes with each service redeployment
+- Always get fresh URL from deployment logs
+- Only auto-fix safe, obvious errors (linting, formatting, imports)
+
+---
+
 ## Project Overview
 
 Building an online card consultation system for career counselors and their visitors.
@@ -237,7 +319,19 @@ gcloud config list
 
 ### Cloud Run Services
 
-- **Staging**: `https://career-creator-frontend-staging-990202338378.asia-east1.run.app`
+**⚠️ WARNING: URLs may change after service redeployment.**
+**Always get fresh URL from deployment logs.**
+
+To get current staging URL:
+
+```bash
+gh run list --branch staging --limit 1
+gh run view <run-id> --log | grep "Service URL:"
+```
+
+Latest known URLs (verify before use):
+
+- **Staging**: `https://career-creator-frontend-staging-849078733818.asia-east1.run.app`
 - **Production**: `https://career-creator-frontend-production-990202338378.asia-east1.run.app`
 
 ### GitHub Actions Deployment

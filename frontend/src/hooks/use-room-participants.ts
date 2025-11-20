@@ -60,7 +60,7 @@ export function useRoomParticipants(
   const {
     roomId,
     currentUser,
-    updateInterval = 10000, // 10 seconds
+    updateInterval = 30000, // 30 seconds (reduced from 10s to save bandwidth - we have Presence for realtime)
     offlineThreshold = 60000, // 1 minute
   } = options;
 

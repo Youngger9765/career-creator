@@ -3,9 +3,10 @@
  * 牌卡即時同步 Hook - 使用 Supabase Broadcast 實現即時同步
  * Phase 3: 雙方都能移動，最後操作優先
  */
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { throttle, debounce } from '@/lib/throttle-debounce';
 
 // 牌卡移動事件
 export interface CardMoveEvent {
@@ -149,6 +150,27 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     [isOwner, storageKey]
   );
 
+  // Create throttled broadcast for card_moved (300ms throttle)
+  const throttledBroadcastMove = useMemo(
+    () =>
+      throttle((event: CardMoveEvent) => {
+        if (!channelRef.current) return;
+
+        channelRef.current
+          .send({
+            type: 'broadcast',
+            event: 'card_moved',
+            payload: event,
+          })
+          .then(() => {})
+          .catch((err) => {
+            console.error('[CardSyncRT] Failed to broadcast move:', err);
+            setError('無法同步牌卡移動');
+          });
+      }, 300),
+    []
+  );
+
   // 發送牌卡移動
   const moveCard = useCallback(
     (
@@ -175,23 +197,13 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         performerId: userId,
       };
 
-      // 廣播移動事件
-      channelRef.current
-        .send({
-          type: 'broadcast',
-          event: 'card_moved',
-          payload: event,
-        })
-        .then(() => {})
-        .catch((err) => {
-          console.error('[CardSyncRT] Failed to broadcast move:', err);
-          setError('無法同步牌卡移動');
-        });
+      // 使用 throttled broadcast（減少頻率）
+      throttledBroadcastMove(event);
 
       // 本地也要處理
       onCardMove?.(event);
     },
-    [isOwner, userName, userId, onCardMove]
+    [isOwner, userName, userId, onCardMove, throttledBroadcastMove]
   );
 
   // 開始拖曳
@@ -221,22 +233,36 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     [userName, userId]
   );
 
-  // 結束拖曳
-  const endDrag = useCallback((cardId: string) => {
-    if (!channelRef.current) return;
+  // Create debounced broadcast for drag_end (500ms debounce)
+  const debouncedBroadcastDragEnd = useMemo(
+    () =>
+      debounce((cardId: string) => {
+        if (!channelRef.current) return;
 
-    // 廣播結束拖曳
-    channelRef.current
-      .send({
-        type: 'broadcast',
-        event: 'drag_end',
-        payload: { cardId },
-      })
-      .then(() => {})
-      .catch((err) => {
-        console.error('[CardSyncRT] Failed to broadcast drag end:', err);
-      });
-  }, []);
+        channelRef.current
+          .send({
+            type: 'broadcast',
+            event: 'drag_end',
+            payload: { cardId },
+          })
+          .then(() => {})
+          .catch((err) => {
+            console.error('[CardSyncRT] Failed to broadcast drag end:', err);
+          });
+      }, 500),
+    []
+  );
+
+  // 結束拖曳
+  const endDrag = useCallback(
+    (cardId: string) => {
+      if (!channelRef.current) return;
+
+      // 使用 debounced broadcast（避免快速重複）
+      debouncedBroadcastDragEnd(cardId);
+    },
+    [debouncedBroadcastDragEnd]
+  );
 
   // 設置頻道和監聽器
   useEffect(() => {

@@ -131,15 +131,48 @@ mv frontend/Dockerfile.optimized frontend/Dockerfile
 - Runtime: Identical
 - Security: Improved (non-root)
 
-## Notes
+## Implementation Results
 
-- Optimized files created as `.optimized` to review before applying
-- No breaking changes expected
-- Recommended to test backend first, then frontend
-- Can be deployed in same PR or separately
+### ✅ Completed (2025-11-21)
+
+#### Backend Results
+
+- **Deployment**: Successfully deployed to staging
+- **Build time**: 3m2s (similar to before, first build)
+- **Status**: ✅ Healthy
+- **Changes**: Multi-stage build (builder + runtime),
+  removed gcc/postgresql-client from runtime
+- **URL**: <https://career-creator-backend-staging-x43mdhfwsq-de.a.run.app>
+
+#### Frontend Results
+
+- **Deployment**: Successfully deployed to staging
+- **Build time**: ~7 minutes (including E2E tests)
+- **Status**: ✅ Running with E2E tests passed
+- **Changes**: Multi-stage build (builder + runner),
+  non-root user (nextjs:nodejs)
+- **URL**:
+  <https://career-creator-frontend-staging-849078733818.asia-east1.run.app>
+- **Issue resolved**: Simplified Dockerfile to avoid
+  public directory COPY issues
+
+### Lessons Learned
+
+1. **Frontend public directory**: COPY --from=builder /app/public can fail
+   if directory structure changes during build
+2. **Simplified approach**: Removed separate deps stage, used simpler 2-stage build
+3. **Non-root user**: Successfully implemented with --chown flag during COPY
+4. **CI/CD integration**: Works seamlessly with buildx and registry caching
+
+### Next Build Benefits
+
+With caching now established:
+
+- Backend: Expected ~30-60s faster builds
+- Frontend: Expected ~1-2 min faster builds (npm cache + docker layers)
 
 ---
 
-**Status**: Ready for implementation and testing
-**Risk Level**: Low
-**Estimated Time**: 30 minutes testing + deployment
+**Status**: ✅ Deployed and Verified
+**Risk Level**: Low (no issues encountered)
+**Actual Time**: ~1 hour (including troubleshooting and testing)

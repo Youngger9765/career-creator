@@ -79,15 +79,18 @@ jobs:
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io
 
-      - name: Build Docker image
-        run: |
-          docker build \
-            -f backend/Dockerfile \
-            -t ${{ env.IMAGE_TAG }} \
-            backend
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Push Docker image
-        run: docker push ${{ env.IMAGE_TAG }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: backend
+          file: backend/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_TAG }}
+          cache-from: type=registry,ref=gcr.io/${{ env.PROJECT_ID }}/career-creator-backend:${{ github.ref_name }}-cache
+          cache-to: type=registry,ref=gcr.io/${{ env.PROJECT_ID }}/career-creator-backend:${{ github.ref_name }}-cache,mode=max
 
       - name: Deploy to Cloud Run
         run: |
@@ -116,6 +119,16 @@ jobs:
           echo "SERVICE_URL=$SERVICE_URL" >> $GITHUB_OUTPUT
           echo "🌐 Backend deployed to: $SERVICE_URL"
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install Python dependencies
+        run: pip install -r backend/requirements.txt
+
       - name: Run database migrations
         run: |
           echo "Running migrations on ${{ env.ENVIRONMENT }} database..."
@@ -137,9 +150,6 @@ jobs:
           else
             echo "⚠️  WARNING: Not using expected transaction pooler URL!"
           fi
-
-          # Install backend dependencies (includes alembic, sqlmodel, pydantic-settings, etc.)
-          pip install -r backend/requirements.txt
 
           # Navigate to backend directory and run migrations
           cd backend
@@ -168,9 +178,19 @@ jobs:
       - name: Run health check
         run: |
           echo "Waiting for service to be ready..."
-          sleep 30
-          curl -f ${{ steps.get-url.outputs.SERVICE_URL }}/health || exit 1
-          echo "✅ Health check passed"
+          MAX_ATTEMPTS=10
+          ATTEMPT=0
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT+1))
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS..."
+            if curl -f -s ${{ steps.get-url.outputs.SERVICE_URL }}/health > /dev/null 2>&1; then
+              echo "✅ Health check passed"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "❌ Health check failed after $MAX_ATTEMPTS attempts"
+          exit 1
 
       - name: Clean up old images
         if: success()

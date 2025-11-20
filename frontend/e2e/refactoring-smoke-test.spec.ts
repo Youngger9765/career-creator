@@ -5,8 +5,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Refactoring Smoke Test', () => {
   test('room page should load and display game mode selection', async ({ page }) => {
-    // Navigate to room as visitor
-    await page.goto('http://localhost:3000/room/test-room?visitor=true&name=TestUser');
+    // Navigate to room as visitor (using baseURL from config)
+    await page.goto('/room/test-room?visitor=true&name=TestUser');
 
     // Wait for page to load
     await page.waitForSelector('.h-screen.bg-gradient-to-br', { timeout: 10000 });
@@ -24,7 +24,7 @@ test.describe('Refactoring Smoke Test', () => {
   });
 
   test('can switch between card deck tabs', async ({ page }) => {
-    await page.goto('http://localhost:3000/room/test-room?visitor=true&name=TestUser');
+    await page.goto('/room/test-room?visitor=true&name=TestUser');
     await page.waitForSelector('.h-screen.bg-gradient-to-br', { timeout: 10000 });
 
     // Click on 職能盤點卡 tab
@@ -43,7 +43,7 @@ test.describe('Refactoring Smoke Test', () => {
   });
 
   test('mockCards data is loaded correctly', async ({ page }) => {
-    await page.goto('http://localhost:3000/room/test-room?visitor=true&name=TestUser');
+    await page.goto('/room/test-room?visitor=true&name=TestUser');
     await page.waitForSelector('.h-screen.bg-gradient-to-br', { timeout: 10000 });
 
     // Verify career cards are mentioned (from mockCards data)

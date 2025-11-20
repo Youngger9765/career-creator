@@ -114,6 +114,14 @@ jobs:
           curl -f ${{ steps.get-url.outputs.SERVICE_URL }} || exit 1
           echo "✅ Health check passed"
 
+      - name: Run E2E tests
+        run: |
+          cd frontend
+          npm ci
+          npx playwright install --with-deps webkit
+          TEST_URL=${{ steps.get-url.outputs.SERVICE_URL }} npx playwright test --project=webkit
+          echo "✅ E2E tests passed on ${{ env.ENVIRONMENT }}"
+
       - name: Clean up old images
         if: success()
         continue-on-error: true

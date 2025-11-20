@@ -4,12 +4,10 @@
  */
 import { test, expect } from '@playwright/test';
 
-const STAGING_URL = 'https://career-creator-frontend-staging-849078733818.asia-east1.run.app';
-
 test.describe('Test Modal Page - DPI Fix Verification', () => {
   test('should open modal with proper size constraints', async ({ page }) => {
     // Go to test page (no auth required)
-    await page.goto(`${STAGING_URL}/test-modal`);
+    await page.goto('/test-modal');
 
     // Wait for page to load
     await expect(page.locator('h1:has-text("CardModal 測試頁面")')).toBeVisible({ timeout: 10000 });
@@ -76,7 +74,7 @@ test.describe('Test Modal Page - DPI Fix Verification', () => {
 
   test('should work on localhost', async ({ page }) => {
     // Test on localhost for local development
-    await page.goto('http://localhost:3000/test-modal');
+    await page.goto('/test-modal');
 
     await expect(page.locator('h1:has-text("CardModal 測試頁面")')).toBeVisible({ timeout: 10000 });
 

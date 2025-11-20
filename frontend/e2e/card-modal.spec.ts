@@ -6,7 +6,7 @@ import { test, expect } from '@playwright/test';
 test.describe('CardModal Windows DPI Fix', () => {
   test('modal should have proper size constraints', async ({ page }) => {
     // Go to a page with CardModal (visitor mode doesn't need auth)
-    await page.goto('http://localhost:3000/room/test-room?visitor=true&name=TestUser');
+    await page.goto('/room/test-room?visitor=true&name=TestUser');
 
     // Wait for page to load
     await page.waitForSelector('.h-screen.bg-gradient-to-br', { timeout: 10000 });

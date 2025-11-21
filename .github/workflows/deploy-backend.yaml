@@ -103,7 +103,7 @@ jobs:
             --memory 1Gi \
             --cpu 1 \
             --concurrency 100 \
-            --min-instances 1 \
+            --min-instances 0 \
             --max-instances 10 \
             --set-env-vars DATABASE_URL="${{ env.DATABASE_URL }}",DIRECT_DATABASE_URL="${{ env.DIRECT_DATABASE_URL }}",JWT_SECRET="${{ env.JWT_SECRET }}",JWT_ALGORITHM=HS256,ACCESS_TOKEN_EXPIRE_MINUTES=15,REFRESH_TOKEN_EXPIRE_DAYS=7,ENVIRONMENT="${{ env.ENVIRONMENT }}",SUPABASE_URL="${{ env.SUPABASE_URL }}",SUPABASE_ANON_KEY="${{ env.SUPABASE_ANON_KEY }}",GCS_BUCKET_NAME="${{ env.GCS_BUCKET_NAME }}",USE_MOCK_STORAGE="${{ env.USE_MOCK_STORAGE }}",TEMP_INIT_SECRET="${{ env.TEMP_INIT_SECRET }}" \
             --timeout 300s \

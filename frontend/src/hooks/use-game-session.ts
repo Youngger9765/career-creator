@@ -4,6 +4,7 @@
  */
 import { useState, useCallback, useEffect } from 'react';
 import { gameSessionsAPI, GameSession, GameStatus, GameAction } from '@/lib/api/game-sessions';
+import { useAuthStore } from '@/stores/auth-store';
 
 interface UseGameSessionOptions {
   roomId: string;
@@ -21,6 +22,7 @@ interface GameState {
 }
 
 export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGameSessionOptions) {
+  const { user } = useAuthStore();
   const [session, setSession] = useState<GameSession | null>(null);
   const [gameState, setGameState] = useState<GameState>({
     selectedDeck: '職游旅人卡',
@@ -85,7 +87,7 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
           .executeAction(session.id, {
             action_type: 'arrange',
             action_data: updatedState,
-            player_id: 'demo-counselor-001', // TODO: Get from auth context
+            player_id: user?.id || 'unknown',
             player_role: 'counselor',
           })
           .catch((err) => {
@@ -95,7 +97,7 @@ export function useGameSession({ roomId, autoLoad = true, gameRuleSlug }: UseGam
         return updatedState;
       });
     },
-    [session]
+    [session, user]
   );
 
   // Update card position

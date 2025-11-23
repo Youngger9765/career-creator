@@ -11,7 +11,7 @@ Test Game Rules Engine - 三層架構核心測試
 
 from sqlmodel import Session
 
-from tests.factories import TestDataBuilder, UserFactory
+from tests.factories import DataBuilder, UserFactory
 
 # Session fixture removed - using PostgreSQL conftest.py fixture instead
 
@@ -230,7 +230,7 @@ class TestGameIntegration:
         from app.game.engine import GameAction, GameEngine, GameState
 
         test_data = (
-            TestDataBuilder(session)
+            DataBuilder(session)
             .with_counselor()
             .with_room()
             .with_visitors(count=1)

@@ -1,19 +1,26 @@
-# Build stage
-FROM python:3.11-slim
+# Build stage - install dependencies
+FROM python:3.11-slim as builder
 
 WORKDIR /app
 
-# Install system dependencies
+# Install build dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies to /install directory
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Runtime stage - minimal image
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy only the installed packages from builder
+COPY --from=builder /install /usr/local
 
 # Copy application code
 COPY . .

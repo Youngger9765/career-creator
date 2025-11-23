@@ -175,7 +175,7 @@ export interface UseGameCardSyncOptions<T extends GameState = GameState> {
  */
 export interface UseGameCardSyncReturn<T extends GameState = GameState> {
   state: {
-    cardPlacements: Record<string, any>; // TODO: 根據遊戲類型細化
+    cardPlacements: CardPlacement;
   };
   draggedByOthers: Map<string, string>;
   updateCards: (placements: Partial<T>) => void;

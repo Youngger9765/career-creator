@@ -66,20 +66,24 @@ jobs:
       - name: Configure Docker for GCR
         run: gcloud auth configure-docker gcr.io
 
-      - name: Build Docker image
-        run: |
-          docker build \
-            --build-arg NEXT_PUBLIC_API_URL="${{ env.API_URL }}" \
-            --build-arg NEXT_PUBLIC_APP_URL="${{ env.APP_URL }}" \
-            --build-arg NEXT_PUBLIC_SUPABASE_URL="${{ env.SUPABASE_URL }}" \
-            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ env.SUPABASE_KEY }}" \
-            --build-arg GCLOUD_PROJECT_ID="${{ env.PROJECT_ID }}" \
-            -f frontend/Dockerfile \
-            -t ${{ env.IMAGE_TAG }} \
-            frontend
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Push Docker image
-        run: docker push ${{ env.IMAGE_TAG }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: frontend
+          file: frontend/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_TAG }}
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ env.API_URL }}
+            NEXT_PUBLIC_APP_URL=${{ env.APP_URL }}
+            NEXT_PUBLIC_SUPABASE_URL=${{ env.SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ env.SUPABASE_KEY }}
+            GCLOUD_PROJECT_ID=${{ env.PROJECT_ID }}
+          cache-from: type=registry,ref=gcr.io/${{ env.PROJECT_ID }}/career-creator-frontend:${{ github.ref_name }}-cache
+          cache-to: type=registry,ref=gcr.io/${{ env.PROJECT_ID }}/career-creator-frontend:${{ github.ref_name }}-cache,mode=max
 
       - name: Deploy to Cloud Run
         run: |
@@ -110,15 +114,46 @@ jobs:
       - name: Run health check
         run: |
           echo "Waiting for service to be ready..."
-          sleep 30
-          curl -f ${{ steps.get-url.outputs.SERVICE_URL }} || exit 1
-          echo "✅ Health check passed"
+          MAX_ATTEMPTS=10
+          ATTEMPT=0
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT+1))
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS..."
+            if curl -f -s ${{ steps.get-url.outputs.SERVICE_URL }} > /dev/null 2>&1; then
+              echo "✅ Health check passed"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "❌ Health check failed after $MAX_ATTEMPTS attempts"
+          exit 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Install Playwright
+        run: |
+          cd frontend
+          npx playwright install --with-deps webkit
 
       - name: Run E2E tests
         run: |
           cd frontend
-          npm ci
-          npx playwright install --with-deps webkit
           TEST_URL=${{ steps.get-url.outputs.SERVICE_URL }} npx playwright test --project=webkit
           echo "✅ E2E tests passed on ${{ env.ENVIRONMENT }}"
 

@@ -196,7 +196,7 @@ All card operations are stored as immutable events, allowing:
 
 ---
 
-# Game Architecture
+## Game Architecture
 
 ## 🎮 Game System Overview
 
@@ -399,11 +399,13 @@ POST /api/rooms/{roomId}/game-state
 
 ---
 
-# Real-time Synchronization Architecture
+## Real-time Synchronization Architecture
 
 ## 📋 Overview
 
-This document consolidates the complete synchronization architecture for the career consultation platform, including technical decisions, implementation details, API design, and synchronization strategies for each game mode.
+This document consolidates the complete synchronization architecture for the
+career consultation platform, including technical decisions, implementation
+details, API design, and synchronization strategies for each game mode.
 
 ---
 
@@ -569,7 +571,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions) {
 
 #### Technical Approach
 
-**Broadcast (Real-time) + Event Sourcing (Persistence)**
+#### Broadcast (Real-time) + Event Sourcing (Persistence)
 
 #### Data Flow Design
 

@@ -164,46 +164,64 @@ def create_room(
 
 @router.get("/{room_id}", response_model=RoomResponse)
 def get_room(room_id: UUID, session: Session = Depends(get_session)):
-    """Get room by ID"""
-    room = session.get(Room, room_id)
-    if not room:
+    """
+    Get room by ID
+
+    Optimized to avoid N+1 queries:
+    - Use LEFT JOIN to preload client information in single query
+    """
+    # Use LEFT JOIN to get room with client info in single query
+    statement = (
+        select(Room, RoomClient.client_id, Client.name)
+        .select_from(Room)
+        .outerjoin(RoomClient, Room.id == RoomClient.room_id)
+        .outerjoin(Client, RoomClient.client_id == Client.id)
+        .where(Room.id == room_id)
+    )
+    result = session.exec(statement).first()
+
+    if not result:
         raise HTTPException(status_code=404, detail="Room not found")
 
-    # Get associated client_id if exists
-    room_dict = room.model_dump()
-    statement = select(RoomClient).where(RoomClient.room_id == room_id)
-    room_client = session.exec(statement).first()
+    room, client_id, client_name = result
 
-    if room_client:
-        room_dict["client_id"] = room_client.client_id
-        # Also fetch client name
-        client = session.get(Client, room_client.client_id)
-        if client:
-            room_dict["client_name"] = client.name
+    # Build response with preloaded data
+    room_dict = room.model_dump()
+    if client_id:
+        room_dict["client_id"] = client_id
+        room_dict["client_name"] = client_name
 
     return room_dict
 
 
 @router.get("/by-code/{share_code}", response_model=RoomResponse)
 def get_room_by_share_code(share_code: str, session: Session = Depends(get_session)):
-    """Get room by share code"""
-    statement = select(Room).where(Room.share_code == share_code)
-    room = session.exec(statement).first()
+    """
+    Get room by share code
 
-    if not room:
+    Optimized to avoid N+1 queries:
+    - Use LEFT JOIN to preload client information in single query
+    """
+    # Use LEFT JOIN to get room with client info in single query
+    statement = (
+        select(Room, RoomClient.client_id, Client.name)
+        .select_from(Room)
+        .outerjoin(RoomClient, Room.id == RoomClient.room_id)
+        .outerjoin(Client, RoomClient.client_id == Client.id)
+        .where(Room.share_code == share_code)
+    )
+    result = session.exec(statement).first()
+
+    if not result:
         raise HTTPException(status_code=404, detail="Room not found")
 
-    # Get associated client_id if exists
-    room_dict = room.model_dump()
-    statement = select(RoomClient).where(RoomClient.room_id == room.id)
-    room_client = session.exec(statement).first()
+    room, client_id, client_name = result
 
-    if room_client:
-        room_dict["client_id"] = room_client.client_id
-        # Also fetch client name
-        client = session.get(Client, room_client.client_id)
-        if client:
-            room_dict["client_name"] = client.name
+    # Build response with preloaded data
+    room_dict = room.model_dump()
+    if client_id:
+        room_dict["client_id"] = client_id
+        room_dict["client_name"] = client_name
 
     return room_dict
 

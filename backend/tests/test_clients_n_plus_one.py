@@ -12,7 +12,7 @@ import pytest
 from sqlalchemy import event
 from sqlmodel import Session
 
-from app.models.client import Client, RoomClient, ConsultationRecord
+from app.models.client import Client, ConsultationRecord, RoomClient
 from app.models.room import Room
 from tests.factories import UserFactory
 
@@ -25,7 +25,7 @@ class QueryCounter:
 
     def __call__(self, conn, cursor, statement, parameters, context, executemany):
         # Only count SELECT queries (ignore transaction control)
-        if statement.strip().upper().startswith('SELECT'):
+        if statement.strip().upper().startswith("SELECT"):
             self.count += 1
             print(f"\n[Query {self.count}]: {statement[:100]}...")
 
@@ -93,11 +93,13 @@ def counselor_with_clients(session: Session):
         )
         session.add(record)
 
-        clients_data.append({
-            "client": client,
-            "rooms": rooms,
-            "record": record,
-        })
+        clients_data.append(
+            {
+                "client": client,
+                "rooms": rooms,
+                "record": record,
+            }
+        )
 
     session.commit()
 
@@ -153,12 +155,15 @@ def test_get_clients_should_not_have_n_plus_one_query(
     # Call the endpoint (this will trigger queries)
     # We need to use async wrapper since the endpoint is async
     import asyncio
-    result = asyncio.run(get_my_clients(
-        session=session,
-        current_user=current_user,
-        status=None,
-        search=None,
-    ))
+
+    result = asyncio.run(
+        get_my_clients(
+            session=session,
+            current_user=current_user,
+            status=None,
+            search=None,
+        )
+    )
 
     # Remove event listener
     event.remove(session.bind, "before_cursor_execute", query_counter)
@@ -188,9 +193,7 @@ def test_get_clients_should_not_have_n_plus_one_query(
         assert (
             client_response.last_consultation_date is not None
         ), "Should have last consultation"
-        assert (
-            len(client_response.rooms) == 3
-        ), "Each client should have 3 rooms"
+        assert len(client_response.rooms) == 3, "Each client should have 3 rooms"
 
 
 def test_get_clients_performance_with_scaling(
@@ -245,12 +248,15 @@ def test_get_clients_performance_with_scaling(
     }
 
     import asyncio
-    result = asyncio.run(get_my_clients(
-        session=session,
-        current_user=current_user,
-        status=None,
-        search=None,
-    ))
+
+    result = asyncio.run(
+        get_my_clients(
+            session=session,
+            current_user=current_user,
+            status=None,
+            search=None,
+        )
+    )
 
     event.remove(session.bind, "before_cursor_execute", query_counter)
 

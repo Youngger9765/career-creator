@@ -114,10 +114,7 @@ async def get_my_clients(
 
     # 1. Preload active rooms count per client (single query with GROUP BY)
     active_rooms_query = (
-        select(
-            RoomClient.client_id,
-            func.count(RoomClient.id).label("active_count")
-        )
+        select(RoomClient.client_id, func.count(RoomClient.id).label("active_count"))
         .join(Room)
         .where(
             RoomClient.client_id.in_(client_ids),
@@ -132,8 +129,7 @@ async def get_my_clients(
     # 2. Preload total consultations per client (single query with GROUP BY)
     total_consultations_query = (
         select(
-            RoomClient.client_id,
-            func.sum(Room.session_count).label("total_sessions")
+            RoomClient.client_id, func.sum(Room.session_count).label("total_sessions")
         )
         .join(Room)
         .where(
@@ -154,20 +150,17 @@ async def get_my_clients(
     subquery = (
         select(
             ConsultationRecord.client_id,
-            sql_func.max(ConsultationRecord.session_date).label("last_date")
+            sql_func.max(ConsultationRecord.session_date).label("last_date"),
         )
         .where(ConsultationRecord.client_id.in_(client_ids))
         .group_by(ConsultationRecord.client_id)
         .subquery()
     )
 
-    last_consultation_query = (
-        select(ConsultationRecord)
-        .join(
-            subquery,
-            (ConsultationRecord.client_id == subquery.c.client_id) &
-            (ConsultationRecord.session_date == subquery.c.last_date)
-        )
+    last_consultation_query = select(ConsultationRecord).join(
+        subquery,
+        (ConsultationRecord.client_id == subquery.c.client_id)
+        & (ConsultationRecord.session_date == subquery.c.last_date),
     )
     last_consultations = session.exec(last_consultation_query).all()
     last_consultation_map = {rec.client_id: rec for rec in last_consultations}

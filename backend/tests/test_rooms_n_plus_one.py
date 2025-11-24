@@ -12,8 +12,8 @@ import pytest
 from sqlalchemy import event
 from sqlmodel import Session
 
-from app.models.room import Room
 from app.models.client import Client, RoomClient
+from app.models.room import Room
 from tests.factories import UserFactory
 
 
@@ -25,7 +25,7 @@ class QueryCounter:
 
     def __call__(self, conn, cursor, statement, parameters, context, executemany):
         # Only count SELECT queries (ignore transaction control)
-        if statement.strip().upper().startswith('SELECT'):
+        if statement.strip().upper().startswith("SELECT"):
             self.count += 1
             print(f"\n[Query {self.count}]: {statement[:100]}...")
 
@@ -76,10 +76,12 @@ def counselor_with_rooms(session: Session):
         )
         session.add(room_client)
 
-        rooms_data.append({
-            "room": room,
-            "client": client,
-        })
+        rooms_data.append(
+            {
+                "room": room,
+                "client": client,
+            }
+        )
 
     session.commit()
 
@@ -151,9 +153,9 @@ def test_list_rooms_should_not_have_n_plus_one_query(
     assert len(result) == 20, "Should return 20 rooms"
 
     for room_response in result:
-        assert room_response["counselor_name"] is not None, (
-            "Each room should have counselor name"
-        )
+        assert (
+            room_response["counselor_name"] is not None
+        ), "Each room should have counselor name"
 
 
 def test_list_rooms_performance_with_scaling(

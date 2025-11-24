@@ -78,11 +78,17 @@ async def get_my_clients(
     """
     Get all clients for the current counselor
     獲取當前諮商師的所有客戶
+
+    Optimized to avoid N+1 queries using:
+    - Preload all statistics with JOIN + GROUP BY
+    - Preload all rooms with single query
+    - Cache counselor name (no need to query per room)
     """
     check_counselor_permission(current_user)
+    counselor_id = str(current_user["user_id"])
 
     # Build base query - get clients directly by counselor_id
-    query = select(Client).where(Client.counselor_id == str(current_user["user_id"]))
+    query = select(Client).where(Client.counselor_id == counselor_id)
 
     # Apply filters
     if status:
@@ -95,67 +101,112 @@ async def get_my_clients(
         )
         query = query.where(search_filter)
 
-    # Execute query
+    # Execute query to get all clients
     clients = session.exec(query).all()
 
-    # Convert to response model with additional data
+    if not clients:
+        return []
+
+    # Extract client IDs for batch queries
+    client_ids = [client.id for client in clients]
+
+    # === OPTIMIZATION: Batch load all statistics with single queries ===
+
+    # 1. Preload active rooms count per client (single query with GROUP BY)
+    active_rooms_query = (
+        select(
+            RoomClient.client_id,
+            func.count(RoomClient.id).label("active_count")
+        )
+        .join(Room)
+        .where(
+            RoomClient.client_id.in_(client_ids),
+            Room.is_active,
+            Room.counselor_id == counselor_id,
+        )
+        .group_by(RoomClient.client_id)
+    )
+    active_rooms_results = session.exec(active_rooms_query).all()
+    active_rooms_map = {client_id: count for client_id, count in active_rooms_results}
+
+    # 2. Preload total consultations per client (single query with GROUP BY)
+    total_consultations_query = (
+        select(
+            RoomClient.client_id,
+            func.sum(Room.session_count).label("total_sessions")
+        )
+        .join(Room)
+        .where(
+            RoomClient.client_id.in_(client_ids),
+            Room.counselor_id == counselor_id,
+        )
+        .group_by(RoomClient.client_id)
+    )
+    consultations_results = session.exec(total_consultations_query).all()
+    consultations_map = {
+        client_id: total or 0 for client_id, total in consultations_results
+    }
+
+    # 3. Preload last consultation record per client (subquery)
+    from sqlalchemy.sql import func as sql_func
+
+    # Use a subquery to get the latest consultation per client
+    subquery = (
+        select(
+            ConsultationRecord.client_id,
+            sql_func.max(ConsultationRecord.session_date).label("last_date")
+        )
+        .where(ConsultationRecord.client_id.in_(client_ids))
+        .group_by(ConsultationRecord.client_id)
+        .subquery()
+    )
+
+    last_consultation_query = (
+        select(ConsultationRecord)
+        .join(
+            subquery,
+            (ConsultationRecord.client_id == subquery.c.client_id) &
+            (ConsultationRecord.session_date == subquery.c.last_date)
+        )
+    )
+    last_consultations = session.exec(last_consultation_query).all()
+    last_consultation_map = {rec.client_id: rec for rec in last_consultations}
+
+    # 4. Preload all rooms for all clients (single query)
+    rooms_query = (
+        select(Room, RoomClient.client_id)
+        .join(RoomClient)
+        .where(
+            RoomClient.client_id.in_(client_ids),
+            Room.counselor_id == counselor_id,
+        )
+        .order_by(RoomClient.client_id, Room.created_at.desc())
+    )
+    rooms_results = session.exec(rooms_query).all()
+
+    # Group rooms by client_id
+    rooms_by_client = {}
+    for room, client_id in rooms_results:
+        if client_id not in rooms_by_client:
+            rooms_by_client[client_id] = []
+        rooms_by_client[client_id].append(room)
+
+    # 5. Get counselor name once (no need to query per room)
+    counselor = session.get(User, counselor_id)
+    counselor_name = counselor.name if counselor else "諮詢師"
+
+    # === Build response using preloaded data ===
     responses = []
     for client in clients:
-        # Get active rooms count (only for current counselor)
-        active_rooms_count = (
-            session.exec(
-                select(func.count(RoomClient.id))
-                .join(Room)
-                .where(
-                    RoomClient.client_id == client.id,
-                    Room.is_active,
-                    Room.counselor_id
-                    == str(current_user["user_id"]),  # 只計算當前諮詢師的活躍諮詢室
-                )
-            ).first()
-            or 0
-        )
+        # Get preloaded data (O(1) lookup)
+        active_rooms_count = active_rooms_map.get(client.id, 0)
+        total_consultations = consultations_map.get(client.id, 0)
+        last_consultation = last_consultation_map.get(client.id)
+        rooms = rooms_by_client.get(client.id, [])
 
-        # Get total consultations (sum of session_count from all rooms
-        # for current counselor)
-        total_consultations = (
-            session.exec(
-                select(func.sum(Room.session_count))
-                .join(RoomClient)
-                .where(
-                    RoomClient.client_id == client.id,
-                    Room.counselor_id
-                    == str(current_user["user_id"]),  # 只計算當前諮詢師的諮詢次數
-                )
-            ).first()
-            or 0
-        )
-
-        # Get last consultation date
-        last_consultation = session.exec(
-            select(ConsultationRecord)
-            .where(ConsultationRecord.client_id == client.id)
-            .order_by(ConsultationRecord.session_date.desc())
-        ).first()
-
-        # Get rooms associated with this client (only for current counselor)
-        rooms = session.exec(
-            select(Room)
-            .join(RoomClient)
-            .where(
-                RoomClient.client_id == client.id,
-                Room.counselor_id
-                == current_user["user_id"],  # 只顯示當前諮詢師的諮詢室
-            )
-            .order_by(Room.created_at.desc())
-        ).all()
-
+        # Build rooms data
         rooms_data = []
         for room in rooms:
-            # Get counselor name from database
-            counselor = session.get(User, room.counselor_id)
-            counselor_name = counselor.name if counselor else "諮詢師"
-
             rooms_data.append(
                 {
                     "id": str(room.id),
@@ -169,7 +220,7 @@ async def get_my_clients(
                     "session_count": room.session_count or 0,
                     "created_at": room.created_at.isoformat(),
                     "last_activity": None,  # TODO: Add from card events if needed
-                    "counselor_name": counselor_name,
+                    "counselor_name": counselor_name,  # Reuse cached counselor name
                 }
             )
 

@@ -214,7 +214,13 @@ def list_user_rooms(
     current_user: dict = Depends(get_current_user_info),
     include_inactive: Optional[bool] = False,
 ):
-    """List rooms where user is counselor, optionally include inactive rooms"""
+    """
+    List rooms where user is counselor, optionally include inactive rooms
+
+    Optimized to avoid N+1 queries:
+    - Use LEFT JOIN to preload client names
+    - Cache counselor name (since all rooms belong to current user)
+    """
 
     # Get all rooms (active and inactive) with client information
     statement = (
@@ -231,6 +237,10 @@ def list_user_rooms(
 
     results = session.exec(statement).all()
 
+    # Optimization: Get counselor name once (all rooms belong to current user)
+    counselor = session.get(User, current_user["id"])
+    counselor_name = counselor.name if counselor else "諮詢師"
+
     # Convert to response format
     rooms = []
     for room, client_name in results:
@@ -238,12 +248,8 @@ def list_user_rooms(
         if client_name:
             room_dict["primary_client_name"] = client_name
 
-        # DEBUG: Print to console
-        print(f"DEBUG: Room '{room.name}' - client_name from query: '{client_name}'")
-
-        # Add counselor name by looking up in database
-        counselor = session.get(User, room.counselor_id)
-        room_dict["counselor_name"] = counselor.name if counselor else "諮詢師"
+        # Reuse cached counselor name (no query per room)
+        room_dict["counselor_name"] = counselor_name
 
         rooms.append(room_dict)
 

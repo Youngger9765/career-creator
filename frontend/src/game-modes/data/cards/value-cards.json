@@ -1,299 +1,1411 @@
 {
   "deck": {
-    "id": "value_cards_36",
+    "id": "value_cards_70",
     "name": "價值導航卡",
-    "description": "36張核心人生價值觀卡片",
+    "description": "70張核心人生價值觀卡片",
     "type": "main",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "cards": [
     {
       "id": "value_001",
-      "title": "家庭",
-      "category": "relationships",
-      "description": "與家人共度時光，建立溫暖的家庭關係",
-      "questions": ["家人對你的意義是什麼？", "理想的家庭生活是什麼樣子？", "如何平衡家庭與工作？"],
-      "icon": "👨‍👩‍👧‍👦"
+      "title": "享受生活、美食等休閒娛樂",
+      "category": "lifestyle",
+      "description": "追求生活品質，享受美食與各種休閒娛樂活動",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-01-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-01-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-01-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-01-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-01-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-01-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_002",
-      "title": "事業成就",
-      "category": "achievement",
-      "description": "在職業生涯中獲得成功和認可",
-      "questions": ["事業成功對你代表什麼？", "願意為事業犧牲什麼？", "理想的職業巔峰是什麼？"],
-      "icon": "🏆"
+      "title": "有趣的人事物",
+      "category": "lifestyle",
+      "description": "被有趣的人事物吸引，追求新奇有趣的體驗",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-02-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-02-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-02-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-02-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-02-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-02-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_003",
-      "title": "健康",
-      "category": "wellbeing",
-      "description": "保持身心健康，享受活力人生",
-      "questions": ["健康對生活品質的影響？", "如何維持身心平衡？", "健康與其他目標的優先順序？"],
-      "icon": "💪"
+      "title": "忠於自我",
+      "category": "personal",
+      "description": "保持真實的自己，不被外界影響改變本質",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-03-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-03-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-03-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-03-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-03-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-03-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_004",
-      "title": "財富",
-      "category": "material",
-      "description": "累積財富，達到經濟自由",
-      "questions": ["金錢對你的意義？", "理想的財務狀態？", "金錢與快樂的關係？"],
-      "icon": "💰"
+      "title": "自由自在不受拘束",
+      "category": "personal",
+      "description": "追求自由，不受限制與束縛的生活方式",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-04-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-04-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-04-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-04-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-04-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-04-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_005",
-      "title": "愛情",
-      "category": "relationships",
-      "description": "擁有深刻的親密關係和浪漫",
-      "questions": ["理想的愛情是什麼樣子？", "愛情在人生中的份量？", "如何經營親密關係？"],
-      "icon": "❤️"
+      "title": "內在的平靜",
+      "category": "wellbeing",
+      "description": "保持內心平和，追求精神上的寧靜",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-05-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-05-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-05-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-05-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-05-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-05-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_006",
-      "title": "友誼",
-      "category": "relationships",
-      "description": "建立真誠深厚的友誼",
-      "questions": ["朋友在生命中的角色？", "如何維繫友誼？", "品質vs數量的選擇？"],
-      "icon": "🤝"
+      "title": "對生命、人性或人生的洞察智慧",
+      "category": "growth",
+      "description": "追求對人生的深刻理解與智慧",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-06-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-06-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-06-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-06-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-06-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-06-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_007",
-      "title": "自由",
-      "category": "autonomy",
-      "description": "擁有選擇權，不受限制地生活",
-      "questions": ["自由對你的定義？", "哪種自由最重要？", "自由與責任的平衡？"],
-      "icon": "🦅"
+      "title": "保持潔淨 身體、心靈或環境",
+      "category": "wellbeing",
+      "description": "維持身心靈與環境的清潔整齊",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-07-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-07-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-07-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-07-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-07-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-07-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_008",
-      "title": "創造力",
-      "category": "expression",
-      "description": "發揮創意，創造新事物",
-      "questions": ["創造帶來什麼滿足感？", "如何培養創造力？", "創意表達的方式？"],
-      "icon": "🎨"
+      "title": "健康的身體與心靈",
+      "category": "wellbeing",
+      "description": "重視身心健康，保持良好的身心狀態",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-08-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-08-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-08-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-08-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-08-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-08-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_009",
-      "title": "學習成長",
-      "category": "growth",
-      "description": "持續學習，不斷進步",
-      "questions": ["學習的動力來源？", "想要成長的領域？", "如何保持學習熱情？"],
-      "icon": "📚"
+      "title": "保有隱私 不受人打擾",
+      "category": "personal",
+      "description": "重視個人隱私，需要不被打擾的空間",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-09-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-09-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-09-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-09-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-09-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-09-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_010",
-      "title": "冒險",
-      "category": "experience",
-      "description": "追求刺激，挑戰未知",
-      "questions": ["冒險對你的意義？", "願意承擔的風險程度？", "最想嘗試的冒險？"],
-      "icon": "🎯"
+      "title": "追求真理與知性",
+      "category": "growth",
+      "description": "追求知識與真理，重視理性思考",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-10-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-10-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-10-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-10-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-10-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-10-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_011",
-      "title": "安全穩定",
-      "category": "security",
-      "description": "生活安定，有保障",
-      "questions": ["安全感的來源？", "穩定vs變化的選擇？", "如何建立安全感？"],
-      "icon": "🛡️"
+      "title": "自我肯定 喜歡自己",
+      "category": "personal",
+      "description": "接納並喜歡真實的自己",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-11-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-11-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-11-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-11-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-11-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-11-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_012",
-      "title": "社會貢獻",
-      "category": "contribution",
-      "description": "對社會產生正面影響",
-      "questions": ["想要改變什麼？", "如何回饋社會？", "貢獻的意義？"],
-      "icon": "🌍"
+      "title": "自我表達與呈現",
+      "category": "personal",
+      "description": "能夠自由表達想法與展現自我",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-12-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-12-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-12-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-12-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-12-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-12-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_013",
-      "title": "權力地位",
-      "category": "achievement",
-      "description": "獲得影響力和社會地位",
-      "questions": ["權力的責任？", "地位的重要性？", "如何運用影響力？"],
-      "icon": "👑"
+      "title": "舒適的環境",
+      "category": "lifestyle",
+      "description": "擁有舒適宜人的生活與工作環境",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-13-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-13-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-13-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-13-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-13-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-13-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_014",
-      "title": "獨立自主",
-      "category": "autonomy",
-      "description": "依靠自己，不依賴他人",
-      "questions": ["獨立的定義？", "自主與合作的平衡？", "如何培養獨立性？"],
-      "icon": "🏔️"
+      "title": "信仰、宗教或靈性的生活",
+      "category": "spiritual",
+      "description": "重視信仰與靈性追求",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-14-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-14-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-14-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-14-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-14-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-14-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_015",
-      "title": "和諧",
-      "category": "wellbeing",
-      "description": "內心平靜，關係和諧",
-      "questions": ["和諧的重要性？", "如何處理衝突？", "內在vs外在和諧？"],
-      "icon": "☮️"
+      "title": "平凡的生活",
+      "category": "lifestyle",
+      "description": "追求簡單平凡的生活方式",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-15-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-15-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-15-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-15-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-15-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-15-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_016",
-      "title": "誠信",
-      "category": "character",
-      "description": "堅守原則，言行一致",
-      "questions": ["誠信的底線？", "原則vs利益的選擇？", "如何維持誠信？"],
-      "icon": "⚖️"
+      "title": "能親近大自然",
+      "category": "lifestyle",
+      "description": "接觸大自然，享受自然環境",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-16-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-16-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-16-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-16-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-16-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-16-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_017",
-      "title": "快樂",
-      "category": "wellbeing",
-      "description": "享受生活，保持愉悅",
-      "questions": ["快樂的來源？", "短期vs長期快樂？", "如何維持快樂？"],
-      "icon": "😊"
+      "title": "規律的生活",
+      "category": "lifestyle",
+      "description": "維持有規律的生活作息",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-17-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-17-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-17-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-17-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-17-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-17-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_018",
-      "title": "知識智慧",
-      "category": "growth",
-      "description": "追求知識，培養智慧",
-      "questions": ["知識的價值？", "智慧如何累積？", "知識與實踐？"],
-      "icon": "🧠"
+      "title": "有獨處的空間",
+      "category": "personal",
+      "description": "需要獨處的時間與空間",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-18-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-18-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-18-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-18-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-18-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-18-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_019",
-      "title": "美感",
-      "category": "expression",
-      "description": "欣賞美好，追求美學",
-      "questions": ["美的定義？", "美感在生活中的角色？", "如何培養美感？"],
-      "icon": "🌺"
+      "title": "低調 不張揚",
+      "category": "personal",
+      "description": "保持低調，不喜歡過度張揚",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-19-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-19-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-19-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-19-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-19-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-19-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_020",
-      "title": "精神信仰",
-      "category": "meaning",
-      "description": "追求精神層面的滿足",
-      "questions": ["信仰的意義？", "精神寄託是什麼？", "如何實踐信仰？"],
-      "icon": "🕊️"
+      "title": "忠誠",
+      "category": "values",
+      "description": "對人對事保持忠誠",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-20-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-20-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-20-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-20-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-20-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-20-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_021",
-      "title": "公平正義",
-      "category": "character",
-      "description": "維護公平，伸張正義",
-      "questions": ["正義的標準？", "如何實踐公平？", "個人vs社會正義？"],
-      "icon": "⚖️"
+      "title": "國家主權 民族意識",
+      "category": "social",
+      "description": "重視國家主權與民族認同",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-21-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-21-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-21-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-21-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-21-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-21-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_022",
-      "title": "休閒娛樂",
-      "category": "experience",
-      "description": "享受休閒時光，放鬆身心",
-      "questions": ["休閒的重要性？", "理想的休閒方式？", "工作與休閒平衡？"],
-      "icon": "🎮"
+      "title": "不欺騙 不說謊",
+      "category": "values",
+      "description": "誠實正直，不欺騙他人",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-22-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-22-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-22-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-22-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-22-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-22-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_023",
-      "title": "挑戰",
-      "category": "growth",
-      "description": "接受挑戰，突破自我",
-      "questions": ["挑戰帶來什麼？", "如何面對困難？", "舒適圈的意義？"],
-      "icon": "🎯"
+      "title": "不要傷害別人",
+      "category": "values",
+      "description": "避免傷害他人，重視同理心",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-23-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-23-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-23-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-23-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-23-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-23-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_024",
-      "title": "認可尊重",
-      "category": "achievement",
-      "description": "獲得他人認可和尊重",
-      "questions": ["認可的重要性？", "自我vs他人認可？", "如何贏得尊重？"],
-      "icon": "🏅"
+      "title": "美德價值",
+      "category": "values",
+      "description": "追求美德與良好品格",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-24-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-24-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-24-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-24-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-24-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-24-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_025",
-      "title": "助人",
-      "category": "contribution",
-      "description": "幫助他人，服務社會",
-      "questions": ["助人的動機？", "如何有效幫助？", "付出與回報？"],
-      "icon": "🤲"
+      "title": "真誠一致",
+      "category": "values",
+      "description": "言行一致，真誠待人",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-25-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-25-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-25-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-25-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-25-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-25-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_026",
-      "title": "傳承",
-      "category": "meaning",
-      "description": "留下遺產，影響後代",
-      "questions": ["想要留下什麼？", "傳承的方式？", "對後代的責任？"],
-      "icon": "🌳"
+      "title": "全人類的福祉",
+      "category": "social",
+      "description": "關心全人類的福祉與發展",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-26-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-26-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-26-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-26-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-26-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-26-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_027",
-      "title": "簡約",
-      "category": "lifestyle",
-      "description": "簡單生活，減少物慾",
-      "questions": ["簡約的定義？", "物質與精神？", "如何實踐簡約？"],
-      "icon": "🍃"
+      "title": "尊重傳統延續歷史",
+      "category": "values",
+      "description": "重視傳統文化與歷史延續",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-27-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-27-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-27-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-27-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-27-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-27-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_028",
-      "title": "多元體驗",
-      "category": "experience",
-      "description": "嘗試不同經驗，豐富人生",
-      "questions": ["想要的體驗？", "深度vs廣度？", "體驗的價值？"],
-      "icon": "🌈"
+      "title": "公平正義",
+      "category": "social",
+      "description": "追求公平正義，維護公理",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-28-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-28-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-28-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-28-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-28-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-28-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_029",
-      "title": "專業卓越",
-      "category": "achievement",
-      "description": "在專業領域追求卓越",
-      "questions": ["卓越的標準？", "專業vs全面？", "如何精進專業？"],
-      "icon": "💎"
+      "title": "保護環境或動植物",
+      "category": "social",
+      "description": "重視環保，保護動植物與生態",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-29-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-29-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-29-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-29-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-29-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-29-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_030",
-      "title": "團隊歸屬",
-      "category": "relationships",
-      "description": "成為團隊一份子，有歸屬感",
-      "questions": ["歸屬感的重要？", "個人vs團隊？", "如何融入團隊？"],
-      "icon": "👥"
+      "title": "社會公益 關懷弱勢",
+      "category": "social",
+      "description": "關懷弱勢群體，投入社會公益",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-30-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-30-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-30-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-30-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-30-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-30-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_031",
-      "title": "環境永續",
-      "category": "contribution",
-      "description": "保護環境，永續發展",
-      "questions": ["環保的責任？", "如何實踐永續？", "便利vs環保？"],
-      "icon": "🌱"
+      "title": "交友廣闊",
+      "category": "relationships",
+      "description": "擁有廣泛的社交圈與人脈",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-31-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-31-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-31-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-31-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-31-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-31-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_032",
-      "title": "文化藝術",
-      "category": "expression",
-      "description": "參與文化，欣賞藝術",
-      "questions": ["文化的意義？", "藝術的價值？", "如何參與文化？"],
-      "icon": "🎭"
+      "title": "愛與被愛",
+      "category": "relationships",
+      "description": "付出愛並感受被愛的美好",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-32-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-32-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-32-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-32-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-32-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-32-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_033",
-      "title": "領導",
-      "category": "achievement",
-      "description": "引導他人，帶領團隊",
-      "questions": ["領導的責任？", "領導風格？", "如何培養領導力？"],
-      "icon": "🚀"
+      "title": "歸屬與認同 屬於某個身份或團體",
+      "category": "relationships",
+      "description": "尋找歸屬感，認同特定群體",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-33-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-33-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-33-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-33-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-33-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-33-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_034",
-      "title": "真實自我",
-      "category": "autonomy",
-      "description": "做真實的自己，不偽裝",
-      "questions": ["真實的定義？", "面具的必要？", "如何保持真實？"],
-      "icon": "🎭"
+      "title": "能彼此尊重",
+      "category": "relationships",
+      "description": "重視相互尊重的關係",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-34-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-34-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-34-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-34-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-34-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-34-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_035",
-      "title": "感恩",
-      "category": "character",
-      "description": "心存感激，珍惜擁有",
-      "questions": ["感恩什麼？", "如何表達感謝？", "感恩的力量？"],
-      "icon": "🙏"
+      "title": "獲得父母的認同",
+      "category": "relationships",
+      "description": "得到父母的認可與支持",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-35-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-35-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-35-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-35-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-35-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-35-S-back-zhtw.png"
+        }
+      }
     },
     {
       "id": "value_036",
-      "title": "生活品質",
+      "title": "有一個安穩的家",
+      "category": "relationships",
+      "description": "擁有穩定溫暖的家庭",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-36-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-36-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-36-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-36-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-36-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-36-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_037",
+      "title": "深刻友誼",
+      "category": "relationships",
+      "description": "建立深厚真摯的友誼",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-37-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-37-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-37-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-37-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-37-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-37-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_038",
+      "title": "人際和諧",
+      "category": "relationships",
+      "description": "維持和諧的人際關係",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-38-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-38-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-38-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-38-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-38-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-38-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_039",
+      "title": "有小孩",
+      "category": "relationships",
+      "description": "擁有孩子，建立家庭",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-39-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-39-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-39-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-39-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-39-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-39-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_040",
+      "title": "能好好照顧家人",
+      "category": "relationships",
+      "description": "有能力照顧家人的需求",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-40-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-40-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-40-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-40-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-40-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-40-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_041",
+      "title": "有夥伴一起打拼",
+      "category": "work",
+      "description": "與夥伴共同努力達成目標",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-41-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-41-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-41-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-41-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-41-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-41-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_042",
+      "title": "解決他人的問題 幫助他人成長",
+      "category": "contribution",
+      "description": "協助他人解決問題並成長",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-42-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-42-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-42-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-42-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-42-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-42-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_043",
+      "title": "對他人社會有影響力",
+      "category": "contribution",
+      "description": "發揮影響力，改變社會",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-43-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-43-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-43-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-43-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-43-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-43-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_044",
+      "title": "負責 勇於承擔責任",
+      "category": "values",
+      "description": "勇於負責，承擔應負的責任",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-44-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-44-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-44-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-44-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-44-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-44-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_045",
+      "title": "資產與金錢",
+      "category": "material",
+      "description": "累積財富與資產",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-45-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-45-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-45-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-45-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-45-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-45-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_046",
+      "title": "晉升的機會與速度",
+      "category": "achievement",
+      "description": "追求快速晉升與發展機會",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-46-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-46-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-46-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-46-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-46-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-46-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_047",
+      "title": "擁有自己的事業",
+      "category": "achievement",
+      "description": "創立並經營自己的事業",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-47-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-47-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-47-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-47-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-47-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-47-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_048",
+      "title": "權威身份 擁有特定地位職權",
+      "category": "achievement",
+      "description": "獲得權威地位與職權",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-48-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-48-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-48-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-48-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-48-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-48-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_049",
+      "title": "社會認可 受人尊重肯定",
+      "category": "achievement",
+      "description": "得到社會認可與他人尊重",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-49-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-49-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-49-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-49-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-49-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-49-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_050",
+      "title": "有效率、有效能",
+      "category": "work",
+      "description": "追求高效率與高效能",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-50-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-50-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-50-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-50-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-50-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-50-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_051",
+      "title": "領導團隊",
+      "category": "work",
+      "description": "帶領團隊達成目標",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-51-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-51-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-51-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-51-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-51-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-51-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_052",
+      "title": "務實 重視可行性",
+      "category": "work",
+      "description": "腳踏實地，重視實際可行性",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-52-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-52-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-52-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-52-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-52-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-52-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_053",
+      "title": "能被看見 有舞台能發光",
+      "category": "achievement",
+      "description": "獲得展現自我的舞台",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-53-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-53-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-53-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-53-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-53-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-53-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_054",
+      "title": "清楚的流程與規範",
+      "category": "work",
+      "description": "遵循明確的流程與規範",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-54-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-54-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-54-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-54-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-54-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-54-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_055",
+      "title": "隨遇而安 順勢而為",
       "category": "lifestyle",
-      "description": "追求高品質的生活方式",
-      "questions": ["品質的定義？", "物質vs精神品質？", "如何提升生活品質？"],
-      "icon": "✨"
+      "description": "隨遇而安，順應自然",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-55-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-55-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-55-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-55-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-55-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-55-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_056",
+      "title": "工作穩定性",
+      "category": "work",
+      "description": "擁有穩定的工作與收入",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-56-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-56-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-56-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-56-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-56-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-56-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_057",
+      "title": "工作生活平衡",
+      "category": "work",
+      "description": "在工作與生活間取得平衡",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-57-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-57-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-57-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-57-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-57-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-57-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_058",
+      "title": "發揮自己的天賦能力",
+      "category": "growth",
+      "description": "運用天賦，發揮潛能",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-58-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-58-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-58-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-58-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-58-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-58-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_059",
+      "title": "追求美感或藝術",
+      "category": "growth",
+      "description": "追求美感與藝術創作",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-59-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-59-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-59-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-59-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-59-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-59-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_060",
+      "title": "專業",
+      "category": "growth",
+      "description": "成為專業領域的專家",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-60-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-60-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-60-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-60-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-60-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-60-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_061",
+      "title": "創新與創造",
+      "category": "growth",
+      "description": "發揮創意，創造新事物",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-61-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-61-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-61-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-61-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-61-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-61-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_062",
+      "title": "追求工作品質",
+      "category": "work",
+      "description": "重視工作成果的品質",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-62-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-62-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-62-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-62-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-62-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-62-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_063",
+      "title": "獨立自主",
+      "category": "personal",
+      "description": "保持獨立，自主決策",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-63-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-63-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-63-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-63-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-63-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-63-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_064",
+      "title": "邏輯清晰",
+      "category": "growth",
+      "description": "思考邏輯清晰有條理",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-64-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-64-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-64-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-64-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-64-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-64-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_065",
+      "title": "能持續自我成長",
+      "category": "growth",
+      "description": "不斷學習，持續成長",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-65-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-65-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-65-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-65-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-65-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-65-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_066",
+      "title": "安全感 工作上或心理面可預測或可掌控",
+      "category": "wellbeing",
+      "description": "追求可預測與可掌控的安全感",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-66-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-66-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-66-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-66-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-66-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-66-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_067",
+      "title": "冒險挑戰",
+      "category": "growth",
+      "description": "勇於冒險，接受挑戰",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-67-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-67-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-67-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-67-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-67-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-67-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_068",
+      "title": "有明確的目標或方向",
+      "category": "work",
+      "description": "設定並追求明確目標",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-68-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-68-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-68-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-68-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-68-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-68-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_069",
+      "title": "有成就感",
+      "category": "achievement",
+      "description": "從成果中獲得成就感",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-69-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-69-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-69-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-69-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-69-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-69-S-back-zhtw.png"
+        }
+      }
+    },
+    {
+      "id": "value_070",
+      "title": "有秩序與穩定的環境",
+      "category": "work",
+      "description": "在有秩序穩定的環境中工作",
+      "imageUrl": {
+        "L": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-70-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-70-L-back-zhtw.png"
+        },
+        "M": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-70-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-70-M-back-zhtw.png"
+        },
+        "S": {
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-70-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/value-navigation-70-S-back-zhtw.png"
+        }
+      }
     }
   ]
 }

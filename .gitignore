@@ -71,6 +71,10 @@ backend/uploads/
 card-image/*.png
 card-image/*.jpg
 card-image/*.jpeg
+card-image/**/*.png
+card-image/**/*.jpg
+card-image/**/*.jpeg
+card-image/**/.DS_Store
 
 # Service Account Keys
 backend/keys/

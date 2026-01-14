@@ -252,12 +252,25 @@ export class CardLoaderService {
           main: (await this.getDeck('profession-collector')) || undefined,
         };
 
-      case 'advantage_analysis':
+      case 'advantage_analysis': {
+        // 優劣勢分析：只使用心態卡（mindset cards 11-52）
+        const fullDeck = await this.getDeck('skill_cards_52');
+        if (!fullDeck) return {};
+
+        const mindsetCards = fullDeck.cards.filter((card) => card.category === 'mindset');
+        return {
+          main: {
+            ...fullDeck,
+            cards: mindsetCards,
+          },
+        };
+      }
+
       case 'growth_planning':
       case 'position_breakdown':
+        // 成長規劃 & 職位拆解：使用全部 52 張卡片
         return {
           main: (await this.getDeck('skill_cards_52')) || undefined,
-          auxiliary: (await this.getDeck('action_cards_24')) || undefined,
         };
 
       case 'value_ranking':

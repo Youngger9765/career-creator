@@ -35,6 +35,7 @@ app = FastAPI(
 if settings.environment == "production":
     origins = [
         "https://career-creator-frontend-production-x43mdhfwsq-de.a.run.app",
+        "https://career-creator-frontend-production-849078733818.asia-east1.run.app",
     ]
     allow_credentials = True
 elif settings.environment == "staging":

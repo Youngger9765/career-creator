@@ -127,8 +127,8 @@ const CardItem: React.FC<CardItemProps> = ({
       <div
         className={`${imageUrls ? '' : 'p-3 pb-10'} space-y-1 flex flex-col ${imageUrls ? '' : 'h-full'} relative overflow-hidden rounded-xl`}
       >
-        {/* 翻面按鈕 - 在卡片內容底部 */}
-        {!isUsed && imageUrls && (
+        {/* 翻面按鈕 - 在卡片內容底部 - 只在有背面圖片時顯示 */}
+        {!isUsed && imageUrls && imageUrls.back && (
           <button
             onClick={(e) => {
               e.stopPropagation();

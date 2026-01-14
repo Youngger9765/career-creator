@@ -46,15 +46,15 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
     ...(state.cardPlacements.disadvantageCards || []),
   ]);
 
-  // 載入牌組
+  // 載入牌組 - 使用 getDecksForGameplay 來取得過濾後的牌組（只有心態卡）
   useEffect(() => {
     const getDeck = async () => {
       const cardLoader = CardLoaderService;
-      const deck = await cardLoader.getDeck(deckType);
-      setMainDeck(deck);
+      const decks = await cardLoader.getDecksForGameplay('advantage_analysis');
+      setMainDeck(decks.main);
     };
     getDeck();
-  }, [deckType]);
+  }, []);
 
   // 過濾出未使用的卡片
   const availableCards = mainDeck?.cards?.filter((card: any) => !usedCards.has(card.id)) || [];

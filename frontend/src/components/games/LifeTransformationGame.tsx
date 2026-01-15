@@ -695,7 +695,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
             </div>
 
             {/* 右側：視覺化圖表區 */}
-            <div className="bg-white dark:bg-gray-100 rounded-lg border border-gray-200 dark:border-gray-300 p-4 md:p-6 min-h-[500px]">
+            <div className="bg-white dark:bg-gray-100 rounded-lg border border-gray-200 dark:border-gray-300 p-4 md:p-6 min-h-[500px] overflow-hidden">
               <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-900 mb-4 md:mb-6">
                 生活平衡分配圖
               </h3>

@@ -3,7 +3,8 @@
  * Renders a single client row in the desktop table view
  */
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import type { Client } from '@/types/client';
 import {
   Mail,
@@ -44,6 +45,18 @@ export function ClientTableRow({
   formatDate,
 }: ClientTableRowProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (showMenu && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.top - 8, // 往上一點
+        left: rect.right - 144, // w-36 = 144px
+      });
+    }
+  }, [showMenu]);
 
   return (
     <tr className="hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
@@ -161,6 +174,7 @@ export function ClientTableRow({
           {/* 三點選單 */}
           <div className="relative">
             <button
+              ref={buttonRef}
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMenu(!showMenu);
@@ -171,15 +185,22 @@ export function ClientTableRow({
               <MoreVertical className="w-5 h-5" />
             </button>
 
-            {/* 下拉選單 */}
-            {showMenu && (
+            {/* 下拉選單 - 使用 Portal 渲染到 body */}
+            {showMenu && createPortal(
               <>
                 {/* 點擊外部關閉 */}
                 <div
-                  className="fixed inset-0 z-10"
+                  className="fixed inset-0 z-[9998]"
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="absolute right-0 bottom-full mb-1 w-36 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-[9999]">
+                <div 
+                  className="fixed w-36 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-[9999]"
+                  style={{ 
+                    top: menuPosition.top,
+                    left: menuPosition.left,
+                    transform: 'translateY(-100%)'
+                  }}
+                >
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -215,7 +236,8 @@ export function ClientTableRow({
                     刪除客戶
                   </button>
                 </div>
-              </>
+              </>,
+              document.body
             )}
           </div>
         </div>

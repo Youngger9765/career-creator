@@ -6,6 +6,7 @@ import { DemoAccount } from '@/types/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { ArrowRight, Zap, Users, FileText, Play } from 'lucide-react';
 
 export default function HomePage() {
   const router = useRouter();
@@ -13,7 +14,6 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // 判斷是否為開發環境
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
@@ -31,10 +31,7 @@ export default function HomePage() {
   const handleDemoLogin = async (account: DemoAccount) => {
     setIsLoading(true);
     try {
-      await login({
-        email: account.email,
-        password: 'demo123',
-      });
+      await login({ email: account.email, password: 'demo123' });
     } catch (error) {
       console.error('Demo login failed:', error);
     } finally {
@@ -44,348 +41,349 @@ export default function HomePage() {
 
   if (isCheckingAuth) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 flex items-center justify-center">
+      <main className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-gray-600">載入中...</div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 relative overflow-hidden">
-      {/* 背景裝飾 - 漂浮的幾何圖形 */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* 左上角裝飾 */}
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-amber-200/30 rounded-full blur-3xl animate-pulse"></div>
-        {/* 右上角裝飾 */}
-        <div className="absolute top-40 -right-20 w-80 h-80 bg-teal-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        {/* 左下角裝飾 */}
-        <div className="absolute bottom-40 -left-40 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        {/* 右下角裝飾 */}
-        <div className="absolute -bottom-20 right-20 w-72 h-72 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-        
-        {/* 小圓點裝飾 */}
-        <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-amber-400/50 rounded-full"></div>
-        <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-teal-400/50 rounded-full"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-4 h-4 bg-blue-400/30 rounded-full"></div>
-        <div className="absolute top-2/3 right-1/4 w-2 h-2 bg-purple-400/40 rounded-full"></div>
-      </div>
-
-      {/* Hero Section */}
-      <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
-        {/* Logo & Brand */}
-        <div className="text-center mb-12 md:mb-16">
-          <div className="flex justify-center mb-6">
-            <Image
-              src="/images/logo.png"
-              alt="職游 Logo"
-              width={280}
-              height={100}
-              className="h-auto drop-shadow-lg"
-              priority
-            />
-          </div>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            線上職涯牌卡諮詢平台
-            <br />
-            <span className="text-base text-gray-500">
-              將實體牌卡數位化，支援遠距諮詢與資料累積
-            </span>
-          </p>
+    <main className="min-h-screen bg-white overflow-hidden">
+      {/* Hero Section - 大膽的首屏設計 */}
+      <section className="relative min-h-screen flex items-center">
+        {/* 背景裝飾 - 有機形狀 */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* 主要漸層背景 */}
+          <div className="absolute top-0 right-0 w-[60%] h-full bg-gradient-to-bl from-[#7AB7B7]/20 via-[#FFCC3A]/10 to-transparent" />
+          {/* 有機形狀 */}
+          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[#7AB7B7]/15 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-[#FFCC3A]/20 rounded-full blur-2xl" />
+          <div className="absolute bottom-20 left-10 w-[200px] h-[200px] bg-[#0056A7]/10 rounded-full blur-2xl" />
+          {/* 裝飾線條 */}
+          <div className="absolute top-1/4 left-20 w-20 h-1 bg-[#FFCC3A] rounded-full" />
+          <div className="absolute bottom-1/3 right-1/3 w-16 h-1 bg-[#7AB7B7] rounded-full" />
         </div>
 
-        {/* Main CTA Cards */}
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-16">
-          {/* 諮詢師登入 */}
-          <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
-            {/* 裝飾條 */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 to-amber-500"></div>
-            <div className="p-8">
-              <div className="text-center">
-                {/* Icon */}
-                <div className="w-20 h-20 bg-gradient-to-br from-amber-100 to-amber-200 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <svg
-                    className="w-10 h-10 text-amber-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">我是諮詢師</h3>
-                <p className="text-gray-500 mb-6 text-sm leading-relaxed">
-                  已有帳號的諮詢師請由此登入
-                  <br />
-                  管理您的諮詢室與客戶資料
-                </p>
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* 左側：文字內容 */}
+            <div className="space-y-8">
+              {/* Logo */}
+              <div className="mb-4">
+                <Image
+                  src="/images/logo.png"
+                  alt="職游 Logo"
+                  width={200}
+                  height={70}
+                  className="h-auto"
+                  priority
+                />
+              </div>
+
+              {/* 大標題 - 表達性字型 */}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-tight">
+                讓職涯諮詢
+                <br />
+                <span className="text-[#7AB7B7]">更有溫度</span>
+              </h1>
+
+              {/* 副標題 */}
+              <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
+                將實體牌卡數位化，打造遠距諮詢的最佳體驗。
+                <br />
+                <span className="text-gray-500">即時同步、免註冊訪客、完整記錄。</span>
+              </p>
+
+              {/* CTA 按鈕組 - 黑色主按鈕 */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <Link
                   href="/login"
-                  className="inline-block w-full bg-brand-gold hover:bg-brand-gold-dark text-black py-3.5 px-6 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-black text-white text-lg font-bold rounded-full hover:bg-gray-800 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                 >
                   諮詢師登入
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* 訪客加入 */}
-          <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
-            {/* 裝飾條 */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-teal-400 to-teal-500"></div>
-            <div className="p-8">
-              <div className="text-center">
-                {/* Icon */}
-                <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <svg
-                    className="w-10 h-10 text-teal-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3">我要加入諮詢</h3>
-                <p className="text-gray-500 mb-6 text-sm leading-relaxed">
-                  使用諮詢師提供的分享碼
-                  <br />
-                  或掃描 QR Code 加入諮詢室
-                </p>
                 <Link
                   href="/join"
-                  className="inline-block w-full bg-brand-teal hover:bg-brand-teal-dark text-black py-3.5 px-6 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-gray-800 text-lg font-bold rounded-full border-2 border-gray-200 hover:border-[#7AB7B7] hover:text-[#7AB7B7] transition-all duration-300"
                 >
                   加入諮詢室
                 </Link>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Features Section */}
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-10">
-            平台特色
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
+            {/* 右側：視覺元素 - 卡片預覽 */}
+            <div className="hidden lg:block relative">
+              <div className="relative w-full h-[500px]">
+                {/* 主卡片 */}
+                <div className="absolute top-10 left-10 w-64 h-80 bg-white rounded-2xl shadow-2xl p-6 transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="w-full h-full bg-gradient-to-br from-[#0056A7] to-[#0056A7]/80 rounded-xl flex items-center justify-center">
+                    <span className="text-white text-6xl">🧭</span>
+                  </div>
+                  <p className="text-center mt-4 font-bold text-gray-800">職游旅人卡</p>
+                </div>
+                {/* 次卡片 */}
+                <div className="absolute top-32 right-10 w-56 h-72 bg-white rounded-2xl shadow-xl p-5 transform rotate-[8deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="w-full h-full bg-gradient-to-br from-[#FFCC3A] to-[#FFCC3A]/80 rounded-xl flex items-center justify-center">
+                    <span className="text-white text-5xl">📊</span>
+                  </div>
+                  <p className="text-center mt-3 font-bold text-gray-800 text-sm">職能盤點卡</p>
+                </div>
+                {/* 第三卡片 */}
+                <div className="absolute bottom-10 left-1/3 w-48 h-64 bg-white rounded-2xl shadow-lg p-4 transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="w-full h-full bg-gradient-to-br from-[#7AB7B7] to-[#7AB7B7]/80 rounded-xl flex items-center justify-center">
+                    <span className="text-white text-4xl">💎</span>
+                  </div>
+                  <p className="text-center mt-2 font-bold text-gray-800 text-xs">價值導航卡</p>
+                </div>
               </div>
-              <h3 className="font-semibold text-gray-800 mb-2 text-lg">即時同步</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                智能輪詢技術
-                <br />
-                確保牌卡操作即時同步
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-800 mb-2 text-lg">免註冊訪客</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                來訪者無需註冊
-                <br />
-                輸入暱稱即可加入諮詢
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="text-center group">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-8 h-8 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <h3 className="font-semibold text-gray-800 mb-2 text-lg">歷史記錄</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                完整保存諮詢過程
-                <br />
-                牌卡操作與筆記記錄
-              </p>
             </div>
           </div>
         </div>
 
-        {/* Card Types Preview */}
-        <div className="max-w-5xl mx-auto mt-16">
-          <h2 className="text-2xl font-bold text-center text-gray-800 mb-10">
-            三大牌卡 · 七種玩法
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* 職游旅人卡 */}
-            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">🧭</span>
+        {/* 向下滾動提示 */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="w-8 h-12 border-2 border-gray-300 rounded-full flex justify-center pt-2">
+            <div className="w-1.5 h-3 bg-gray-400 rounded-full animate-pulse" />
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works - 步驟引導 */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+              三步驟開始諮詢
+            </h2>
+            <p className="text-gray-500 text-lg">簡單、快速、無負擔</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Step 1 */}
+            <div className="relative group">
+              <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-[#FFCC3A] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-black text-black">1</span>
                 </div>
-                <h3 className="font-semibold text-gray-800">職游旅人卡</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">諮詢師登入</h3>
+                <p className="text-gray-500">
+                  使用您的帳號登入，進入專屬的諮詢管理後台。
+                </p>
               </div>
-              <ul className="text-sm text-gray-500 space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
-                  六大性格分析
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
-                  職業收藏家
-                </li>
-              </ul>
+              {/* 連接線 */}
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gray-200" />
             </div>
 
-            {/* 職能盤點卡 */}
-            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">📊</span>
+            {/* Step 2 */}
+            <div className="relative group">
+              <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-[#7AB7B7] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-black text-white">2</span>
                 </div>
-                <h3 className="font-semibold text-gray-800">職能盤點卡</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">邀請來訪者</h3>
+                <p className="text-gray-500">
+                  分享諮詢室連結或 QR Code，來訪者免註冊即可加入。
+                </p>
               </div>
-              <ul className="text-sm text-gray-500 space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
-                  優劣勢分析
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
-                  成長計畫
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
-                  職位拆解
-                </li>
-              </ul>
+              <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gray-200" />
             </div>
 
-            {/* 價值導航卡 */}
-            <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center">
-                  <span className="text-xl">💎</span>
+            {/* Step 3 */}
+            <div className="group">
+              <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                <div className="w-16 h-16 bg-[#0056A7] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-black text-white">3</span>
                 </div>
-                <h3 className="font-semibold text-gray-800">價值導航卡</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">開始諮詢</h3>
+                <p className="text-gray-500">
+                  選擇牌卡與玩法，即時同步操作，完整記錄諮詢過程。
+                </p>
               </div>
-              <ul className="text-sm text-gray-500 space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-teal-400 rounded-full"></span>
-                  價值觀排序
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-teal-400 rounded-full"></span>
-                  生活改造王
-                </li>
-              </ul>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Demo Accounts Section - Development Only */}
-        {isDevelopment && demoAccounts.length > 0 && (
-          <div className="max-w-2xl mx-auto mt-16">
-            <div className="bg-gray-100 border border-gray-200 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">
+      {/* Features - 功能亮點 */}
+      <section className="py-24">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* 左側：功能列表 */}
+            <div className="space-y-8">
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900">
+                為諮詢師打造的
+                <br />
+                <span className="text-[#FFCC3A]">專業工具</span>
+              </h2>
+
+              <div className="space-y-6">
+                {/* Feature Item */}
+                <div className="flex gap-4 group">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                    <Zap className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-lg mb-1">即時同步</h3>
+                    <p className="text-gray-500">智能輪詢技術，確保諮詢師與來訪者的操作即時同步。</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 group">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
+                    <Users className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-lg mb-1">免註冊訪客</h3>
+                    <p className="text-gray-500">來訪者無需註冊帳號，輸入暱稱即可加入諮詢室。</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 group">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+                    <FileText className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-lg mb-1">完整記錄</h3>
+                    <p className="text-gray-500">自動保存諮詢過程，包含牌卡操作、截圖與筆記。</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 右側：三大牌卡 */}
+            <div className="bg-gray-50 rounded-3xl p-8 lg:p-12">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+                三大牌卡 · 七種玩法
+              </h3>
+              <div className="space-y-4">
+                {/* 職游旅人卡 */}
+                <div className="bg-white rounded-2xl p-5 border-l-4 border-[#0056A7] hover:shadow-lg transition-shadow">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-2xl">🧭</span>
+                    <h4 className="font-bold text-gray-900">職游旅人卡</h4>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="px-3 py-1 bg-[#0056A7]/10 text-[#0056A7] text-sm rounded-full font-medium">六大性格分析</span>
+                    <span className="px-3 py-1 bg-[#0056A7]/10 text-[#0056A7] text-sm rounded-full font-medium">職業收藏家</span>
+                  </div>
+                </div>
+
+                {/* 職能盤點卡 */}
+                <div className="bg-white rounded-2xl p-5 border-l-4 border-[#FFCC3A] hover:shadow-lg transition-shadow">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-2xl">📊</span>
+                    <h4 className="font-bold text-gray-900">職能盤點卡</h4>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="px-3 py-1 bg-[#FFCC3A]/20 text-[#B8860B] text-sm rounded-full font-medium">優劣勢分析</span>
+                    <span className="px-3 py-1 bg-[#FFCC3A]/20 text-[#B8860B] text-sm rounded-full font-medium">成長計畫</span>
+                    <span className="px-3 py-1 bg-[#FFCC3A]/20 text-[#B8860B] text-sm rounded-full font-medium">職位拆解</span>
+                  </div>
+                </div>
+
+                {/* 價值導航卡 */}
+                <div className="bg-white rounded-2xl p-5 border-l-4 border-[#7AB7B7] hover:shadow-lg transition-shadow">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="text-2xl">💎</span>
+                    <h4 className="font-bold text-gray-900">價值導航卡</h4>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    <span className="px-3 py-1 bg-[#7AB7B7]/20 text-[#5A9A9A] text-sm rounded-full font-medium">價值觀排序</span>
+                    <span className="px-3 py-1 bg-[#7AB7B7]/20 text-[#5A9A9A] text-sm rounded-full font-medium">生活改造王</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - 行動呼籲 */}
+      <section className="py-24 bg-gradient-to-br from-[#0056A7] to-[#003d75] relative overflow-hidden">
+        {/* 裝飾 */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#7AB7B7]/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#FFCC3A]/20 rounded-full blur-3xl" />
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-6">
+              準備好開始了嗎？
+            </h2>
+            <p className="text-xl text-white/80 mb-10">
+              立即體驗數位化職涯諮詢的全新可能
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/login"
+                className="group inline-flex items-center justify-center gap-3 px-10 py-5 bg-[#FFCC3A] text-black text-lg font-bold rounded-full hover:bg-[#FFD966] transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+              >
+                立即開始
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/join"
+                className="inline-flex items-center justify-center gap-3 px-10 py-5 bg-white/10 text-white text-lg font-bold rounded-full border-2 border-white/30 hover:bg-white/20 transition-all duration-300"
+              >
+                我是來訪者
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Demo Accounts - Development Only */}
+      {isDevelopment && demoAccounts.length > 0 && (
+        <section className="py-12 bg-gray-100">
+          <div className="container mx-auto px-6 max-w-2xl">
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <h3 className="text-lg font-bold text-gray-700 mb-4 text-center">
                 🛠️ 開發測試帳號
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 {demoAccounts.map((account) => (
                   <button
                     key={account.id}
                     onClick={() => handleDemoLogin(account)}
                     disabled={isLoading}
-                    className="p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors text-left disabled:opacity-50"
                   >
                     <div className="font-medium text-gray-800 text-sm">{account.name}</div>
                     <div className="text-xs text-gray-500">{account.description}</div>
                   </button>
                 ))}
               </div>
-              {isLoading && <div className="text-center text-gray-600 mt-4">登入中...</div>}
             </div>
           </div>
-        )}
+        </section>
+      )}
 
-        {/* Footer */}
-        <footer className="mt-20 pt-8 border-t border-gray-200">
-          <div className="max-w-3xl mx-auto">
-            {/* navicareer Logo */}
-            <div className="flex justify-center mb-6">
-              <a
-                href="https://navicareer.tw"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+      {/* Footer */}
+      <footer className="py-12 bg-white border-t border-gray-100">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <a href="https://navicareer.tw" target="_blank" rel="noopener noreferrer">
                 <Image
                   src="/images/navicareer-logo.png"
                   alt="職游 navicareer"
-                  width={180}
-                  height={60}
-                  className="opacity-80 hover:opacity-100 transition-opacity"
+                  width={140}
+                  height={45}
+                  className="opacity-70 hover:opacity-100 transition-opacity"
                 />
               </a>
             </div>
-            {/* Description */}
-            <p className="text-center text-sm text-gray-500 leading-relaxed mb-6 px-4">
-              職游是職涯助人者的成長導航，提供職涯諮詢師課程、獨家生涯牌卡與課程，
-              <br className="hidden md:block" />
-              並創造諮詢媒合、諮詢師交流等平台，期待無論是助人者還是來訪者，都能發揮所長，熱愛自己的生活！
+            <p className="text-sm text-gray-400 text-center md:text-right max-w-md">
+              職游是職涯助人者的成長導航，期待無論是助人者還是來訪者，都能發揮所長，熱愛自己的生活！
             </p>
-            {/* Copyright */}
-            <div className="text-center">
-              <p className="text-xs text-gray-400">
-                © {new Date().getFullYear()} 職游 Career Creator. All rights reserved.
-              </p>
-            </div>
           </div>
-        </footer>
-      </div>
+          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+            <p className="text-xs text-gray-400">
+              © {new Date().getFullYear()} 職游 Career Creator. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }

@@ -348,41 +348,28 @@ const DropZone: React.FC<DropZoneProps> = ({
           style={{ width: cardWidth, height: cardHeight }}
           onClick={() => setViewingCard(card)}
         >
-          {/* 底部按鈕組 - 查看大卡 & 翻轉（只有有背面時才顯示翻轉） */}
+          {/* 底部翻轉按鈕（只有有背面時才顯示） */}
           {(() => {
             const imageUrls =
               typeof card.imageUrl === 'object'
                 ? card.imageUrl?.M || card.imageUrl
                 : null;
             const hasBack = imageUrls?.back && imageUrls.back !== imageUrls.front;
-            return (
+            return hasBack ? (
               <div className="absolute bottom-2 left-2 right-2 flex gap-1.5 z-20">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setViewingCard(card);
+                    toggleCardFlip(card.id);
                   }}
                   className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
-                  title="查看大卡"
+                  title="翻轉卡片"
                 >
-                  <Eye className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
-                  <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">查看</span>
+                  <RotateCw className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
+                  <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">翻轉</span>
                 </button>
-                {hasBack && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleCardFlip(card.id);
-                    }}
-                    className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
-                    title="翻轉卡片"
-                  >
-                    <RotateCw className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
-                    <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">翻轉</span>
-                  </button>
-                )}
               </div>
-            );
+            ) : null;
           })()}
           {(() => {
             // Get image URLs - use M size for dropzone cards
@@ -498,9 +485,10 @@ const DropZone: React.FC<DropZoneProps> = ({
           </div>
         )}
 
-        {/* 標題條 */}
+        {/* 標題條 - 點擊查看大卡 */}
         <div
-          className={`${getCardBackground(card.id)} border rounded-lg px-3 py-2.5 flex items-center justify-between gap-2 hover:shadow-md transition-all cursor-move group`}
+          className={`${getCardBackground(card.id)} border rounded-lg px-3 py-2.5 flex items-center justify-between gap-2 hover:shadow-md transition-all cursor-pointer group`}
+          onClick={() => setViewingCard(card)}
         >
           {/* 左側：編號 + 標題 */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -523,19 +511,9 @@ const DropZone: React.FC<DropZoneProps> = ({
             </div>
           </div>
 
-          {/* 右側：查看按鈕 + 移除按鈕 */}
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setViewingCard(card);
-              }}
-              className="p-1.5 bg-white/90 dark:bg-gray-700/90 hover:bg-white dark:hover:bg-gray-600 rounded-md transition-colors border border-gray-200 dark:border-gray-600"
-              title="查看大卡"
-            >
-              <Eye className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
-            </button>
-            {showRemoveButton && (
+          {/* 右側：移除按鈕 */}
+          {showRemoveButton && (
+            <div className="flex items-center gap-1 flex-shrink-0">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -546,8 +524,8 @@ const DropZone: React.FC<DropZoneProps> = ({
               >
                 ×
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* 最後一張卡片後的插入線 */}

@@ -156,7 +156,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
       totalCards: allCards.length,
     });
 
-    return `【技能卡: ${skillName} | 行動卡: ${actionName}】\n----------\n`;
+    return `【職能卡: ${skillName} | 行動卡: ${actionName}】\n----------\n`;
   }, [skillCardsInUse, actionCardsInUse, allCards]);
 
   // 處理計畫文字變更（只有房主可以編輯）
@@ -170,7 +170,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
       // 如果文字開頭不是前綴，或者前綴已更改，則更新
       if (prefix && !text.startsWith(prefix)) {
         // 移除舊的前綴（如果有的話）
-        const oldPrefixMatch = text.match(/^【技能卡:.*?】\n----------\n/);
+        const oldPrefixMatch = text.match(/^【職能卡:.*?】\n----------\n/);
         let userContent = text;
         if (oldPrefixMatch) {
           userContent = text.substring(oldPrefixMatch[0].length);
@@ -208,7 +208,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 
     // 如果已有內容，更新前綴
     if (planText) {
-      const oldPrefixMatch = planText.match(/^【技能卡:.*?】\n----------\n/);
+      const oldPrefixMatch = planText.match(/^【職能卡:.*?】\n----------\n/);
       let userContent = planText;
       if (oldPrefixMatch) {
         userContent = planText.substring(oldPrefixMatch[0].length);
@@ -251,7 +251,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         decks: [
           {
             id: 'skill',
-            label: '技能卡',
+            label: '職能卡',
             cards: availableSkillCards,
             color: 'blue',
             type: 'skill',

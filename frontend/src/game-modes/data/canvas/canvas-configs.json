@@ -193,7 +193,7 @@
     {
       "id": "free_canvas",
       "name": "自由畫布",
-      "description": "用於職位拆解，自由排列和連結技能卡",
+      "description": "用於職位拆解，自由排列和連結職能卡",
       "type": "free",
       "gameplay": "position_breakdown",
       "layout": {

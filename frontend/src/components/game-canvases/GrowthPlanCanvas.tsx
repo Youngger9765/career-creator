@@ -2,7 +2,7 @@
  * GrowthPlanCanvas - 成長計畫畫布元件
  *
  * 用於職能盤點卡的成長計畫玩法
- * 將技能卡（卡片A）和行動卡（卡片B）結合，填寫成長計畫
+ * 將職能卡（卡片A）和行動卡（卡片B）結合，填寫成長計畫
  */
 
 'use client';
@@ -48,7 +48,7 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
   planText = '',
   isReadOnly = false,
 }) => {
-  // 處理技能卡（A區）
+  // 處理職能卡（A區）
   const handleCardAAdd = (cardId: string) => {
     onCardUse?.(cardId);
     checkAndCreatePlan([cardId], actionCards, planText);
@@ -81,7 +81,7 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
     checkAndCreatePlan(skillCards, actionCards, text);
   };
 
-  // 過濾技能卡和行動卡
+  // 過濾職能卡和行動卡
   const availableSkillCards = cards.filter((card) => !card.id.startsWith('action_'));
   const availableActionCards = cards.filter((card) => card.id.startsWith('action_'));
 
@@ -90,18 +90,18 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
       <div className="min-h-full flex flex-col space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            {/* 技能卡 A區 */}
+            {/* 職能卡 A區 */}
             <div className="flex justify-center">
               <DropZone
                 id="cardA"
                 cards={availableSkillCards}
                 placedCardIds={skillCards}
                 maxCards={1}
-                allowedCardTypes={['skill_']} // 只允許技能卡
-                title="技能卡"
+                allowedCardTypes={['skill_']} // 只允許職能卡
+                title="職能卡"
                 subtitle="選擇要發展的技能"
                 icon={Target}
-                emptyMessage="拖曳技能卡到此處"
+                emptyMessage="拖曳職能卡到此處"
                 emptySubMessage="使用程式語言開發軟體應用程式的..."
                 dragOverColor="border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                 showCardNumbers={false}

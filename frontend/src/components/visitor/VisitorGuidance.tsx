@@ -31,7 +31,7 @@ export function VisitorGuidance({ gameMode, isVisible, onClose }: VisitorGuidanc
         return {
           title: '優劣勢分析',
           steps: [
-            '選擇與您相關的技能卡片',
+            '選擇與您相關的職能卡片',
             '將卡片拖拽到「優勢」或「劣勢」區域',
             '每個區域最多放置5張卡片',
             '與諮詢師討論您的選擇',

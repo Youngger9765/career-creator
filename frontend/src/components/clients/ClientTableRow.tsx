@@ -51,9 +51,17 @@ export function ClientTableRow({
   useEffect(() => {
     if (showMenu && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
+      const menuHeight = 140; // 預估選單高度
+      const spaceBelow = window.innerHeight - rect.bottom;
+      
+      // 如果下方空間不夠，向上展開
+      const top = spaceBelow < menuHeight 
+        ? rect.top - menuHeight - 4 
+        : rect.bottom + 4;
+      
       setMenuPosition({
-        top: rect.bottom + 4, // 向下展開
-        left: rect.right - 144, // w-36 = 144px
+        top,
+        left: rect.left - 100, // 向左偏移讓選單對齊按鈕
       });
     }
   }, [showMenu]);

@@ -9,7 +9,7 @@
   "cards": [
     {
       "id": "action_01",
-      "title": "行動卡 01",
+      "title": "課程進修",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -26,7 +26,7 @@
     },
     {
       "id": "action_02",
-      "title": "行動卡 02",
+      "title": "閱讀進修",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -43,7 +43,7 @@
     },
     {
       "id": "action_03",
-      "title": "行動卡 03",
+      "title": "實際應用",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -60,7 +60,7 @@
     },
     {
       "id": "action_04",
-      "title": "行動卡 04",
+      "title": "爭取專案",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -77,7 +77,7 @@
     },
     {
       "id": "action_05",
-      "title": "行動卡 05",
+      "title": "突破困境",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -94,7 +94,7 @@
     },
     {
       "id": "action_06",
-      "title": "行動卡 06",
+      "title": "請益前輩",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -111,7 +111,7 @@
     },
     {
       "id": "action_07",
-      "title": "行動卡 07",
+      "title": "收集回饋",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -128,7 +128,7 @@
     },
     {
       "id": "action_08",
-      "title": "行動卡 08",
+      "title": "社群學習",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -145,7 +145,7 @@
     },
     {
       "id": "action_09",
-      "title": "行動卡 09",
+      "title": "教學分享",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -162,7 +162,7 @@
     },
     {
       "id": "action_10",
-      "title": "行動卡 10",
+      "title": "建立習慣",
       "description": "行動卡片",
       "category": "action",
       "imageUrl": {
@@ -179,7 +179,7 @@
     },
     {
       "id": "mindset_01",
-      "title": "職能卡 01",
+      "title": "成就導向",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -199,7 +199,7 @@
     },
     {
       "id": "mindset_02",
-      "title": "職能卡 02",
+      "title": "專注目標",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -219,7 +219,7 @@
     },
     {
       "id": "mindset_03",
-      "title": "職能卡 03",
+      "title": "發揮效率",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -239,7 +239,7 @@
     },
     {
       "id": "mindset_04",
-      "title": "職能卡 04",
+      "title": "肢體動覺",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -259,7 +259,7 @@
     },
     {
       "id": "mindset_05",
-      "title": "職能卡 05",
+      "title": "責任承諾",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -279,7 +279,7 @@
     },
     {
       "id": "mindset_06",
-      "title": "職能卡 06",
+      "title": "廣泛蒐集",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -299,7 +299,7 @@
     },
     {
       "id": "mindset_07",
-      "title": "職能卡 07",
+      "title": "規範秩序",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -319,7 +319,7 @@
     },
     {
       "id": "mindset_08",
-      "title": "職能卡 08",
+      "title": "美感創作",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -339,7 +339,7 @@
     },
     {
       "id": "mindset_09",
-      "title": "職能卡 09",
+      "title": "靈活應變",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -359,7 +359,7 @@
     },
     {
       "id": "mindset_10",
-      "title": "職能卡 10",
+      "title": "統籌規劃",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -379,7 +379,7 @@
     },
     {
       "id": "mindset_11",
-      "title": "職能卡 11",
+      "title": "公平正義",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -399,7 +399,7 @@
     },
     {
       "id": "mindset_12",
-      "title": "職能卡 12",
+      "title": "積極主動",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -419,7 +419,7 @@
     },
     {
       "id": "mindset_13",
-      "title": "職能卡 13",
+      "title": "解決問題",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -439,7 +439,7 @@
     },
     {
       "id": "mindset_14",
-      "title": "職能卡 14",
+      "title": "自我覺察",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -459,7 +459,7 @@
     },
     {
       "id": "mindset_15",
-      "title": "職能卡 15",
+      "title": "創新思維",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -479,7 +479,7 @@
     },
     {
       "id": "mindset_16",
-      "title": "職能卡 16",
+      "title": "邏輯推理",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -499,7 +499,7 @@
     },
     {
       "id": "mindset_17",
-      "title": "職能卡 17",
+      "title": "戰略思維",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -519,7 +519,7 @@
     },
     {
       "id": "mindset_18",
-      "title": "職能卡 18",
+      "title": "概念思考",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -539,7 +539,7 @@
     },
     {
       "id": "mindset_19",
-      "title": "職能卡 19",
+      "title": "熱愛學習",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -559,7 +559,7 @@
     },
     {
       "id": "mindset_20",
-      "title": "職能卡 20",
+      "title": "自我管理",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -579,7 +579,7 @@
     },
     {
       "id": "mindset_21",
-      "title": "職能卡 21",
+      "title": "相信自己",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -599,7 +599,7 @@
     },
     {
       "id": "mindset_22",
-      "title": "職能卡 22",
+      "title": "尊重包容",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -619,7 +619,7 @@
     },
     {
       "id": "mindset_23",
-      "title": "職能卡 23",
+      "title": "忠於信念",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -639,7 +639,7 @@
     },
     {
       "id": "mindset_24",
-      "title": "職能卡 24",
+      "title": "克敵致勝",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -659,7 +659,7 @@
     },
     {
       "id": "mindset_25",
-      "title": "職能卡 25",
+      "title": "回溯過往",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -679,7 +679,7 @@
     },
     {
       "id": "mindset_26",
-      "title": "職能卡 26",
+      "title": "審慎周全",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -699,7 +699,7 @@
     },
     {
       "id": "mindset_27",
-      "title": "職能卡 27",
+      "title": "想像未來",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -719,7 +719,7 @@
     },
     {
       "id": "mindset_28",
-      "title": "職能卡 28",
+      "title": "關注優勢",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -739,7 +739,7 @@
     },
     {
       "id": "mindset_29",
-      "title": "職能卡 29",
+      "title": "樂觀正向",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -759,7 +759,7 @@
     },
     {
       "id": "mindset_30",
-      "title": "職能卡 30",
+      "title": "批判思考",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -779,7 +779,7 @@
     },
     {
       "id": "mindset_31",
-      "title": "職能卡 31",
+      "title": "察言觀色",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -799,7 +799,7 @@
     },
     {
       "id": "mindset_32",
-      "title": "職能卡 32",
+      "title": "感同身受",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -819,7 +819,7 @@
     },
     {
       "id": "mindset_33",
-      "title": "職能卡 33",
+      "title": "協調衝突",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -839,7 +839,7 @@
     },
     {
       "id": "mindset_34",
-      "title": "職能卡 34",
+      "title": "協助他人",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -859,7 +859,7 @@
     },
     {
       "id": "mindset_35",
-      "title": "職能卡 35",
+      "title": "推動影響",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -879,7 +879,7 @@
     },
     {
       "id": "mindset_36",
-      "title": "職能卡 36",
+      "title": "培養他人",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -899,7 +899,7 @@
     },
     {
       "id": "mindset_37",
-      "title": "職能卡 37",
+      "title": "團隊意識",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -919,7 +919,7 @@
     },
     {
       "id": "mindset_38",
-      "title": "職能卡 38",
+      "title": "領導統率",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -939,7 +939,7 @@
     },
     {
       "id": "mindset_39",
-      "title": "職能卡 39",
+      "title": "表達技巧",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -959,7 +959,7 @@
     },
     {
       "id": "mindset_40",
-      "title": "職能卡 40",
+      "title": "善於識人",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -979,7 +979,7 @@
     },
     {
       "id": "mindset_41",
-      "title": "職能卡 41",
+      "title": "深化關係",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {
@@ -999,7 +999,7 @@
     },
     {
       "id": "mindset_42",
-      "title": "職能卡 42",
+      "title": "結識新人",
       "description": "職能卡片",
       "category": "mindset",
       "imageUrl": {

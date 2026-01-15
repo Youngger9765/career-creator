@@ -120,6 +120,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   renderHeader,
   renderEmpty,
   viewMode: externalViewMode,
+  onViewModeChange,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -131,6 +132,8 @@ const DropZone: React.FC<DropZoneProps> = ({
   // 如果有外部控制的 viewMode，使用外部的；否則使用內部的
   const viewMode = externalViewMode ?? internalViewMode;
   const setViewMode = externalViewMode ? () => {} : setInternalViewMode;
+  // 如果有外部 onViewModeChange，隱藏內部 toggle
+  const hasExternalViewMode = !!onViewModeChange;
 
   // 同步外部 maxCards 狀態
   useEffect(() => {
@@ -642,7 +645,7 @@ const DropZone: React.FC<DropZoneProps> = ({
                   <div />
                 )}
                 {/* 視圖模式切換（只有在沒有外部控制時顯示） */}
-                {!externalViewMode && (
+                {!hasExternalViewMode && (
                   <div className={`flex items-center gap-0.5 rounded p-0.5 ${headerClassName?.includes('text-white') ? 'bg-white/20' : 'bg-gray-100'}`}>
                     <button
                       onClick={() => setViewMode('grid')}

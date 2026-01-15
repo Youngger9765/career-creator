@@ -51,9 +51,27 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50">
+    <main className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 relative overflow-hidden">
+      {/* 背景裝飾 - 漂浮的幾何圖形 */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* 左上角裝飾 */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-amber-200/30 rounded-full blur-3xl animate-pulse"></div>
+        {/* 右上角裝飾 */}
+        <div className="absolute top-40 -right-20 w-80 h-80 bg-teal-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        {/* 左下角裝飾 */}
+        <div className="absolute bottom-40 -left-40 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        {/* 右下角裝飾 */}
+        <div className="absolute -bottom-20 right-20 w-72 h-72 bg-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        
+        {/* 小圓點裝飾 */}
+        <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-amber-400/50 rounded-full"></div>
+        <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-teal-400/50 rounded-full"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-4 h-4 bg-blue-400/30 rounded-full"></div>
+        <div className="absolute top-2/3 right-1/4 w-2 h-2 bg-purple-400/40 rounded-full"></div>
+      </div>
+
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-8 md:py-16">
+      <div className="container mx-auto px-4 py-8 md:py-16 relative z-10">
         {/* Logo & Brand */}
         <div className="text-center mb-12 md:mb-16">
           <div className="flex justify-center mb-6">
@@ -62,7 +80,7 @@ export default function HomePage() {
               alt="職游 Logo"
               width={280}
               height={100}
-              className="h-auto"
+              className="h-auto drop-shadow-lg"
               priority
             />
           </div>

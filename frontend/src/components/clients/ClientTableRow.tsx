@@ -46,7 +46,7 @@ export function ClientTableRow({
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+    <tr className="hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
       {/* Client Info */}
       <td className="px-5 py-4">
         <div className="flex items-center gap-3">

@@ -502,7 +502,7 @@ const DropZone: React.FC<DropZoneProps> = ({
 
         {/* 標題條 - 點擊查看大卡 */}
         <div
-          className={`${getCardBackground(card.id)} border rounded-lg px-3 py-2.5 flex items-center justify-between gap-2 hover:shadow-md transition-all cursor-pointer group`}
+          className={`${getCardBackground(card.id)} border rounded-lg px-3 py-3 flex items-center justify-between gap-2 hover:shadow-md transition-all cursor-pointer group`}
           onClick={() => setViewingCard(card)}
         >
           {/* 左側：編號 + 標題 */}
@@ -513,7 +513,7 @@ const DropZone: React.FC<DropZoneProps> = ({
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {card.title}
               </p>
               {card.category && (

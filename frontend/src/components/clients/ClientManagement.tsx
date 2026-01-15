@@ -213,7 +213,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
       </div>
 
       {/* Client List */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm">
         {filteredClients.length === 0 ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             {searchTerm ? '沒有符合條件的客戶' : '尚未新增任何客戶'}

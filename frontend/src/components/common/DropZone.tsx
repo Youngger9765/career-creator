@@ -683,7 +683,7 @@ const DropZone: React.FC<DropZoneProps> = ({
           )}
 
       {/* 內容區域 */}
-      <div className={`flex-1 min-h-0 overflow-y-auto p-3 ${contentClassName}`}>
+      <div className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-4 ${contentClassName}`}>
         {placedCardIds.length === 0 ? (
           renderEmpty ? (
             renderEmpty()
@@ -695,7 +695,7 @@ const DropZone: React.FC<DropZoneProps> = ({
             className={
               viewMode === 'compact'
                 ? 'flex flex-col gap-2'
-                : 'flex flex-wrap justify-center gap-3'
+                : 'flex flex-wrap justify-center gap-4'
             }
           >
             {placedCardIds.map((cardId, index) => {

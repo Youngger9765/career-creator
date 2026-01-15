@@ -176,7 +176,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
     return (
       <div className={`space-y-6 ${className}`}>
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
           <p className="mt-4 text-gray-600">載入客戶資料中...</p>
         </div>
       </div>
@@ -188,12 +188,12 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">客戶管理</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">管理您的諮詢客戶資料</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">客戶管理</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">管理您的諮詢客戶資料</p>
         </div>
         <button
           onClick={() => setShowCreateForm(true)}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          className="px-4 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-medium rounded-xl hover:from-teal-600 hover:to-teal-700 transition-all shadow-sm flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
           新增客戶
@@ -202,18 +202,18 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
           placeholder="搜尋客戶姓名或 email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400 transition-colors"
+          className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400 text-gray-900 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-400 dark:focus:ring-amber-400 transition-all shadow-sm"
         />
       </div>
 
       {/* Client List */}
-      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden shadow-sm">
         {filteredClients.length === 0 ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             {searchTerm ? '沒有符合條件的客戶' : '尚未新增任何客戶'}

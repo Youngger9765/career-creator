@@ -81,60 +81,7 @@ jobs:
         if: inputs.action == 'seed'
         run: |
           cd backend
-          python -c "
-from app.core.database import engine
-from sqlmodel import Session, text
-import sys
-
-try:
-    with Session(engine) as session:
-        # Count total records
-        result = session.exec(
-            text('''
-SELECT COUNT(*) as total,
-       COUNT(DISTINCT room_id) as rooms,
-       COUNT(DISTINCT client_id) as clients,
-       MIN(session_date) as earliest,
-       MAX(session_date) as latest
-FROM consultation_records
-WHERE counselor_id = '00000000-0000-0000-0001-000000000001'
-            ''')
-        ).first()
-
-        print('\n' + '='*60)
-        print('📊 Verification Results')
-        print('='*60)
-        print(f'Total consultation records: {result[0]}')
-        print(f'Unique rooms: {result[1]}')
-        print(f'Unique clients: {result[2]}')
-        print(f'Date range: {result[3]} to {result[4]}')
-        print('='*60 + '\n')
-
-        # Check if data was created
-        if result[0] == 0:
-            print('❌ ERROR: No records were created!')
-            sys.exit(1)
-
-        # Verify counselor notes exist
-        notes = session.exec(
-            text('''
-SELECT COUNT(*) FROM counselor_notes cn
-JOIN rooms r ON r.id = cn.room_id
-WHERE r.counselor_id = '00000000-0000-0000-0001-000000000001'
-            ''')
-        ).first()
-
-        print(f'Counselor notes: {notes[0]}')
-
-        if notes[0] == 0:
-            print('⚠️  WARNING: No counselor notes were created!')
-
-        print('\n✅ Seed verification passed!\n')
-
-except Exception as e:
-    print(f'\n❌ Verification failed: {e}\n')
-    sys.exit(1)
-"
+          python scripts/verify_demo_data.py
 
       - name: Summary
         if: always()

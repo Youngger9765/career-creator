@@ -706,7 +706,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                   <div className="relative h-96 flex items-center justify-center">
                     <div className="relative w-full h-full max-w-lg">
                       {/* 使用 CSS 實現簡單的圓餅圖 */}
-                      <svg viewBox="-80 -20 360 240" className="w-full h-full overflow-visible">
+                      <svg viewBox="-50 -20 300 240" className="w-full h-full overflow-visible">
                         {(() => {
                           let currentAngle = 0;
                           const segments = [];

@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRoomStore } from '@/stores/room-store';
 import { useGameSession } from '@/hooks/use-game-session';
@@ -391,8 +393,22 @@ export default function RoomPage() {
       {/* 頂部標題欄 - 重新設計 */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 gap-4">
-          {/* 左側：退出 + 諮詢室名稱 */}
+          {/* 左側：Logo + 退出 + 諮詢室名稱 */}
           <div className="flex items-center gap-3 min-w-0">
+            {/* Logo */}
+            <Link href="/dashboard" className="flex-shrink-0">
+              <Image
+                src="/logos/current/logo.png"
+                alt="職游"
+                width={36}
+                height={36}
+                className="rounded-lg"
+              />
+            </Link>
+
+            {/* 分隔線 */}
+            <div className="w-px h-6 bg-gray-200 hidden sm:block" />
+
             {/* 退出按鈕 - ghost 樣式 */}
             {!currentGameplay && (
               <button
@@ -428,9 +444,6 @@ export default function RoomPage() {
                 </svg>
               </button>
             )}
-
-            {/* 分隔線 */}
-            <div className="w-px h-6 bg-gray-200 hidden sm:block" />
 
             {/* 諮詢室名稱 */}
             {currentRoom && (

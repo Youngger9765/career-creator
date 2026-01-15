@@ -41,6 +41,7 @@ if settings.environment == "production":
 elif settings.environment == "staging":
     origins = [
         "https://career-creator-frontend-staging-x43mdhfwsq-de.a.run.app",
+        "https://career-creator-frontend-staging-849078733818.asia-east1.run.app",
         "http://localhost:3000",  # Allow local development
         "http://localhost:3001",  # Alternative dev port
     ]

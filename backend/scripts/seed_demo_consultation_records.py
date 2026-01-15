@@ -24,6 +24,7 @@ from app.core.config import settings
 from app.core.database import engine
 from app.models.client import Client, ConsultationRecord, RoomClient
 from app.models.counselor_note import CounselorNote
+
 # GameRuleTemplate not needed - frontend loads cards from JSON
 from app.models.room import Room
 from app.models.user import User
@@ -73,24 +74,25 @@ CONSULTATION_NOTES_TEMPLATES = [
     "本次諮詢處理求職準備議題。協助案主優化履歷，突出專案成果與量化數據。同時演練面試常見問題，加強 STAR 法則應用。案主表現進步明顯，預計下週將開始投遞目標職位。",
 ]
 
-# GCS screenshot URL patterns (will be generated based on bucket config)
-def get_demo_screenshot_urls(bucket_name: str, count: int = 3) -> List[str]:
-    """Generate demo GCS screenshot URLs"""
-    # Use realistic filenames that might exist in a demo GCS bucket
-    demo_filenames = [
-        "demo/gameplay-personality-assessment-1.png",
-        "demo/gameplay-values-exploration-2.png",
-        "demo/gameplay-skills-inventory-1.png",
-        "demo/card-layout-screenshot-1.png",
-        "demo/card-layout-screenshot-2.png",
-        "demo/consultation-session-1.png",
-        "demo/consultation-session-2.png",
-        "demo/final-result-screenshot.png",
-    ]
+# GCS screenshot URL - single reference screenshot for all demo records
+DEMO_SCREENSHOT_URL = "https://storage.googleapis.com/career-creator-screenshots-production/screenshots/00000000-0000-0000-0001-000000000001/9ce1e522-eea3-4845-b569-3eba0f53c3e7/12af68cc-5928-4795-aeb5-9fec3e94eb35.png"
 
-    selected = random.sample(demo_filenames, min(count, len(demo_filenames)))
-    return [f"https://storage.googleapis.com/{bucket_name}/{filename}"
-            for filename in selected]
+
+def get_demo_screenshot_urls(bucket_name: str, count: int = 3) -> List[str]:
+    """
+    Return demo screenshot URLs.
+
+    All consultation records will use the same reference screenshot
+    to ensure consistency across staging and production environments.
+
+    Args:
+        bucket_name: GCS bucket name (unused, kept for backward compatibility)
+        count: Number of screenshots (unused, kept for backward compatibility)
+
+    Returns:
+        List containing the single reference screenshot URL
+    """
+    return [DEMO_SCREENSHOT_URL]
 
 
 def get_minimal_game_state(game_rule_slug: str) -> dict:
@@ -120,9 +122,10 @@ def verify_counselor_exists(session: Session) -> bool:
     """Verify Dr. Sarah Chen exists in database"""
     # Use text query to avoid schema mismatch issues
     from sqlalchemy import text
+
     result = session.exec(
         text("SELECT id, email, name, roles FROM users WHERE id = :user_id"),
-        params={"user_id": str(DR_SARAH_CHEN_UUID)}
+        params={"user_id": str(DR_SARAH_CHEN_UUID)},
     ).first()
 
     if not result:
@@ -143,12 +146,14 @@ def create_demo_clients(session: Session) -> List[Client]:
         existing = session.exec(
             select(Client).where(
                 Client.email == client_data["email"],
-                Client.counselor_id == DR_SARAH_CHEN_UUID
+                Client.counselor_id == DR_SARAH_CHEN_UUID,
             )
         ).first()
 
         if existing:
-            print(f"  → Client '{client_data['name']}' already exists, using existing record")
+            print(
+                f"  → Client '{client_data['name']}' already exists, using existing record"
+            )
             created_clients.append(existing)
             continue
 
@@ -208,9 +213,7 @@ def create_demo_rooms(session: Session, clients: List[Client]) -> List[Room]:
 
 
 def create_consultation_records(
-    session: Session,
-    rooms: List[Room],
-    bucket_name: str
+    session: Session, rooms: List[Room], bucket_name: str
 ) -> List[ConsultationRecord]:
     """Create 6-9 consultation records across rooms"""
     records = []
@@ -226,7 +229,9 @@ def create_consultation_records(
         ).first()
 
         if not room_client:
-            print(f"  ⚠️  Warning: No client found for room {room.name}, skipping record")
+            print(
+                f"  ⚠️  Warning: No client found for room {room.name}, skipping record"
+            )
             continue
 
         # Generate random session date in past 2 months
@@ -239,11 +244,13 @@ def create_consultation_records(
             counselor_id=DR_SARAH_CHEN_UUID,
             session_date=session_date,
             duration_minutes=random.randint(45, 90),
-            screenshots=get_demo_screenshot_urls(bucket_name, random.randint(2, 3)),
+            screenshots=get_demo_screenshot_urls(
+                bucket_name
+            ),  # All use same reference screenshot
             game_state=get_minimal_game_state("basic_career"),
             topics=random.sample(
                 ["職涯定位", "技能盤點", "價值觀探索", "求職準備", "面試技巧", "職場適應"],
-                k=random.randint(2, 3)
+                k=random.randint(2, 3),
             ),
             notes=random.choice(CONSULTATION_NOTES_TEMPLATES),
             follow_up_required=random.choice([True, False]),
@@ -323,7 +330,7 @@ def rollback_seed_data(session: Session) -> None:
     clients = session.exec(
         select(Client).where(
             Client.counselor_id == DR_SARAH_CHEN_UUID,
-            Client.email.in_([c["email"] for c in DEMO_CLIENTS])
+            Client.email.in_([c["email"] for c in DEMO_CLIENTS]),
         )
     ).all()
     for client in clients:
@@ -341,7 +348,9 @@ def main(environment: str = "staging", rollback: bool = False):
     print(f"{'='*60}")
     print(f"Environment: {environment.upper()}")
     print(f"Bucket: {settings.gcs_bucket_name}")
-    print(f"Database: {settings.database_url.split('@')[1].split('/')[0] if '@' in settings.database_url else 'unknown'}")
+    print(
+        f"Database: {settings.database_url.split('@')[1].split('/')[0] if '@' in settings.database_url else 'unknown'}"
+    )
     print(f"{'='*60}\n")
 
     if rollback:
@@ -370,7 +379,9 @@ def main(environment: str = "staging", rollback: bool = False):
 
             # Step 4: Create consultation records
             print("\nStep 4: Creating consultation records...")
-            records = create_consultation_records(session, rooms, settings.gcs_bucket_name)
+            records = create_consultation_records(
+                session, rooms, settings.gcs_bucket_name
+            )
             session.commit()
             print(f"✓ {len(records)} records created")
 
@@ -381,9 +392,9 @@ def main(environment: str = "staging", rollback: bool = False):
             print(f"✓ {len(notes)} notes created")
 
             # Verification query
-            print("\n" + "="*60)
+            print("\n" + "=" * 60)
             print("📊 Verification Results")
-            print("="*60)
+            print("=" * 60)
 
             total_records = session.exec(
                 select(ConsultationRecord).where(
@@ -398,7 +409,9 @@ def main(environment: str = "staging", rollback: bool = False):
 
             print("\n✅ Seed completed successfully!")
             print(f"\n💡 To verify in database:")
-            print(f"   SELECT * FROM consultation_records WHERE counselor_id = '{DR_SARAH_CHEN_UUID}';")
+            print(
+                f"   SELECT * FROM consultation_records WHERE counselor_id = '{DR_SARAH_CHEN_UUID}';"
+            )
             print(f"\n🔄 To rollback this seed:")
             print(f"   python scripts/seed_demo_consultation_records.py --rollback")
 
@@ -418,12 +431,12 @@ if __name__ == "__main__":
         "--env",
         choices=["staging", "production"],
         default="staging",
-        help="Target environment (default: staging)"
+        help="Target environment (default: staging)",
     )
     parser.add_argument(
         "--rollback",
         action="store_true",
-        help="Remove demo data instead of creating it"
+        help="Remove demo data instead of creating it",
     )
 
     args = parser.parse_args()

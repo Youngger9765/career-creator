@@ -3,13 +3,11 @@
  * Renders a single client row in the desktop table view
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { Client } from '@/types/client';
 import {
   Mail,
   Phone,
-  Calendar,
-  Tag,
   Edit2,
   Trash2,
   Home,
@@ -17,7 +15,7 @@ import {
   ChevronRight,
   Eye,
   FileText,
-  MoreHorizontal,
+  MoreVertical,
 } from 'lucide-react';
 
 interface ClientTableRowProps {
@@ -45,6 +43,8 @@ export function ClientTableRow({
   onVerifyEmail,
   formatDate,
 }: ClientTableRowProps) {
+  const [showMenu, setShowMenu] = useState(false);
+
   return (
     <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
       {/* Client Info */}
@@ -119,78 +119,105 @@ export function ClientTableRow({
         </p>
       </td>
 
-      {/* Actions - 合併操作與管理 */}
+      {/* Actions */}
       <td className="px-4 py-4">
-        <div className="flex items-center gap-2">
-          {/* 主要操作：進入諮詢室 */}
+        <div className="flex items-center gap-3">
+          {/* 主要操作：進入諮詢室 - 不會斷行 */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onEnterRoom(client);
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-teal-500 hover:bg-teal-600 rounded-full transition-colors whitespace-nowrap"
             title="進入諮詢室"
             disabled={submitLoading}
           >
-            <Home className="w-3.5 h-3.5" />
+            <Home className="w-4 h-4" />
             諮詢室
           </button>
 
-          {/* 記錄按鈕 */}
+          {/* 記錄按鈕 - 獨立明顯 */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onToggleRecords(client.id);
             }}
-            className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
               isRecordsExpanded
-                ? 'text-teal-700 bg-teal-50'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'text-white bg-[#0056A7]'
+                : 'text-[#0056A7] bg-[#0056A7]/10 hover:bg-[#0056A7]/20'
             }`}
             title="查看諮詢記錄"
           >
-            <FileText className="w-3.5 h-3.5" />
+            <FileText className="w-4 h-4" />
+            記錄
             {isRecordsExpanded ? (
-              <ChevronDown className="w-3.5 h-3.5" />
+              <ChevronDown className="w-4 h-4" />
             ) : (
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-4 h-4" />
             )}
           </button>
 
-          {/* 分隔線 */}
-          <div className="w-px h-6 bg-gray-200 mx-1" />
+          {/* 三點選單 */}
+          <div className="relative">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+              title="更多操作"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
 
-          {/* 次要操作 */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewClient(client);
-            }}
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="檢視詳情"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditClient(client);
-            }}
-            className="p-1.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-            title="編輯"
-          >
-            <Edit2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDeleteClient(client.id, client.name);
-            }}
-            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-            title="刪除"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+            {/* 下拉選單 */}
+            {showMenu && (
+              <>
+                {/* 點擊外部關閉 */}
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowMenu(false)}
+                />
+                <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewClient(client);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    檢視詳情
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditClient(client);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    編輯資料
+                  </button>
+                  <div className="border-t border-gray-100 my-1" />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteClient(client.id, client.name);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    刪除客戶
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </td>
     </tr>

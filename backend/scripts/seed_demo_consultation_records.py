@@ -121,13 +121,19 @@ def get_minimal_game_state(game_rule_slug: str) -> dict:
 
 def verify_counselor_exists(session: Session) -> bool:
     """Verify Dr. Sarah Chen exists in database"""
-    counselor = session.get(User, DR_SARAH_CHEN_UUID)
-    if not counselor:
+    # Use text query to avoid schema mismatch issues
+    from sqlalchemy import text
+    result = session.exec(
+        text("SELECT id, email, name, roles FROM users WHERE id = :user_id"),
+        params={"user_id": str(DR_SARAH_CHEN_UUID)}
+    ).first()
+
+    if not result:
         print(f"❌ Error: Counselor {DR_SARAH_CHEN_EMAIL} not found in database")
         print(f"   Expected UUID: {DR_SARAH_CHEN_UUID}")
         return False
 
-    print(f"✓ Found counselor: {counselor.name} ({counselor.email})")
+    print(f"✓ Found counselor: {result[2]} ({result[1]})")
     return True
 
 

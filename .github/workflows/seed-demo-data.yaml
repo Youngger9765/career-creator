@@ -1,0 +1,159 @@
+name: Seed Demo Consultation Records
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        default: 'seed'
+        options:
+          - seed
+          - rollback
+
+jobs:
+  seed-demo-data:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Configure environment variables
+        run: |
+          cd backend
+          if [ "${{ inputs.environment }}" == "staging" ]; then
+            echo "DATABASE_URL=${{ secrets.DATABASE_POOLER_URL_STAGING }}" >> .env
+            echo "DIRECT_DATABASE_URL=${{ secrets.DATABASE_POOLER_URL_STAGING }}" >> .env
+            echo "GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME_STAGING }}" >> .env
+            echo "Environment: STAGING"
+          else
+            echo "DATABASE_URL=${{ secrets.DATABASE_POOLER_URL_PRODUCTION }}" >> .env
+            echo "DIRECT_DATABASE_URL=${{ secrets.DATABASE_POOLER_URL_PRODUCTION }}" >> .env
+            echo "GCS_BUCKET_NAME=${{ secrets.GCS_BUCKET_NAME_PRODUCTION }}" >> .env
+            echo "Environment: PRODUCTION"
+          fi
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+
+      - name: Seed demo consultation records
+        run: |
+          cd backend
+          if [ "${{ inputs.action }}" == "rollback" ]; then
+            echo "🗑️  Rolling back demo data..."
+            python scripts/seed_demo_consultation_records.py \
+              --env ${{ inputs.environment }} \
+              --rollback
+          else
+            echo "🌱 Seeding demo data..."
+            # Production requires manual confirmation - auto-confirm in CI
+            if [ "${{ inputs.environment }}" == "production" ]; then
+              echo "CONFIRM" | python scripts/seed_demo_consultation_records.py \
+                --env ${{ inputs.environment }}
+            else
+              python scripts/seed_demo_consultation_records.py \
+                --env ${{ inputs.environment }}
+            fi
+          fi
+
+      - name: Verify results
+        if: inputs.action == 'seed'
+        run: |
+          cd backend
+          python -c "
+from app.core.database import engine
+from sqlmodel import Session, text
+import sys
+
+try:
+    with Session(engine) as session:
+        # Count total records
+        result = session.exec(
+            text('''
+SELECT COUNT(*) as total,
+       COUNT(DISTINCT room_id) as rooms,
+       COUNT(DISTINCT client_id) as clients,
+       MIN(session_date) as earliest,
+       MAX(session_date) as latest
+FROM consultation_records
+WHERE counselor_id = '00000000-0000-0000-0001-000000000001'
+            ''')
+        ).first()
+
+        print('\n' + '='*60)
+        print('📊 Verification Results')
+        print('='*60)
+        print(f'Total consultation records: {result[0]}')
+        print(f'Unique rooms: {result[1]}')
+        print(f'Unique clients: {result[2]}')
+        print(f'Date range: {result[3]} to {result[4]}')
+        print('='*60 + '\n')
+
+        # Check if data was created
+        if result[0] == 0:
+            print('❌ ERROR: No records were created!')
+            sys.exit(1)
+
+        # Verify counselor notes exist
+        notes = session.exec(
+            text('''
+SELECT COUNT(*) FROM counselor_notes cn
+JOIN rooms r ON r.id = cn.room_id
+WHERE r.counselor_id = '00000000-0000-0000-0001-000000000001'
+            ''')
+        ).first()
+
+        print(f'Counselor notes: {notes[0]}')
+
+        if notes[0] == 0:
+            print('⚠️  WARNING: No counselor notes were created!')
+
+        print('\n✅ Seed verification passed!\n')
+
+except Exception as e:
+    print(f'\n❌ Verification failed: {e}\n')
+    sys.exit(1)
+"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Seed Demo Data - Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment**: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Action**: ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ inputs.action }}" == "seed" ]; then
+            echo "✅ Demo consultation records created for Dr. Sarah Chen" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Next Steps**:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Login as \`demo.counselor@example.com\` / \`demo123\`" >> $GITHUB_STEP_SUMMARY
+            echo "2. Navigate to consultation records page" >> $GITHUB_STEP_SUMMARY
+            echo "3. Verify 6-9 records are visible" >> $GITHUB_STEP_SUMMARY
+            echo "4. (Optional) Upload demo screenshots to GCS" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "🗑️  Demo data has been rolled back" >> $GITHUB_STEP_SUMMARY
+          fi

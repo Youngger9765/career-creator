@@ -24,7 +24,7 @@ export default function HomePage() {
       setIsCheckingAuth(false);
     }
     if (isDevelopment) {
-      loadDemoAccounts();
+    loadDemoAccounts();
     }
   }, [router, loadDemoAccounts, isDevelopment]);
 
@@ -359,7 +359,7 @@ export default function HomePage() {
       )}
 
       {/* Footer */}
-      <footer className="py-12 bg-white border-t border-gray-100">
+      <footer className="py-12 bg-[#2D3436]">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
@@ -369,15 +369,15 @@ export default function HomePage() {
                   alt="職游 navicareer"
                   width={140}
                   height={45}
-                  className="opacity-70 hover:opacity-100 transition-opacity"
+                  className="opacity-80 hover:opacity-100 transition-opacity"
                 />
               </a>
             </div>
-            <p className="text-sm text-gray-400 text-center md:text-right max-w-md">
+            <p className="text-sm text-gray-300 text-center md:text-right max-w-md">
               職游是職涯助人者的成長導航，期待無論是助人者還是來訪者，都能發揮所長，熱愛自己的生活！
             </p>
-          </div>
-          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+              </div>
+          <div className="mt-8 pt-6 border-t border-gray-600 text-center">
             <p className="text-xs text-gray-400">
               © {new Date().getFullYear()} 職游 Career Creator. All rights reserved.
             </p>

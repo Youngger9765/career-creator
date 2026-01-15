@@ -43,6 +43,7 @@ export interface DropZoneProps {
   headerClassName?: string;
   contentClassName?: string;
   dragOverColor?: string;
+  zoneColorScheme?: 'default' | 'green' | 'red' | 'yellow'; // 區域顏色主題
 
   // 卡片尺寸配置
   cardWidth?: string | number; // 預設 '90px'
@@ -93,6 +94,7 @@ const DropZone: React.FC<DropZoneProps> = ({
   headerClassName = '',
   contentClassName = '',
   dragOverColor = 'border-blue-500 bg-blue-50 dark:bg-blue-900/20',
+  zoneColorScheme = 'default',
   cardWidth = '180px',
   cardHeight = '240px',
   showCardNumbers = true,
@@ -222,8 +224,18 @@ const DropZone: React.FC<DropZoneProps> = ({
 
   const isOverLimit = placedCardIds.length >= maxCards;
 
-  // 根據卡片ID決定背景色
+  // 根據區域顏色主題或卡片ID決定背景色
   const getCardBackground = (cardId: string) => {
+    // 如果有指定區域顏色主題，優先使用
+    if (zoneColorScheme === 'green') {
+      return 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-green-300 dark:border-green-600';
+    } else if (zoneColorScheme === 'red') {
+      return 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/30 dark:to-rose-900/30 border-red-300 dark:border-red-600';
+    } else if (zoneColorScheme === 'yellow') {
+      return 'bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 border-yellow-300 dark:border-yellow-600';
+    }
+    
+    // 預設根據卡片ID判斷
     if (cardId.startsWith('mindset_')) {
       return 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700';
     } else if (cardId.startsWith('action_')) {

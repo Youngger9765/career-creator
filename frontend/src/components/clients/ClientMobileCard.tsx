@@ -16,8 +16,8 @@ import {
   ChevronDown,
   ChevronRight,
   Eye,
-  CheckCircle,
-  AlertCircle,
+  FileText,
+  MoreVertical,
 } from 'lucide-react';
 
 interface ClientMobileCardProps {
@@ -43,104 +43,140 @@ export function ClientMobileCard({
   onDeleteClient,
   formatDate,
 }: ClientMobileCardProps) {
+  const [showMenu, setShowMenu] = React.useState(false);
+
   return (
-    <div className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Client Header */}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            {client.name}
-          </h3>
-          {client.tags && client.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {client.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                >
-                  <Tag className="w-3 h-3 mr-1" />
-                  {tag}
-                </span>
-              ))}
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          {/* Avatar */}
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+            {client.name.charAt(0)}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-bold text-gray-900 truncate">
+              {client.name}
+            </h3>
+
+            {/* Contact Info */}
+            <div className="mt-1 space-y-0.5">
+              {client.email && (
+                <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                  <Mail className="w-3 h-3" />
+                  <span className="truncate">{client.email}</span>
+                </div>
+              )}
+              {client.phone && (
+                <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                  <Phone className="w-3 h-3" />
+                  <span>{client.phone}</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Contact Info */}
-      <div className="space-y-2 mb-3 text-sm">
-        {client.email ? (
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <span className="text-gray-700 dark:text-gray-300 truncate flex-1">{client.email}</span>
-            {/* Email verification icons - Hidden for now */}
-            {false && client.email_verified ? (
-              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-            ) : false ? (
-              <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
-            ) : null}
           </div>
-        ) : null}
-        {client.phone && (
-          <div className="flex items-center gap-2">
-            <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <span className="text-gray-700 dark:text-gray-300">{client.phone}</span>
+
+          {/* More Menu */}
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
+
+            {showMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowMenu(false)}
+                />
+                <div className="absolute right-0 top-full mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-20">
+                  <button
+                    onClick={() => {
+                      onViewClient(client);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <Eye className="w-4 h-4" />
+                    檢視
+                  </button>
+                  <button
+                    onClick={() => {
+                      onEditClient(client);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-amber-600 hover:bg-amber-50 flex items-center gap-2"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    編輯
+                  </button>
+                  <button
+                    onClick={() => {
+                      onDeleteClient(client.id, client.name);
+                      setShowMenu(false);
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    刪除
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Tags */}
+        {client.tags && client.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {client.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         )}
+
+        {/* Last Consultation */}
         {client.last_consultation_date && (
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <span className="text-gray-500 dark:text-gray-400 text-xs">
-              最後諮詢: {formatDate(client.last_consultation_date)}
-            </span>
+          <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-400">
+            <Calendar className="w-3 h-3" />
+            <span>最後諮詢: {formatDate(client.last_consultation_date)}</span>
           </div>
         )}
       </div>
-
-      {/* Notes */}
-      {client.notes && (
-        <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-800 rounded text-sm">
-          <p className="text-gray-600 dark:text-gray-400 line-clamp-2">{client.notes}</p>
-        </div>
-      )}
 
       {/* Action Buttons */}
-      <div className="flex gap-2">
+      <div className="px-4 pb-4 flex gap-2">
         <button
           onClick={() => onEnterRoom(client)}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 rounded-xl transition-all shadow-sm"
           disabled={submitLoading}
         >
           <Home className="w-4 h-4" />
-          進入諮詢室
+          諮詢室
         </button>
         <button
           onClick={() => onToggleRecords(client.id)}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-all ${
+            isRecordsExpanded
+              ? 'bg-amber-500 text-white'
+              : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+          }`}
         >
+          <FileText className="w-4 h-4" />
+          記錄
           {isRecordsExpanded ? (
             <ChevronDown className="w-4 h-4" />
           ) : (
             <ChevronRight className="w-4 h-4" />
           )}
-        </button>
-        <button
-          onClick={() => onViewClient(client)}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <Eye className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => onEditClient(client)}
-          className="px-4 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-        >
-          <Edit2 className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => onDeleteClient(client.id, client.name)}
-          className="px-4 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-        >
-          <Trash2 className="w-4 h-4" />
         </button>
       </div>
     </div>

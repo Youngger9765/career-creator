@@ -345,7 +345,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
             </div>
 
             {/* Mobile Card View */}
-            <div className="lg:hidden divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="lg:hidden p-4 space-y-4">
               {filteredClients.map((client) => (
                 <React.Fragment key={client.id}>
                   <ClientMobileCard
@@ -365,15 +365,15 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
 
                   {/* Expanded Records for Mobile */}
                   {expandedRecords.has(client.id) && (
-                    <div className="bg-gray-50 dark:bg-gray-800 p-4">
-                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-3">
+                    <div className="bg-amber-50 rounded-2xl p-4 -mt-2 border border-amber-100">
+                      <h4 className="text-sm font-semibold text-amber-800 flex items-center gap-2 mb-3">
                         <Activity className="w-4 h-4" />
                         諮詢記錄
                       </h4>
 
                       {loadingRecords.has(client.id) ? (
                         <div className="text-center py-4">
-                          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
                           <p className="mt-2 text-sm text-gray-500">載入記錄中...</p>
                         </div>
                       ) : clientRecords[client.id] && clientRecords[client.id].length > 0 ? (
@@ -381,18 +381,17 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                           {clientRecords[client.id].map((record) => (
                             <div
                               key={record.id}
-                              className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                              className="bg-white rounded-xl p-4 border border-gray-100"
                             >
                               <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-sm">
-                                  <Clock className="w-4 h-4 text-gray-400" />
-                                  <p className="font-medium text-gray-900 dark:text-gray-100">
-                                    {formatDate(record.session_date)}
-                                  </p>
-                                </div>
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-full">
-                                  <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <Clock className="w-4 h-4 text-gray-400" />
+                                    <p className="font-medium text-gray-700">
+                                      {formatDate(record.session_date)}
+                                    </p>
+                                  </div>
+                                  <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-teal-700 bg-teal-50 rounded-full">
                                     {(record.game_state?.gameplay &&
                                       GAMEPLAY_NAMES[record.game_state.gameplay]) ||
                                       record.game_rule_name ||
@@ -400,24 +399,22 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                   </span>
                                 </div>
                                 {record.notes && (
-                                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                                      {record.notes}
-                                    </p>
-                                  </div>
+                                  <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+                                    {record.notes}
+                                  </p>
                                 )}
                                 {record.screenshots && record.screenshots.length > 0 && (
-                                  <div className="space-y-2">
+                                  <div className="flex gap-2 overflow-x-auto pb-1">
                                     {record.screenshots.map((url, idx) => (
                                       <button
                                         key={idx}
                                         onClick={() => setSelectedImage(url)}
-                                        className="w-full rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all"
+                                        className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 hover:opacity-80 transition-opacity"
                                       >
                                         <img
                                           src={url}
-                                          alt={`Screenshot ${idx + 1}`}
-                                          className="w-full h-auto object-contain bg-gray-100 dark:bg-gray-700"
+                                          alt={`截圖 ${idx + 1}`}
+                                          className="w-full h-full object-cover"
                                         />
                                       </button>
                                     ))}
@@ -428,7 +425,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div className="text-center py-4 text-sm text-gray-400">
                           尚無諮詢記錄
                         </div>
                       )}

@@ -127,15 +127,40 @@ export default function RoomPage() {
   // IMPORTANT: Use useMemo to prevent re-creating object on every render
   const currentUserInfo = useMemo(() => {
     if (!isReady) return undefined;
+
+    // For visitors, use same ID format as Presence (matches use-presence.ts)
+    if (isVisitor) {
+      let visitorId: string | undefined = undefined;
+
+      if (typeof window !== 'undefined') {
+        const visitorSessionStr = localStorage.getItem('visitor_session');
+        if (visitorSessionStr) {
+          try {
+            const visitorSession = JSON.parse(visitorSessionStr);
+            const sessionId = visitorSession.session_id || visitorSession.visitor_id;
+            if (sessionId && visitorSession.room_id === roomId) {
+              visitorId = `visitor_${sessionId}`;
+            }
+          } catch (e) {
+            console.error(`Failed to parse visitor_session for room ${roomId}:`, e);
+          }
+        }
+      }
+
+      return {
+        id: visitorId || `visitor-${visitorName || urlVisitorName}`,
+        name: visitorName || urlVisitorName,
+        type: 'visitor' as const,
+      };
+    }
+
+    // For authenticated users
     return {
-      id: user?.id || (isVisitor ? `visitor-${visitorName || urlVisitorName}` : 'current-user'),
-      name: isVisitor ? visitorName || urlVisitorName : user?.name || 'User',
-      type: (isVisitor ? 'visitor' : isCounselor ? 'counselor' : 'user') as
-        | 'counselor'
-        | 'visitor'
-        | 'user',
+      id: user?.id || 'current-user',
+      name: user?.name || 'User',
+      type: (isCounselor ? 'counselor' : 'user') as 'counselor' | 'user',
     };
-  }, [isReady, user?.id, user?.name, isVisitor, visitorName, urlVisitorName, isCounselor]);
+  }, [isReady, user?.id, user?.name, isVisitor, visitorName, urlVisitorName, isCounselor, roomId]);
 
   const {
     participants,

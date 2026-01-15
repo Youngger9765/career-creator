@@ -184,6 +184,7 @@ class ClientUpdate(SQLModel):
     """Model for updating client information."""
 
     name: Optional[str] = Field(default=None, max_length=100)
+    email: Optional[str] = Field(default=None, max_length=255)
     phone: Optional[str] = Field(default=None, max_length=50)
     notes: Optional[str] = Field(default=None)
     tags: Optional[List[str]] = Field(default=None)

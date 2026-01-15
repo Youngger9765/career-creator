@@ -50,6 +50,7 @@ export interface ClientCreate {
 
 export interface ClientUpdate {
   name?: string;
+  email?: string;
   phone?: string;
   notes?: string;
   tags?: string[];

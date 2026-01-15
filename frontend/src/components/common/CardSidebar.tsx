@@ -316,6 +316,7 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
                       category={card.category}
                       type={deck.type}
                       imageUrl={card.imageUrl}
+                      imageSize="S"
                       isDraggable={true}
                     />
                   </div>
@@ -501,6 +502,8 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
                             description={card.description}
                             category={card.category}
                             type={deck.type}
+                            imageUrl={card.imageUrl}
+                            imageSize="S"
                             isDraggable={true}
                           />
                         </div>

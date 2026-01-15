@@ -810,7 +810,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                                   dominantBaseline="middle"
                                   className="pointer-events-none"
                                 >
-                                  {percentage.toFixed(1)}%
+                                  {Math.round(percentage)}%
                                 </text>
                               </g>
                             );
@@ -855,14 +855,14 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
 
                       {/* 中心文字 */}
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <div className="text-center bg-white dark:bg-gray-100 rounded-full w-32 h-32 md:w-36 md:h-36 flex flex-col items-center justify-center shadow-sm">
+                        <div className="text-center bg-white dark:bg-gray-100 rounded-full w-16 h-16 md:w-20 md:h-20 flex flex-col items-center justify-center shadow-sm">
                           {/* 分數形式顯示 */}
                           <div className="flex flex-col items-center leading-none">
-                            <div className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-900">
+                            <div className="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-900">
                               {usedTokens}
                             </div>
-                            <div className="w-full h-0.5 bg-gray-400 dark:bg-gray-500 my-1.5"></div>
-                            <div className="text-xl md:text-2xl font-medium text-gray-600 dark:text-gray-700">
+                            <div className="w-full h-0.5 bg-gray-400 dark:bg-gray-500 my-0.5"></div>
+                            <div className="text-sm md:text-base font-medium text-gray-600 dark:text-gray-700">
                               {totalTokens}
                             </div>
                           </div>
@@ -902,7 +902,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                         };
 
                         const percentage =
-                          totalTokens > 0 ? ((tokens / totalTokens) * 100).toFixed(1) : '0';
+                          totalTokens > 0 ? Math.round((tokens / totalTokens) * 100) : 0;
 
                         return (
                           <div

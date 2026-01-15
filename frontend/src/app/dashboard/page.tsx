@@ -104,7 +104,7 @@ export default function DashboardPage() {
             {!sidebarCollapsed && (
               <Link href="/" className="flex items-center gap-2">
                 <Image
-                  src="/images/logo.png"
+                  src="/logos/current/logo.png"
                   alt="職游 Logo"
                   width={120}
                   height={40}
@@ -257,7 +257,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <Link href="/" className="flex items-center gap-2">
                 <Image
-                  src="/images/logo.png"
+                  src="/logos/current/logo.png"
                   alt="職游 Logo"
                   width={100}
                   height={32}

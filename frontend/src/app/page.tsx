@@ -71,7 +71,7 @@ export default function HomePage() {
               {/* Logo */}
               <div className="mb-4">
                 <Image
-                  src="/images/logo.png"
+                  src="/logos/current/logo.png"
                   alt="職游 Logo"
                   width={200}
                   height={70}
@@ -365,7 +365,7 @@ export default function HomePage() {
             <div className="flex items-center gap-4">
               <a href="https://navicareer.tw" target="_blank" rel="noopener noreferrer">
                 <Image
-                  src="/images/navicareer-logo.png"
+                  src="/logos/current/logo-light.png"
                   alt="職游 navicareer"
                   width={140}
                   height={45}

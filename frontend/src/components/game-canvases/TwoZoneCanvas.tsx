@@ -125,7 +125,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
 
   return (
     <div className={`w-full h-full overflow-y-auto ${className}`}>
-      <div className="min-h-full grid grid-cols-2 gap-4 p-4">
+      <div className="min-h-full grid grid-cols-2 gap-6 lg:gap-8 p-8 lg:p-12">
         {/* 優勢區域 */}
         <DropZone
           id="advantage-zone"

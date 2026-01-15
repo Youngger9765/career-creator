@@ -11,7 +11,7 @@ describe('CardLoaderService - Gameplay Card Filtering', () => {
   });
 
   describe('advantage_analysis (優劣勢分析)', () => {
-    it('should only return mindset cards (skill-inventory 11-52)', async () => {
+    it('should return all 52 skill cards (action + mindset)', async () => {
       const decks = await CardLoaderService.getDecksForGameplay('advantage_analysis');
 
       expect(decks.main).toBeDefined();
@@ -19,19 +19,17 @@ describe('CardLoaderService - Gameplay Card Filtering', () => {
 
       const cards = decks.main!.cards;
 
-      // Should have 42 mindset cards (skill-inventory 11-52)
-      expect(cards.length).toBe(42);
+      // Should have all 52 cards
+      expect(cards.length).toBe(52);
 
-      // All cards should have category "mindset"
-      cards.forEach((card) => {
-        expect(card.category).toBe('mindset');
-      });
-
-      // Should NOT include action cards (01-10)
-      const hasActionCard = cards.some(
-        (card) => card.id === 'skill_001' || card.category === 'hard' || card.category === 'soft'
+      // Should include both action cards (01-10) and mindset cards (11-52)
+      const actionCards = cards.filter(
+        (card) => card.category === 'hard' || card.category === 'soft'
       );
-      expect(hasActionCard).toBe(false);
+      const mindsetCards = cards.filter((card) => card.category === 'mindset');
+
+      expect(actionCards.length).toBe(10);
+      expect(mindsetCards.length).toBe(42);
     });
   });
 

@@ -46,7 +46,7 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
     ...(state.cardPlacements.disadvantageCards || []),
   ]);
 
-  // 載入牌組 - 使用 getDecksForGameplay 來取得過濾後的牌組（只有心態卡）
+  // 載入牌組 - 使用 getDecksForGameplay 取得完整職能盤點卡牌組
   useEffect(() => {
     const getDeck = async () => {
       const cardLoader = CardLoaderService;

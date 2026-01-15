@@ -329,10 +329,10 @@ const DropZone: React.FC<DropZoneProps> = ({
           </button>
         )}
 
-        {/* 卡片內容 - 直立長方形 */}
+        {/* 卡片內容 */}
         <div
           className={`rounded-lg shadow-sm hover:shadow-lg transition-all cursor-move flex flex-col relative overflow-hidden`}
-          style={{ aspectRatio: '461/771' }}
+          style={{ width: cardWidth, height: cardHeight }}
         >
           {/* 底部按鈕組 - 查看大卡 & 翻轉 */}
           <div className="absolute bottom-2 left-2 right-2 flex gap-1.5 z-20">

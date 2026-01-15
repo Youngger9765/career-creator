@@ -252,19 +252,11 @@ export class CardLoaderService {
           main: (await this.getDeck('profession-collector')) || undefined,
         };
 
-      case 'advantage_analysis': {
-        // 優劣勢分析：只使用心態卡（mindset cards 11-52）
-        const fullDeck = await this.getDeck('skill_cards_52');
-        if (!fullDeck) return {};
-
-        const mindsetCards = fullDeck.cards.filter((card) => card.category === 'mindset');
+      case 'advantage_analysis':
+        // 優劣勢分析：使用全部 52 張職能盤點卡
         return {
-          main: {
-            ...fullDeck,
-            cards: mindsetCards,
-          },
+          main: (await this.getDeck('skill_cards_52')) || undefined,
         };
-      }
 
       case 'growth_planning':
       case 'position_breakdown':

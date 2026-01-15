@@ -138,6 +138,8 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 className="h-full"
                 headerClassName="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20"
                 contentClassName="flex items-center justify-center"
+                viewMode={viewMode}
+                onViewModeChange={onViewModeChange}
               />
             ))}
         </div>

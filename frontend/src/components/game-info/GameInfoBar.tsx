@@ -8,6 +8,7 @@
 'use client';
 
 import React from 'react';
+import { Compass, Gamepad2, Layout, Layers } from 'lucide-react';
 
 interface GameInfoBarProps {
   mode: string;
@@ -30,44 +31,58 @@ const GameInfoBar: React.FC<GameInfoBarProps> = ({
 }) => {
   return (
     <div
-      className={`bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-3 sm:px-6 py-2 sm:py-3 ${className}`}
+      className={`bg-white border-b border-gray-100 px-4 sm:px-6 py-3 ${className}`}
     >
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        {/* Desktop: 水平排列 */}
-        <div className="hidden sm:flex items-center space-x-6 text-sm">
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-500 dark:text-gray-400">模式:</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">{mode}</span>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        {/* Desktop: pill 標籤樣式 */}
+        <div className="hidden sm:flex items-center gap-3 flex-wrap">
+          {/* 模式 - 深海藍 */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#0056A7]/10 rounded-full">
+            <Compass className="w-4 h-4 text-[#0056A7]" />
+            <span className="text-sm font-medium text-[#0056A7]">{mode}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-500 dark:text-gray-400">玩法:</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">{gameplay}</span>
+          
+          {/* 玩法 - 品牌金 */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#FFCC3A]/20 rounded-full">
+            <Gamepad2 className="w-4 h-4 text-[#B8860B]" />
+            <span className="text-sm font-medium text-[#B8860B]">{gameplay}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-500 dark:text-gray-400">畫布:</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">{canvas}</span>
+          
+          {/* 畫布 - 職游青 */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#7AB7B7]/20 rounded-full">
+            <Layout className="w-4 h-4 text-[#5A9A9A]" />
+            <span className="text-sm font-medium text-[#5A9A9A]">{canvas}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-500 dark:text-gray-400">牌卡:</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">{deckName}</span>
+          
+          {/* 牌卡 - 灰色 */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full">
+            <Layers className="w-4 h-4 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">{deckName}</span>
           </div>
         </div>
 
         {/* Mobile: 精簡顯示 */}
-        <div className="sm:hidden flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900 dark:text-gray-100">{gameplay}</span>
-            <span className="text-gray-400">•</span>
-            <span className="text-gray-600 dark:text-gray-400">{deckName}</span>
+        <div className="sm:hidden flex items-center justify-between">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#0056A7]/10 rounded-full text-xs font-medium text-[#0056A7]">
+              {mode}
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#FFCC3A]/20 rounded-full text-xs font-medium text-[#B8860B]">
+              {gameplay}
+            </span>
           </div>
-          <div className="text-gray-500 dark:text-gray-400">
+          <div className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
             {availableCards}/{totalCards}
           </div>
         </div>
 
-        {/* Card count - Desktop only */}
-        <div className="hidden sm:block text-xs text-gray-500 dark:text-gray-400">
-          總卡片: {totalCards} 張 | 可用: {availableCards} 張
+        {/* Card count - Desktop */}
+        <div className="hidden sm:flex items-center gap-2 text-sm">
+          <span className="text-gray-400">總卡片</span>
+          <span className="font-bold text-gray-700">{totalCards}</span>
+          <span className="text-gray-300">|</span>
+          <span className="text-gray-400">可用</span>
+          <span className="font-bold text-[#7AB7B7]">{availableCards}</span>
         </div>
       </div>
     </div>

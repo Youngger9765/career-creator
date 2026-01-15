@@ -571,25 +571,25 @@ const DropZone: React.FC<DropZoneProps> = ({
         ? renderHeader()
         : (title || subtitle || showCounter) && (
             <div
-              className={`flex-shrink-0 px-4 py-3 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 ${headerClassName}`}
+              className={`flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700 ${headerClassName || 'bg-gray-50 dark:bg-gray-900'}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  {Icon && <Icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />}
+                  {Icon && <Icon className={`w-5 h-5 ${headerClassName?.includes('text-white') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />}
                   <div className="flex-1">
                     {title && (
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      <h3 className={`text-sm font-bold ${headerClassName?.includes('text-white') ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
                         {title}
                       </h3>
                     )}
                     <div className="flex items-center gap-2 mt-0.5">
                       {subtitle && (
-                        <p className="text-xs text-gray-600 dark:text-gray-400">{subtitle}</p>
+                        <p className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/80' : 'text-gray-600 dark:text-gray-400'}`}>{subtitle}</p>
                       )}
                       {/* 數量編輯器 - 簡化版 */}
                       {isEditable && showCounter && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs text-gray-500 dark:text-gray-400">上限:</span>
+                          <span className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>上限:</span>
                           <input
                             type="text"
                             value={tempMaxCards.toString()}
@@ -616,7 +616,7 @@ const DropZone: React.FC<DropZoneProps> = ({
                             className="w-10 text-xs text-center px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-900 dark:text-gray-100 font-medium"
                             onFocus={(e) => e.target.select()}
                           />
-                          <span className="text-xs text-gray-500 dark:text-gray-400">張</span>
+                          <span className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>張</span>
                         </div>
                       )}
                     </div>
@@ -624,7 +624,7 @@ const DropZone: React.FC<DropZoneProps> = ({
                 </div>
                 <div className="flex items-center space-x-2">
                   {/* 視圖模式切換 */}
-                  <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-md p-0.5">
+                  <div className={`flex items-center gap-1 rounded-md p-0.5 ${headerClassName?.includes('text-white') ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-800'}`}>
                     <button
                       onClick={() => setViewMode('grid')}
                       className={`p-1.5 rounded transition-colors ${

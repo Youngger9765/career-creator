@@ -387,22 +387,19 @@ export default function RoomPage() {
 
   return (
     <div className="h-screen bg-gradient-to-br from-amber-50/50 via-white to-teal-50/50 flex flex-col overflow-hidden">
-      {/* 頂部標題欄 - Fixed position */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-3 sm:px-6 py-3 sm:py-4 gap-3">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full lg:w-auto">
-            {/* 退出按鈕 - 只在選擇遊戲模式時顯示 */}
+      {/* 頂部標題欄 - 重新設計 */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-200">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 gap-4">
+          {/* 左側：退出 + 諮詢室名稱 */}
+          <div className="flex items-center gap-3 min-w-0">
+            {/* 退出按鈕 - ghost 樣式 */}
             {!currentGameplay && (
               <button
                 onClick={() => setShowExitDialog(true)}
-                className="px-3 py-1.5 sm:py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors flex items-center gap-2 font-medium text-sm"
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                title="退出諮詢室"
               >
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -410,70 +407,88 @@ export default function RoomPage() {
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   />
                 </svg>
-                <span className="hidden sm:inline">退出諮詢室</span>
-                <span className="sm:hidden">退出</span>
               </button>
             )}
 
+            {/* 切換遊戲模式按鈕 */}
+            {isCounselor && showNewArchitecture && currentGameplay && (
+              <button
+                onClick={() => setCurrentGameplay('')}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                title="切換遊戲模式"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  />
+                </svg>
+              </button>
+            )}
+
+            {/* 分隔線 */}
+            <div className="w-px h-6 bg-gray-200 hidden sm:block" />
+
+            {/* 諮詢室名稱 */}
             {currentRoom && (
-              <div className="flex-1">
-                <h1 className="text-base sm:text-xl font-bold text-gray-800 dark:text-gray-200">
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-gray-900 truncate">
                   {currentRoom.name}
                 </h1>
                 {currentRoom.description && (
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
+                  <p className="text-xs text-gray-500 truncate hidden sm:block">
                     {currentRoom.description}
                   </p>
                 )}
               </div>
             )}
+          </div>
 
-            {/* 切換遊戲模式按鈕 - 僅諮詢師在已選擇遊戲時顯示 */}
-            {isCounselor && showNewArchitecture && currentGameplay && (
-              <>
-                <button
-                  onClick={() => setCurrentGameplay('')}
-                  className="px-2 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 shadow-sm"
-                >
-                  <svg
-                    className="w-3 h-3 sm:w-4 sm:h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                    />
-                  </svg>
-                  <span className="hidden sm:inline">切換遊戲模式</span>
-                  <span className="sm:hidden">切換</span>
-                </button>
-              </>
-            )}
-
-            {/* 參與者列表 */}
+          {/* 中間：線上人數 */}
+          <div className="hidden md:flex items-center">
             <ParticipantList
               participants={participants as any}
               onlineCount={onlineCount}
               isLoading={participantsLoading}
-              className="hidden sm:block"
+              className=""
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:space-x-4 w-full lg:w-auto text-xs sm:text-sm">
-            <div className="text-gray-600 truncate max-w-full">
+          {/* 右側：用戶資訊 + 分享碼 + 狀態 */}
+          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+            {/* 用戶名稱 */}
+            <div className="hidden sm:block text-sm font-medium text-gray-700">
               {isVisitor
-                ? `訪客: ${visitorName || urlVisitorName}`
-                : `${user?.name} (${user?.roles?.join(', ')})`}
+                ? visitorName || urlVisitorName
+                : user?.name}
             </div>
+
+            {/* 分享碼 - 明顯的複製按鈕 */}
             {currentRoom && (
-              <div className="text-gray-500 hidden sm:block">分享碼: {currentRoom.share_code}</div>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full">
+                <span className="text-xs text-gray-500 hidden sm:inline">分享碼</span>
+                <span className="text-sm font-mono font-bold text-gray-800">{currentRoom.share_code}</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(currentRoom.share_code || '');
+                  }}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                  title="複製分享碼"
+                >
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
             )}
-            {/* 同步資訊圖標移到這裡 */}
-            <div id="sync-status-container" className="relative"></div>
+
+            {/* 狀態燈 */}
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" title="連線中" />
+              <div id="sync-status-container" className="relative"></div>
+            </div>
           </div>
         </div>
       </div>

@@ -9,9 +9,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { GameModeService, GameMode, Gameplay } from '../services/mode.service';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { GAMEPLAY_IDS } from '@/constants/game-modes';
 import {
   Users,
@@ -24,6 +21,7 @@ import {
   Layers,
   Navigation,
   RefreshCcw,
+  ArrowRight,
 } from 'lucide-react';
 
 interface GameOption {
@@ -34,8 +32,6 @@ interface GameOption {
   gameplayName: string;
   description: string;
   icon: React.ReactNode;
-  color: string;
-  gradient: string;
 }
 
 interface CombinedGameSelectorProps {
@@ -55,7 +51,6 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
 }) => {
   const [gameOptions, setGameOptions] = useState<GameOption[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
 
   useEffect(() => {
     // 載入所有遊戲模式和玩法組合
@@ -72,8 +67,6 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
           gameplayName: gameplay.name,
           description: gameplay.description || '',
           icon: getGameplayIcon(gameplay.id),
-          color: getModeColor(mode.id),
-          gradient: getModeGradient(mode.id),
         });
       });
     });
@@ -87,7 +80,7 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
   }, [currentMode, currentGameplay]);
 
   const getGameplayIcon = (gameplayId: string) => {
-    const iconClass = 'w-6 h-6';
+    const iconClass = 'w-5 h-5';
     switch (gameplayId) {
       case 'personality_analysis':
         return <Sparkles className={iconClass} />;
@@ -108,29 +101,45 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
     }
   };
 
-  const getModeColor = (modeId: string) => {
+  // 模式配色 - 使用品牌色
+  const getModeStyles = (modeId: string) => {
     switch (modeId) {
       case 'career_traveler':
-        return 'bg-purple-500';
+        return {
+          bg: 'bg-blue-50',
+          border: 'border-blue-200',
+          text: 'text-blue-700',
+          icon: 'bg-blue-500',
+          hover: 'hover:border-blue-300 hover:bg-blue-50/80',
+          selected: 'border-blue-500 bg-blue-50 ring-2 ring-blue-200',
+        };
       case 'skill_inventory':
-        return 'bg-blue-500';
+        return {
+          bg: 'bg-amber-50',
+          border: 'border-amber-200',
+          text: 'text-amber-700',
+          icon: 'bg-amber-500',
+          hover: 'hover:border-amber-300 hover:bg-amber-50/80',
+          selected: 'border-amber-500 bg-amber-50 ring-2 ring-amber-200',
+        };
       case 'value_navigation':
-        return 'bg-green-500';
+        return {
+          bg: 'bg-teal-50',
+          border: 'border-teal-200',
+          text: 'text-teal-700',
+          icon: 'bg-teal-500',
+          hover: 'hover:border-teal-300 hover:bg-teal-50/80',
+          selected: 'border-teal-500 bg-teal-50 ring-2 ring-teal-200',
+        };
       default:
-        return 'bg-gray-500';
-    }
-  };
-
-  const getModeGradient = (modeId: string) => {
-    switch (modeId) {
-      case 'career_traveler':
-        return 'from-purple-400 to-purple-600';
-      case 'skill_inventory':
-        return 'from-blue-400 to-blue-600';
-      case 'value_navigation':
-        return 'from-green-400 to-green-600';
-      default:
-        return 'from-gray-400 to-gray-600';
+        return {
+          bg: 'bg-gray-50',
+          border: 'border-gray-200',
+          text: 'text-gray-700',
+          icon: 'bg-gray-500',
+          hover: 'hover:border-gray-300 hover:bg-gray-50/80',
+          selected: 'border-gray-500 bg-gray-50 ring-2 ring-gray-200',
+        };
     }
   };
 
@@ -165,168 +174,133 @@ const CombinedGameSelector: React.FC<CombinedGameSelectorProps> = ({
     .filter((item) => item.group);
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-8 ${className}`}>
+      {/* 標題 */}
       <div className="text-center">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">
-          選擇遊戲模式
-        </h2>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
-          選擇適合的諮詢工具和玩法
-        </p>
+        <h2 className="text-2xl font-bold text-gray-800">選擇遊戲模式</h2>
+        <p className="text-gray-500 mt-2">選擇適合的諮詢工具開始今天的諮詢</p>
       </div>
 
       {/* Desktop: 三欄式分組顯示 */}
-      <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-        {orderedGroups.map(({ modeId, group }) => (
-          <div key={modeId} className="space-y-3">
-            {/* 模式標題 */}
-            <div className="text-center">
-              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                {group.modeName}
-              </h3>
-              <div
-                className={`h-1 w-20 mx-auto bg-gradient-to-r rounded-full ${getModeGradient(modeId)}`}
-              />
-            </div>
+      <div className="hidden md:grid md:grid-cols-3 gap-6">
+        {orderedGroups.map(({ modeId, group }) => {
+          const styles = getModeStyles(modeId);
+          return (
+            <div key={modeId} className="space-y-4">
+              {/* 模式標題卡片 */}
+              <div className={`rounded-xl p-4 ${styles.bg} border ${styles.border}`}>
+                <h3 className={`text-lg font-bold ${styles.text}`}>{group.modeName}</h3>
+              </div>
 
-            {/* 該模式下的玩法卡片 */}
-            <div className="space-y-2">
-              {group.options.map((option) => {
-                const isSelected = selectedOption === option.id;
-                const isHovered = hoveredOption === option.id;
+              {/* 該模式下的玩法卡片 */}
+              <div className="space-y-3">
+                {group.options.map((option) => {
+                  const isSelected = selectedOption === option.id;
+                  const optionStyles = getModeStyles(option.modeId);
 
-                return (
-                  <Card
-                    key={option.id}
-                    className={`
-                      relative cursor-pointer transition-all duration-200
-                      ${isSelected ? 'ring-2 ring-offset-1 ring-blue-500 shadow-md' : ''}
-                      ${isHovered ? 'transform -translate-y-0.5 shadow-sm' : ''}
-                      ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-md'}
-                    `}
-                    onMouseEnter={() => !disabled && setHoveredOption(option.id)}
-                    onMouseLeave={() => setHoveredOption(null)}
-                    onClick={() => !disabled && handleOptionSelect(option)}
-                  >
-                    {/* 左側彩色條 */}
-                    <div
-                      className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b rounded-l-lg ${option.gradient}`}
-                    />
-
-                    <CardHeader className="pb-2 pt-3 px-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className={`p-1.5 rounded-md text-white ${option.color}`}>
-                            {React.cloneElement(option.icon as React.ReactElement, {
-                              className: 'w-4 h-4',
-                            })}
-                          </div>
-                          <CardTitle className="text-sm font-medium">
-                            {option.gameplayName}
-                          </CardTitle>
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => handleOptionSelect(option)}
+                      disabled={disabled}
+                      className={`
+                        w-full text-left p-4 rounded-xl border-2 transition-all duration-200
+                        ${isSelected ? optionStyles.selected : `bg-white border-gray-100 ${optionStyles.hover}`}
+                        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                      `}
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Icon */}
+                        <div
+                          className={`p-2 rounded-lg text-white flex-shrink-0 ${optionStyles.icon}`}
+                        >
+                          {option.icon}
                         </div>
-                        {isSelected && (
-                          <Badge
-                            variant="default"
-                            className="bg-blue-500 text-[10px] px-1.5 py-0.5"
-                          >
-                            選中
-                          </Badge>
-                        )}
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <h4 className="font-semibold text-gray-800">{option.gameplayName}</h4>
+                            {isSelected && (
+                              <span
+                                className={`text-xs font-medium px-2 py-0.5 rounded-full ${optionStyles.bg} ${optionStyles.text}`}
+                              >
+                                已選擇
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                            {option.description}
+                          </p>
+                        </div>
+
+                        {/* Arrow */}
+                        <ArrowRight
+                          className={`w-4 h-4 flex-shrink-0 transition-transform ${isSelected ? optionStyles.text : 'text-gray-300'}`}
+                        />
                       </div>
-                    </CardHeader>
-
-                    <CardContent className="pt-0 px-4 pb-3">
-                      <CardDescription className="text-xs leading-relaxed line-clamp-2 mb-3">
-                        {option.description}
-                      </CardDescription>
-
-                      <Button
-                        className={`
-                          w-full text-xs h-7
-                          ${
-                            isSelected
-                              ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                              : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300'
-                          }
-                        `}
-                        disabled={disabled}
-                        variant={isSelected ? 'default' : 'outline'}
-                        size="sm"
-                      >
-                        {isSelected ? '已選擇' : '選擇此玩法'}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Mobile: 列表式選擇 */}
-      <div className="md:hidden space-y-4">
-        {orderedGroups.map(({ modeId, group }) => (
-          <div key={modeId} className="space-y-2">
-            {/* 模式標題 */}
-            <div className="flex items-center gap-2 px-2">
-              <div className={`h-8 w-1 rounded-full bg-gradient-to-b ${getModeGradient(modeId)}`} />
-              <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                {group.modeName}
-              </h3>
-            </div>
+      <div className="md:hidden space-y-6">
+        {orderedGroups.map(({ modeId, group }) => {
+          const styles = getModeStyles(modeId);
+          return (
+            <div key={modeId} className="space-y-3">
+              {/* 模式標題 */}
+              <div className={`rounded-lg px-4 py-3 ${styles.bg} border ${styles.border}`}>
+                <h3 className={`font-bold ${styles.text}`}>{group.modeName}</h3>
+              </div>
 
-            {/* 該模式下的玩法按鈕 */}
-            <div className="space-y-2">
-              {group.options.map((option) => {
-                const isSelected = selectedOption === option.id;
-                return (
-                  <button
-                    key={option.id}
-                    onClick={() => !disabled && handleOptionSelect(option)}
-                    disabled={disabled}
-                    className={`
-                      w-full p-4 rounded-lg border-2 transition-all text-left
-                      ${
-                        isSelected
-                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
-                      }
-                      ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.98]'}
-                    `}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg text-white ${option.color} flex-shrink-0`}>
-                        {React.cloneElement(option.icon as React.ReactElement, {
-                          className: 'w-5 h-5',
-                        })}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-1">
-                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base">
-                            {option.gameplayName}
-                          </h4>
-                          {isSelected && (
-                            <Badge
-                              variant="default"
-                              className="bg-blue-500 text-xs px-2 py-0.5 flex-shrink-0"
-                            >
-                              ✓
-                            </Badge>
-                          )}
+              {/* 該模式下的玩法按鈕 */}
+              <div className="space-y-2">
+                {group.options.map((option) => {
+                  const isSelected = selectedOption === option.id;
+                  const optionStyles = getModeStyles(option.modeId);
+
+                  return (
+                    <button
+                      key={option.id}
+                      onClick={() => handleOptionSelect(option)}
+                      disabled={disabled}
+                      className={`
+                        w-full p-4 rounded-xl border-2 transition-all text-left
+                        ${isSelected ? optionStyles.selected : `bg-white border-gray-100 ${optionStyles.hover}`}
+                        ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.99]'}
+                      `}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`p-2 rounded-lg text-white flex-shrink-0 ${optionStyles.icon}`}
+                        >
+                          {option.icon}
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-2">
-                          {option.description}
-                        </p>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-800">{option.gameplayName}</h4>
+                          <p className="text-sm text-gray-500 line-clamp-1">{option.description}</p>
+                        </div>
+                        {isSelected && (
+                          <span
+                            className={`text-xs font-medium px-2 py-1 rounded-full ${optionStyles.bg} ${optionStyles.text}`}
+                          >
+                            ✓
+                          </span>
+                        )}
                       </div>
-                    </div>
-                  </button>
-                );
-              })}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

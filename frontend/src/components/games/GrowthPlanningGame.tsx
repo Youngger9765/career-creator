@@ -1,8 +1,8 @@
 /**
  * GrowthPlanningGame - 成長計畫玩法
  *
- * 結合技能卡和行動卡制定成長計畫
- * 包含三個區域：已有技能、欲發展技能、行動計畫
+ * 結合職能卡(mindset)和行動卡(action)制定成長計畫
+ * 包含兩個區域：職能卡區、行動卡區
  */
 
 'use client';
@@ -29,8 +29,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   mode = 'skill',
   deckType = 'skill_cards_52',
 }) => {
-  const [skillDeck, setSkillDeck] = useState<any>(null);
-  const [actionDeck, setActionDeck] = useState<any>(null);
+  const [fullDeck, setFullDeck] = useState<any>(null);
   const [planText, setPlanText] = useState<string>('');
 
   // Auth 資訊
@@ -79,23 +78,31 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     }
   }, [gameSync]);
 
-  // 載入牌組
+  // 載入牌組 - 從同一個 deck 中分離 action 和 mindset 卡
   useEffect(() => {
     const getDecks = async () => {
       const cardLoader = CardLoaderService;
-      const skills = await cardLoader.getDeck('skill_cards_52');
-      const actions = await cardLoader.getDeck('action_cards_24');
-      setSkillDeck(skills);
-      setActionDeck(actions);
+      const deck = await cardLoader.getDeck('skill_cards_52');
+      setFullDeck(deck);
     };
     getDecks();
   }, []);
 
+  // 從 fullDeck 中分離出 mindset 卡和 action 卡
+  const mindsetCards = useMemo(
+    () => fullDeck?.cards?.filter((card: any) => card.category === 'mindset') || [],
+    [fullDeck]
+  );
+  const actionCards = useMemo(
+    () => fullDeck?.cards?.filter((card: any) => card.category === 'action') || [],
+    [fullDeck]
+  );
+
   // 處理卡片使用 - 從卡片ID推斷類型
   const handleCardUse = (cardId: string) => {
-    // 從技能卡組中查找
-    const isSkillCard = skillDeck?.cards?.some((card: any) => card.id === cardId);
-    const zone = isSkillCard ? 'skills' : 'actions';
+    // 從 mindset 卡組中查找
+    const isMindsetCard = mindsetCards.some((card: any) => card.id === cardId);
+    const zone = isMindsetCard ? 'skills' : 'actions';
     handleCardMove(cardId, zone);
   };
 
@@ -125,8 +132,8 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 
   // 合併所有卡片供查找使用
   const allCards = useMemo(
-    () => [...(skillDeck?.cards || []), ...(actionDeck?.cards || [])],
-    [skillDeck?.cards, actionDeck?.cards]
+    () => fullDeck?.cards || [],
+    [fullDeck?.cards]
   );
 
   // 建立卡片前綴文字
@@ -231,10 +238,8 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   ]);
 
   // 過濾出未使用的卡片
-  const availableSkillCards =
-    skillDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
-  const availableActionCards =
-    actionDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
+  const availableMindsetCards = mindsetCards.filter((card: any) => !usedCardIds.has(card.id));
+  const availableActionCards = actionCards.filter((card: any) => !usedCardIds.has(card.id));
 
   return (
     <GameLayout
@@ -242,19 +247,19 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         mode: '職能盤點',
         gameplay: '成長計畫',
         canvas: 'AB 畫布',
-        deckName: skillDeck?.name || '職能卡、行動卡',
-        totalCards: (skillDeck?.cards?.length || 0) + (actionDeck?.cards?.length || 0),
-        availableCards: availableSkillCards.length + availableActionCards.length,
+        deckName: fullDeck?.name || '職能卡、行動卡',
+        totalCards: fullDeck?.cards?.length || 0,
+        availableCards: availableMindsetCards.length + availableActionCards.length,
       }}
       sidebar={{
         type: 'tabbed',
         decks: [
           {
-            id: 'skill',
+            id: 'mindset',
             label: '職能卡',
-            cards: availableSkillCards,
+            cards: availableMindsetCards,
             color: 'blue',
-            type: 'skill',
+            type: 'mindset',
           },
           {
             id: 'action',

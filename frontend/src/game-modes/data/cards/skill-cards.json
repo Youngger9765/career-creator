@@ -2,1291 +2,1018 @@
   "deck": {
     "id": "skill_cards_52",
     "name": "職能盤點卡",
-    "description": "52張職能盤點卡：10張行動卡 + 42張心態卡",
+    "description": "52張職能盤點卡：10張行動卡 + 42張職能卡",
     "type": "main",
     "version": "2.0.0"
   },
   "cards": [
     {
-      "id": "skill_001",
-      "title": "程式設計",
-      "description": "使用程式語言開發軟體應用程式的能力",
-      "category": "hard",
-      "level": "專業",
-      "related_careers": [
-        "軟體工程師",
-        "資料科學家",
-        "產品經理"
-      ],
-      "learning_resources": [
-        "線上課程",
-        "實作專案",
-        "程式競賽"
-      ],
-      "time_to_develop": "1-2年",
+      "id": "action_01",
+      "title": "行動卡 01",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-01-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-01-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-01-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-01-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-01-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-01-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_002",
-      "title": "溝通協調",
-      "description": "有效表達想法並協調不同團隊合作的能力",
-      "category": "soft",
-      "level": "基礎",
-      "related_careers": [
-        "產品經理",
-        "銷售代表",
-        "國小老師"
-      ],
-      "learning_resources": [
-        "演講訓練",
-        "團隊專案",
-        "領導課程"
-      ],
-      "time_to_develop": "6個月-1年",
+      "id": "action_02",
+      "title": "行動卡 02",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-02-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-02-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-02-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-02-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-02-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-02-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_003",
-      "title": "視覺設計",
-      "description": "創造美觀且功能性視覺作品的創意能力",
-      "category": "hard",
-      "level": "專業",
-      "related_careers": [
-        "平面設計師"
-      ],
-      "learning_resources": [
-        "設計軟體",
-        "作品集建立",
-        "設計理論"
-      ],
-      "time_to_develop": "1-3年",
+      "id": "action_03",
+      "title": "行動卡 03",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-03-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-03-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-03-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-03-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-03-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-03-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_004",
-      "title": "醫療知識",
-      "description": "理解人體結構、疾病診斷和治療的專業知識",
-      "category": "hard",
-      "level": "專業",
-      "related_careers": [
-        "護理師",
-        "心理諮商師"
-      ],
-      "learning_resources": [
-        "醫學教育",
-        "臨床實習",
-        "專業證照"
-      ],
-      "time_to_develop": "3-5年",
+      "id": "action_04",
+      "title": "行動卡 04",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-04-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-04-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-04-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-04-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-04-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-04-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_005",
-      "title": "數字敏感",
-      "description": "快速處理數字計算和財務分析的能力",
-      "category": "hard",
-      "level": "中級",
-      "related_careers": [
-        "會計師"
-      ],
-      "learning_resources": [
-        "會計課程",
-        "財務軟體",
-        "實務經驗"
-      ],
-      "time_to_develop": "6個月-1年",
+      "id": "action_05",
+      "title": "行動卡 05",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-05-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-05-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-05-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-05-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-05-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-05-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_006",
-      "title": "說服力",
-      "description": "影響他人決策和建立信任關係的能力",
-      "category": "soft",
-      "level": "中級",
-      "related_careers": [
-        "銷售代表"
-      ],
-      "learning_resources": [
-        "銷售訓練",
-        "心理學",
-        "實戰練習"
-      ],
-      "time_to_develop": "3-6個月",
+      "id": "action_06",
+      "title": "行動卡 06",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-06-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-06-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-06-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-06-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-06-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-06-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_007",
-      "title": "機械原理",
-      "description": "理解機械運作原理和工程設計的技術知識",
-      "category": "hard",
-      "level": "專業",
-      "related_careers": [
-        "機械工程師"
-      ],
-      "learning_resources": [
-        "工程教育",
-        "CAD軟體",
-        "實作專案"
-      ],
-      "time_to_develop": "2-4年",
+      "id": "action_07",
+      "title": "行動卡 07",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-07-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-07-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-07-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-07-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-07-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-07-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_008",
-      "title": "教學技巧",
-      "description": "有效傳授知識和引導學生學習的能力",
-      "category": "soft",
-      "level": "中級",
-      "related_careers": [
-        "國小老師"
-      ],
-      "learning_resources": [
-        "教育訓練",
-        "教學實習",
-        "課程設計"
-      ],
-      "time_to_develop": "1-2年",
+      "id": "action_08",
+      "title": "行動卡 08",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-08-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-08-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-08-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-08-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-08-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-08-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_009",
-      "title": "烹飪技術",
-      "description": "掌握食材處理和料理製作的專業技能",
-      "category": "hard",
-      "level": "專業",
-      "related_careers": [
-        "廚師"
-      ],
-      "learning_resources": [
-        "烹飪學校",
-        "餐廳實習",
-        "食譜研究"
-      ],
-      "time_to_develop": "2-3年",
+      "id": "action_09",
+      "title": "行動卡 09",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-09-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-09-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-09-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-09-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-09-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-09-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_010",
-      "title": "傾聽能力",
-      "description": "專注理解他人需求和情感的溝通技巧",
-      "category": "soft",
-      "level": "基礎",
-      "related_careers": [
-        "心理諮商師"
-      ],
-      "learning_resources": [
-        "諮商訓練",
-        "心理學課程",
-        "實務練習"
-      ],
-      "time_to_develop": "6個月-1年",
+      "id": "action_10",
+      "title": "行動卡 10",
+      "description": "行動卡片",
+      "category": "action",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-10-L-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-10-L-front-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-10-M-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-10-M-front-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-10-S-front-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-action-10-S-front-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_011",
-      "title": "心態卡片 11",
-      "description": "待從圖片讀取",
+      "id": "mindset_01",
+      "title": "職能卡 01",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-11-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-11-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-01-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-01-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-11-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-11-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-01-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-01-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-11-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-11-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-01-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-01-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_012",
-      "title": "心態卡片 12",
-      "description": "待從圖片讀取",
+      "id": "mindset_02",
+      "title": "職能卡 02",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-12-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-12-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-02-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-02-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-12-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-12-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-02-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-02-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-12-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-12-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-02-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-02-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_013",
-      "title": "心態卡片 13",
-      "description": "待從圖片讀取",
+      "id": "mindset_03",
+      "title": "職能卡 03",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-13-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-13-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-03-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-03-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-13-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-13-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-03-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-03-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-13-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-13-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-03-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-03-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_014",
-      "title": "心態卡片 14",
-      "description": "待從圖片讀取",
+      "id": "mindset_04",
+      "title": "職能卡 04",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-14-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-14-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-04-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-04-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-14-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-14-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-04-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-04-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-14-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-14-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-04-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-04-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_015",
-      "title": "心態卡片 15",
-      "description": "待從圖片讀取",
+      "id": "mindset_05",
+      "title": "職能卡 05",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-15-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-15-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-05-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-05-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-15-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-15-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-05-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-05-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-15-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-15-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-05-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-05-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_016",
-      "title": "心態卡片 16",
-      "description": "待從圖片讀取",
+      "id": "mindset_06",
+      "title": "職能卡 06",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-16-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-16-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-06-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-06-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-16-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-16-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-06-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-06-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-16-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-16-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-06-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-06-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_017",
-      "title": "心態卡片 17",
-      "description": "待從圖片讀取",
+      "id": "mindset_07",
+      "title": "職能卡 07",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-17-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-17-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-07-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-07-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-17-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-17-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-07-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-07-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-17-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-17-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-07-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-07-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_018",
-      "title": "心態卡片 18",
-      "description": "待從圖片讀取",
+      "id": "mindset_08",
+      "title": "職能卡 08",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-18-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-18-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-08-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-08-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-18-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-18-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-08-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-08-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-18-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-18-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-08-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-08-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_019",
-      "title": "心態卡片 19",
-      "description": "待從圖片讀取",
+      "id": "mindset_09",
+      "title": "職能卡 09",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-19-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-19-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-09-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-09-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-19-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-19-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-09-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-09-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-19-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-19-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-09-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-09-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_020",
-      "title": "心態卡片 20",
-      "description": "待從圖片讀取",
+      "id": "mindset_10",
+      "title": "職能卡 10",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-20-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-20-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-10-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-10-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-20-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-20-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-10-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-10-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-20-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-20-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-10-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-10-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_021",
-      "title": "心態卡片 21",
-      "description": "待從圖片讀取",
+      "id": "mindset_11",
+      "title": "職能卡 11",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-21-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-21-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-11-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-11-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-21-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-21-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-11-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-11-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-21-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-21-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-11-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-11-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_022",
-      "title": "心態卡片 22",
-      "description": "待從圖片讀取",
+      "id": "mindset_12",
+      "title": "職能卡 12",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-22-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-22-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-12-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-12-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-22-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-22-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-12-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-12-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-22-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-22-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-12-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-12-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_023",
-      "title": "心態卡片 23",
-      "description": "待從圖片讀取",
+      "id": "mindset_13",
+      "title": "職能卡 13",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-23-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-23-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-13-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-13-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-23-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-23-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-13-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-13-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-23-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-23-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-13-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-13-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_024",
-      "title": "心態卡片 24",
-      "description": "待從圖片讀取",
+      "id": "mindset_14",
+      "title": "職能卡 14",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-24-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-24-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-14-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-14-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-24-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-24-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-14-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-14-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-24-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-24-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-14-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-14-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_025",
-      "title": "心態卡片 25",
-      "description": "待從圖片讀取",
+      "id": "mindset_15",
+      "title": "職能卡 15",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-25-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-25-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-15-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-15-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-25-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-25-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-15-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-15-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-25-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-25-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-15-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-15-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_026",
-      "title": "心態卡片 26",
-      "description": "待從圖片讀取",
+      "id": "mindset_16",
+      "title": "職能卡 16",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-26-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-26-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-16-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-16-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-26-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-26-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-16-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-16-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-26-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-26-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-16-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-16-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_027",
-      "title": "心態卡片 27",
-      "description": "待從圖片讀取",
+      "id": "mindset_17",
+      "title": "職能卡 17",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-27-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-27-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-17-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-17-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-27-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-27-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-17-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-17-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-27-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-27-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-17-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-17-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_028",
-      "title": "心態卡片 28",
-      "description": "待從圖片讀取",
+      "id": "mindset_18",
+      "title": "職能卡 18",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-28-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-28-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-18-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-18-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-28-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-28-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-18-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-18-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-28-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-28-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-18-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-18-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_029",
-      "title": "心態卡片 29",
-      "description": "待從圖片讀取",
+      "id": "mindset_19",
+      "title": "職能卡 19",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-29-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-29-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-19-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-19-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-29-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-29-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-19-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-19-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-29-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-29-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-19-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-19-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_030",
-      "title": "心態卡片 30",
-      "description": "待從圖片讀取",
+      "id": "mindset_20",
+      "title": "職能卡 20",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-30-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-30-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-20-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-20-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-30-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-30-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-20-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-20-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-30-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-30-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-20-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-20-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_031",
-      "title": "心態卡片 31",
-      "description": "待從圖片讀取",
+      "id": "mindset_21",
+      "title": "職能卡 21",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-31-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-31-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-21-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-21-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-31-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-31-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-21-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-21-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-31-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-31-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-21-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-21-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_032",
-      "title": "心態卡片 32",
-      "description": "待從圖片讀取",
+      "id": "mindset_22",
+      "title": "職能卡 22",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-32-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-32-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-22-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-22-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-32-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-32-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-22-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-22-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-32-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-32-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-22-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-22-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_033",
-      "title": "心態卡片 33",
-      "description": "待從圖片讀取",
+      "id": "mindset_23",
+      "title": "職能卡 23",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-33-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-33-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-23-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-23-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-33-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-33-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-23-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-23-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-33-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-33-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-23-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-23-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_034",
-      "title": "心態卡片 34",
-      "description": "待從圖片讀取",
+      "id": "mindset_24",
+      "title": "職能卡 24",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-34-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-34-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-24-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-24-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-34-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-34-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-24-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-24-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-34-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-34-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-24-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-24-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_035",
-      "title": "心態卡片 35",
-      "description": "待從圖片讀取",
+      "id": "mindset_25",
+      "title": "職能卡 25",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-35-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-35-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-25-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-25-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-35-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-35-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-25-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-25-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-35-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-35-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-25-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-25-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_036",
-      "title": "心態卡片 36",
-      "description": "待從圖片讀取",
+      "id": "mindset_26",
+      "title": "職能卡 26",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-36-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-36-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-26-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-26-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-36-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-36-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-26-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-26-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-36-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-36-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-26-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-26-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_037",
-      "title": "心態卡片 37",
-      "description": "待從圖片讀取",
+      "id": "mindset_27",
+      "title": "職能卡 27",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-37-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-37-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-27-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-27-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-37-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-37-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-27-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-27-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-37-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-37-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-27-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-27-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_038",
-      "title": "心態卡片 38",
-      "description": "待從圖片讀取",
+      "id": "mindset_28",
+      "title": "職能卡 28",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-38-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-38-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-28-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-28-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-38-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-38-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-28-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-28-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-38-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-38-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-28-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-28-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_039",
-      "title": "心態卡片 39",
-      "description": "待從圖片讀取",
+      "id": "mindset_29",
+      "title": "職能卡 29",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-39-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-39-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-29-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-29-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-39-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-39-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-29-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-29-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-39-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-39-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-29-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-29-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_040",
-      "title": "心態卡片 40",
-      "description": "待從圖片讀取",
+      "id": "mindset_30",
+      "title": "職能卡 30",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-40-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-40-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-30-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-30-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-40-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-40-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-30-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-30-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-40-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-40-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-30-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-30-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_041",
-      "title": "心態卡片 41",
-      "description": "待從圖片讀取",
+      "id": "mindset_31",
+      "title": "職能卡 31",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-41-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-41-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-31-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-31-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-41-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-41-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-31-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-31-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-41-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-41-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-31-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-31-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_042",
-      "title": "心態卡片 42",
-      "description": "待從圖片讀取",
+      "id": "mindset_32",
+      "title": "職能卡 32",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-42-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-42-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-32-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-32-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-42-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-42-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-32-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-32-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-42-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-42-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-32-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-32-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_043",
-      "title": "心態卡片 43",
-      "description": "待從圖片讀取",
+      "id": "mindset_33",
+      "title": "職能卡 33",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-43-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-43-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-33-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-33-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-43-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-43-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-33-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-33-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-43-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-43-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-33-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-33-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_044",
-      "title": "心態卡片 44",
-      "description": "待從圖片讀取",
+      "id": "mindset_34",
+      "title": "職能卡 34",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-44-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-44-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-34-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-34-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-44-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-44-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-34-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-34-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-44-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-44-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-34-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-34-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_045",
-      "title": "心態卡片 45",
-      "description": "待從圖片讀取",
+      "id": "mindset_35",
+      "title": "職能卡 35",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-45-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-45-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-35-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-35-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-45-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-45-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-35-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-35-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-45-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-45-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-35-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-35-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_046",
-      "title": "心態卡片 46",
-      "description": "待從圖片讀取",
+      "id": "mindset_36",
+      "title": "職能卡 36",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-46-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-46-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-36-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-36-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-46-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-46-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-36-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-36-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-46-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-46-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-36-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-36-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_047",
-      "title": "心態卡片 47",
-      "description": "待從圖片讀取",
+      "id": "mindset_37",
+      "title": "職能卡 37",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-47-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-47-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-37-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-37-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-47-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-47-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-37-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-37-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-47-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-47-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-37-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-37-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_048",
-      "title": "心態卡片 48",
-      "description": "待從圖片讀取",
+      "id": "mindset_38",
+      "title": "職能卡 38",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-48-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-48-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-38-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-38-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-48-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-48-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-38-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-38-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-48-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-48-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-38-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-38-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_049",
-      "title": "心態卡片 49",
-      "description": "待從圖片讀取",
+      "id": "mindset_39",
+      "title": "職能卡 39",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-49-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-49-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-39-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-39-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-49-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-49-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-39-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-39-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-49-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-49-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-39-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-39-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_050",
-      "title": "心態卡片 50",
-      "description": "待從圖片讀取",
+      "id": "mindset_40",
+      "title": "職能卡 40",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-50-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-50-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-40-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-40-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-50-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-50-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-40-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-40-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-50-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-50-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-40-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-40-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_051",
-      "title": "心態卡片 51",
-      "description": "待從圖片讀取",
+      "id": "mindset_41",
+      "title": "職能卡 41",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-51-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-51-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-41-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-41-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-51-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-51-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-41-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-41-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-51-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-51-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-41-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-41-S-back-zhtw.png"
         }
       }
     },
     {
-      "id": "skill_052",
-      "title": "心態卡片 52",
-      "description": "待從圖片讀取",
+      "id": "mindset_42",
+      "title": "職能卡 42",
+      "description": "職能卡片",
       "category": "mindset",
-      "level": "待定",
-      "related_careers": [],
-      "learning_resources": [],
-      "time_to_develop": "待定",
       "imageUrl": {
         "L": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-52-L-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-52-L-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-42-L-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-42-L-back-zhtw.png"
         },
         "M": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-52-M-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-52-M-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-42-M-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-42-M-back-zhtw.png"
         },
         "S": {
-          "front": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-52-S-front-zhtw.png",
-          "back": "https://storage.googleapis.com/career-creator-assets/cards/skill-inventory-52-S-back-zhtw.png"
+          "front": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-42-S-front-zhtw.png",
+          "back": "https://storage.googleapis.com/career-creator-assets/cards/competencyassessmentcards-mindset-42-S-back-zhtw.png"
         }
       }
     }

@@ -27,7 +27,7 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
   mode = 'skill',
   deckType = 'skill_cards_52',
 }) => {
-  const [mainDeck, setMainDeck] = useState<any>(null);
+  const [fullDeck, setFullDeck] = useState<any>(null);
   const [maxCards, setMaxCards] = useState(10);
 
   // 使用統一的卡片同步 Hook
@@ -45,10 +45,16 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
     const getDeck = async () => {
       const cardLoader = CardLoaderService;
       const deck = await cardLoader.getDeck(deckType);
-      setMainDeck(deck);
+      setFullDeck(deck);
     };
     getDeck();
   }, [deckType]);
+
+  // 職位拆解只用 mindset 卡
+  const mindsetCards = useMemo(
+    () => fullDeck?.cards?.filter((card: any) => card.category === 'mindset') || [],
+    [fullDeck]
+  );
 
   // 處理文件上傳
   const handleFileUpload = (file: File) => {
@@ -75,8 +81,8 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
   const positionCards = state.cardPlacements.positionCards || [];
   const usedCardIds = new Set(positionCards);
 
-  // 過濾出未使用的卡片
-  const availableCards = mainDeck?.cards?.filter((card: any) => !usedCardIds.has(card.id)) || [];
+  // 過濾出未使用的 mindset 卡片
+  const availableCards = mindsetCards.filter((card: any) => !usedCardIds.has(card.id));
 
   return (
     <GameLayout
@@ -84,19 +90,19 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
         mode: '職位分析',
         gameplay: '職位拆解',
         canvas: '職位分析畫布',
-        deckName: mainDeck?.name || '職能盤點卡',
-        totalCards: mainDeck?.cards?.length || 0,
+        deckName: '職能卡',
+        totalCards: mindsetCards.length,
         availableCards: availableCards.length,
       }}
       sidebar={{
         type: 'single',
         decks: [
           {
-            id: 'skill',
-            label: '職能盤點卡',
+            id: 'mindset',
+            label: '職能卡',
             cards: availableCards,
             color: 'blue',
-            type: 'skill',
+            type: 'mindset',
           },
         ],
         width: 'w-96',
@@ -104,7 +110,7 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
       }}
       canvas={
         <JobDecompositionCanvas
-          cards={mainDeck?.cards || []}
+          cards={mindsetCards}
           maxCards={maxCards}
           isRoomOwner={isRoomOwner}
           onCardMove={(cardId, zone) => handleCardMove(cardId, zone ? 'position' : null)}

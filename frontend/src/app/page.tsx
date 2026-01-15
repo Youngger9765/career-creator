@@ -125,7 +125,7 @@ export default function HomePage() {
                 </p>
                 <Link
                   href="/login"
-                  className="inline-block w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white py-3.5 px-6 rounded-xl font-medium hover:from-amber-600 hover:to-amber-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="inline-block w-full bg-brand-gold hover:bg-brand-gold-dark text-white py-3.5 px-6 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   諮詢師登入
                 </Link>
@@ -163,7 +163,7 @@ export default function HomePage() {
                 </p>
                 <Link
                   href="/join"
-                  className="inline-block w-full bg-gradient-to-r from-teal-500 to-teal-600 text-white py-3.5 px-6 rounded-xl font-medium hover:from-teal-600 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="inline-block w-full bg-brand-teal hover:bg-brand-teal-dark text-white py-3.5 px-6 rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   加入諮詢室
                 </Link>

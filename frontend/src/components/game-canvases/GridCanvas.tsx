@@ -124,7 +124,7 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 showCounter={false}
                 isEditable={false}
                 cardWidth="150px" // 增大卡片寬度
-                cardHeight="210px" // 增大卡片高度
+                cardHeight="150px" // 1:1 比例
                 onCardAdd={(cardId) => handleCardAdd(zone.id, cardId)}
                 onCardRemove={(cardId) => handleCardRemove(zone.id, cardId)}
                 onCardDragStart={onDragStart}

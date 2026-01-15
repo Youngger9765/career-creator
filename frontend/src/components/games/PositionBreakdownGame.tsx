@@ -108,7 +108,9 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
         width: 'w-96',
         columns: 2,
       }}
-      canvas={
+      enableViewModeToggle={true}
+      defaultViewMode="grid"
+      canvas={(viewMode) => (
         <JobDecompositionCanvas
           cards={mindsetCards}
           maxCards={maxCards}
@@ -121,8 +123,9 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
           draggedByOthers={draggedByOthers}
           onDragStart={cardSync.startDrag}
           onDragEnd={cardSync.endDrag}
+          viewMode={viewMode}
         />
-      }
+      )}
     />
   );
 };

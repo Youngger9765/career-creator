@@ -83,7 +83,9 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
         width: 'w-96',
         columns: 2,
       }}
-      canvas={
+      enableViewModeToggle={true}
+      defaultViewMode="grid"
+      canvas={(viewMode) => (
         <TwoZoneCanvas
           cards={mainDeck?.cards || []}
           advantageCardIds={state.cardPlacements.advantageCards || []}
@@ -97,8 +99,9 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
           draggedByOthers={draggedByOthers}
           onDragStart={cardSync.startDrag}
           onDragEnd={cardSync.endDrag}
+          viewMode={viewMode}
         />
-      }
+      )}
     />
   );
 };

@@ -392,12 +392,15 @@ const DropZone: React.FC<DropZoneProps> = ({
                   ? { front: card.imageUrl, back: card.imageUrl }
                   : null;
 
-            if (imageUrls) {
+            if (imageUrls && imageUrls.front) {
               // 有圖片時顯示圖片
+              // 如果沒有 back 或 back 跟 front 一樣，只顯示 front
+              const hasValidBack = imageUrls.back && imageUrls.back !== imageUrls.front;
+              const displayImage = (isFlipped && hasValidBack) ? imageUrls.back : imageUrls.front;
               return (
                 <img
-                  src={isFlipped ? imageUrls.back : imageUrls.front}
-                  alt={isFlipped ? `${card.title} - 背面` : card.title}
+                  src={displayImage}
+                  alt={isFlipped && hasValidBack ? `${card.title} - 背面` : card.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
               );
@@ -510,7 +513,7 @@ const DropZone: React.FC<DropZoneProps> = ({
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
                 {card.title}
               </p>
               {card.category && (

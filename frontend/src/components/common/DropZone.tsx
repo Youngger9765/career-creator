@@ -76,6 +76,9 @@ export interface DropZoneProps {
   renderCard?: (card: CardData, index: number) => React.ReactNode;
   renderHeader?: () => React.ReactNode;
   renderEmpty?: () => React.ReactNode;
+
+  // 全域視圖模式（由外部控制）
+  viewMode?: 'grid' | 'compact';
 }
 
 const DropZone: React.FC<DropZoneProps> = ({
@@ -115,13 +118,18 @@ const DropZone: React.FC<DropZoneProps> = ({
   renderCard,
   renderHeader,
   renderEmpty,
+  viewMode: externalViewMode,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [tempMaxCards, setTempMaxCards] = useState(maxCards);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [viewingCard, setViewingCard] = useState<CardData | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid'); // 視圖模式
+  const [internalViewMode, setInternalViewMode] = useState<'grid' | 'compact'>('grid');
+  
+  // 如果有外部控制的 viewMode，使用外部的；否則使用內部的
+  const viewMode = externalViewMode ?? internalViewMode;
+  const setViewMode = externalViewMode ? () => {} : setInternalViewMode;
 
   // 同步外部 maxCards 狀態
   useEffect(() => {
@@ -571,104 +579,94 @@ const DropZone: React.FC<DropZoneProps> = ({
         ? renderHeader()
         : (title || subtitle || showCounter) && (
             <div
-              className={`flex-shrink-0 px-4 py-3 border-b border-gray-200 dark:border-gray-700 ${headerClassName || 'bg-gray-50 dark:bg-gray-900'}`}
+              className={`flex-shrink-0 px-3 py-2 border-b border-gray-200 dark:border-gray-700 ${headerClassName || 'bg-gray-50 dark:bg-gray-900'}`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {Icon && <Icon className={`w-5 h-5 ${headerClassName?.includes('text-white') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />}
-                  <div className="flex-1">
-                    {title && (
-                      <h3 className={`text-sm font-bold ${headerClassName?.includes('text-white') ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
-                        {title}
-                      </h3>
-                    )}
-                    <div className="flex items-center gap-2 mt-0.5">
-                      {subtitle && (
-                        <p className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/80' : 'text-gray-600 dark:text-gray-400'}`}>{subtitle}</p>
-                      )}
-                      {/* 數量編輯器 - 簡化版 */}
-                      {isEditable && showCounter && (
-                        <div className="flex items-center gap-1.5">
-                          <span className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>上限:</span>
-                          <input
-                            type="text"
-                            value={tempMaxCards.toString()}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              if (value !== '' && !/^\d*$/.test(value)) return;
-                              setTempMaxCards(value === '' ? 0 : parseInt(value));
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                const finalValue = Math.max(1, tempMaxCards);
-                                setTempMaxCards(finalValue);
-                                onMaxCardsChange?.(finalValue);
-                                e.currentTarget.blur();
-                              }
-                            }}
-                            onBlur={() => {
-                              const finalValue = Math.max(1, tempMaxCards);
-                              if (finalValue !== maxCards) {
-                                setTempMaxCards(finalValue);
-                                onMaxCardsChange?.(finalValue);
-                              }
-                            }}
-                            className="w-10 text-xs text-center px-1.5 py-0.5 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-900 dark:text-gray-100 font-medium"
-                            onFocus={(e) => e.target.select()}
-                          />
-                          <span className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/80' : 'text-gray-500 dark:text-gray-400'}`}>張</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              {/* 第一行：標題 + 計數器 */}
+              <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center gap-2">
+                  {Icon && <Icon className={`w-4 h-4 ${headerClassName?.includes('text-white') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />}
+                  {title && (
+                    <h3 className={`text-sm font-bold ${headerClassName?.includes('text-white') ? 'text-white' : 'text-gray-900 dark:text-gray-100'}`}>
+                      {title}
+                    </h3>
+                  )}
                 </div>
-                <div className="flex items-center space-x-2">
-                  {/* 視圖模式切換 */}
-                  <div className={`flex items-center gap-1 rounded-md p-0.5 ${headerClassName?.includes('text-white') ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                {/* 計數器 */}
+                {showCounter && (
+                  <span
+                    className={`
+                      text-xs font-bold px-2 py-0.5 rounded
+                      ${headerClassName?.includes('text-white') ? 'bg-white/20 text-white' : isOverLimit ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600'}
+                    `}
+                  >
+                    {placedCardIds.length}/{maxCards}
+                  </span>
+                )}
+              </div>
+              {/* 第二行：上限編輯 + 視圖切換 */}
+              <div className="flex items-center justify-between">
+                {/* 數量編輯器 */}
+                {isEditable && showCounter ? (
+                  <div className="flex items-center gap-1">
+                    <span className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/70' : 'text-gray-500'}`}>上限:</span>
+                    <input
+                      type="text"
+                      value={tempMaxCards.toString()}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value !== '' && !/^\d*$/.test(value)) return;
+                        setTempMaxCards(value === '' ? 0 : parseInt(value));
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const finalValue = Math.max(1, tempMaxCards);
+                          setTempMaxCards(finalValue);
+                          onMaxCardsChange?.(finalValue);
+                          e.currentTarget.blur();
+                        }
+                      }}
+                      onBlur={() => {
+                        const finalValue = Math.max(1, tempMaxCards);
+                        if (finalValue !== maxCards) {
+                          setTempMaxCards(finalValue);
+                          onMaxCardsChange?.(finalValue);
+                        }
+                      }}
+                      className="w-8 text-xs text-center px-1 py-0.5 bg-white/90 border-0 rounded focus:ring-1 focus:ring-white outline-none text-gray-900 font-medium"
+                      onFocus={(e) => e.target.select()}
+                    />
+                    <span className={`text-xs ${headerClassName?.includes('text-white') ? 'text-white/70' : 'text-gray-500'}`}>張</span>
+                  </div>
+                ) : (
+                  <div />
+                )}
+                {/* 視圖模式切換（只有在沒有外部控制時顯示） */}
+                {!externalViewMode && (
+                  <div className={`flex items-center gap-0.5 rounded p-0.5 ${headerClassName?.includes('text-white') ? 'bg-white/20' : 'bg-gray-100'}`}>
                     <button
                       onClick={() => setViewMode('grid')}
-                      className={`p-1.5 rounded transition-colors ${
+                      className={`p-1 rounded transition-colors ${
                         viewMode === 'grid'
-                          ? 'bg-white dark:bg-gray-700 shadow-sm'
-                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                          ? 'bg-white shadow-sm'
+                          : 'hover:bg-white/50'
                       }`}
                       title="網格模式"
                     >
-                      <LayoutGrid className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                      <LayoutGrid className="w-3 h-3 text-gray-600" />
                     </button>
                     <button
                       onClick={() => setViewMode('compact')}
-                      className={`p-1.5 rounded transition-colors ${
+                      className={`p-1 rounded transition-colors ${
                         viewMode === 'compact'
-                          ? 'bg-white dark:bg-gray-700 shadow-sm'
-                          : 'hover:bg-gray-200 dark:hover:bg-gray-700'
+                          ? 'bg-white shadow-sm'
+                          : 'hover:bg-white/50'
                       }`}
                       title="列表模式"
                     >
-                      <List className="w-3.5 h-3.5 text-gray-600 dark:text-gray-400" />
+                      <List className="w-3 h-3 text-gray-600" />
                     </button>
                   </div>
-
-                  {/* 計數器 */}
-                  {showCounter && (
-                    <span
-                      className={`
-                        text-xs font-medium px-2 py-1 rounded flex items-center space-x-1
-                        ${
-                          isOverLimit
-                            ? 'bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400'
-                            : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                        }
-                      `}
-                    >
-                      <span>
-                        {placedCardIds.length} / {maxCards}
-                      </span>
-                    </span>
-                  )}
-
-                  {showCounter && isOverLimit && <AlertCircle className="w-4 h-4 text-red-500" />}
-                </div>
+                )}
               </div>
             </div>
           )}

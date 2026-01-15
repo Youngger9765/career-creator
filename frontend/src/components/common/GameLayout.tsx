@@ -33,8 +33,12 @@ interface GameLayoutProps {
     onCardDragStart?: (cardId: string) => void;
   };
 
-  // 畫布內容
-  canvas: React.ReactNode;
+  // 畫布內容 - 可以是 ReactNode 或接收 viewMode 的函數
+  canvas: React.ReactNode | ((viewMode: 'grid' | 'compact') => React.ReactNode);
+
+  // 視圖模式控制
+  enableViewModeToggle?: boolean;
+  defaultViewMode?: 'grid' | 'compact';
 
   // 額外樣式
   className?: string;
@@ -45,15 +49,25 @@ const GameLayout: React.FC<GameLayoutProps> = ({
   infoBar,
   sidebar,
   canvas,
+  enableViewModeToggle = false,
+  defaultViewMode = 'grid',
   className = '',
   canvasClassName = '',
 }) => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = React.useState(false);
+  const [viewMode, setViewMode] = React.useState<'grid' | 'compact'>(defaultViewMode);
+
+  // 計算 canvas 內容
+  const canvasContent = typeof canvas === 'function' ? canvas(viewMode) : canvas;
 
   return (
     <div className={`h-full flex flex-col ${className}`}>
       {/* 遊戲資訊欄 */}
-      <GameInfoBar {...infoBar} />
+      <GameInfoBar 
+        {...infoBar} 
+        viewMode={enableViewModeToggle ? viewMode : undefined}
+        onViewModeChange={enableViewModeToggle ? setViewMode : undefined}
+      />
 
       {/* 主要遊戲區域 */}
       <div className="flex-1 flex overflow-hidden relative">
@@ -120,7 +134,7 @@ const GameLayout: React.FC<GameLayoutProps> = ({
         )}
 
         {/* 右側畫布區 */}
-        <div className={`flex-1 overflow-hidden ${canvasClassName}`}>{canvas}</div>
+        <div className={`flex-1 overflow-hidden ${canvasClassName}`}>{canvasContent}</div>
       </div>
     </div>
   );

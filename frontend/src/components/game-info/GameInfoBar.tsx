@@ -8,7 +8,7 @@
 'use client';
 
 import React from 'react';
-import { Compass, Gamepad2, Layout, Layers } from 'lucide-react';
+import { Compass, Gamepad2, Layout, Layers, LayoutGrid, List } from 'lucide-react';
 
 interface GameInfoBarProps {
   mode: string;
@@ -18,6 +18,9 @@ interface GameInfoBarProps {
   totalCards: number;
   availableCards: number;
   className?: string;
+  // 視圖模式控制
+  viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 const GameInfoBar: React.FC<GameInfoBarProps> = ({
@@ -28,6 +31,8 @@ const GameInfoBar: React.FC<GameInfoBarProps> = ({
   totalCards,
   availableCards,
   className = '',
+  viewMode,
+  onViewModeChange,
 }) => {
   return (
     <div
@@ -76,13 +81,44 @@ const GameInfoBar: React.FC<GameInfoBarProps> = ({
           </div>
         </div>
 
-        {/* Card count - Desktop */}
-        <div className="hidden sm:flex items-center gap-2 text-sm">
-          <span className="text-gray-400">總卡片</span>
-          <span className="font-bold text-gray-700">{totalCards}</span>
-          <span className="text-gray-300">|</span>
-          <span className="text-gray-400">可用</span>
-          <span className="font-bold text-[#7AB7B7]">{availableCards}</span>
+        {/* Card count + View Toggle - Desktop */}
+        <div className="hidden sm:flex items-center gap-4">
+          {/* 視圖切換 */}
+          {viewMode && onViewModeChange && (
+            <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => onViewModeChange('grid')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-white shadow-sm'
+                    : 'hover:bg-gray-200'
+                }`}
+                title="網格模式"
+              >
+                <LayoutGrid className="w-4 h-4 text-gray-600" />
+              </button>
+              <button
+                onClick={() => onViewModeChange('compact')}
+                className={`p-1.5 rounded-md transition-colors ${
+                  viewMode === 'compact'
+                    ? 'bg-white shadow-sm'
+                    : 'hover:bg-gray-200'
+                }`}
+                title="列表模式"
+              >
+                <List className="w-4 h-4 text-gray-600" />
+              </button>
+            </div>
+          )}
+          
+          {/* 卡片計數 */}
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-gray-400">總卡片</span>
+            <span className="font-bold text-gray-700">{totalCards}</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-gray-400">可用</span>
+            <span className="font-bold text-[#7AB7B7]">{availableCards}</span>
+          </div>
         </div>
       </div>
     </div>

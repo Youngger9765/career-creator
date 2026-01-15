@@ -39,6 +39,8 @@ interface ThreeColumnCanvasProps {
   draggedByOthers?: Map<string, string>; // cardId -> performerName
   onDragStart?: (cardId: string) => void;
   onDragEnd?: (cardId: string) => void;
+  // 外部控制的視圖模式
+  viewMode?: 'grid' | 'compact';
 }
 
 const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
@@ -52,6 +54,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   draggedByOthers,
   onDragStart,
   onDragEnd,
+  viewMode,
 }) => {
   // 使用外部狀態，如果沒有則使用本地狀態
   const likeCards = cardPlacements?.likeCards || [];
@@ -154,11 +157,11 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxLike} 張卡片`}
           className="min-h-96"
-          headerClassName="bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+          headerClassName="bg-gradient-to-r from-emerald-400 to-teal-400 text-white"
           dragOverColor="border-green-500 bg-green-100 dark:bg-green-900/30"
           zoneColorScheme="green"
-          cardWidth="135px" // 1.5x of default 90px
-          cardHeight="240px" // 1.5x of default 160px
+          cardWidth="135px"
+          cardHeight="240px"
           showCardNumbers={false}
           showRemoveButton={true}
           allowReorder={true}
@@ -174,6 +177,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardDragStart={onDragStart}
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
+          viewMode={viewMode}
         />
 
         {/* 中立欄位 */}
@@ -187,11 +191,11 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxNeutral} 張卡片`}
           className="min-h-96"
-          headerClassName="bg-gradient-to-r from-gray-400 to-gray-500 text-white"
+          headerClassName="bg-gradient-to-r from-slate-400 to-gray-400 text-white"
           dragOverColor="border-gray-500 bg-gray-100 dark:bg-gray-800"
           zoneColorScheme="yellow"
-          cardWidth="135px" // 1.5x of default 90px
-          cardHeight="240px" // 1.5x of default 160px
+          cardWidth="135px"
+          cardHeight="240px"
           showCardNumbers={false}
           showRemoveButton={true}
           allowReorder={true}
@@ -207,6 +211,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardDragStart={onDragStart}
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
+          viewMode={viewMode}
         />
 
         {/* 不喜歡欄位 */}
@@ -220,11 +225,11 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           emptyMessage="拖曳卡片到此處"
           emptySubMessage={`最多可放 ${localMaxDislike} 張卡片`}
           className="min-h-96"
-          headerClassName="bg-gradient-to-r from-red-500 to-rose-500 text-white"
+          headerClassName="bg-gradient-to-r from-rose-400 to-pink-400 text-white"
           dragOverColor="border-red-500 bg-red-100 dark:bg-red-900/30"
           zoneColorScheme="red"
-          cardWidth="135px" // 1.5x of default 90px
-          cardHeight="240px" // 1.5x of default 160px
+          cardWidth="135px"
+          cardHeight="240px"
           showCardNumbers={false}
           showRemoveButton={true}
           allowReorder={true}
@@ -240,6 +245,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardDragStart={onDragStart}
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
+          viewMode={viewMode}
         />
       </div>
     </div>

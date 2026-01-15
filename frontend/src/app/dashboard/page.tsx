@@ -296,12 +296,12 @@ export default function DashboardPage() {
         {/* Content Area */}
         <div className="p-4 md:p-6 lg:p-8">
           {/* Welcome Banner */}
-          <div className="mb-6 p-6 bg-gradient-to-r from-amber-500 to-teal-500 rounded-2xl shadow-lg text-white">
-            <h1 className="text-2xl font-bold mb-1">
+          <div className="mb-6 p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <h1 className="text-2xl font-bold text-gray-800 mb-1">
               歡迎回來，{user?.full_name || user?.name || '諮詢師'}！
             </h1>
-            <p className="text-white/80 text-sm">
-              您目前有 {clientCount} 位客戶，開始今天的諮詢吧！
+            <p className="text-gray-500 text-sm">
+              您目前有 <span className="text-amber-600 font-semibold">{clientCount}</span> 位客戶，開始今天的諮詢吧！
             </p>
           </div>
 

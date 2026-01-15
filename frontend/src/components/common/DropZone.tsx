@@ -332,8 +332,9 @@ const DropZone: React.FC<DropZoneProps> = ({
 
         {/* 卡片內容 */}
         <div
-          className={`rounded-lg shadow-sm hover:shadow-lg transition-all cursor-move flex flex-col relative overflow-hidden`}
+          className={`rounded-lg shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col relative overflow-hidden`}
           style={{ width: cardWidth, height: cardHeight }}
+          onClick={() => setViewingCard(card)}
         >
           {/* 底部按鈕組 - 查看大卡 & 翻轉（只有有背面時才顯示翻轉） */}
           {(() => {

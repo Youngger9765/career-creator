@@ -255,9 +255,9 @@ export default function RoomPage() {
   // 顯示檢查中的狀態
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
           <p className="text-gray-600">檢查認證狀態...</p>
         </div>
       </div>
@@ -267,9 +267,9 @@ export default function RoomPage() {
   // 顯示加入諮詢室中
   if (roomLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
           <p className="text-gray-600">正在加入諮詢室...</p>
         </div>
       </div>
@@ -386,16 +386,16 @@ export default function RoomPage() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-amber-50/50 via-white to-teal-50/50 flex flex-col overflow-hidden">
       {/* 頂部標題欄 - Fixed position */}
-      <div className="sticky top-0 z-50 bg-white shadow-sm border-b">
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between px-3 sm:px-6 py-3 sm:py-4 gap-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full lg:w-auto">
             {/* 退出按鈕 - 只在選擇遊戲模式時顯示 */}
             {!currentGameplay && (
               <button
                 onClick={() => setShowExitDialog(true)}
-                className="px-3 py-1.5 sm:py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2 font-medium text-sm"
+                className="px-3 py-1.5 sm:py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors flex items-center gap-2 font-medium text-sm"
               >
                 <svg
                   className="w-4 h-4 sm:w-5 sm:h-5"
@@ -433,7 +433,7 @@ export default function RoomPage() {
               <>
                 <button
                   onClick={() => setCurrentGameplay('')}
-                  className="px-2 sm:px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2"
+                  className="px-2 sm:px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2 shadow-sm"
                 >
                   <svg
                     className="w-3 h-3 sm:w-4 sm:h-4"
@@ -520,7 +520,7 @@ export default function RoomPage() {
       {isCounselor && currentGameplay && (
         <button
           onClick={() => setMobileNotesOpen(true)}
-          className="md:hidden fixed bottom-4 right-4 z-40 px-4 py-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2 font-medium"
+          className="md:hidden fixed bottom-4 right-4 z-40 px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-full shadow-lg hover:from-teal-600 hover:to-teal-700 transition-all flex items-center gap-2 font-medium"
           title="開始記錄"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

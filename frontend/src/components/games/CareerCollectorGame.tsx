@@ -83,7 +83,7 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
       }}
       enableViewModeToggle={true}
       defaultViewMode="grid"
-      canvas={(viewMode) => (
+      canvas={(viewMode, onViewModeChange) => (
         <CollectionCanvas
           cards={mainDeck?.cards || []}
           collectedCardIds={collectedCardIds}
@@ -98,6 +98,7 @@ const CareerCollectorGame: React.FC<CareerCollectorGameProps> = ({
           onDragStart={cardSync.startDrag}
           onDragEnd={cardSync.endDrag}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
       )}
     />

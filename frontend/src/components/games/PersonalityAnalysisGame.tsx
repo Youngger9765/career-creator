@@ -86,7 +86,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
       }}
       enableViewModeToggle={true}
       defaultViewMode="grid"
-      canvas={(viewMode) => (
+      canvas={(viewMode, onViewModeChange) => (
         <ThreeColumnCanvas
           cards={mainDeck?.cards || []}
           isRoomOwner={isRoomOwner}
@@ -98,6 +98,7 @@ const PersonalityAnalysisGame: React.FC<PersonalityAnalysisGameProps> = ({
           onDragStart={cardSync.startDrag}
           onDragEnd={cardSync.endDrag}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
       )}
     />

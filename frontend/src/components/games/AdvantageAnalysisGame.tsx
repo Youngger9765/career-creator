@@ -85,7 +85,7 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
       }}
       enableViewModeToggle={true}
       defaultViewMode="grid"
-      canvas={(viewMode) => (
+      canvas={(viewMode, onViewModeChange) => (
         <TwoZoneCanvas
           cards={mainDeck?.cards || []}
           advantageCardIds={state.cardPlacements.advantageCards || []}
@@ -100,6 +100,7 @@ const AdvantageAnalysisGame: React.FC<AdvantageAnalysisGameProps> = ({
           onDragStart={cardSync.startDrag}
           onDragEnd={cardSync.endDrag}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
       )}
     />

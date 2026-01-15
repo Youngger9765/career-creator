@@ -273,9 +273,10 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         columns: 2,
       }}
       enableViewModeToggle={true}
-      canvas={(viewMode) => (
+      canvas={(viewMode, onViewModeChange) => (
         <GrowthPlanCanvas
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
           cards={allCards}
           onCardUse={handleCardUse}
           onCardRemove={handleCardRemove}

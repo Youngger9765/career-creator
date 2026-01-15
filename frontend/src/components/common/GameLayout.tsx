@@ -33,8 +33,8 @@ interface GameLayoutProps {
     onCardDragStart?: (cardId: string) => void;
   };
 
-  // 畫布內容 - 可以是 ReactNode 或接收 viewMode 的函數
-  canvas: React.ReactNode | ((viewMode: 'grid' | 'compact') => React.ReactNode);
+  // 畫布內容 - 可以是 ReactNode 或接收 viewMode 和 onViewModeChange 的函數
+  canvas: React.ReactNode | ((viewMode: 'grid' | 'compact', onViewModeChange: (mode: 'grid' | 'compact') => void) => React.ReactNode);
 
   // 視圖模式控制
   enableViewModeToggle?: boolean;
@@ -58,7 +58,7 @@ const GameLayout: React.FC<GameLayoutProps> = ({
   const [viewMode, setViewMode] = React.useState<'grid' | 'compact'>(defaultViewMode);
 
   // 計算 canvas 內容
-  const canvasContent = typeof canvas === 'function' ? canvas(viewMode) : canvas;
+  const canvasContent = typeof canvas === 'function' ? canvas(viewMode, setViewMode) : canvas;
 
   return (
     <div className={`h-full flex flex-col ${className}`}>

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Zap, Users, FileText, Play } from 'lucide-react';
+import ProductShowcase from '@/components/home/ProductShowcase';
 
 export default function HomePage() {
   const router = useRouter();
@@ -17,14 +18,21 @@ export default function HomePage() {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      router.push('/dashboard');
+    // Only execute on client-side to avoid SSR localStorage errors
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        router.push('/dashboard');
+      } else {
+        setIsCheckingAuth(false);
+      }
     } else {
+      // Server-side: set to false immediately
       setIsCheckingAuth(false);
     }
+
     if (isDevelopment) {
-    loadDemoAccounts();
+      loadDemoAccounts();
     }
   }, [router, loadDemoAccounts, isDevelopment]);
 
@@ -204,6 +212,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Product Showcase - 產品展示 */}
+      <ProductShowcase />
 
       {/* Features - 功能亮點 */}
       <section className="py-24">

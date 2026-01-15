@@ -147,7 +147,10 @@ export function ClientMobileCard({
         {client.last_consultation_date && (
           <div className="flex items-center gap-1.5 mt-3 text-xs text-gray-400">
             <Calendar className="w-3 h-3" />
-            <span>最後諮詢: {formatDate(client.last_consultation_date)}</span>
+            <div className="flex flex-col">
+              <span>最後諮詢</span>
+              <span>{formatDate(client.last_consultation_date)}</span>
+            </div>
           </div>
         )}
       </div>

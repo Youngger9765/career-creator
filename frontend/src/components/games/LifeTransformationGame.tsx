@@ -872,7 +872,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                   </div>
 
                   {/* 圖例 */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm md:text-base">
+                  <div className="grid grid-cols-1 gap-3 text-sm md:text-base">
                     {Array.from(usedCardIds)
                       .sort()
                       .map((cardId) => {
@@ -913,7 +913,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                               className="w-4 h-4 md:w-5 md:h-5 rounded-full flex-shrink-0"
                               style={{ backgroundColor: getCardColor(cardId) }}
                             />
-                            <div className="flex-1 truncate text-gray-700 dark:text-gray-700 font-medium">
+                            <div className="flex-1 text-gray-700 dark:text-gray-700 font-medium">
                               {card?.title || '未知'}
                             </div>
                             <div className="text-gray-900 dark:text-gray-900 font-semibold text-base md:text-lg">

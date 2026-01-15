@@ -17,6 +17,7 @@ interface CardItemProps {
   category?: string;
   type?: 'skill' | 'mindset' | 'action' | 'value' | 'career'; // 添加類型以區分顏色
   imageUrl?: any; // Card image URLs
+  imageSize?: 'S' | 'M' | 'L'; // 對應卡片圖片尺寸
   isDraggable?: boolean;
   showRemoveButton?: boolean;
   isUsed?: boolean;
@@ -32,6 +33,7 @@ const CardItem: React.FC<CardItemProps> = ({
   category,
   type,
   imageUrl,
+  imageSize = 'M',
   isDraggable = true,
   showRemoveButton = false,
   isUsed = false,
@@ -75,14 +77,16 @@ const CardItem: React.FC<CardItemProps> = ({
     }
   };
 
-  // Get image URLs - use M size for card items
+  // Get image URLs - select size when available
   const imageUrls =
     typeof imageUrl === 'object' && imageUrl !== null
-      ? 'M' in imageUrl
-        ? imageUrl.M || null // M size
-        : 'front' in imageUrl
-          ? imageUrl // Direct { front, back } object
-          : null
+      ? 'front' in imageUrl
+        ? imageUrl // Direct { front, back } object
+        : (imageUrl[imageSize] ||
+            imageUrl.M ||
+            imageUrl.L ||
+            imageUrl.S ||
+            null)
       : imageUrl
         ? { front: imageUrl, back: imageUrl }
         : null;

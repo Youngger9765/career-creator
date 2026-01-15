@@ -664,7 +664,7 @@ const DropZone: React.FC<DropZoneProps> = ({
                     </span>
                   )}
 
-                  {isOverLimit && <AlertCircle className="w-4 h-4 text-red-500" />}
+                  {showCounter && isOverLimit && <AlertCircle className="w-4 h-4 text-red-500" />}
                 </div>
               </div>
             </div>

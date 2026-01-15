@@ -24,7 +24,7 @@ from app.core.config import settings
 from app.core.database import engine
 from app.models.client import Client, ConsultationRecord, RoomClient
 from app.models.counselor_note import CounselorNote
-from app.models.game_rule import GameRuleTemplate
+# GameRuleTemplate not needed - frontend loads cards from JSON
 from app.models.room import Room
 from app.models.user import User
 
@@ -233,9 +233,6 @@ def create_consultation_records(
         days_ago = random.randint(1, 60)
         session_date = datetime.utcnow() - timedelta(days=days_ago)
 
-        # Get game rule for this room
-        game_rule = session.get(GameRuleTemplate, room.game_rule_id)
-
         record = ConsultationRecord(
             room_id=room.id,
             client_id=room_client.client_id,
@@ -243,7 +240,7 @@ def create_consultation_records(
             session_date=session_date,
             duration_minutes=random.randint(45, 90),
             screenshots=get_demo_screenshot_urls(bucket_name, random.randint(2, 3)),
-            game_state=get_minimal_game_state(game_rule.slug if game_rule else "basic_career"),
+            game_state=get_minimal_game_state("basic_career"),
             topics=random.sample(
                 ["職涯定位", "技能盤點", "價值觀探索", "求職準備", "面試技巧", "職場適應"],
                 k=random.randint(2, 3)

@@ -59,8 +59,8 @@ export default function HomePage() {
           <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[#7AB7B7]/15 rounded-full blur-3xl" />
           <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] bg-[#FFCC3A]/20 rounded-full blur-2xl" />
           <div className="absolute bottom-20 left-10 w-[200px] h-[200px] bg-[#0056A7]/10 rounded-full blur-2xl" />
-          {/* 裝飾線條 */}
-          <div className="absolute top-1/4 left-20 w-20 h-1 bg-[#FFCC3A] rounded-full" />
+          {/* 裝飾線條 - 移到不會干擾 logo 的位置 */}
+          <div className="absolute top-[60%] left-20 w-20 h-1 bg-[#FFCC3A] rounded-full" />
           <div className="absolute bottom-1/3 right-1/3 w-16 h-1 bg-[#7AB7B7] rounded-full" />
         </div>
 

@@ -23,20 +23,20 @@ describe('Button - Navicareer Brand Variants', () => {
     expect(button).toHaveClass('border-black');
   });
 
-  it('renders brand-gold button with correct background', () => {
+  it('renders brand-gold button with correct background and accessible text', () => {
     render(<Button variant="brand-gold">Brand Gold</Button>);
     const button = screen.getByRole('button', { name: /brand gold/i });
 
     expect(button).toHaveClass('bg-brand-gold');
-    expect(button).toHaveClass('text-white');
+    expect(button).toHaveClass('text-black'); // WCAG AA compliant (13.95:1 contrast)
   });
 
-  it('renders brand-teal button with correct background', () => {
+  it('renders brand-teal button with correct background and accessible text', () => {
     render(<Button variant="brand-teal">Brand Teal</Button>);
     const button = screen.getByRole('button', { name: /brand teal/i });
 
     expect(button).toHaveClass('bg-brand-teal');
-    expect(button).toHaveClass('text-white');
+    expect(button).toHaveClass('text-black'); // WCAG AA compliant (9.28:1 contrast)
   });
 
   it('applies large size with correct padding', () => {

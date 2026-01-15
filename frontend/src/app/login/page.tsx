@@ -160,7 +160,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-brand-gold hover:bg-brand-gold-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-gold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+              className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-black bg-brand-gold hover:bg-brand-gold-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-gold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
             >
               {loading ? '登入中...' : '登入'}
             </button>

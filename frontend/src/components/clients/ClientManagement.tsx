@@ -222,30 +222,27 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
           <>
             {/* Desktop Table View */}
             <div className="hidden lg:block overflow-x-auto">
-              <table className="w-full table-fixed">
-                <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th className="w-[18%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      客戶資訊
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100">
+                    <th className="px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      客戶
                     </th>
-                    <th className="w-[25%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       聯絡方式
                     </th>
-                    <th className="w-[11%] px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       最後諮詢
                     </th>
-                    <th className="w-[24%] px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       備註
                     </th>
-                    <th className="w-[14%] px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       操作
-                    </th>
-                    <th className="w-[8%] px-3 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      管理
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                   {filteredClients.map((client) => {
                     return (
                       <React.Fragment key={client.id}>
@@ -267,78 +264,64 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
 
                         {/* Expanded Records Row */}
                         {expandedRecords.has(client.id) && (
-                          <tr className="bg-gray-50 dark:bg-gray-800">
-                            <td colSpan={8} className="px-12 py-6">
-                              <div className="space-y-3 ml-8 pl-6 border-l-4 border-blue-500">
-                                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                  <Activity className="w-4 h-4" />
-                                  諮詢記錄
-                                </h4>
-
+                          <tr>
+                            <td colSpan={5} className="px-5 py-4 bg-gray-50/50">
+                              <div className="space-y-3">
                                 {loadingRecords.has(client.id) ? (
-                                  <div className="text-center py-4">
-                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                                    <p className="mt-2 text-sm text-gray-500">載入記錄中...</p>
+                                  <div className="text-center py-6">
+                                    <div className="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-teal-500"></div>
+                                    <p className="mt-2 text-sm text-gray-500">載入中...</p>
                                   </div>
                                 ) : clientRecords[client.id] &&
                                   clientRecords[client.id].length > 0 ? (
-                                  <div className="space-y-2">
+                                  <div className="grid gap-3">
                                     {clientRecords[client.id].map((record) => (
                                       <div
                                         key={record.id}
-                                        className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+                                        className="bg-white rounded-xl p-4 border border-gray-100 hover:border-gray-200 transition-colors"
                                       >
-                                        <div className="flex gap-6">
-                                          {/* 左欄：日期、玩法、筆記 */}
-                                          <div className="flex-1 space-y-3">
-                                            <div className="flex items-center gap-3 flex-wrap">
-                                              <div className="flex items-center gap-2">
-                                                <Clock className="w-4 h-4 text-gray-400" />
-                                                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                  {formatDate(record.session_date)}
-                                                </p>
-                                              </div>
-                                              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border border-blue-200 dark:border-blue-700 rounded-full">
-                                                <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                                                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                                                  {(record.game_state?.gameplay &&
-                                                    GAMEPLAY_NAMES[record.game_state.gameplay]) ||
-                                                    record.game_rule_name ||
-                                                    '未指定'}
-                                                </span>
-                                              </div>
+                                        <div className="flex items-start justify-between gap-4">
+                                          {/* 左側：日期與玩法 */}
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-3 mb-2">
+                                              <span className="text-sm font-medium text-gray-700">
+                                                {formatDate(record.session_date)}
+                                              </span>
+                                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium text-teal-700 bg-teal-50 rounded-full">
+                                                {(record.game_state?.gameplay &&
+                                                  GAMEPLAY_NAMES[record.game_state.gameplay]) ||
+                                                  record.game_rule_name ||
+                                                  '未指定'}
+                                              </span>
                                             </div>
-
                                             {record.notes && (
-                                              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                                                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
-                                                  {record.notes}
-                                                </p>
-                                              </div>
+                                              <p className="text-sm text-gray-600 line-clamp-2">
+                                                {record.notes}
+                                              </p>
                                             )}
                                           </div>
 
-                                          {/* 右欄：截圖 */}
+                                          {/* 右側：截圖縮圖 */}
                                           {record.screenshots && record.screenshots.length > 0 && (
-                                            <div className="flex gap-3 flex-wrap">
-                                              {record.screenshots.map((url, idx) => (
+                                            <div className="flex gap-2 flex-shrink-0">
+                                              {record.screenshots.slice(0, 2).map((url, idx) => (
                                                 <button
                                                   key={idx}
                                                   onClick={() => setSelectedImage(url)}
-                                                  className="relative group cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all transform hover:scale-105"
+                                                  className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 hover:opacity-80 transition-opacity"
                                                 >
                                                   <img
                                                     src={url}
-                                                    alt={`Screenshot ${idx + 1}`}
-                                                    className="w-64 h-auto object-contain bg-gray-100 dark:bg-gray-700"
+                                                    alt={`截圖 ${idx + 1}`}
+                                                    className="w-full h-full object-cover"
                                                   />
-                                                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <div className="bg-white/90 dark:bg-gray-800/90 rounded-full p-3">
-                                                      <Camera className="w-5 h-5 text-gray-800 dark:text-white" />
-                                                    </div>
-                                                  </div>
                                                 </button>
                                               ))}
+                                              {record.screenshots.length > 2 && (
+                                                <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+                                                  +{record.screenshots.length - 2}
+                                                </div>
+                                              )}
                                             </div>
                                           )}
                                         </div>
@@ -346,7 +329,7 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
                                     ))}
                                   </div>
                                 ) : (
-                                  <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
+                                  <div className="text-center py-6 text-sm text-gray-400">
                                     尚無諮詢記錄
                                   </div>
                                 )}

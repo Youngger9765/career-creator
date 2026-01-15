@@ -97,8 +97,8 @@ const CardItem: React.FC<CardItemProps> = ({
         relative group
         ${getCardBackground()}
         border
-        rounded-xl shadow-sm hover:shadow-lg
-        transition-all duration-200
+        rounded-2xl shadow-md hover:shadow-2xl hover:-translate-y-1
+        transition-all duration-300
         w-full
         ${isDraggable ? 'cursor-move' : 'cursor-default'}
         ${isUsed ? 'opacity-40 pointer-events-none' : ''}

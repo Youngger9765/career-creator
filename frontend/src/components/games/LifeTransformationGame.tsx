@@ -695,7 +695,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
             </div>
 
             {/* 右側：視覺化圖表區 */}
-            <div className="bg-white dark:bg-gray-100 rounded-lg border border-gray-200 dark:border-gray-300 p-4 md:p-6 min-h-[500px]">
+            <div className="bg-white dark:bg-gray-100 rounded-lg border border-gray-200 dark:border-gray-300 p-4 md:p-6">
               <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-900 mb-4 md:mb-6">
                 生活平衡分配圖
               </h3>
@@ -703,10 +703,10 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
               {usedTokens > 0 ? (
                 <div className="space-y-6">
                   {/* 圓餅圖區域 */}
-                  <div className="relative h-80 flex items-center justify-center">
-                    <div className="relative w-full h-full max-w-md">
+                  <div className="relative h-96 flex items-center justify-center">
+                    <div className="relative w-full h-full max-w-lg">
                       {/* 使用 CSS 實現簡單的圓餅圖 */}
-                      <svg viewBox="-20 0 240 200" className="w-full h-full overflow-visible">
+                      <svg viewBox="-80 -20 360 240" className="w-full h-full overflow-visible">
                         {(() => {
                           let currentAngle = 0;
                           const segments = [];

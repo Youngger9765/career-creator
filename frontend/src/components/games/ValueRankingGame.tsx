@@ -82,7 +82,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
       infoBar={{
         mode: '價值導航',
         gameplay: '價值觀排序',
-        canvas: '3x3網格畫布',
+        canvas: '價值排序畫布',
         deckName: mainDeck?.name || '價值導航卡',
         totalCards: mainDeck?.cards?.length || 0,
         availableCards: availableCards.length,

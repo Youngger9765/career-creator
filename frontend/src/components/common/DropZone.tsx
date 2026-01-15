@@ -695,7 +695,12 @@ const DropZone: React.FC<DropZoneProps> = ({
             className={
               viewMode === 'compact'
                 ? 'flex flex-col gap-2'
-                : 'flex flex-wrap justify-center gap-3'
+                : 'grid gap-3'
+            }
+            style={
+              viewMode !== 'compact'
+                ? { gridTemplateColumns: `repeat(auto-fill, ${cardWidth})`, justifyContent: 'center' }
+                : undefined
             }
           >
             {placedCardIds.map((cardId, index) => {

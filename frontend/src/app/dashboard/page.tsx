@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { authAPI } from '../../lib/api/auth';
+import Image from 'next/image';
 import { useAuthStore } from '@/stores/auth-store';
 import { clientsAPI } from '../../lib/api/clients';
 import { ClientManagement } from '../../components/clients/ClientManagement';
-import { LogOut, Users, Home, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, Users, Home, Settings, ChevronLeft, ChevronRight, Plus, UserPlus } from 'lucide-react';
 
 type NavItem = 'clients';
 
@@ -81,9 +81,9 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
           <p className="mt-4 text-gray-600">載入儀表板資料中...</p>
         </div>
       </div>
@@ -91,42 +91,78 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-amber-50/50 via-white to-teal-50/50 flex overflow-hidden">
       {/* Sidebar */}
       <aside
         className={`hidden md:flex md:flex-shrink-0 h-screen transition-all duration-300 ${
-          sidebarCollapsed ? 'w-20' : 'w-64'
+          sidebarCollapsed ? 'w-20' : 'w-72'
         }`}
       >
-        <div className="flex flex-col w-full h-full bg-white border-r border-gray-200">
+        <div className="flex flex-col w-full h-full bg-white/80 backdrop-blur-sm border-r border-gray-200/60 shadow-lg">
           {/* Logo / Title */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-            {!sidebarCollapsed && <h1 className="text-xl font-bold text-gray-900">諮詢師儀表板</h1>}
+          <div className="flex items-center justify-between h-20 px-4 border-b border-gray-200/60">
+            {!sidebarCollapsed && (
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/images/logo.png"
+                  alt="職游 Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto"
+                />
+              </Link>
+            )}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
+              className={`p-2 rounded-xl hover:bg-gray-100 transition-colors ${
                 sidebarCollapsed ? 'mx-auto' : ''
               }`}
               title={sidebarCollapsed ? '展開側邊欄' : '收合側邊欄'}
             >
               {sidebarCollapsed ? (
-                <ChevronRight className="w-5 h-5 text-gray-600" />
+                <ChevronRight className="w-5 h-5 text-gray-500" />
               ) : (
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
+                <ChevronLeft className="w-5 h-5 text-gray-500" />
               )}
             </button>
           </div>
 
+          {/* Quick Actions */}
+          {!sidebarCollapsed && (
+            <div className="px-4 py-4 border-b border-gray-200/60">
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/rooms/create"
+                  className="flex flex-col items-center gap-1 p-3 bg-gradient-to-br from-amber-50 to-amber-100 hover:from-amber-100 hover:to-amber-200 rounded-xl transition-all group"
+                >
+                  <div className="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Plus className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xs font-medium text-amber-700">創建諮詢室</span>
+                </Link>
+                <Link
+                  href="/join"
+                  className="flex flex-col items-center gap-1 p-3 bg-gradient-to-br from-teal-50 to-teal-100 hover:from-teal-100 hover:to-teal-200 rounded-xl transition-all group"
+                >
+                  <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <UserPlus className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xs font-medium text-teal-700">加入諮詢室</span>
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Navigation */}
-          <nav className="flex-1 px-2 py-6 space-y-1">
+          <nav className="flex-1 px-3 py-4 space-y-1">
             <button
               onClick={() => setActiveNav('clients')}
               className={`w-full flex items-center ${
                 sidebarCollapsed ? 'justify-center px-2' : 'px-4'
-              } py-3 text-sm font-medium rounded-lg transition-colors ${
+              } py-3.5 text-sm font-medium rounded-xl transition-all ${
                 activeNav === 'clients'
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
               title={sidebarCollapsed ? '客戶管理' : ''}
             >
@@ -135,25 +171,27 @@ export default function DashboardPage() {
                 <>
                   客戶管理
                   {clientCount > 0 && (
-                    <span className="ml-auto bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                    <span className={`ml-auto px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                      activeNav === 'clients' 
+                        ? 'bg-white/20 text-white' 
+                        : 'bg-amber-100 text-amber-600'
+                    }`}>
                       {clientCount}
                     </span>
                   )}
                 </>
               )}
               {sidebarCollapsed && clientCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></span>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-amber-400 rounded-full"></span>
               )}
             </button>
-
-            {/* Future navigation items can be added here */}
           </nav>
 
           {/* User Info & Actions */}
-          <div className="border-t border-gray-200 p-2 space-y-1">
+          <div className="border-t border-gray-200/60 p-3 space-y-2">
             {!sidebarCollapsed && (
-              <div className="px-4 py-2 mb-2">
-                <p className="text-sm font-medium text-gray-900 truncate">
+              <div className="px-3 py-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl mb-2">
+                <p className="text-sm font-semibold text-gray-800 truncate">
                   {user?.full_name || user?.name || user?.email}
                 </p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
@@ -165,7 +203,7 @@ export default function DashboardPage() {
                 href="/admin/database"
                 className={`flex items-center ${
                   sidebarCollapsed ? 'justify-center px-2' : 'px-4'
-                } py-2 text-sm font-medium text-purple-700 hover:bg-purple-50 rounded-lg transition-colors`}
+                } py-2.5 text-sm font-medium text-purple-600 hover:bg-purple-50 rounded-xl transition-colors`}
                 title={sidebarCollapsed ? '資料庫管理' : ''}
               >
                 <Settings className={`w-4 h-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
@@ -173,27 +211,24 @@ export default function DashboardPage() {
               </Link>
             )}
 
-            <Link
-              href="/rooms/create"
-              className={`flex items-center ${
-                sidebarCollapsed ? 'justify-center px-2' : 'px-4'
-              } py-2 text-sm font-medium text-blue-700 hover:bg-blue-50 rounded-lg transition-colors`}
-              title={sidebarCollapsed ? '創建諮詢室' : ''}
-            >
-              <Home className={`w-4 h-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
-              {!sidebarCollapsed && '創建諮詢室'}
-            </Link>
-
-            <Link
-              href="/join"
-              className={`flex items-center ${
-                sidebarCollapsed ? 'justify-center px-2' : 'px-4'
-              } py-2 text-sm font-medium text-green-700 hover:bg-green-50 rounded-lg transition-colors`}
-              title={sidebarCollapsed ? '加入諮詢室' : ''}
-            >
-              <Home className={`w-4 h-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
-              {!sidebarCollapsed && '加入諮詢室'}
-            </Link>
+            {sidebarCollapsed && (
+              <>
+                <Link
+                  href="/rooms/create"
+                  className="flex items-center justify-center px-2 py-2.5 text-sm font-medium text-amber-600 hover:bg-amber-50 rounded-xl transition-colors"
+                  title="創建諮詢室"
+                >
+                  <Plus className="w-4 h-4" />
+                </Link>
+                <Link
+                  href="/join"
+                  className="flex items-center justify-center px-2 py-2.5 text-sm font-medium text-teal-600 hover:bg-teal-50 rounded-xl transition-colors"
+                  title="加入諮詢室"
+                >
+                  <UserPlus className="w-4 h-4" />
+                </Link>
+              </>
+            )}
 
             <button
               onClick={() => {
@@ -204,7 +239,7 @@ export default function DashboardPage() {
               }}
               className={`w-full flex items-center ${
                 sidebarCollapsed ? 'justify-center px-2' : 'px-4'
-              } py-2 text-sm font-medium text-red-700 hover:bg-red-50 rounded-lg transition-colors`}
+              } py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors`}
               title={sidebarCollapsed ? '登出' : ''}
             >
               <LogOut className={`w-4 h-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
@@ -217,23 +252,28 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
         {/* Mobile Header */}
-        <header className="md:hidden bg-white shadow-sm border-b">
+        <header className="md:hidden bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200/60">
           <div className="px-4 py-4">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">諮詢師儀表板</h1>
-                <p className="text-xs text-gray-600 truncate">{user?.full_name || user?.email}</p>
-              </div>
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/images/logo.png"
+                  alt="職游 Logo"
+                  width={100}
+                  height={32}
+                  className="h-8 w-auto"
+                />
+              </Link>
               <div className="flex items-center gap-2">
                 <Link
                   href="/rooms/create"
-                  className="px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700"
+                  className="px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-medium rounded-lg hover:from-amber-600 hover:to-amber-700 shadow-sm"
                 >
                   創建
                 </Link>
                 <Link
                   href="/join"
-                  className="px-3 py-2 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700"
+                  className="px-3 py-2 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-xs font-medium rounded-lg hover:from-teal-600 hover:to-teal-700 shadow-sm"
                 >
                   加入
                 </Link>
@@ -244,7 +284,7 @@ export default function DashboardPage() {
                       window.location.href = '/';
                     }
                   }}
-                  className="px-3 py-2 border border-red-300 text-red-700 text-xs font-medium rounded-lg hover:bg-red-50"
+                  className="p-2 border border-red-200 text-red-500 rounded-lg hover:bg-red-50"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -254,9 +294,19 @@ export default function DashboardPage() {
         </header>
 
         {/* Content Area */}
-        <div className="p-4 md:p-8">
+        <div className="p-4 md:p-6 lg:p-8">
+          {/* Welcome Banner */}
+          <div className="mb-6 p-6 bg-gradient-to-r from-amber-500 to-teal-500 rounded-2xl shadow-lg text-white">
+            <h1 className="text-2xl font-bold mb-1">
+              歡迎回來，{user?.full_name || user?.name || '諮詢師'}！
+            </h1>
+            <p className="text-white/80 text-sm">
+              您目前有 {clientCount} 位客戶，開始今天的諮詢吧！
+            </p>
+          </div>
+
           {activeNav === 'clients' && (
-            <div className="bg-white rounded-lg shadow">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/60">
               <div className="p-6">
                 <ClientManagement />
               </div>

@@ -336,20 +336,35 @@ export default function HomePage() {
 
         {/* Footer */}
         <footer className="mt-20 pt-8 border-t border-gray-200">
-          <div className="text-center">
-            <p className="text-sm text-gray-400">
-              © {new Date().getFullYear()} 職游 Career Creator. All rights reserved.
-            </p>
-            <p className="text-xs text-gray-400 mt-2">
+          <div className="max-w-3xl mx-auto">
+            {/* navicareer Logo */}
+            <div className="flex justify-center mb-6">
               <a
                 href="https://navicareer.tw"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-teal-500 transition-colors"
               >
-                navicareer.tw
+                <Image
+                  src="/images/navicareer-logo.png"
+                  alt="職游 navicareer"
+                  width={180}
+                  height={60}
+                  className="opacity-80 hover:opacity-100 transition-opacity"
+                />
               </a>
+            </div>
+            {/* Description */}
+            <p className="text-center text-sm text-gray-500 leading-relaxed mb-6 px-4">
+              職游是職涯助人者的成長導航，提供職涯諮詢師課程、獨家生涯牌卡與課程，
+              <br className="hidden md:block" />
+              並創造諮詢媒合、諮詢師交流等平台，期待無論是助人者還是來訪者，都能發揮所長，熱愛自己的生活！
             </p>
+            {/* Copyright */}
+            <div className="text-center">
+              <p className="text-xs text-gray-400">
+                © {new Date().getFullYear()} 職游 Career Creator. All rights reserved.
+              </p>
+            </div>
           </div>
         </footer>
       </div>

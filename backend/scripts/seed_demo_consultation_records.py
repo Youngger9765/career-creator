@@ -24,16 +24,13 @@ from app.core.config import settings
 from app.core.database import engine
 from app.models.client import Client, ConsultationRecord, RoomClient
 from app.models.counselor_note import CounselorNote
-from app.models.game_rule import CardDeck, GameRuleTemplate
+from app.models.game_rule import GameRuleTemplate
 from app.models.room import Room
 from app.models.user import User
 
 # Dr. Sarah Chen's UUID (from DEMO_ACCOUNT_UUIDS)
 DR_SARAH_CHEN_UUID = UUID("00000000-0000-0000-0001-000000000001")
 DR_SARAH_CHEN_EMAIL = "demo.counselor@example.com"
-
-# Game rule slugs from seeds.py
-GAME_RULE_SLUGS = ["basic_career", "basic_values", "basic_skills"]
 
 # Fake demo clients
 DEMO_CLIENTS = [
@@ -172,47 +169,32 @@ def create_demo_clients(session: Session) -> List[Client]:
 
 
 def create_demo_rooms(session: Session, clients: List[Client]) -> List[Room]:
-    """Create 3 rooms with different game rules"""
+    """Create 3 rooms for demo clients"""
     rooms = []
 
-    for idx, game_rule_slug in enumerate(GAME_RULE_SLUGS):
-        # Get game rule by slug
-        game_rule = session.exec(
-            select(GameRuleTemplate).where(GameRuleTemplate.slug == game_rule_slug)
-        ).first()
+    room_names = [
+        "職業探索諮詢室",
+        "價值觀探索室",
+        "職能盤點室",
+    ]
 
-        if not game_rule:
-            print(f"  ⚠️  Warning: Game rule '{game_rule_slug}' not found, skipping room")
-            continue
-
-        # Get default deck for this game rule
-        deck = session.exec(
-            select(CardDeck).where(
-                CardDeck.game_rule_id == game_rule.id,
-                CardDeck.is_default == True
-            )
-        ).first()
-
-        room_names = {
-            "basic_career": "職業探索諮詢室",
-            "basic_values": "價值觀探索室",
-            "basic_skills": "職能盤點室",
-        }
+    for idx in range(3):
+        # Use rotating client assignment
+        client = clients[idx % len(clients)]
 
         room = Room(
             counselor_id=DR_SARAH_CHEN_UUID,
-            name=room_names.get(game_rule_slug, f"諮詢室 {idx+1}"),
-            description=f"使用 {game_rule.name} 的諮詢空間",
-            game_rule_id=game_rule.id,
-            card_deck_id=deck.id if deck else None,
+            name=room_names[idx],
+            description=f"為 {client.name} 提供的諮詢空間",
+            game_rule_id=None,  # No game rule dependency
+            card_deck_id=None,  # No deck dependency
             is_active=True,
             session_count=0,
         )
         session.add(room)
         session.flush()  # Get room ID
 
-        # Associate client with room (use rotating client assignment)
-        client = clients[idx % len(clients)]
+        # Associate client with room
         room_client = RoomClient(
             room_id=room.id,
             client_id=client.id,
@@ -220,7 +202,7 @@ def create_demo_rooms(session: Session, clients: List[Client]) -> List[Room]:
         session.add(room_client)
 
         rooms.append(room)
-        print(f"  → Created room: {room.name} (game: {game_rule_slug}, client: {client.name})")
+        print(f"  → Created room: {room.name} (client: {client.name})")
 
     return rooms
 

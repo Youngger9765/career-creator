@@ -222,22 +222,22 @@ export function ClientManagement({ className = '' }: ClientManagementProps) {
           <>
             {/* Desktop Table View */}
             <div className="hidden lg:block overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full table-fixed">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    <th className="px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="w-[180px] px-5 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       客戶
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="w-[200px] px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       聯絡方式
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="w-[140px] px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">
                       最後諮詢
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="w-[180px] px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       備註
                     </th>
-                    <th className="px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="w-[280px] px-4 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                       操作
                     </th>
                   </tr>

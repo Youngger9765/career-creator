@@ -104,11 +104,11 @@ export function ClientTableRow({
       {/* Last Consultation */}
       <td className="px-4 py-4">
         {client.last_consultation_date ? (
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
             {formatDate(client.last_consultation_date)}
           </div>
         ) : (
-          <span className="text-sm text-gray-400">尚未諮詢</span>
+          <span className="text-sm text-gray-400 whitespace-nowrap">尚未諮詢</span>
         )}
       </td>
 

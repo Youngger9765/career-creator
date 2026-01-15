@@ -66,14 +66,14 @@ function ParticipantAvatar({ participant }: { participant: RoomParticipant }) {
         <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
       )}
 
-      {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+      {/* Tooltip - 向下顯示 */}
+      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900"></div>
         <div className="bg-gray-900 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
           <div className="font-medium">{participant.name}</div>
           <div className="text-gray-300 capitalize">{participant.type}</div>
           <div className="text-gray-400">{participant.isOnline ? '線上' : '離線'}</div>
         </div>
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-gray-900"></div>
       </div>
     </div>
   );

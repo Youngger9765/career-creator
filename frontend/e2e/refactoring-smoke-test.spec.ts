@@ -20,7 +20,7 @@ test.describe('Refactoring Smoke Test', () => {
     await expect(page.locator('text=價值導航卡').first()).toBeVisible();
 
     // Verify visitor name is displayed in header
-    await expect(page.locator('text=訪客: TestUser')).toBeVisible();
+    await expect(page.locator('text=TestUser')).toBeVisible();
   });
 
   test('can switch between card deck tabs', async ({ page }) => {

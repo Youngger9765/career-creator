@@ -52,6 +52,27 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Navicareer Brand Colors
+        'brand-gold': {
+          DEFAULT: '#F5B942',
+          light: '#FFB84D',
+          dark: '#E5A932',
+        },
+        'brand-teal': {
+          DEFAULT: '#5DBAAE',
+          light: '#6DCDC1',
+          dark: '#4DB8A8',
+        },
+        'brand-navy': {
+          DEFAULT: '#2C4A6B',
+          light: '#3A5A7B',
+          dark: '#1E3A5F',
+        },
+        'brand-orange': {
+          DEFAULT: '#FF6B35',
+          light: '#FF7849',
+        },
+        'brand-yellow-soft': '#FFE5B4',
       },
       borderRadius: {
         lg: "var(--radius)",

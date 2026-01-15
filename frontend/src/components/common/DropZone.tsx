@@ -334,31 +334,42 @@ const DropZone: React.FC<DropZoneProps> = ({
           className={`rounded-lg shadow-sm hover:shadow-lg transition-all cursor-move flex flex-col relative overflow-hidden`}
           style={{ width: cardWidth, height: cardHeight }}
         >
-          {/* 底部按鈕組 - 查看大卡 & 翻轉 */}
-          <div className="absolute bottom-2 left-2 right-2 flex gap-1.5 z-20">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setViewingCard(card);
-              }}
-              className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
-              title="查看大卡"
-            >
-              <Eye className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
-              <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">查看</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleCardFlip(card.id);
-              }}
-              className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
-              title="翻轉卡片"
-            >
-              <RotateCw className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
-              <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">翻轉</span>
-            </button>
-          </div>
+          {/* 底部按鈕組 - 查看大卡 & 翻轉（只有有背面時才顯示翻轉） */}
+          {(() => {
+            const imageUrls =
+              typeof card.imageUrl === 'object'
+                ? card.imageUrl?.M || card.imageUrl
+                : null;
+            const hasBack = imageUrls?.back && imageUrls.back !== imageUrls.front;
+            return (
+              <div className="absolute bottom-2 left-2 right-2 flex gap-1.5 z-20">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setViewingCard(card);
+                  }}
+                  className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
+                  title="查看大卡"
+                >
+                  <Eye className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
+                  <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">查看</span>
+                </button>
+                {hasBack && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleCardFlip(card.id);
+                    }}
+                    className="flex-1 px-2 py-1 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-md flex items-center justify-center gap-1 hover:bg-white/50 dark:hover:bg-gray-700/50 transition-colors border border-gray-200/30 dark:border-gray-600/30 shadow-sm"
+                    title="翻轉卡片"
+                  >
+                    <RotateCw className="w-3.5 h-3.5 text-gray-700 dark:text-gray-200" />
+                    <span className="text-[11px] font-medium text-gray-700 dark:text-gray-200">翻轉</span>
+                  </button>
+                )}
+              </div>
+            );
+          })()}
           {(() => {
             // Get image URLs - use M size for dropzone cards
             const imageUrls =

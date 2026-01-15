@@ -120,6 +120,8 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
                 className="w-64 h-96"
                 headerClassName="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20"
                 contentClassName="flex items-center justify-center"
+                viewMode={viewMode}
+                onViewModeChange={onViewModeChange}
               />
             </div>
 
@@ -154,6 +156,8 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
                 className="w-64 h-96"
                 headerClassName="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/20 dark:to-yellow-900/20"
                 contentClassName="flex items-center justify-center"
+                viewMode={viewMode}
+                onViewModeChange={onViewModeChange}
               />
             </div>
           </div>

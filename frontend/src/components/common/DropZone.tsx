@@ -79,6 +79,7 @@ export interface DropZoneProps {
 
   // 全域視圖模式（由外部控制）
   viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 const DropZone: React.FC<DropZoneProps> = ({

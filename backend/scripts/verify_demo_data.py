@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """Verify demo consultation records in database."""
+import sys
+from pathlib import Path
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from app.core.database import engine
 from sqlmodel import Session, text
-import sys
 
 
 def verify_demo_data():

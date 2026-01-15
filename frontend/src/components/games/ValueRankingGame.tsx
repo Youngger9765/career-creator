@@ -102,7 +102,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
         columns: 2,
       }}
       enableViewModeToggle={true}
-      canvas={
+      canvas={(viewMode) => (
         <GridCanvas
           cards={mainDeck?.cards || []}
           onCardMove={handleCardMove}
@@ -114,8 +114,9 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
           draggedByOthers={draggedByOthers}
           onDragStart={cardSync.startDrag}
           onDragEnd={cardSync.endDrag}
+          viewMode={viewMode}
         />
-      }
+      )}
     />
   );
 };

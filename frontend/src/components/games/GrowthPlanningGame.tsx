@@ -273,8 +273,9 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         columns: 2,
       }}
       enableViewModeToggle={true}
-      canvas={
+      canvas={(viewMode) => (
         <GrowthPlanCanvas
+          viewMode={viewMode}
           cards={allCards}
           onCardUse={handleCardUse}
           onCardRemove={handleCardRemove}
@@ -288,7 +289,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
           planText={planText} // 傳遞同步的文字狀態
           isReadOnly={!isRoomOwner} // 訪客只能讀
         />
-      }
+      )}
     />
   );
 };

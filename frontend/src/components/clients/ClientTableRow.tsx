@@ -52,7 +52,7 @@ export function ClientTableRow({
     if (showMenu && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setMenuPosition({
-        top: rect.top - 8, // 往上一點
+        top: rect.bottom + 4, // 向下展開
         left: rect.right - 144, // w-36 = 144px
       });
     }
@@ -198,7 +198,6 @@ export function ClientTableRow({
                   style={{ 
                     top: menuPosition.top,
                     left: menuPosition.left,
-                    transform: 'translateY(-100%)'
                   }}
                 >
                   <button

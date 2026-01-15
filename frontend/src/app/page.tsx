@@ -71,7 +71,7 @@ export default function HomePage() {
               {/* Logo */}
               <div className="mb-4">
                 <Image
-                  src="/logos/current/logo.png"
+                  src="/logos/current/logo1.png"
                   alt="職游 Logo"
                   width={200}
                   height={70}

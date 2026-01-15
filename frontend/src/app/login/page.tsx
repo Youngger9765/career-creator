@@ -97,7 +97,7 @@ export default function LoginPage() {
         <div className="text-center">
           <a href="/" className="inline-block">
             <Image
-              src="/logos/current/logo.png"
+              src="/logos/current/logo1.png"
               alt="職游 Logo"
               width={200}
               height={72}

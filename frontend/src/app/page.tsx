@@ -116,25 +116,25 @@ export default function HomePage() {
             <div className="hidden lg:block relative">
               <div className="relative w-full h-[500px]">
                 {/* 主卡片 */}
-                <div className="absolute top-10 left-10 w-64 h-80 bg-white rounded-2xl shadow-2xl p-6 transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
-                  <div className="w-full h-full bg-gradient-to-br from-[#0056A7] to-[#0056A7]/80 rounded-xl flex items-center justify-center">
+                <div className="absolute top-10 left-10 w-64 h-96 bg-white rounded-2xl shadow-2xl p-6 transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="w-full h-64 bg-gradient-to-br from-[#0056A7] to-[#0056A7]/80 rounded-xl flex items-center justify-center">
                     <span className="text-white text-6xl">🧭</span>
                   </div>
-                  <p className="text-center mt-4 font-bold text-gray-800">職游旅人卡</p>
+                  <p className="text-center mt-6 font-bold text-gray-800 text-xl">職游旅人卡</p>
                 </div>
                 {/* 次卡片 */}
-                <div className="absolute top-32 right-10 w-56 h-72 bg-white rounded-2xl shadow-xl p-5 transform rotate-[8deg] hover:rotate-0 transition-transform duration-500">
-                  <div className="w-full h-full bg-gradient-to-br from-[#FFCC3A] to-[#FFCC3A]/80 rounded-xl flex items-center justify-center">
+                <div className="absolute top-32 right-10 w-56 h-80 bg-white rounded-2xl shadow-xl p-5 transform rotate-[8deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="w-full h-52 bg-gradient-to-br from-[#FFCC3A] to-[#FFCC3A]/80 rounded-xl flex items-center justify-center">
                     <span className="text-white text-5xl">📊</span>
                   </div>
-                  <p className="text-center mt-3 font-bold text-gray-800 text-sm">職能盤點卡</p>
+                  <p className="text-center mt-4 font-bold text-gray-800 text-lg">職能盤點卡</p>
                 </div>
                 {/* 第三卡片 */}
-                <div className="absolute bottom-10 left-1/3 w-48 h-64 bg-white rounded-2xl shadow-lg p-4 transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500">
-                  <div className="w-full h-full bg-gradient-to-br from-[#7AB7B7] to-[#7AB7B7]/80 rounded-xl flex items-center justify-center">
+                <div className="absolute bottom-10 left-1/3 w-48 h-72 bg-white rounded-2xl shadow-lg p-4 transform rotate-[-3deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="w-full h-44 bg-gradient-to-br from-[#7AB7B7] to-[#7AB7B7]/80 rounded-xl flex items-center justify-center">
                     <span className="text-white text-4xl">💎</span>
                   </div>
-                  <p className="text-center mt-2 font-bold text-gray-800 text-xs">價值導航卡</p>
+                  <p className="text-center mt-4 font-bold text-gray-800 text-base">價值導航卡</p>
                 </div>
               </div>
             </div>

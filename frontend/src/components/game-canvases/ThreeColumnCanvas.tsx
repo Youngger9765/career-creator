@@ -41,6 +41,7 @@ interface ThreeColumnCanvasProps {
   onDragEnd?: (cardId: string) => void;
   // 外部控制的視圖模式
   viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
@@ -55,6 +56,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
   onDragStart,
   onDragEnd,
   viewMode,
+  onViewModeChange,
 }) => {
   // 使用外部狀態，如果沒有則使用本地狀態
   const likeCards = cardPlacements?.likeCards || [];
@@ -178,6 +180,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
 
         {/* 中立欄位 */}
@@ -212,6 +215,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
 
         {/* 不喜歡欄位 */}
@@ -246,6 +250,7 @@ const ThreeColumnCanvas: React.FC<ThreeColumnCanvasProps> = ({
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
       </div>
     </div>

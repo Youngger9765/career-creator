@@ -26,6 +26,7 @@ interface CollectionCanvasProps {
   onDragStart?: (cardId: string) => void;
   onDragEnd?: (cardId: string) => void;
   viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
@@ -41,6 +42,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
   onDragStart,
   onDragEnd,
   viewMode,
+  onViewModeChange,
 }) => {
   // 使用外部狀態，不再內部管理
   const collectedCardIds = externalCollectedCardIds || [];
@@ -101,6 +103,7 @@ const CollectionCanvas: React.FC<CollectionCanvasProps> = ({
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
       </div>
     </div>

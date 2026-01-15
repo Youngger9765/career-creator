@@ -39,6 +39,7 @@ interface JobDecompositionCanvasProps {
   onDragStart?: (cardId: string) => void;
   onDragEnd?: (cardId: string) => void;
   viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
@@ -55,6 +56,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
   onDragStart,
   onDragEnd,
   viewMode,
+  onViewModeChange,
 }) => {
   const [isLocked, setIsLocked] = useState(false);
   const [localMaxCards, setLocalMaxCards] = useState(maxCards);
@@ -110,6 +112,7 @@ const JobDecompositionCanvas: React.FC<JobDecompositionCanvasProps> = ({
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
       </div>
 

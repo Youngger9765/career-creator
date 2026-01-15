@@ -40,6 +40,7 @@ interface TwoZoneCanvasProps {
   onDragStart?: (cardId: string) => void;
   onDragEnd?: (cardId: string) => void;
   viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
@@ -58,6 +59,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
   onDragStart,
   onDragEnd,
   viewMode,
+  onViewModeChange,
 }) => {
   const [advantageCards, setAdvantageCards] = useState<string[]>(advantageCardIds || []);
   const [disadvantageCards, setDisadvantageCards] = useState<string[]>(disadvantageCardIds || []);
@@ -158,6 +160,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
 
         {/* 劣勢區域 */}
@@ -190,6 +193,7 @@ const TwoZoneCanvas: React.FC<TwoZoneCanvasProps> = ({
           onCardDragEnd={onDragEnd}
           draggedByOthers={draggedByOthers}
           viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
         />
       </div>
     </div>

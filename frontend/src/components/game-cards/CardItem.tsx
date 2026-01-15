@@ -15,7 +15,7 @@ interface CardItemProps {
   title: string;
   description?: string;
   category?: string;
-  type?: 'skill' | 'action' | 'value' | 'career'; // 添加類型以區分顏色
+  type?: 'skill' | 'mindset' | 'action' | 'value' | 'career'; // 添加類型以區分顏色
   imageUrl?: any; // Card image URLs
   isDraggable?: boolean;
   showRemoveButton?: boolean;

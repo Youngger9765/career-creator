@@ -16,7 +16,7 @@ import CardModal from './CardModal';
 // 大卡片組件 - 用於 Single 模式
 interface BigCardProps {
   card: any;
-  type?: 'skill' | 'action' | 'value' | 'career';
+  type?: 'skill' | 'mindset' | 'action' | 'value' | 'career';
 }
 
 const BigCard: React.FC<BigCardProps> = ({ card, type }) => {
@@ -158,7 +158,7 @@ export interface DeckConfig {
   label: string;
   cards: any[];
   color: 'blue' | 'orange' | 'green' | 'purple' | 'red';
-  type?: 'skill' | 'action' | 'value' | 'career';
+  type?: 'skill' | 'mindset' | 'action' | 'value' | 'career';
 }
 
 interface CardSidebarProps {

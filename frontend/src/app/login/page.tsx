@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { authAPI } from '@/lib/api/auth';
 
 export default function LoginPage() {
@@ -11,6 +12,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  // 判斷是否為開發環境
+  const isDevelopment = process.env.NODE_ENV === 'development';
 
   useEffect(() => {
     // Simple token check
@@ -26,9 +30,9 @@ export default function LoginPage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
           <p className="mt-2 text-gray-600">檢查登入狀態...</p>
         </div>
       </div>
@@ -67,41 +71,53 @@ export default function LoginPage() {
   };
 
   const fillTestAccount = () => {
-    console.log('Filling test account...');
     setEmail('demo.counselor@example.com');
     setPassword('demo123');
   };
 
   const fillTestAccount2 = () => {
-    console.log('Filling test account 2...');
     setEmail('test@example.com');
     setPassword('demo123');
   };
 
   const fillCounselorAccount = () => {
-    console.log('Filling counselor account...');
     setEmail('counselor@example.com');
     setPassword('test1234');
   };
 
   const fillAdminAccount = () => {
-    console.log('Filling admin account...');
     setEmail('demo.admin@example.com');
     setPassword('demo123');
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">諮詢師登入</h2>
-          <p className="mt-2 text-center text-sm text-gray-600">登入您的諮詢師帳號</p>
+        {/* Logo */}
+        <div className="text-center">
+          <a href="/" className="inline-block">
+            <Image
+              src="/images/logo.png"
+              alt="職游 Logo"
+              width={200}
+              height={72}
+              className="mx-auto"
+              priority
+            />
+          </a>
         </div>
 
+        {/* Title */}
+        <div>
+          <h2 className="text-center text-2xl font-bold text-gray-800">諮詢師登入</h2>
+          <p className="mt-2 text-center text-sm text-gray-500">登入您的諮詢師帳號</p>
+        </div>
+
+        {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+          <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="sr-only">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 電子信箱
               </label>
               <input
@@ -110,14 +126,14 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="電子信箱"
+                className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                placeholder="請輸入電子信箱"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 密碼
               </label>
               <input
@@ -126,108 +142,104 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
-                className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="密碼"
+                className="block w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition-all"
+                placeholder="請輸入密碼"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
 
-          {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+          {error && (
+            <div className="text-red-600 text-sm text-center bg-red-50 py-2 px-4 rounded-lg">
+              {error}
+            </div>
+          )}
 
           <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
             >
               {loading ? '登入中...' : '登入'}
             </button>
           </div>
 
           <div className="text-center">
-            <a href="/forgot-password" className="text-sm text-gray-600 hover:text-gray-900">
+            <a href="/forgot-password" className="text-sm text-gray-500 hover:text-amber-600 transition-colors">
               忘記密碼？
             </a>
           </div>
         </form>
 
-        {/* Demo accounts for testing */}
-        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-          <h3 className="text-sm font-medium text-yellow-800 mb-3">開發測試帳號</h3>
+        {/* Demo accounts for testing - Development Only */}
+        {isDevelopment && (
+          <div className="mt-6 p-4 bg-gray-100 border border-gray-200 rounded-xl">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">🛠️ 開發測試帳號</h3>
 
-          {/* Demo Account 1 */}
-          <div className="mb-3 p-2 bg-white rounded border">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-medium text-gray-800">Demo 諮詢師</p>
-                <p className="text-xs text-gray-600">demo.counselor@example.com / demo123</p>
+            <div className="space-y-2">
+              <div className="p-2 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-medium text-gray-800">Demo 諮詢師</p>
+                  <p className="text-xs text-gray-500">demo.counselor@example.com</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={fillTestAccount}
+                  className="px-3 py-1.5 text-xs bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  填入
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={fillTestAccount}
-                className="ml-2 px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-              >
-                填入
-              </button>
+
+              <div className="p-2 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-medium text-gray-800">測試諮詢師</p>
+                  <p className="text-xs text-gray-500">test@example.com</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={fillTestAccount2}
+                  className="px-3 py-1.5 text-xs bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  填入
+                </button>
+              </div>
+
+              <div className="p-2 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-medium text-gray-800">王諮詢師</p>
+                  <p className="text-xs text-gray-500">counselor@example.com</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={fillCounselorAccount}
+                  className="px-3 py-1.5 text-xs bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  填入
+                </button>
+              </div>
+
+              <div className="p-2 bg-white rounded-lg border border-gray-200 flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-medium text-gray-800">系統管理員</p>
+                  <p className="text-xs text-gray-500">demo.admin@example.com</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={fillAdminAccount}
+                  className="px-3 py-1.5 text-xs bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  填入
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Test Account */}
-          <div className="mb-3 p-2 bg-white rounded border">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-medium text-gray-800">測試諮詢師</p>
-                <p className="text-xs text-gray-600">test@example.com / demo123</p>
-              </div>
-              <button
-                type="button"
-                onClick={fillTestAccount2}
-                className="ml-2 px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-              >
-                填入
-              </button>
-            </div>
-          </div>
-
-          {/* Counselor Account */}
-          <div className="mb-3 p-2 bg-white rounded border">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-medium text-gray-800">王諮詢師</p>
-                <p className="text-xs text-gray-600">counselor@example.com / test1234</p>
-              </div>
-              <button
-                type="button"
-                onClick={fillCounselorAccount}
-                className="ml-2 px-2 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-              >
-                填入
-              </button>
-            </div>
-          </div>
-
-          {/* Admin Account */}
-          <div className="p-2 bg-white rounded border">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-medium text-gray-800">系統管理員</p>
-                <p className="text-xs text-gray-600">demo.admin@example.com / demo123</p>
-              </div>
-              <button
-                type="button"
-                onClick={fillAdminAccount}
-                className="ml-2 px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-              >
-                填入
-              </button>
-            </div>
-          </div>
-        </div>
+        )}
 
         <div className="text-center">
-          <a href="/" className="text-sm text-gray-600 hover:text-gray-900">
+          <a href="/" className="text-sm text-gray-500 hover:text-amber-600 transition-colors">
             ← 回到首頁
           </a>
         </div>

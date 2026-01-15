@@ -191,23 +191,23 @@ const CardSidebar: React.FC<CardSidebarProps> = ({
   // 顏色配置
   const colorConfig = {
     blue: {
-      tab: 'data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400',
+      tab: 'data-[state=active]:text-blue-700 dark:data-[state=active]:text-blue-300 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900/50 data-[state=active]:border-b-2 data-[state=active]:border-blue-500',
       badge: 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300',
     },
     orange: {
-      tab: 'data-[state=active]:text-orange-600 dark:data-[state=active]:text-orange-400',
+      tab: 'data-[state=active]:text-orange-700 dark:data-[state=active]:text-orange-300 data-[state=active]:bg-orange-100 dark:data-[state=active]:bg-orange-900/50 data-[state=active]:border-b-2 data-[state=active]:border-orange-500',
       badge: 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300',
     },
     green: {
-      tab: 'data-[state=active]:text-green-600 dark:data-[state=active]:text-green-400',
+      tab: 'data-[state=active]:text-green-700 dark:data-[state=active]:text-green-300 data-[state=active]:bg-green-100 dark:data-[state=active]:bg-green-900/50 data-[state=active]:border-b-2 data-[state=active]:border-green-500',
       badge: 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300',
     },
     purple: {
-      tab: 'data-[state=active]:text-purple-600 dark:data-[state=active]:text-purple-400',
+      tab: 'data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-300 data-[state=active]:bg-purple-100 dark:data-[state=active]:bg-purple-900/50 data-[state=active]:border-b-2 data-[state=active]:border-purple-500',
       badge: 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300',
     },
     red: {
-      tab: 'data-[state=active]:text-red-600 dark:data-[state=active]:text-red-400',
+      tab: 'data-[state=active]:text-red-700 dark:data-[state=active]:text-red-300 data-[state=active]:bg-red-100 dark:data-[state=active]:bg-red-900/50 data-[state=active]:border-b-2 data-[state=active]:border-red-500',
       badge: 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
     },
   };

@@ -81,9 +81,9 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
     checkAndCreatePlan(skillCards, actionCards, text);
   };
 
-  // 過濾職能卡和行動卡
-  const availableSkillCards = cards.filter((card) => !card.id.startsWith('action_'));
-  const availableActionCards = cards.filter((card) => card.id.startsWith('action_'));
+  // 過濾職能卡和行動卡 - 使用 category 判斷
+  const availableSkillCards = cards.filter((card) => card.category === 'mindset');
+  const availableActionCards = cards.filter((card) => card.category === 'action');
 
   return (
     <div className={`w-full h-full overflow-y-auto p-6 ${className}`}>
@@ -97,7 +97,7 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
                 cards={availableSkillCards}
                 placedCardIds={skillCards}
                 maxCards={1}
-                allowedCardTypes={['skill_']} // 只允許職能卡
+                allowedCardTypes={['mindset_']} // 只允許職能卡
                 title="職能卡"
                 subtitle="選擇要發展的技能"
                 icon={Target}

@@ -42,7 +42,7 @@ const CardItem: React.FC<CardItemProps> = ({
   const [isFlipped, setIsFlipped] = useState(false);
   // 根據卡片類型或ID前綴決定背景色
   const getCardBackground = () => {
-    if (type === 'skill' || id.startsWith('skill_')) {
+    if (type === 'mindset' || id.startsWith('mindset_')) {
       return 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/60 dark:to-indigo-900/60 border-blue-200 dark:border-blue-700';
     } else if (type === 'action' || id.startsWith('action_')) {
       return 'bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/60 dark:to-amber-900/60 border-orange-200 dark:border-orange-700';
@@ -56,7 +56,7 @@ const CardItem: React.FC<CardItemProps> = ({
 
   // 根據卡片類型決定分類標籤顏色
   const getCategoryColor = () => {
-    if (type === 'skill' || id.startsWith('skill_')) {
+    if (type === 'mindset' || id.startsWith('mindset_')) {
       return 'text-blue-600 dark:text-blue-400';
     } else if (type === 'action' || id.startsWith('action_')) {
       return 'text-orange-600 dark:text-orange-400';

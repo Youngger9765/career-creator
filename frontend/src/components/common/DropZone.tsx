@@ -224,7 +224,7 @@ const DropZone: React.FC<DropZoneProps> = ({
 
   // 根據卡片ID決定背景色
   const getCardBackground = (cardId: string) => {
-    if (cardId.startsWith('skill_')) {
+    if (cardId.startsWith('mindset_')) {
       return 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700';
     } else if (cardId.startsWith('action_')) {
       return 'bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 border-orange-200 dark:border-orange-700';
@@ -238,7 +238,7 @@ const DropZone: React.FC<DropZoneProps> = ({
 
   // 根據卡片ID決定分類標籤顏色
   const getCategoryColor = (cardId: string) => {
-    if (cardId.startsWith('skill_')) {
+    if (cardId.startsWith('mindset_')) {
       return 'text-blue-600 dark:text-blue-400';
     } else if (cardId.startsWith('action_')) {
       return 'text-orange-600 dark:text-orange-400';

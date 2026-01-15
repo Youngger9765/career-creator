@@ -101,6 +101,7 @@ const ValueRankingGame: React.FC<ValueRankingGameProps> = ({
         width: 'w-96',
         columns: 2,
       }}
+      enableViewModeToggle={true}
       canvas={
         <GridCanvas
           cards={mainDeck?.cards || []}

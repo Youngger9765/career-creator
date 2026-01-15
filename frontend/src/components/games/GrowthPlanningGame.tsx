@@ -272,6 +272,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         width: 'w-96',
         columns: 2,
       }}
+      enableViewModeToggle={true}
       canvas={
         <GrowthPlanCanvas
           cards={allCards}

@@ -25,6 +25,8 @@ interface GridCanvasProps {
   draggedByOthers?: Map<string, string>; // cardId -> performerName
   onDragStart?: (cardId: string) => void;
   onDragEnd?: (cardId: string) => void;
+  viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 interface GridZone {
@@ -49,6 +51,8 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
   draggedByOthers,
   onDragStart,
   onDragEnd,
+  viewMode,
+  onViewModeChange,
 }) => {
   // 定義區域配置
   const zoneConfigs: Omit<GridZone, 'placedCardIds'>[] = [
@@ -172,6 +176,8 @@ const GridCanvas: React.FC<GridCanvasProps> = ({
                 dragOverColor={`border-green-500 bg-green-50 dark:bg-green-900/20`}
                 className="h-full"
                 headerClassName="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20"
+                viewMode={viewMode}
+                onViewModeChange={onViewModeChange}
               />
             ))}
         </div>

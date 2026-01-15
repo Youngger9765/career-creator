@@ -28,6 +28,8 @@ interface GrowthPlanCanvasProps {
   onDragStart?: (cardId: string) => void; // 同步相關
   onDragEnd?: (cardId: string) => void; // 同步相關
   isReadOnly?: boolean; // 是否為唯讀模式
+  viewMode?: 'grid' | 'compact';
+  onViewModeChange?: (mode: 'grid' | 'compact') => void;
 }
 
 interface GrowthPlan {
@@ -47,6 +49,8 @@ const GrowthPlanCanvas: React.FC<GrowthPlanCanvasProps> = ({
   actionCards = [],
   planText = '',
   isReadOnly = false,
+  viewMode,
+  onViewModeChange,
 }) => {
   // 處理職能卡（A區）
   const handleCardAAdd = (cardId: string) => {

@@ -384,8 +384,9 @@ export default function HomePage() {
                 />
               </a>
             </div>
-            <p className="text-sm text-gray-300 text-center md:text-right max-w-md">
-              職游是職涯助人者的成長導航，期待無論是助人者還是來訪者，都能發揮所長，熱愛自己的生活！
+            <p className="text-sm text-gray-300 text-center md:text-right">
+              <span className="block">職游是職涯助人者的成長導航</span>
+              <span className="block mt-1">期待每個人都能發揮所長，熱愛自己的生活！</span>
             </p>
               </div>
           <div className="mt-8 pt-6 border-t border-gray-600 text-center">

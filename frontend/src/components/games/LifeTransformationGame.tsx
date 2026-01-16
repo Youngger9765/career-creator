@@ -45,16 +45,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-// 圓餅圖配色方案 - 配合品牌色，柔和溫暖
+// 圓餅圖配色方案 - 品牌色為主，增強對比度以利區分
 const PIE_CHART_COLORS = [
-  '#7AB7B7', // 主色 - 溫柔青綠（價值導航卡）
-  '#FFCC3A', // 主色 - 溫暖金黃（職能盤點卡）
-  '#A8D5E2', // 柔和藍（延伸）
-  '#FFE6A1', // 柔和黃（延伸）
-  '#D4A5A5', // 柔和粉（延伸）
-  '#B8D4B8', // 柔和綠（延伸）
-  '#DBC4E8', // 柔和紫（延伸）
-  '#FFD4A3', // 柔和橘（延伸）
+  '#7AB7B7', // 主色 - 青綠（價值導航卡）
+  '#FFCC3A', // 主色 - 金黃（職能盤點卡）
+  '#E57373', // 柔和紅
+  '#81C784', // 柔和綠
+  '#64B5F6', // 柔和藍
+  '#BA68C8', // 柔和紫
+  '#FFB74D', // 柔和橘
+  '#A1887F', // 柔和棕
 ];
 
 interface TokenAllocation {
@@ -790,10 +790,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                                   strokeWidth="1.5"
                                 />
                                 {/* 標籤文字 */}
-                                <g
-                                  className="transition-transform duration-200 hover:scale-110 will-change-transform"
-                                  style={{ transformOrigin: `${labelX} ${labelY}` }}
-                                >
+                                <g>
                                   <text
                                     x={labelX}
                                     y={labelY}

@@ -790,30 +790,33 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                                   strokeWidth="1.5"
                                 />
                                 {/* 標籤文字 */}
-                                <text
-                                  x={labelX}
-                                  y={labelY}
-                                  fill={color}
-                                  fontSize="10"
-                                  fontWeight="600"
-                                  textAnchor={labelX > centerX ? 'start' : 'end'}
-                                  dominantBaseline="middle"
-                                  className="pointer-events-none"
+                                <g
+                                  className="transition-transform duration-200 hover:scale-110 will-change-transform"
+                                  style={{ transformOrigin: `${labelX} ${labelY}` }}
                                 >
-                                  {card?.title || cardId}
-                                </text>
-                                <text
-                                  x={labelX}
-                                  y={labelY + 10}
-                                  fill={color}
-                                  fontSize="9"
-                                  fontWeight="500"
-                                  textAnchor={labelX > centerX ? 'start' : 'end'}
-                                  dominantBaseline="middle"
-                                  className="pointer-events-none"
-                                >
-                                  {Math.round(percentage)}%
-                                </text>
+                                  <text
+                                    x={labelX}
+                                    y={labelY}
+                                    fill="#1a1a1a"
+                                    fontSize="11"
+                                    fontWeight="700"
+                                    textAnchor={labelX > centerX ? 'start' : 'end'}
+                                    dominantBaseline="middle"
+                                  >
+                                    {card?.title || cardId}
+                                  </text>
+                                  <text
+                                    x={labelX}
+                                    y={labelY + 12}
+                                    fill="#4a4a4a"
+                                    fontSize="10"
+                                    fontWeight="600"
+                                    textAnchor={labelX > centerX ? 'start' : 'end'}
+                                    dominantBaseline="middle"
+                                  >
+                                    {Math.round(percentage)}%
+                                  </text>
+                                </g>
                               </g>
                             );
                           });

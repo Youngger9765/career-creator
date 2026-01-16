@@ -125,8 +125,30 @@ export function ClientTableRow({
       {/* Last Consultation */}
       <td className="px-4 py-4">
         {client.last_consultation_date ? (
-          <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-            {formatDate(client.last_consultation_date)}
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            {(() => {
+              const date = new Date(client.last_consultation_date);
+              if (isNaN(date.getTime())) {
+                return <span className="text-gray-400">無日期</span>;
+              }
+              const dateStr = date.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                timeZone: 'Asia/Taipei',
+              });
+              const timeStr = date.toLocaleTimeString('zh-TW', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Taipei',
+              });
+              return (
+                <>
+                  <div>{dateStr}</div>
+                  <div>{timeStr}</div>
+                </>
+              );
+            })()}
           </div>
         ) : (
           <span className="text-sm text-gray-400 whitespace-nowrap">尚未諮詢</span>

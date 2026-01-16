@@ -45,6 +45,18 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
+// 圓餅圖配色方案 - 配合品牌色，柔和溫暖
+const PIE_CHART_COLORS = [
+  '#7AB7B7', // 主色 - 溫柔青綠（價值導航卡）
+  '#FFCC3A', // 主色 - 溫暖金黃（職能盤點卡）
+  '#A8D5E2', // 柔和藍（延伸）
+  '#FFE6A1', // 柔和黃（延伸）
+  '#D4A5A5', // 柔和粉（延伸）
+  '#B8D4B8', // 柔和綠（延伸）
+  '#DBC4E8', // 柔和紫（延伸）
+  '#FFD4A3', // 柔和橘（延伸）
+];
+
 interface TokenAllocation {
   area: string;
   amount: number;
@@ -711,16 +723,6 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                           let currentAngle = 0;
                           const segments = [];
                           const labels = [];
-                          const colors = [
-                            '#3B82F6',
-                            '#10B981',
-                            '#F59E0B',
-                            '#EF4444',
-                            '#8B5CF6',
-                            '#EC4899',
-                            '#06B6D4',
-                            '#84CC16',
-                          ];
 
                           // 為每張卡片生成固定顏色（基於 cardId）
                           const getCardColor = (cardId: string) => {
@@ -728,7 +730,7 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                             for (let i = 0; i < cardId.length; i++) {
                               hash = cardId.charCodeAt(i) + ((hash << 5) - hash);
                             }
-                            return colors[Math.abs(hash) % colors.length];
+                            return PIE_CHART_COLORS[Math.abs(hash) % PIE_CHART_COLORS.length];
                           };
 
                           // 為每個有籌碼的卡片創建扇形（按 cardId 排序以保持固定順序）
@@ -881,24 +883,13 @@ const LifeTransformationGame: React.FC<LifeTransformationGameProps> = ({
                         const tokens = cardArea?.tokens || 0;
                         if (tokens === 0) return null;
 
-                        const colors = [
-                          '#3B82F6',
-                          '#10B981',
-                          '#F59E0B',
-                          '#EF4444',
-                          '#8B5CF6',
-                          '#EC4899',
-                          '#06B6D4',
-                          '#84CC16',
-                        ];
-
                         // 使用相同的 hash 函數確保顏色一致
                         const getCardColor = (id: string) => {
                           let hash = 0;
                           for (let i = 0; i < id.length; i++) {
                             hash = id.charCodeAt(i) + ((hash << 5) - hash);
                           }
-                          return colors[Math.abs(hash) % colors.length];
+                          return PIE_CHART_COLORS[Math.abs(hash) % PIE_CHART_COLORS.length];
                         };
 
                         const percentage =

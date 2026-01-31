@@ -248,7 +248,7 @@ export default function RoomPage() {
 
   // 自動創建或獲取當天的 consultation record（僅諮詢師）
   useEffect(() => {
-    if (!currentRoom || !isCounselor || !currentRoom.client_id) return;
+    if (!currentRoom || isVisitor || !isCounselor || !currentRoom.client_id) return;
 
     const initConsultationRecord = async () => {
       try {
@@ -278,7 +278,7 @@ export default function RoomPage() {
     };
 
     initConsultationRecord();
-  }, [currentRoom, isCounselor, roomId]);
+  }, [currentRoom, isVisitor, isCounselor, roomId]);
 
   // 顯示檢查中的狀態
   if (isChecking) {

@@ -311,33 +311,40 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
           <div className="h-full flex flex-col">
             {/* 模式和玩法選擇器 - 顯示所有組合 */}
             {!gameStarted && !selectedGameplay && (
-            <div className="h-full overflow-y-auto px-3 sm:px-6 py-4 sm:py-8">
-              <div className="max-w-7xl mx-auto">
-                {/* Owner 離線提示（訪客才顯示） */}
-                {isVisitor && !ownerOnline && (
-                  <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">⏸️</span>
-                      <div>
-                        <p className="font-medium text-yellow-800 dark:text-yellow-200">
-                          等待諮詢師上線
-                        </p>
-                        <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                          諮詢師離線時無法切換遊戲模式
-                        </p>
+              <>
+                {/* 訪客：顯示等待諮詢師選擇遊戲的遮罩 */}
+                {isVisitor ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center px-4">
+                      <div className="mb-4">
+                        <span className="text-6xl">🎮</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                        等待諮詢師選擇遊戲
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">諮詢師正在選擇遊戲模式</p>
+                      <div className="mt-4">
+                        <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          等待中
+                        </div>
                       </div>
                     </div>
                   </div>
+                ) : (
+                  /* 諮詢師：顯示選擇器 */
+                  <div className="h-full overflow-y-auto px-3 sm:px-6 py-4 sm:py-8">
+                    <div className="max-w-7xl mx-auto">
+                      <CombinedGameSelector
+                        onGameSelect={handleGameSelect}
+                        currentMode={selectedMode}
+                        currentGameplay={selectedGameplay}
+                        disabled={!canInteractLocal}
+                      />
+                    </div>
+                  </div>
                 )}
-
-                <CombinedGameSelector
-                  onGameSelect={handleGameSelect}
-                  currentMode={selectedMode}
-                  currentGameplay={selectedGameplay}
-                  disabled={!canInteractLocal}
-                />
-              </div>
-            </div>
+              </>
           )}
 
           {/* 錯誤顯示 */}

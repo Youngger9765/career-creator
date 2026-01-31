@@ -486,14 +486,15 @@ export default function RoomPage() {
           </div>
 
           {/* 中間：線上人數 */}
-          <div className="hidden md:flex items-center">
+          {/* Temporarily hidden - debugging participant list issue */}
+          {/* <div className="hidden md:flex items-center">
             <ParticipantList
               participants={participants as any}
               onlineCount={onlineCount}
               isLoading={participantsLoading}
               className=""
             />
-          </div>
+          </div> */}
 
           {/* 右側：用戶資訊 + 分享碼 + 狀態 */}
           <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">

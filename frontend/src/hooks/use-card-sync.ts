@@ -103,6 +103,8 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
+  // 防止重複廣播初始狀態（避免無限循環）
+  const hasInitialBroadcastRef = useRef(false);
 
   // LocalStorage key
   const storageKey = `career_creator_cards_${roomId}_${gameType}`;
@@ -347,7 +349,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         setError(null);
         channelRef.current = channel;
 
-        // 新用戶請求當前狀態
+        // 訪客：請求當前狀態
         if (!isOwner) {
           channel.send({
             type: 'broadcast',
@@ -355,12 +357,33 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
             payload: { userId },
           });
         }
+
+        // 諮詢師：重新連線時廣播當前狀態（只廣播一次，防止無限循環）
+        if (isOwner && !hasInitialBroadcastRef.current) {
+          const currentState = loadGameState();
+          if (currentState) {
+            hasInitialBroadcastRef.current = true; // 標記已廣播
+            console.log('[CardSyncRT] Owner reconnected, broadcasting initial state once');
+
+            // 延遲 100ms 廣播，避免與其他初始化邏輯衝突
+            setTimeout(() => {
+              if (channelRef.current) {
+                channelRef.current.send({
+                  type: 'broadcast',
+                  event: 'current_game_state',
+                  payload: currentState,
+                });
+              }
+            }, 100);
+          }
+        }
       }
     });
 
     return () => {
       channel.unsubscribe();
       channelRef.current = null;
+      hasInitialBroadcastRef.current = false; // 重置廣播標記
 
       // Cleanup pending throttled/debounced calls to prevent memory leaks
       throttledBroadcastMove.cancel();

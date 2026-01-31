@@ -40,7 +40,18 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      // Clear token and redirect to login
+      // Check if this is a visitor session
+      const isVisitor = typeof window !== 'undefined' &&
+        (window.location.search.includes('visitor=true') ||
+         localStorage.getItem('visitor_session') !== null);
+
+      // Visitors: don't redirect to login, just fail the request
+      if (isVisitor) {
+        console.debug('[API] 401 for visitor, request failed:', originalRequest.url);
+        return Promise.reject(error);
+      }
+
+      // Authenticated users: clear token and redirect to login
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
 

@@ -133,6 +133,36 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     [isOwner, channel, persistState, onStateChange]
   );
 
+  // Exit game - Return to game selection screen (Owner only)
+  const exitGame = useCallback(() => {
+    if (!isOwner || !channel) {
+      console.warn('[GameModeSync] Only owner can exit game');
+      return;
+    }
+
+    const emptyState: GameModeState = { deck: '', gameRule: '', gameMode: '' };
+
+    // Update local state
+    setSyncedState(emptyState);
+    persistState(emptyState);
+    hasActiveGameRef.current = false; // Clear active game flag
+    onStateChange?.(emptyState);
+
+    // Broadcast to others
+    channel
+      .send({
+        type: 'broadcast',
+        event: 'mode_changed',
+        payload: emptyState,
+      })
+      .then(() => {
+        console.log('[GameModeSync] Successfully broadcasted game exit');
+      })
+      .catch((err) => {
+        console.error('[GameModeSync] Failed to broadcast game exit:', err);
+      });
+  }, [isOwner, channel, persistState, onStateChange]);
+
   // Start game (Owner only)
   const startGame = useCallback(() => {
     if (!isOwner || !channel) {
@@ -256,6 +286,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     isConnected,
     error,
     changeGameMode,
+    exitGame,
     startGame,
     gameStarted,
     waitingForOwnerState,

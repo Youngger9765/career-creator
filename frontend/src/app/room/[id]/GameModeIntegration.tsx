@@ -14,6 +14,7 @@ import { GameModeService } from '@/game-modes/services/mode.service';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import CombinedGameSelector from '@/game-modes/components/CombinedGameSelector';
 import { useGameModeSync } from '@/hooks/use-game-mode-sync';
+import { usePresence } from '@/hooks/use-presence';
 import { DECK_TYPES, GAMEPLAY_IDS, GAMEPLAY_NAMES } from '@/constants/game-modes';
 
 // 導入獨立的遊戲組件
@@ -64,10 +65,14 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     setPortalContainer(container);
   }, []);
 
+  // 使用 room presence 檢測 counselor 在線狀態
+  const { onlineUsers } = usePresence(roomId);
+  const counselorOnline = onlineUsers.some(u => u.role === 'owner');
+
   // 使用遊戲模式同步 Hook
   const {
     syncedState,
-    ownerOnline,
+    ownerOnline: gameChannelOwnerOnline,
     canInteract,
     isConnected,
     error: syncError,
@@ -83,6 +88,9 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       onStateChange?.(state);
     },
   });
+
+  // 使用 room presence 的在線狀態（更準確）
+  const ownerOnline = counselorOnline;
 
   // 選擇遊戲（模式 + 玩法）- Owner 同步選擇
   const handleGameSelect = (modeId: string, gameplayId: string) => {

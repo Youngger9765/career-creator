@@ -347,13 +347,26 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         setError(null);
         channelRef.current = channel;
 
-        // 新用戶請求當前狀態
+        // 訪客：請求當前狀態
         if (!isOwner) {
           channel.send({
             type: 'broadcast',
             event: 'request_game_state',
             payload: { userId },
           });
+        }
+
+        // 諮詢師：重新連線時主動廣播當前狀態（確保訪客同步）
+        if (isOwner) {
+          const currentState = loadGameState();
+          if (currentState) {
+            console.log('[CardSyncRT] Owner reconnected, broadcasting current state to all visitors');
+            channel.send({
+              type: 'broadcast',
+              event: 'current_game_state',
+              payload: currentState,
+            });
+          }
         }
       }
     });

@@ -115,7 +115,29 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     },
     onStateReceived: (gameState) => {
       console.log(`[${gameType}] Received game state:`, gameState);
-      // TODO: 處理完整狀態同步
+
+      // 將 gameState.cards 轉換為 cardPlacements 格式
+      const placements: Record<string, string[]> = {};
+
+      // 初始化所有區域
+      zones.forEach((zone) => {
+        placements[`${zone}Cards`] = [];
+      });
+
+      // 將卡片分配到對應區域
+      if (gameState.cards) {
+        Object.entries(gameState.cards).forEach(([cardId, cardInfo]) => {
+          const zone = cardInfo.zone;
+          const key = `${zone}Cards`;
+          if (placements[key]) {
+            placements[key].push(cardId);
+          }
+        });
+      }
+
+      // 更新狀態
+      console.log(`[${gameType}] Updating state with received placements:`, placements);
+      updateCards(placements);
     },
   });
 

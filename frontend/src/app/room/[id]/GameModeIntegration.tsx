@@ -69,6 +69,12 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   const { onlineUsers } = usePresence(roomId);
   const counselorOnline = onlineUsers.some(u => u.role === 'owner');
 
+  // Debug: log online users
+  useEffect(() => {
+    console.log('[GameMode] onlineUsers:', onlineUsers.map(u => ({ id: u.id, role: u.role })));
+    console.log('[GameMode] counselorOnline:', counselorOnline);
+  }, [onlineUsers, counselorOnline]);
+
   // 使用遊戲模式同步 Hook
   const {
     syncedState,

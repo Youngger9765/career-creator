@@ -1,171 +1,33 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-TW">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
   <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>線上牌卡系統 - 第一階段結案報告</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css" />
+  <title>Phase 1 Closure Report</title>
   <style>
-    body {
-      box-sizing: border-box;
-      min-width: 200px;
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 0 20px;
-      background-color: #f6f8fa;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-      line-height: 1.8;
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
     }
-    .markdown-body {
-      background-color: white;
-      padding: 60px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      line-height: 1.8;
-    }
-    .markdown-body h1 {
-      font-size: 2.5em;
-      border-bottom: 2px solid #0969da;
-      padding-bottom: 0.3em;
-      margin-bottom: 24px;
-      margin-top: 32px;
-      color: #1f2328;
-    }
-    .markdown-body h2 {
-      font-size: 1.8em;
-      border-bottom: 1px solid #d0d7de;
-      padding-bottom: 0.3em;
-      margin-top: 48px;
-      margin-bottom: 24px;
-      color: #1f2328;
-    }
-    .markdown-body h3 {
-      font-size: 1.4em;
-      margin-top: 32px;
-      margin-bottom: 16px;
-      color: #1f2328;
-    }
-    .markdown-body h4 {
-      font-size: 1.2em;
-      margin-top: 24px;
-      margin-bottom: 12px;
-      color: #1f2328;
-    }
-    .markdown-body table {
-      display: table;
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-      margin-bottom: 24px;
-      font-size: 14px;
-    }
-    .markdown-body table th {
-      font-weight: 600;
-      padding: 12px 16px;
-      border: 1px solid #d0d7de;
-      background-color: #f6f8fa;
-      text-align: left;
-    }
-    .markdown-body table td {
-      padding: 12px 16px;
-      border: 1px solid #d0d7de;
-      line-height: 1.6;
-    }
-    .markdown-body table tr:nth-child(even) {
-      background-color: #f8f9fa;
-    }
-    .markdown-body pre {
-      padding: 16px;
-      overflow: auto;
-      font-size: 13px;
-      line-height: 1.45;
-      background-color: #f6f8fa;
-      border-radius: 6px;
-      border: 1px solid #d0d7de;
-    }
-    .markdown-body blockquote {
-      padding: 0 1em;
-      color: #636c76;
-      border-left: 0.25em solid #0969da;
-      margin: 0 0 16px 0;
-    }
-    .markdown-body ul, .markdown-body ol {
-      padding-left: 2em;
-      margin-top: 12px;
-      margin-bottom: 24px;
-    }
-    .markdown-body li {
-      margin-bottom: 12px;
-      line-height: 1.8;
-    }
-    .markdown-body li p {
-      margin-top: 8px;
-      margin-bottom: 8px;
-    }
-    .markdown-body strong {
-      font-weight: 600;
-      color: #1f2328;
-    }
-    .markdown-body hr {
-      height: 0.25em;
-      padding: 0;
-      margin: 32px 0;
-      background-color: #d0d7de;
-      border: 0;
-    }
-    .markdown-body p {
-      margin-top: 0;
-      margin-bottom: 16px;
-      line-height: 1.8;
-    }
-    #TOC {
-      border: 1px solid #d0d7de;
-      border-radius: 6px;
-      padding: 20px 30px;
-      background-color: #f6f8fa;
-      margin-bottom: 32px;
-    }
-    #TOC ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-    #TOC ul ul {
-      padding-left: 20px;
-      margin-top: 8px;
-    }
-    #TOC li {
-      margin-bottom: 10px;
-      line-height: 1.6;
-    }
-    #TOC a {
-      text-decoration: none;
-      color: #0969da;
-    }
-    #TOC a:hover {
-      text-decoration: underline;
-    }
-    @media print {
-      body {
-        background-color: white;
-        padding: 0;
-      }
-      .markdown-body {
-        box-shadow: none;
-        padding: 20px;
-      }
-    }
-    @media (max-width: 768px) {
-      .markdown-body {
-        padding: 30px 20px;
-      }
-      body {
-        padding: 0 10px;
-      }
-    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css" />
 </head>
-<body>
-  <article class="markdown-body">
+<body class="markdown-body" style="max-width: 980px; margin: 0 auto; padding: 45px;">
+<header id="title-block-header">
+<h1 class="title">Phase 1 Closure Report</h1>
+</header>
 <h1 id="線上牌卡系統---第一階段結案報告簡化版">線上牌卡系統 -
 第一階段結案報告（簡化版）</h1>
 <p><strong>專案代號</strong>: Career Creator - Online Card Consultation
@@ -181,6 +43,7 @@ System <strong>報告版本</strong>: v1.0（簡化版）
 <li><a href="#3-功能交付清單">功能交付清單</a></li>
 <li><a href="#4-問題與教訓">問題與教訓</a></li>
 <li><a href="#5-成本與資源">成本與資源</a></li>
+<li><a href="#6-系統截圖">系統截圖</a></li>
 </ol>
 <hr />
 <h2 id="專案總覽">1. 專案總覽</h2>
@@ -227,7 +90,7 @@ System <strong>報告版本</strong>: v1.0（簡化版）
 </tr>
 <tr class="even">
 <td>正式環境</td>
-<td>[Production URL]</td>
+<td>https://career-creator-frontend-production-849078733818.asia-east1.run.app</td>
 </tr>
 </tbody>
 </table>
@@ -240,6 +103,12 @@ System <strong>報告版本</strong>: v1.0（簡化版）
 </ul>
 <h3 id="成功指標達成狀況">1.3 成功指標達成狀況</h3>
 <table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 30%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>指標</th>
@@ -263,14 +132,14 @@ System <strong>報告版本</strong>: v1.0（簡化版）
 </tr>
 <tr class="odd">
 <td>多人即時同步</td>
-<td>延遲 &lt; 500ms</td>
-<td>200-300ms</td>
-<td>✅ 140% 超標</td>
+<td>50 人並發，延遲 &lt; 500ms</td>
+<td>50 人 100% 成功，延遲 200-300ms</td>
+<td>✅ 100% 成功，延遲達標 140%</td>
 </tr>
 <tr class="even">
-<td>系統穩定性</td>
-<td>99% 可用率</td>
-<td>99.2%</td>
+<td>負載測試</td>
+<td>50 人並發</td>
+<td>50 人 100% 成功</td>
 <td>✅ 100%</td>
 </tr>
 <tr class="odd">
@@ -283,6 +152,11 @@ System <strong>報告版本</strong>: v1.0（簡化版）
 </table>
 <h3 id="專案團隊">1.4 專案團隊</h3>
 <table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>角色</th>
@@ -304,9 +178,14 @@ System <strong>報告版本</strong>: v1.0（簡化版）
 <tr class="odd">
 <td>UI/UX 設計師</td>
 <td>Hannah</td>
-<td>牌卡視覺設計、素材提供</td>
+<td>牌卡視覺設計、素材提供（2025-09 ~ 2025-12）</td>
 </tr>
 <tr class="even">
+<td>UI/UX 設計師</td>
+<td>Arth Lai</td>
+<td>牌卡視覺設計、素材提供（2025-12 ~ 2026-01）</td>
+</tr>
+<tr class="odd">
 <td>客戶代表</td>
 <td>[諮詢師代表]</td>
 <td>需求驗證、使用者測試</td>
@@ -954,10 +833,60 @@ E2E 測試應在 PR 階段執行</p>
 改善需基於真實回饋，而非假設</li>
 </ol>
 <hr />
+<h2 id="系統截圖">6. 系統截圖</h2>
+<h3 id="諮詢師端介面">6.1 諮詢師端介面</h3>
+<h4 id="登入頁面">登入頁面</h4>
+<p><img src="./images/01-login-page.png" alt="登入頁面" />
+<em>諮詢師登入介面，支援快速登入測試</em></p>
+<h4 id="諮詢師儀表板客戶與諮詢室管理">諮詢師儀表板（客戶與諮詢室管理）</h4>
+<p><img src="./images/02-client-room-list.png" alt="諮詢師儀表板" />
+<em>諮詢師主控台整合介面，包含客戶管理、諮詢室列表與快速操作功能</em></p>
+<h4 id="諮詢室頁面">諮詢室頁面</h4>
+<p><img src="./images/03-consultation-room.png" alt="諮詢室頁面" />
+<em>諮詢室互動介面，支援即時協作與牌卡操作</em></p>
+<h4 id="加入諮詢室頁面-輸入房間碼">加入諮詢室頁面 - 輸入房間碼</h4>
+<p><img src="./images/04-join-room.png" alt="加入諮詢室" />
+<em>訪客端加入諮詢室步驟一：輸入房間碼</em></p>
+<h4 id="加入諮詢室頁面-填入姓名">加入諮詢室頁面 - 填入姓名</h4>
+<p><img src="./images/05-join-room-name.png" alt="填入姓名" />
+<em>訪客端加入諮詢室步驟二：填入個人姓名</em></p>
+<h3 id="牌卡互動介面">6.2 牌卡互動介面</h3>
+<h4 id="遊戲模式選擇">遊戲模式選擇</h4>
+<p><img src="./images/00-game-mode-selection.png" alt="遊戲模式選擇" />
+<em>三大牌組、七種玩法選擇介面</em></p>
+<h4 id="riasec-六大性格分析">RIASEC 六大性格分析</h4>
+<p><img src="./images/01-riasec-personality.png"
+alt="RIASEC 六大性格分析" /> <em>職游旅人卡 - RIASEC
+職業性格測評</em></p>
+<h4 id="職業收藏家職游旅人卡">職業收藏家（職游旅人卡）</h4>
+<p><img src="./images/02-career-collector.png" alt="職業收藏家" />
+<em>職業探索卡片互動介面</em></p>
+<h4 id="職能盤點卡-優劣勢分析">職能盤點卡 - 優劣勢分析</h4>
+<p><img src="./images/03-competency-assessment.png" alt="優劣勢分析" />
+<em>職能盤點卡第一種玩法：分析個人優劣勢</em></p>
+<h4 id="職能盤點卡-成長計畫">職能盤點卡 - 成長計畫</h4>
+<p><img src="./images/04-growth-plan.png" alt="成長計畫" />
+<em>職能盤點卡第二種玩法：規劃職能成長路徑</em></p>
+<h4 id="職能盤點卡-職位拆解">職能盤點卡 - 職位拆解</h4>
+<p><img src="./images/05-position-breakdown.png" alt="職位拆解" />
+<em>職能盤點卡第三種玩法：拆解目標職位所需職能</em></p>
+<h4 id="價值導航卡-價值觀排序">價值導航卡 - 價值觀排序</h4>
+<p><img src="./images/04-value-navigation.png" alt="價值觀排序" />
+<em>價值導航卡第一種玩法：排序個人價值觀</em></p>
+<h4 id="價值導航卡-生活改造王">價值導航卡 - 生活改造王</h4>
+<p><img src="./images/07-life-redesign.png" alt="生活改造王" />
+<em>價值導航卡第二種玩法：基於價值觀規劃生活改造</em></p>
+<h3 id="協作功能">6.3 協作功能</h3>
+<h4 id="訪客協作介面">訪客協作介面</h4>
+<p><img src="./images/06-visitor-collaboration.png"
+alt="訪客協作介面" /> <em>來訪者端即時互動介面</em></p>
+<h4 id="多人在線狀態">多人在線狀態</h4>
+<p><img src="./images/08-multi-user-status.png" alt="多人在線狀態" />
+<em>即時同步與在線狀態顯示</em></p>
+<hr />
 <p><strong>報告完成日期</strong>: 2026-01-30 <strong>報告版本</strong>:
 v1.0（簡化版） <strong>下次更新</strong>: 第二階段結案後（2026-04）</p>
 <hr />
 <p><strong>🎉 感謝所有參與第一階段開發的團隊成員！</strong></p>
-  </article>
 </body>
 </html>

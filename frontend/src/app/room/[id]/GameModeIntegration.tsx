@@ -92,7 +92,14 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     isOwner: isRoomOwner,
     onStateChange: (state) => {
       // 當同步狀態改變時，更新本地顯示
+      console.log('[GameModeIntegration] onStateChange received:', {
+        isVisitor,
+        gameMode: state.gameMode,
+        deck: state.deck,
+        gameRule: state.gameRule,
+      });
       setSelectedGameplay(state.gameMode);
+      console.log('[GameModeIntegration] selectedGameplay updated to:', state.gameMode);
       onStateChange?.(state);
     },
   });

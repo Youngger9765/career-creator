@@ -148,6 +148,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     setSyncedState(emptyState);
     persistState(emptyState);
     hasActiveGameRef.current = false; // Clear active game flag
+    setGameStarted(false); // ✅ Reset game started flag
     onStateChange?.(emptyState);
 
     // Broadcast to others
@@ -197,11 +198,18 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
 
     // Listen for mode changes
     gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
-      setSyncedState(payload as GameModeState);
+      const newState = payload as GameModeState;
+      setSyncedState(newState);
+
+      // ✅ If empty state (exit game), reset gameStarted flag
+      if (!newState.deck && !newState.gameRule && !newState.gameMode) {
+        setGameStarted(false);
+      }
+
       if (!isOwner) {
         setWaitingForOwnerState(false); // ✅ 收到模式變更，停止等待
       }
-      onStateChange?.(payload as GameModeState);
+      onStateChange?.(newState);
     });
 
     // Listen for game start

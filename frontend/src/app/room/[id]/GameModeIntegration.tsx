@@ -85,6 +85,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     changeGameMode,
     startGame,
     gameStarted,
+    waitingForOwnerState,
   } = useGameModeSync({
     roomId,
     isOwner: isRoomOwner,
@@ -283,11 +284,33 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       {/* 使用 Portal 將同步狀態渲染到頂部容器 */}
       {portalContainer && syncStatusComponent && createPortal(syncStatusComponent, portalContainer)}
 
+      {/* 訪客等待 Owner 狀態 */}
+      {waitingForOwnerState && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center px-4">
+            <div className="mb-4">
+              <span className="text-6xl">🔄</span>
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              正在連接諮商師...
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">等待諮商師的遊戲狀態</p>
+            <div className="mt-4">
+              <div className="inline-flex items-center gap-2 text-sm text-gray-500">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                連線中
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 主要內容區域 */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full flex flex-col">
-          {/* 模式和玩法選擇器 - 顯示所有組合 */}
-          {!gameStarted && !selectedGameplay && (
+      {!waitingForOwnerState && (
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full flex flex-col">
+            {/* 模式和玩法選擇器 - 顯示所有組合 */}
+            {!gameStarted && !selectedGameplay && (
             <div className="h-full overflow-y-auto px-3 sm:px-6 py-4 sm:py-8">
               <div className="max-w-7xl mx-auto">
                 {/* Owner 離線提示（訪客才顯示） */}
@@ -359,8 +382,9 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
               )}
             </div>
           )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

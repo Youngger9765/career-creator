@@ -3,7 +3,7 @@
  * 遊戲模式同步 Hook - 使用 Supabase Broadcast 同步遊戲模式
  * Owner 切換模式時，所有參與者即時同步
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DECK_TYPES, GAMEPLAY_IDS, getDefaultGameplay } from '@/constants/game-modes';
@@ -38,6 +38,8 @@ export interface UseGameModeSyncReturn {
   startGame: () => void;
   // 遊戲是否已開始
   gameStarted: boolean;
+  // 訪客是否正在等待 Owner 的狀態
+  waitingForOwnerState: boolean;
 }
 
 const DEFAULT_STATE: GameModeState = {
@@ -52,12 +54,20 @@ const STORAGE_KEY = 'career_creator_game_mode';
 export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyncReturn {
   const { roomId, isOwner, initialState = DEFAULT_STATE, onStateChange } = options;
 
-  const [syncedState, setSyncedState] = useState<GameModeState>(initialState);
+  // 訪客不使用 DEFAULT_STATE，等待 Owner 的狀態
+  const [syncedState, setSyncedState] = useState<GameModeState>(
+    isOwner ? initialState : { deck: '', gameRule: '', gameMode: '' }
+  );
   const [ownerOnline, setOwnerOnline] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gameStarted, setGameStarted] = useState(false);
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
+  // 訪客等待 Owner 狀態（避免顯示 DEFAULT_STATE）
+  const [waitingForOwnerState, setWaitingForOwnerState] = useState(!isOwner);
+  // 追蹤 Owner 是否有主動選擇遊戲（非從 localStorage 載入）
+  const hasActiveGameRef = useRef(false);
+  const syncedStateRef = useRef(syncedState);
 
   // Load persisted state for owner
   useEffect(() => {
@@ -86,6 +96,11 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     [isOwner, roomId]
   );
 
+  // Update refs when state changes
+  useEffect(() => {
+    syncedStateRef.current = syncedState;
+  }, [syncedState]);
+
   // Change game mode (Owner only)
   const changeGameMode = useCallback(
     (deck: string, gameRule: string, gameMode: string) => {
@@ -99,6 +114,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       // Update local state immediately
       setSyncedState(newState);
       persistState(newState);
+      hasActiveGameRef.current = true; // ✅ 標記為主動選擇的遊戲
       onStateChange?.(newState);
 
       // Broadcast to others
@@ -150,6 +166,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Listen for mode changes
     gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
       setSyncedState(payload as GameModeState);
+      if (!isOwner) {
+        setWaitingForOwnerState(false); // ✅ 收到模式變更，停止等待
+      }
       onStateChange?.(payload as GameModeState);
     });
 
@@ -161,10 +180,20 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Request current state (for non-owners joining)
     gameChannel.on('broadcast', { event: 'request_state' }, ({ payload }) => {
       if (isOwner) {
+        // 只發送主動選擇的遊戲狀態，不發送從 localStorage 載入的舊狀態
+        const stateToSend = hasActiveGameRef.current
+          ? syncedStateRef.current
+          : { deck: '', gameRule: '', gameMode: '' }; // 沒有主動選擇 → 發送空狀態
+
+        console.log('[GameModeSync] Sending state to visitor:', {
+          hasActiveGame: hasActiveGameRef.current,
+          state: stateToSend,
+        });
+
         gameChannel.send({
           type: 'broadcast',
           event: 'current_state',
-          payload: syncedState,
+          payload: stateToSend,
         });
       }
     });
@@ -173,6 +202,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     gameChannel.on('broadcast', { event: 'current_state' }, ({ payload }) => {
       if (!isOwner) {
         setSyncedState(payload as GameModeState);
+        setWaitingForOwnerState(false); // ✅ 收到 Owner 狀態，停止等待
         onStateChange?.(payload as GameModeState);
       }
     });
@@ -228,5 +258,6 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     changeGameMode,
     startGame,
     gameStarted,
+    waitingForOwnerState,
   };
 }

@@ -7,10 +7,17 @@
 ## 🚨 Young 負責項目（2026-01-31）
 
 ### Production Bug 修復
-- [ ] **調整 PROD DB 參數** 🔴 URGENT
-  - [ ] 修復訪客看到 "等待諮詢師回來" overlay（即使 counselor 在線）
-  - [ ] 修復 Game state changed 訊息狂跳問題（infinite loop）
-  - [ ] 優化 Supabase Realtime 連線效能
+- [x] **調整 PROD DB 參數** ✅ FIXED (2026-01-31)
+  - [x] 修復訪客看到 "等待諮詢師回來" overlay（即使 counselor 在線）
+    - Root cause: 使用錯誤的 presence channel (`game_mode` vs `room`)
+    - Fix: 使用 `usePresence(roomId)` + `canInteractLocal`
+    - Verified: E2E test 通過，overlay 不再誤顯示
+  - [x] 修復 Game state changed 訊息狂跳問題（infinite loop）
+    - Root cause: useEffect dependency array 包含 `syncedState`
+    - Fix: 移除 `syncedState` 和 `onStateChange` 從 dependencies
+    - Verified: WebSocket 監控顯示 1.8 msg/s（正常），0 條重複 log
+  - [x] 優化 Supabase Realtime 連線效能
+    - Verified: 無背景狂發訊息，不會燒錢
 
 ### 第一階段結案報告
 - [ ] **撰寫線上牌卡系統第一階段結案報告** 🔴 Young

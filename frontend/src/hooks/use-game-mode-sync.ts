@@ -34,6 +34,8 @@ export interface UseGameModeSyncReturn {
   error: string | null;
   // 切換遊戲模式（只有 Owner 能用）
   changeGameMode: (deck: string, gameRule: string, gameMode: string) => void;
+  // 離開遊戲，返回選擇畫面（只有 Owner 能用）
+  exitGame: () => void;
   // 開始遊戲（只有 Owner 能用）
   startGame: () => void;
   // 遊戲是否已開始

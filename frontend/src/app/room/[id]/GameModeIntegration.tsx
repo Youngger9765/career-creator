@@ -8,7 +8,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { GameModeService } from '@/game-modes/services/mode.service';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
@@ -152,15 +152,21 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   }, [selectedGameplay, onGameplayChange]);
 
   // 監聽 currentGameplay，當諮詢師從 header 返回時，自動調用 exitGame
+  // 使用 ref 防止重複觸發
+  const isExitingRef = useRef(false);
+
   useEffect(() => {
-    if (isRoomOwner && !currentGameplay && selectedGameplay) {
+    if (isRoomOwner && !currentGameplay && selectedGameplay && !isExitingRef.current) {
       // currentGameplay 被清空（header 返回），且之前有選擇遊戲
+      isExitingRef.current = true;
       console.log('[GameModeIntegration] Detected game exit from header, calling exitGame()');
       exitGame();
       setSelectedGameplay('');
       setSelectedMode('');
+      // Reset flag after state updates
+      setTimeout(() => { isExitingRef.current = false; }, 0);
     }
-  }, [currentGameplay, isRoomOwner, selectedGameplay, exitGame]);
+  }, [currentGameplay, isRoomOwner, selectedGameplay]); // exitGame removed from deps (stable callback)
 
   // 選擇玩法
   const handleGameplaySelect = async (gameplayId: string) => {

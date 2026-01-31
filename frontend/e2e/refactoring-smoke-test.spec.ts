@@ -2,8 +2,10 @@
  * Smoke test to verify refactoring didn't break basic functionality
  */
 import { test, expect } from '@playwright/test';
+import { skipInCI } from './test-helpers';
 
 test.describe('Refactoring Smoke Test', () => {
+  test.skip(skipInCI, 'Requires specific room setup, not suitable for CI');
   test('room page should load and display game mode selection', async ({ page }) => {
     // Navigate to room as visitor (using baseURL from config)
     await page.goto('/room/test-room?visitor=true&name=TestUser');

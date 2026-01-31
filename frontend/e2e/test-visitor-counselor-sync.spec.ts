@@ -6,6 +6,10 @@
 
 import { test as base, expect } from '@playwright/test';
 import type { Page, BrowserContext } from '@playwright/test';
+import { skipInCI } from './test-helpers';
+
+// Skip in CI - requires login credentials and specific account setup
+base.skip(skipInCI, 'Requires login credentials, not suitable for CI');
 
 // 擴展 test fixture 支援雙瀏覽器
 const test = base.extend<{

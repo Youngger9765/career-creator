@@ -241,7 +241,7 @@ export function useRoomParticipants(
     participants: mergedParticipants,
     participantCount,
     onlineCount,
-    isLoading: isLoading || !presenceConnected,
+    isLoading: isLoading, // Only reflect actual data loading, not Presence connection
     error: error || presenceError ? new Error(presenceError || 'Unknown error') : null,
     refreshParticipants,
   };

@@ -3,6 +3,9 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { skipInCI } from './test-helpers';
+
+test.skip(skipInCI, 'Production integration tests only run locally');
 
 test('monitor WebSocket messages for infinite loop', async ({ page }) => {
   const PRODUCTION_URL = 'https://career-creator-frontend-production-x43mdhfwsq-de.a.run.app';

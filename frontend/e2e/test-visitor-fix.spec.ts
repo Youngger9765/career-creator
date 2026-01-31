@@ -20,8 +20,8 @@ test('visitor can join room without redirect loop', async ({ page }) => {
     }
   });
 
-  // Visit room as visitor
-  const url = `http://localhost:3003/room/${roomId}?visitor=true&name=${visitorName}`;
+  // Visit room as visitor (using baseURL from config)
+  const url = `/room/${roomId}?visitor=true&name=${visitorName}`;
   console.log('Visiting:', url);
 
   await page.goto(url, {

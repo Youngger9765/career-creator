@@ -3,9 +3,12 @@
  */
 import { test } from '@playwright/test';
 import * as path from 'path';
+import { skipInCI } from './test-helpers';
 
 const ROOM_URL = 'https://career-creator-frontend-production-849078733818.asia-east1.run.app/room/bd2bece6-398f-41b7-8a23-6dd8461b7df4';
 const SCREENSHOTS_DIR = path.join(__dirname, '../../docs/images/gameplays');
+
+test.skip(skipInCI, 'Production screenshot tests only run locally');
 
 test('Auto capture all gameplays', async ({ page }) => {
   await page.goto(ROOM_URL);

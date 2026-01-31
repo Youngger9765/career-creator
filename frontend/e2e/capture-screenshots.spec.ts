@@ -4,11 +4,14 @@
  */
 import { test, expect } from '@playwright/test';
 import * as path from 'path';
+import { skipInCI } from './test-helpers';
 
 const PRODUCTION_URL = 'https://career-creator-frontend-production-849078733818.asia-east1.run.app';
 const SCREENSHOTS_DIR = path.join(__dirname, '../../docs/images');
 
 test.describe('Phase 1 Closure Report Screenshots', () => {
+  test.skip(skipInCI, 'Production screenshot tests only run locally');
+
   test.use({
     baseURL: PRODUCTION_URL,
     viewport: { width: 1920, height: 1080 }

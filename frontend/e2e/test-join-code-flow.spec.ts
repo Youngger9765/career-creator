@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { skipInCI } from './test-helpers';
+
+test.skip(skipInCI, 'Production integration tests only run locally');
 
 test('test /join/3F4BK0 visitor flow and online status', async ({ page }) => {
   const shareCode = '3F4BK0';

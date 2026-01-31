@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { skipInCI } from './test-helpers';
+
+test.skip(skipInCI, 'Production debug tests only run locally');
 
 test('debug production visitor - wait 30 seconds for polling', async ({ page }) => {
   const roomId = '6afd6944-3c75-425c-93f8-cfc439604b21';

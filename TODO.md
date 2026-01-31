@@ -6,6 +6,12 @@
 
 ## 🚨 Young 負責項目（2026-01-31）
 
+### Production Bug 修復
+- [ ] **調整 PROD DB 參數** 🔴 URGENT
+  - [ ] 修復訪客看到 "等待諮詢師回來" overlay（即使 counselor 在線）
+  - [ ] 修復 Game state changed 訊息狂跳問題（infinite loop）
+  - [ ] 優化 Supabase Realtime 連線效能
+
 ### 第一階段結案報告
 - [ ] **撰寫線上牌卡系統第一階段結案報告** 🔴 Young
   - [ ] 專案概述與目標

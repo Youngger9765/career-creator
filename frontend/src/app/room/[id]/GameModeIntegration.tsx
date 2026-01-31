@@ -98,10 +98,13 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   // 使用 room presence 的在線狀態（更準確）
   const ownerOnline = counselorOnline;
 
+  // 計算是否可互動（使用 room presence，不使用 game_mode channel）
+  const canInteractLocal = isRoomOwner || counselorOnline;
+
   // 選擇遊戲（模式 + 玩法）- Owner 同步選擇
   const handleGameSelect = (modeId: string, gameplayId: string) => {
     // 檢查是否能互動（Owner 或 Owner 在線時）
-    if (!canInteract) {
+    if (!canInteractLocal) {
       console.warn('[GameModeIntegration] Cannot select game - owner is offline');
       return;
     }
@@ -308,7 +311,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
                   onGameSelect={handleGameSelect}
                   currentMode={selectedMode}
                   currentGameplay={selectedGameplay}
-                  disabled={!canInteract}
+                  disabled={!canInteractLocal}
                 />
               </div>
             </div>
@@ -334,7 +337,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
               <div className="h-full">{renderGame()}</div>
 
               {/* Owner 離線遮罩層 */}
-              {!canInteract && (
+              {!canInteractLocal && (
                 <div className="absolute inset-0 z-50 flex items-center justify-center">
                   {/* 半透明黑色遮罩 */}
                   <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />

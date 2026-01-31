@@ -107,8 +107,8 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   // 使用 room presence 的在線狀態（更準確）
   const ownerOnline = counselorOnline;
 
-  // 計算是否可互動（使用 room presence，不使用 game_mode channel）
-  const canInteractLocal = isRoomOwner || counselorOnline;
+  // 計算是否可互動：Owner 永遠可以，訪客需要等諮詢師開始遊戲
+  const canInteractLocal = isRoomOwner || (counselorOnline && gameStarted);
 
   // 選擇遊戲（模式 + 玩法）- Owner 同步選擇
   const handleGameSelect = (modeId: string, gameplayId: string) => {

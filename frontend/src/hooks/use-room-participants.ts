@@ -188,6 +188,16 @@ export function useRoomParticipants(
   const mergedParticipants = useMemo(() => {
     const merged = [...participants];
 
+    // 🔍 診斷 LOG
+    console.log('[useRoomParticipants] mergedParticipants 計算:', {
+      presenceConnected,
+      onlineUsersCount: onlineUsers.length,
+      onlineUsers: onlineUsers.map(u => ({ id: u.id, name: u.name, role: u.role })),
+      participantsCount: participants.length,
+      participants: participants.map(p => ({ id: p.id, name: p.name, type: p.type, isOnline: p.isOnline })),
+      currentUserId: currentUser?.id,
+    });
+
     // 如果有 Presence 連線，使用即時在線狀態
     if (presenceConnected && onlineUsers.length > 0) {
       // 將 Presence 用戶加入或更新到參與者列表
@@ -196,6 +206,7 @@ export function useRoomParticipants(
 
         if (existingIndex >= 0) {
           // 更新現有參與者的在線狀態
+          console.log('[useRoomParticipants] 更新現有參與者:', presenceUser.id);
           merged[existingIndex] = {
             ...merged[existingIndex],
             isOnline: true,
@@ -203,6 +214,7 @@ export function useRoomParticipants(
           };
         } else {
           // 新增在線參與者
+          console.log('[useRoomParticipants] 新增在線參與者:', presenceUser.id, presenceUser.name);
           merged.push({
             id: presenceUser.id,
             name: presenceUser.name,
@@ -229,6 +241,13 @@ export function useRoomParticipants(
         return a.isOnline ? -1 : 1;
       }
       return new Date(b.lastActiveAt).getTime() - new Date(a.lastActiveAt).getTime();
+    });
+
+    // 🔍 診斷 LOG - 最終結果
+    console.log('[useRoomParticipants] 最終 merged 結果:', {
+      count: merged.length,
+      onlineCount: merged.filter(p => p.isOnline).length,
+      merged: merged.map(p => ({ id: p.id, name: p.name, type: p.type, isOnline: p.isOnline })),
     });
 
     return merged;

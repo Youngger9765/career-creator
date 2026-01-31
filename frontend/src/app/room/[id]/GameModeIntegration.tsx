@@ -129,6 +129,8 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
       const gameRuleName = GAMEPLAY_NAMES[gameplayId] || gameplayId;
 
       changeGameMode(deckName, gameRuleName, gameplayId);
+      // 自動開始遊戲，設置 gameStarted = true，讓訪客端遮罩消失
+      startGame();
     }
 
     // 本地預覽更新

@@ -42,8 +42,8 @@ export interface UseGameModeSyncReturn {
 
 const DEFAULT_STATE: GameModeState = {
   deck: DECK_TYPES.TRAVELER,
-  gameRule: '六大性格分析',
-  gameMode: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
+  gameRule: '',
+  gameMode: '', // 空字串表示諮詢師尚未選擇遊戲模式
 };
 
 // LocalStorage key for owner state persistence

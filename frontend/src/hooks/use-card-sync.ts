@@ -29,6 +29,18 @@ export interface DragInfo {
   startTime: number;
 }
 
+// 文件上傳事件
+export interface FileUploadEvent {
+  name: string;
+  type: string;
+  size: number;
+  dataUrl: string;
+  uploadedAt: number;
+  performedBy: 'owner' | 'visitor';
+  performerName: string;
+  performerId: string;
+}
+
 // 遊戲狀態（存在 localStorage）
 export interface CardGameState {
   cards: {
@@ -58,6 +70,7 @@ export interface UseCardSyncOptions {
   onDragStart?: (info: DragInfo) => void;
   onDragEnd?: (cardId: string) => void;
   onStateReceived?: (state: CardGameState) => void;
+  onFileUpload?: (fileData: FileUploadEvent) => void;
 }
 
 export interface UseCardSyncReturn {
@@ -75,6 +88,8 @@ export interface UseCardSyncReturn {
   startDrag: (cardId: string) => void;
   // 結束拖曳
   endDrag: (cardId: string) => void;
+  // 上傳文件
+  uploadFile: (fileData: Omit<FileUploadEvent, 'performedBy' | 'performerName' | 'performerId'>) => void;
   // 載入遊戲狀態
   loadGameState: () => CardGameState | null;
   // 儲存遊戲狀態（Owner only）
@@ -97,6 +112,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     onDragStart,
     onDragEnd,
     onStateReceived,
+    onFileUpload,
   } = options;
 
   const [draggedCards, setDraggedCards] = useState<Map<string, DragInfo>>(new Map());
@@ -265,6 +281,39 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     [debouncedBroadcastDragEnd]
   );
 
+  // 上傳文件
+  const uploadFile = useCallback(
+    (fileData: Omit<FileUploadEvent, 'performedBy' | 'performerName' | 'performerId'>) => {
+      if (!channelRef.current) {
+        console.warn('[CardSyncRT] Channel not connected');
+        return;
+      }
+
+      const event: FileUploadEvent = {
+        ...fileData,
+        performedBy: isOwner ? 'owner' : 'visitor',
+        performerName: userName,
+        performerId: userId,
+      };
+
+      // 廣播文件上傳
+      channelRef.current
+        .send({
+          type: 'broadcast',
+          event: 'file_uploaded',
+          payload: event,
+        })
+        .then(() => {
+          console.log('[CardSyncRT] File upload broadcasted:', event.name);
+        })
+        .catch((err) => {
+          console.error('[CardSyncRT] Failed to broadcast file upload:', err);
+          setError('無法同步文件上傳');
+        });
+    },
+    [isOwner, userName, userId]
+  );
+
   // 設置頻道和監聽器
   useEffect(() => {
     if (!supabase || !roomId) return;
@@ -312,6 +361,18 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
       });
 
       onDragEnd?.(cardId);
+    });
+
+    // 監聽文件上傳
+    channel.on('broadcast', { event: 'file_uploaded' }, ({ payload }) => {
+      const event = payload as FileUploadEvent;
+
+      // 如果是自己的操作，跳過（已在本地處理）
+      if (event.performerId === userId) return;
+
+      // 處理他人的文件上傳
+      console.log('[CardSyncRT] Received file upload:', event.name);
+      onFileUpload?.(event);
     });
 
     // 新用戶請求狀態
@@ -375,6 +436,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     onDragStart,
     onDragEnd,
     onStateReceived,
+    onFileUpload,
     loadGameState,
     throttledBroadcastMove,
     debouncedBroadcastDragEnd,
@@ -385,6 +447,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     moveCard,
     startDrag,
     endDrag,
+    uploadFile,
     loadGameState,
     saveGameState,
     isConnected,

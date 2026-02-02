@@ -117,6 +117,19 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       console.log(`[${gameType}] Received game state:`, gameState);
       // TODO: 處理完整狀態同步
     },
+    onFileUpload: (fileData) => {
+      console.log(`[${gameType}] Received remote file upload:`, fileData.name);
+      // 更新本地狀態（不廣播，因為這是遠端事件）
+      updateCards({
+        uploadedFile: {
+          name: fileData.name,
+          type: fileData.type,
+          size: fileData.size,
+          dataUrl: fileData.dataUrl,
+          uploadedAt: fileData.uploadedAt,
+        },
+      });
+    },
   });
 
   /**
@@ -193,12 +206,42 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     [state.cardPlacements, zones, updateCards, isRoomOwner, cardSync, gameType, persistence]
   );
 
+  /**
+   * 文件上傳函數
+   */
+  const handleFileUpload = useCallback(
+    (fileData: {
+      name: string;
+      type: string;
+      size: number;
+      dataUrl: string;
+      uploadedAt: number;
+    }) => {
+      console.log(`[${gameType}] Local file upload:`, fileData.name);
+
+      // 1. 更新本地狀態
+      updateCards({
+        uploadedFile: fileData,
+      });
+
+      // 2. 廣播到其他用戶
+      if (cardSync.isConnected) {
+        cardSync.uploadFile(fileData);
+      }
+
+      // 3. Mark as dirty for persistence
+      persistence.markDirty();
+    },
+    [updateCards, cardSync, gameType, persistence]
+  );
+
   return {
     state,
     draggedByOthers,
     handleCardMove,
     handleCardReorder, // Export reorder function
-    updateCards, // Export for components that need it (e.g., file upload)
+    handleFileUpload, // Export file upload function
+    updateCards, // Export for components that need it (e.g., backward compatibility)
     cardSync,
     userId,
     userName,

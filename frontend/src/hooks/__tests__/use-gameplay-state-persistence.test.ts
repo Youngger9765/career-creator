@@ -117,7 +117,7 @@ describe('useGameplayStatePersistence - uploadedFile', () => {
         zone1: ['card1'],
         uploadedFile: {
           name: 'visitor-test.pdf',
-          dataUrl: 'data:application/pdf;base64,JVBERi0xLj...',
+          url: 'https://storage.googleapis.com/test-bucket/rooms/room2/visitor-test.pdf', // GCS URL
           size: 9999,
           type: 'application/pdf',
           uploadedAt: 1706889800000,
@@ -161,7 +161,7 @@ describe('useGameplayStatePersistence - uploadedFile', () => {
       cardPlacements: {},
       uploadedFile: {
         name: 'local.pdf',
-        dataUrl: 'data:application/pdf;base64,JVBERi0xLj...',
+        url: 'https://storage.googleapis.com/test-bucket/rooms/room3/local.pdf', // GCS URL
         size: 7777,
         type: 'application/pdf',
         uploadedAt: 1706889900000,

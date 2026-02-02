@@ -32,7 +32,7 @@ interface JobDecompositionCanvasProps {
     name: string;
     type: string;
     size: number;
-    dataUrl: string;
+    url: string; // GCS public URL (was dataUrl)
     uploadedAt: number;
   };
   draggedByOthers?: Map<string, string>; // cardId -> performerName

@@ -13,6 +13,7 @@ import JobDecompositionCanvas from '../game-canvases/JobDecompositionCanvas';
 import GameLayout from '../common/GameLayout';
 import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
 import { GAMEPLAY_IDS } from '@/constants/game-modes';
+import { fileUploadsAPI } from '@/lib/api/file-uploads';
 
 interface PositionBreakdownGameProps {
   roomId: string;
@@ -56,8 +57,8 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
     [fullDeck]
   );
 
-  // 處理文件上傳（將 File 轉換為 base64 並廣播）
-  const onFileUpload = (file: File) => {
+  // 處理文件上傳（上傳到 GCS 後端並廣播 URL）
+  const onFileUpload = async (file: File) => {
     console.log('上傳文件:', file.name, file.type);
 
     // 1. File size validation (max 5MB)
@@ -74,36 +75,30 @@ const PositionBreakdownGame: React.FC<PositionBreakdownGameProps> = ({
       return;
     }
 
-    // 3. Broadcast size check (Supabase Realtime has ~200KB limit)
-    const estimatedBase64Size = Math.ceil((file.size * 4) / 3);
-    const MAX_BROADCAST_SIZE = 200 * 1024; // 200KB
-    if (estimatedBase64Size > MAX_BROADCAST_SIZE) {
-      alert(
-        `文件過大，無法即時同步。請使用小於 ${Math.floor(MAX_BROADCAST_SIZE / 1024)}KB 的文件。`
-      );
-      return;
-    }
-
-    // 4. Connection check
+    // 3. Connection check
     if (!cardSync.isConnected) {
       alert('網路連線中斷，無法同步文件');
       return;
     }
 
-    // 將文件轉換為 base64 並儲存
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string;
-      // 使用統一的 handleFileUpload（會廣播並持久化）
+    try {
+      // 4. Upload file to backend GCS endpoint
+      const response = await fileUploadsAPI.uploadFile(roomId, file);
+
+      console.log('文件上傳成功:', response.url);
+
+      // 5. Broadcast GCS URL (使用統一的 handleFileUpload)
       handleFileUpload({
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        dataUrl: dataUrl,
-        uploadedAt: Date.now(),
+        name: response.name,
+        type: response.type,
+        size: response.size,
+        url: response.url, // GCS public URL
+        uploadedAt: response.uploadedAt,
       });
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('文件上傳失敗:', error);
+      alert(`文件上傳失敗: ${error instanceof Error ? error.message : '未知錯誤'}`);
+    }
   };
 
   // 計算已使用的卡片

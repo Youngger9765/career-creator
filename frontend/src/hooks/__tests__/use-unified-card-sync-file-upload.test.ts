@@ -72,13 +72,13 @@ describe('useUnifiedCardSync - File Upload Synchronization', () => {
       })
     );
 
-    // Simulate file upload
+    // Simulate file upload (using GCS URL)
     const mockFile = new File(['test content'], 'test.pdf', { type: 'application/pdf' });
     const mockFileData = {
       name: 'test.pdf',
       type: 'application/pdf',
       size: mockFile.size,
-      dataUrl: 'data:application/pdf;base64,dGVzdCBjb250ZW50',
+      url: 'https://storage.googleapis.com/test-bucket/rooms/test-room/test.pdf', // GCS URL
       uploadedAt: Date.now(),
     };
 
@@ -119,7 +119,7 @@ describe('useUnifiedCardSync - File Upload Synchronization', () => {
       name: 'remote.pdf',
       type: 'application/pdf',
       size: 12345,
-      dataUrl: 'data:application/pdf;base64,cmVtb3RlIGRhdGE=',
+      url: 'https://storage.googleapis.com/test-bucket/rooms/test-room/remote.pdf', // GCS URL
       uploadedAt: Date.now(),
     };
 
@@ -156,7 +156,7 @@ describe('useUnifiedCardSync - File Upload Synchronization', () => {
       name: 'remote.pdf',
       type: 'application/pdf',
       size: 12345,
-      dataUrl: 'data:application/pdf;base64,cmVtb3RlIGRhdGE=',
+      url: 'https://storage.googleapis.com/test-bucket/rooms/test-room/remote.pdf', // GCS URL
       uploadedAt: Date.now(),
     };
 

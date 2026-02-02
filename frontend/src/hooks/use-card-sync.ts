@@ -29,12 +29,12 @@ export interface DragInfo {
   startTime: number;
 }
 
-// 文件上傳事件
+// 文件上傳事件 (使用 GCS URL，不使用 base64 dataUrl)
 export interface FileUploadEvent {
   name: string;
   type: string;
   size: number;
-  dataUrl: string;
+  url: string; // GCS public URL (was dataUrl)
   uploadedAt: number;
   performedBy: 'owner' | 'visitor';
   performerName: string;

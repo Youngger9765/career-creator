@@ -24,7 +24,7 @@ interface PDFUploaderProps {
   initialFile?: {
     name: string;
     type: string;
-    dataUrl: string;
+    url: string; // GCS public URL (was dataUrl)
   };
 }
 
@@ -36,13 +36,13 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({
   className = '',
   initialFile,
 }) => {
-  // 從 initialFile 初始化狀態
+  // 從 initialFile 初始化狀態 (支援 GCS URL)
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(() => {
     if (initialFile) {
       const fileType = initialFile.type.startsWith('image/') ? 'image' : 'pdf';
       return {
         type: fileType,
-        url: initialFile.dataUrl,
+        url: initialFile.url, // GCS public URL (was dataUrl)
         name: initialFile.name,
       };
     }
@@ -71,7 +71,11 @@ export const PDFUploader: React.FC<PDFUploaderProps> = ({
 
   const removeUploadedFile = () => {
     if (uploadedFile) {
-      URL.revokeObjectURL(uploadedFile.url);
+      // Note: For GCS URLs, no need to revoke (was only needed for blob URLs)
+      // Only revoke if it's a local blob URL (starts with "blob:")
+      if (uploadedFile.url.startsWith('blob:')) {
+        URL.revokeObjectURL(uploadedFile.url);
+      }
       setUploadedFile(null);
     }
   };

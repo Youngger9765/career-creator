@@ -125,7 +125,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
           name: fileData.name,
           type: fileData.type,
           size: fileData.size,
-          dataUrl: fileData.dataUrl,
+          url: fileData.url, // GCS public URL (was dataUrl)
           uploadedAt: fileData.uploadedAt,
         },
       });
@@ -214,7 +214,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       name: string;
       type: string;
       size: number;
-      dataUrl: string;
+      url: string; // GCS public URL (was dataUrl)
       uploadedAt: number;
     }) => {
       console.log(`[${gameType}] Local file upload:`, fileData.name);

@@ -93,7 +93,7 @@ export interface PositionBreakdownGameState extends GameStateBase {
     name: string;
     type: string;
     size: number;
-    dataUrl: string;
+    url: string; // GCS public URL (was dataUrl)
     uploadedAt: number;
   };
 }

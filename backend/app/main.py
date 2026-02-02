@@ -8,6 +8,7 @@ from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.clients import router as clients_router
 from app.api.counselor_notes import router as counselor_notes_router
+from app.api.file_uploads import router as file_uploads_router
 from app.api.game_rules import router as game_rules_router
 from app.api.gameplay_states import router as gameplay_states_router
 from app.api.rooms import router as rooms_router
@@ -79,6 +80,7 @@ app.include_router(admin_router)
 app.include_router(clients_router)
 app.include_router(counselor_notes_router, prefix="/api")
 app.include_router(gameplay_states_router, prefix="/api")
+app.include_router(file_uploads_router)
 
 # Mount static files for uploaded screenshots (development only)
 if os.path.exists("uploads"):

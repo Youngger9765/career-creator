@@ -129,6 +129,30 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
           uploadedAt: fileData.uploadedAt,
         },
       });
+
+      // Owner needs to save state when receiving visitor's upload
+      if (isRoomOwner) {
+        const gameState = {
+          cards: zones.reduce((acc, z) => {
+            const key = `${z}Cards`;
+            const cards = state.cardPlacements[key] || [];
+            cards.forEach((id: string) => {
+              acc[id] = { zone: z };
+            });
+            return acc;
+          }, {} as any),
+          uploadedFile: {
+            name: fileData.name,
+            type: fileData.type,
+            size: fileData.size,
+            url: fileData.url,
+            uploadedAt: fileData.uploadedAt,
+          },
+          lastUpdated: Date.now(),
+          gameType,
+        };
+        cardSync.saveGameState(gameState);
+      }
     },
   });
 
@@ -159,6 +183,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
             });
             return acc;
           }, {} as any),
+          uploadedFile: state.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };
@@ -197,6 +222,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
             });
             return acc;
           }, {} as any),
+          uploadedFile: state.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };

@@ -1,12 +1,36 @@
 """Gameplay state models for persisting game progress."""
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Column, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
+
+
+class FileUploaderInfo(BaseModel):
+    """Information about who uploaded the file."""
+
+    userId: str
+    userName: str
+    role: str
+
+    model_config = ConfigDict(extra="forbid")
+
+
+class FileUploadMetadata(BaseModel):
+    """Metadata for uploaded files in gameplay state."""
+
+    name: str
+    url: str
+    size: int
+    type: str
+    uploadedAt: int
+    uploadedBy: FileUploaderInfo
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class GameplayStateBase(SQLModel):

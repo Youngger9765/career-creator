@@ -3,7 +3,7 @@
  * 遊戲模式同步 Hook - 使用 Supabase Broadcast 同步遊戲模式
  * Owner 切換模式時，所有參與者即時同步
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DECK_TYPES, GAMEPLAY_IDS, getDefaultGameplay } from '@/constants/game-modes';
@@ -36,6 +36,8 @@ export interface UseGameModeSyncReturn {
   changeGameMode: (deck: string, gameRule: string, gameMode: string) => void;
   // 開始遊戲（只有 Owner 能用）
   startGame: () => void;
+  // 退出遊戲（只有 Owner 能用）
+  exitGame: () => void;
   // 遊戲是否已開始
   gameStarted: boolean;
 }
@@ -59,6 +61,21 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
   const [gameStarted, setGameStarted] = useState(false);
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
+  // Use ref to store latest syncedState for listeners (prevents closure stale state)
+  const syncedStateRef = useRef<GameModeState>(initialState);
+
+  // Use ref for onStateChange to prevent effect re-subscription on every render
+  const onStateChangeRef = useRef(onStateChange);
+  useEffect(() => {
+    onStateChangeRef.current = onStateChange;
+  }, [onStateChange]);
+
+  // Helper to update both state and ref
+  const updateSyncedState = useCallback((newState: GameModeState) => {
+    setSyncedState(newState);
+    syncedStateRef.current = newState;
+  }, []);
+
   // Load persisted state for owner
   useEffect(() => {
     if (isOwner && typeof window !== 'undefined') {
@@ -67,13 +84,13 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setSyncedState(parsed);
+          updateSyncedState(parsed);
         } catch (err) {
           console.error('[GameModeSync] Failed to parse saved state:', err);
         }
       }
     }
-  }, [isOwner, roomId]);
+  }, [isOwner, roomId, updateSyncedState]);
 
   // Persist state for owner
   const persistState = useCallback(
@@ -97,9 +114,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       const newState: GameModeState = { deck, gameRule, gameMode };
 
       // Update local state immediately
-      setSyncedState(newState);
+      updateSyncedState(newState);
       persistState(newState);
-      onStateChange?.(newState);
+      onStateChangeRef.current?.(newState);
 
       // Broadcast to others
       channel
@@ -114,7 +131,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
           setError('無法同步遊戲模式');
         });
     },
-    [isOwner, channel, persistState, onStateChange]
+    [isOwner, channel, persistState, updateSyncedState]
   );
 
   // Start game (Owner only)
@@ -140,6 +157,41 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       });
   }, [isOwner, channel]);
 
+  // Exit game (Owner only) - 退出玩法，廣播給所有訪客回到等待中
+  const exitGame = useCallback(() => {
+    if (!isOwner || !channel) {
+      console.warn('[GameModeSync] Only owner can exit game');
+      return;
+    }
+
+    const resetState: GameModeState = {
+      deck: DECK_TYPES.TRAVELER,
+      gameRule: '',
+      gameMode: '', // 重置為空字串 = 等待中
+    };
+
+    // Update local state
+    updateSyncedState(resetState);
+    persistState(resetState);
+    setGameStarted(false);
+    onStateChangeRef.current?.(resetState);
+
+    // Broadcast to all participants
+    channel
+      .send({
+        type: 'broadcast',
+        event: 'game_exit',
+        payload: resetState,
+      })
+      .then(() => {
+        console.log('[GameModeSync] Successfully broadcasted game exit');
+      })
+      .catch((err) => {
+        console.error('[GameModeSync] Failed to broadcast game exit:', err);
+        setError('無法退出遊戲');
+      });
+  }, [isOwner, channel, persistState, updateSyncedState]);
+
   // Setup channel and listeners
   useEffect(() => {
     if (!supabase || !roomId) return;
@@ -149,8 +201,8 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
 
     // Listen for mode changes
     gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
-      setSyncedState(payload as GameModeState);
-      onStateChange?.(payload as GameModeState);
+      updateSyncedState(payload as GameModeState);
+      onStateChangeRef.current?.(payload as GameModeState);
     });
 
     // Listen for game start
@@ -158,13 +210,22 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       setGameStarted(true);
     });
 
+    // Listen for game exit - 訪客收到後回到等待中
+    gameChannel.on('broadcast', { event: 'game_exit' }, ({ payload }) => {
+      updateSyncedState(payload as GameModeState);
+      setGameStarted(false);
+      onStateChangeRef.current?.(payload as GameModeState);
+      console.log('[GameModeSync] Received game exit, returning to waiting state');
+    });
+
     // Request current state (for non-owners joining)
     gameChannel.on('broadcast', { event: 'request_state' }, ({ payload }) => {
       if (isOwner) {
+        // Use ref to get latest state (prevents closure stale state bug)
         gameChannel.send({
           type: 'broadcast',
           event: 'current_state',
-          payload: syncedState,
+          payload: syncedStateRef.current,
         });
       }
     });
@@ -172,8 +233,8 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Receive current state (for non-owners)
     gameChannel.on('broadcast', { event: 'current_state' }, ({ payload }) => {
       if (!isOwner) {
-        setSyncedState(payload as GameModeState);
-        onStateChange?.(payload as GameModeState);
+        updateSyncedState(payload as GameModeState);
+        onStateChangeRef.current?.(payload as GameModeState);
       }
     });
 
@@ -227,6 +288,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     error,
     changeGameMode,
     startGame,
+    exitGame,
     gameStarted,
   };
 }

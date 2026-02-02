@@ -38,6 +38,7 @@ interface GameModeIntegrationProps {
   onGameplayChange?: (gameplay: string) => void;
   currentGameplay?: string;
   onStateChange?: (state: any) => void;
+  onExitGame?: (exitFn: () => void) => void;
 }
 
 const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
@@ -48,6 +49,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   onGameplayChange,
   currentGameplay,
   onStateChange,
+  onExitGame,
 }) => {
   // 模式和玩法選擇 - 本地預覽狀態
   const [selectedMode, setSelectedMode] = useState<string>('');
@@ -84,6 +86,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     error: syncError,
     changeGameMode,
     startGame,
+    exitGame,
     gameStarted,
   } = useGameModeSync({
     roomId,
@@ -100,6 +103,13 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   // 計算是否可互動（使用 room presence，不使用 game_mode channel）
   const canInteractLocal = isRoomOwner || counselorOnline;
+
+  // 將 exitGame 函數傳遞給父元件
+  useEffect(() => {
+    if (exitGame && onExitGame) {
+      onExitGame(exitGame);
+    }
+  }, [exitGame, onExitGame]);
 
   // 選擇遊戲（模式 + 玩法）- Owner 同步選擇
   const handleGameSelect = (modeId: string, gameplayId: string) => {

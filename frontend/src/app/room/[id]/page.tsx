@@ -50,6 +50,7 @@ export default function RoomPage() {
     useState<ConsultationRecord | null>(null);
   const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const exitGameRef = useRef<(() => void) | null>(null);
 
   // Game Session for state persistence
   const gameSession = useGameSession({
@@ -455,7 +456,10 @@ export default function RoomPage() {
             {/* 切換遊戲模式按鈕 */}
             {isCounselor && showNewArchitecture && currentGameplay && (
               <button
-                onClick={() => setCurrentGameplay('')}
+                onClick={() => {
+                  exitGameRef.current?.();
+                  setCurrentGameplay('');
+                }}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                 title="切換遊戲模式"
               >
@@ -565,6 +569,9 @@ export default function RoomPage() {
             console.log('[Room] Game state changed:', state);
             // 可以在這裡更新 gameSession 或其他狀態
           }}
+          onExitGame={(exitFn) => {
+            exitGameRef.current = exitFn;
+          }}
         />
       </div>
 
@@ -668,6 +675,7 @@ export default function RoomPage() {
             </button>
             <button
               onClick={() => {
+                exitGameRef.current?.();
                 setShowExitDialog(false);
                 router.push('/dashboard');
               }}

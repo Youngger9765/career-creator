@@ -194,10 +194,7 @@ async def upload_file(
         await file.seek(0)  # Reset file pointer
         blob.upload_from_file(file.file, content_type=file.content_type)
 
-        # Make blob publicly accessible
-        blob.make_public()
-
-        # Get public URL
+        # Get public URL (bucket has allUsers objectViewer for public access)
         public_url = blob.public_url
 
         # Return file metadata (user must be counselor since we checked above)

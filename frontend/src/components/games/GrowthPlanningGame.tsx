@@ -3,6 +3,11 @@
  *
  * 結合職能卡(mindset)和行動卡(action)制定成長計畫
  * 包含兩個區域：職能卡區、行動卡區
+ *
+ * Sync Architecture:
+ * - Uses SINGLE channel via useUnifiedCardSync
+ * - Settings (planText) synced via cardSync.saveGameState({ settings: { planText } })
+ * - Follows LifeTransformationGame pattern
  */
 
 'use client';
@@ -12,8 +17,7 @@ import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GrowthPlanCanvas from '../game-canvases/GrowthPlanCanvas';
 import GameLayout from '../common/GameLayout';
 import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
-import { useCardSync, CardGameState } from '@/hooks/use-card-sync';
-import { useAuthStore } from '@/stores/auth-store';
+import { CardGameState } from '@/hooks/use-card-sync';
 import { debounce } from '@/lib/throttle-debounce';
 import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
@@ -33,32 +37,23 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   const [fullDeck, setFullDeck] = useState<any>(null);
   const [planText, setPlanText] = useState<string>('');
 
-  // Auth 資訊
-  const { user } = useAuthStore();
-  const userId = user?.id || `visitor-${Date.now()}`;
-  const userName = user?.name || '訪客';
+  // Ref to track planText for onStateReceived callback (avoid stale closure)
+  const planTextRef = useRef(planText);
+  useEffect(() => {
+    planTextRef.current = planText;
+  }, [planText]);
 
-  // 使用統一的卡片同步 Hook - 處理牌卡同步
+  // 使用統一的卡片同步 Hook - 處理牌卡 + 設定同步（SINGLE channel）
   const { state, draggedByOthers, handleCardMove, cardSync, updateCards } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.GROWTH_PLANNING,
     storeKey: GAMEPLAY_IDS.GROWTH_PLANNING,
     isRoomOwner,
     zones: ['skills', 'actions'], // 定義這個遊戲的區域
-  });
-
-  // 使用 useCardSync 處理文字同步 - 使用不同的 channel 避免衝突
-  const gameSync = useCardSync({
-    roomId,
-    gameType: `${GAMEPLAY_IDS.GROWTH_PLANNING}_settings`, // 使用不同的 channel 名稱
-    isOwner: isRoomOwner,
-    userName,
-    userId,
-    onCardMove: () => {}, // 忽略卡片移動（由 useUnifiedCardSync 處理）
-    onStateReceived: (receivedState) => {
+    onStateReceived: (receivedState: any) => {
       console.log('[GrowthPlanning] 接收到遊戲狀態:', receivedState);
 
-      // 處理文字輸入 - 像 LifeTransformationGame 一樣存在 settings 中
+      // 處理文字輸入 - 存在 settings 中
       if (receivedState.settings?.planText !== undefined) {
         console.log('[GrowthPlanning] 更新文字:', receivedState.settings.planText);
         setPlanText(receivedState.settings.planText);
@@ -68,8 +63,8 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 
   // 載入已儲存的狀態 - 只在連線狀態變更時執行一次
   useEffect(() => {
-    if (gameSync.isConnected) {
-      const savedState = gameSync.loadGameState();
+    if (cardSync.isConnected) {
+      const savedState = cardSync.loadGameState();
       console.log('[GrowthPlanning] 載入遊戲狀態:', savedState);
 
       if (savedState?.settings?.planText !== undefined) {
@@ -78,7 +73,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameSync.isConnected]); // 只依賴 isConnected，避免 gameSync 物件變更造成無限循環
+  }, [cardSync.isConnected]); // 只依賴 isConnected，避免物件變更造成無限循環
 
   // 載入牌組 - 從同一個 deck 中分離 action 和 mindset 卡
   useEffect(() => {
@@ -138,22 +133,22 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     [fullDeck?.cards]
   );
 
-  // Keep gameSync in ref to avoid recreating debounced function
-  const gameSyncRef = useRef(gameSync);
+  // Keep cardSync in ref to avoid recreating debounced function
+  const cardSyncRef = useRef(cardSync);
   useEffect(() => {
-    gameSyncRef.current = gameSync;
-  }, [gameSync]);
+    cardSyncRef.current = cardSync;
+  }, [cardSync]);
 
   // Debounced save function for remote sync (500ms delay)
   // This reduces broadcast frequency while maintaining smooth local typing
   const debouncedSaveGameState = useMemo(
     () =>
-      debounce((state: CardGameState) => {
-        if (gameSyncRef.current.isConnected) {
-          gameSyncRef.current.saveGameState(state);
+      debounce((gameState: CardGameState) => {
+        if (cardSyncRef.current.isConnected) {
+          cardSyncRef.current.saveGameState(gameState);
         }
       }, 500),
-    [] // Empty deps - use ref to access latest gameSync
+    [] // Empty deps - use ref to access latest cardSync
   );
 
   // Cleanup debounced function on unmount
@@ -206,19 +201,29 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
       setPlanText(text); // 立即更新本地狀態（打字流暢）
 
       // Debounced 同步到遠端（500ms 延遲，減少廣播訊息）
+      // Build card state from current placements
+      const cards: Record<string, { zone: string }> = {};
+      ['skills', 'actions'].forEach((zone) => {
+        const key = `${zone}Cards`;
+        const cardIds = state.cardPlacements[key] || [];
+        cardIds.forEach((id: string) => {
+          cards[id] = { zone };
+        });
+      });
+
       const gameState: CardGameState = {
-        cards: {}, // 空的卡片資料
+        cards,
         settings: {
           planText: text, // 文字存在 settings 中
         },
         lastUpdated: Date.now(),
-        gameType: `${GAMEPLAY_IDS.GROWTH_PLANNING}_settings`,
+        gameType: GAMEPLAY_IDS.GROWTH_PLANNING, // Use same channel as card sync
       };
 
       // 使用 debounced 版本 - 只有停止打字 500ms 後才會廣播
       debouncedSaveGameState(gameState);
     },
-    [isRoomOwner, getCardPrefix, debouncedSaveGameState]
+    [isRoomOwner, getCardPrefix, debouncedSaveGameState, state.cardPlacements]
   );
 
   // Keep refs for functions to avoid useEffect dependency issues
@@ -228,12 +233,6 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     getCardPrefixRef.current = getCardPrefix;
     handlePlanTextChangeRef.current = handlePlanTextChange;
   }, [getCardPrefix, handlePlanTextChange]);
-
-  // Keep planText in ref to avoid it triggering the effect
-  const planTextRef = useRef(planText);
-  useEffect(() => {
-    planTextRef.current = planText;
-  }, [planText]);
 
   // 當卡片改變時，自動更新前綴
   // Only trigger when cards actually change, not when functions/planText change

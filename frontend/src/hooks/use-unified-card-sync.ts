@@ -17,10 +17,11 @@ interface UseUnifiedCardSyncOptions {
   storeKey: string;
   isRoomOwner: boolean;
   zones: string[]; // 例如 ['like', 'neutral', 'dislike']
+  onStateReceived?: (gameState: any) => void; // Optional callback for handling settings
 }
 
 export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
-  const { roomId, gameType, storeKey, isRoomOwner, zones } = options;
+  const { roomId, gameType, storeKey, isRoomOwner, zones, onStateReceived } = options;
 
   // Auth
   const { user } = useAuthStore();
@@ -115,7 +116,10 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     },
     onStateReceived: (gameState) => {
       console.log(`[${gameType}] Received game state:`, gameState);
-      // TODO: 處理完整狀態同步
+      // Call the optional callback to handle settings (e.g., planText)
+      if (onStateReceived) {
+        onStateReceived(gameState);
+      }
     },
     onFileUpload: (fileData) => {
       console.log(`[${gameType}] Received remote file upload:`, fileData.name);

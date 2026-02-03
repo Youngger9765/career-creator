@@ -33,17 +33,17 @@ vi.mock('@/hooks/use-unified-card-sync', () => ({
     cardSync: {
       startDrag: vi.fn(),
       endDrag: vi.fn(),
+      isConnected: true,
+      loadGameState: vi.fn(() => null),
+      saveGameState: vi.fn(),
     },
     updateCards: vi.fn(),
   })),
 }));
 
+// CardGameState type export needed
 vi.mock('@/hooks/use-card-sync', () => ({
-  useCardSync: vi.fn(() => ({
-    isConnected: true,
-    loadGameState: vi.fn(() => null),
-    saveGameState: vi.fn(),
-  })),
+  CardGameState: {},
 }));
 
 vi.mock('@/stores/auth-store', () => ({
@@ -113,6 +113,9 @@ describe('GrowthPlanningGame', () => {
         cardSync: {
           startDrag: vi.fn(),
           endDrag: vi.fn(),
+          isConnected: true,
+          loadGameState: vi.fn(() => null),
+          saveGameState: vi.fn(),
         },
         updateCards: vi.fn(),
       });
@@ -149,6 +152,9 @@ describe('GrowthPlanningGame', () => {
         cardSync: {
           startDrag: vi.fn(),
           endDrag: vi.fn(),
+          isConnected: true,
+          loadGameState: vi.fn(() => null),
+          saveGameState: vi.fn(),
         },
         updateCards: vi.fn(),
       });

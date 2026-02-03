@@ -180,16 +180,6 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     const skillName = skillCard?.title || '未選擇';
     const actionName = actionCard?.title || '未選擇';
 
-    console.log('[GrowthPlanning] Card prefix debug:', {
-      skillCardId: skillCardsInUse[0],
-      actionCardId: actionCardsInUse[0],
-      skillCard,
-      actionCard,
-      skillName,
-      actionName,
-      totalCards: allCards.length,
-    });
-
     return `【職能卡: ${skillName} | 行動卡: ${actionName}】\n----------\n`;
   }, [skillCardsInUse, actionCardsInUse, allCards]);
 
@@ -231,36 +221,47 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     [isRoomOwner, getCardPrefix, debouncedSaveGameState]
   );
 
+  // Keep refs for functions to avoid useEffect dependency issues
+  const getCardPrefixRef = useRef(getCardPrefix);
+  const handlePlanTextChangeRef = useRef(handlePlanTextChange);
+  useEffect(() => {
+    getCardPrefixRef.current = getCardPrefix;
+    handlePlanTextChangeRef.current = handlePlanTextChange;
+  }, [getCardPrefix, handlePlanTextChange]);
+
+  // Keep planText in ref to avoid it triggering the effect
+  const planTextRef = useRef(planText);
+  useEffect(() => {
+    planTextRef.current = planText;
+  }, [planText]);
+
   // 當卡片改變時，自動更新前綴
+  // Only trigger when cards actually change, not when functions/planText change
   useEffect(() => {
     if (!isRoomOwner) return;
 
-    const prefix = getCardPrefix();
+    const prefix = getCardPrefixRef.current();
     if (!prefix) return;
 
+    const currentPlanText = planTextRef.current;
+
     // 如果已有內容，更新前綴
-    if (planText) {
-      const oldPrefixMatch = planText.match(/^【職能卡:.*?】\n----------\n/);
-      let userContent = planText;
+    if (currentPlanText) {
+      const oldPrefixMatch = currentPlanText.match(/^【職能卡:.*?】\n----------\n/);
+      let userContent = currentPlanText;
       if (oldPrefixMatch) {
-        userContent = planText.substring(oldPrefixMatch[0].length);
+        userContent = currentPlanText.substring(oldPrefixMatch[0].length);
       }
       const newText = prefix + userContent;
-      if (newText !== planText) {
-        handlePlanTextChange(newText);
+      if (newText !== currentPlanText) {
+        handlePlanTextChangeRef.current(newText);
       }
     } else if (skillCardsInUse.length > 0 || actionCardsInUse.length > 0) {
       // 如果沒有內容但有卡片，初始化前綴
-      handlePlanTextChange(prefix);
+      handlePlanTextChangeRef.current(prefix);
     }
-  }, [
-    skillCardsInUse,
-    actionCardsInUse,
-    isRoomOwner,
-    getCardPrefix,
-    handlePlanTextChange,
-    planText,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [skillCardsInUse, actionCardsInUse, isRoomOwner]); // Only depend on actual data changes
 
   // 過濾出未使用的卡片
   const availableMindsetCards = mindsetCards.filter((card: any) => !usedCardIds.has(card.id));

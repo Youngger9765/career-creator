@@ -13,6 +13,7 @@ vi.mock('@/lib/supabase-client', () => ({
   supabase: {
     channel: vi.fn(),
   },
+  isSupabaseConfigured: vi.fn(() => true),
 }));
 
 describe('useGameModeSync', () => {
@@ -181,6 +182,56 @@ describe('useGameModeSync', () => {
         expect(visitorResult.current.syncedState.gameMode).not.toBe('');
         expect(visitorResult.current.syncedState.gameMode).toBe('personality_assessment');
       });
+    });
+  });
+
+  describe('Presence tracking independence', () => {
+    it('ownerOnline should remain false when internal presence tracking is removed', async () => {
+      // This test documents expected behavior after removing duplicate Presence tracking
+      // ownerOnline from useGameModeSync is already overwritten by usePresence in GameModeIntegration.tsx
+      const { result } = renderHook(() =>
+        useGameModeSync({
+          roomId: 'test-room',
+          isOwner: false,
+        })
+      );
+
+      await waitFor(() => expect(mockChannel.subscribe).toHaveBeenCalled());
+
+      // ownerOnline should be false (default) since we're removing internal presence tracking
+      // The actual owner online status comes from usePresence hook
+      expect(result.current.ownerOnline).toBe(false);
+    });
+
+    it('game mode sync should work independently from presence tracking', async () => {
+      // Core functionality: game mode sync should work without relying on presence
+      const newState = {
+        deck: DECK_TYPES.SKILLS,
+        gameRule: '優劣勢分析',
+        gameMode: 'advantage_analysis',
+      };
+
+      const { result } = renderHook(() =>
+        useGameModeSync({
+          roomId: 'test-room',
+          isOwner: false,
+        })
+      );
+
+      await waitFor(() => expect(mockChannel.subscribe).toHaveBeenCalled());
+
+      // Receive mode change (this is the core functionality)
+      act(() => {
+        emitEvent('broadcast', 'mode_changed', newState);
+      });
+
+      // Verify mode sync works
+      await waitFor(() => {
+        expect(result.current.syncedState).toEqual(newState);
+      });
+
+      // Verify connected state (channel, not presence)
+      expect(result.current.isConnected).toBe(true);
     });
   });
 

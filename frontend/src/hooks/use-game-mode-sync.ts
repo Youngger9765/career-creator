@@ -276,13 +276,8 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
         }
       });
 
-      // Owner presence tracking
-      gameChannel.on('presence', { event: 'sync' }, () => {
-        const state = gameChannel.presenceState();
-        const users = Object.values(state).flat();
-        const ownerExists = users.some((u: any) => u.role === 'owner');
-        setOwnerOnline(ownerExists);
-      });
+      // NOTE: Presence tracking removed to avoid duplicate with usePresence hook
+      // ownerOnline is provided by usePresence in GameModeIntegration.tsx
 
       // Subscribe to channel
       gameChannel.subscribe(async (status, err) => {
@@ -296,11 +291,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
           setError(null);
           setChannel(gameChannel);
 
-          // Track presence
-          if (isOwnerRef.current) {
-            await gameChannel.track({ role: 'owner', id: `owner-${roomId}` });
-          } else {
-            await gameChannel.track({ role: 'participant', id: `user-${Date.now()}` });
+          // NOTE: Presence tracking (channel.track) removed to avoid duplicate with usePresence hook
+          // Only request current state for non-owners
+          if (!isOwnerRef.current) {
             // Request current state from owner
             gameChannel.send({
               type: 'broadcast',

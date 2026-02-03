@@ -25,6 +25,8 @@ import html2canvas from 'html2canvas';
 import { Camera } from 'lucide-react';
 import { consultationRecordsAPI } from '@/lib/api/clients';
 import { ConsultationRecord } from '@/types/client';
+import { useIdleTimeout } from '@/hooks/use-idle-timeout';
+import { IdleTimeoutDialog } from '@/components/idle-timeout-dialog';
 
 export default function RoomPage() {
   const params = useParams();
@@ -175,6 +177,25 @@ export default function RoomPage() {
     currentUser: currentUserInfo,
     updateInterval: 10000, // 10 seconds
     offlineThreshold: 60000, // 1 minute
+  });
+
+  // Idle timeout - automatically save and disconnect after 30 minutes of inactivity
+  const { showWarning: showIdleWarning, countdown: idleCountdown, resetTimer: resetIdleTimer } = useIdleTimeout({
+    timeoutMs: 30 * 60 * 1000, // 30 minutes
+    onTimeout: () => {
+      console.log('[RoomPage] Idle timeout reached, saving and exiting');
+      // Save current game state
+      gameSession.saveState();
+      // Exit game if in gameplay
+      if (exitGameRef.current) {
+        exitGameRef.current();
+      }
+      // Redirect to home
+      router.push('/');
+    },
+    // Reset timer when game state changes (indicates user activity)
+    activities: [gameSession.gameState, currentGameplay],
+    enabled: isReady, // Only enable when room is ready
   });
 
   // Debug log for participants (only on significant changes)
@@ -686,6 +707,13 @@ export default function RoomPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Idle Timeout Warning Dialog */}
+      <IdleTimeoutDialog
+        open={showIdleWarning}
+        countdown={idleCountdown}
+        onContinue={resetIdleTimer}
+      />
     </div>
   );
 }

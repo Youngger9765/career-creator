@@ -138,16 +138,22 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     [fullDeck?.cards]
   );
 
+  // Keep gameSync in ref to avoid recreating debounced function
+  const gameSyncRef = useRef(gameSync);
+  useEffect(() => {
+    gameSyncRef.current = gameSync;
+  }, [gameSync]);
+
   // Debounced save function for remote sync (500ms delay)
   // This reduces broadcast frequency while maintaining smooth local typing
   const debouncedSaveGameState = useMemo(
     () =>
       debounce((state: CardGameState) => {
-        if (gameSync.isConnected) {
-          gameSync.saveGameState(state);
+        if (gameSyncRef.current.isConnected) {
+          gameSyncRef.current.saveGameState(state);
         }
       }, 500),
-    [gameSync]
+    [] // Empty deps - use ref to access latest gameSync
   );
 
   // Cleanup debounced function on unmount

@@ -164,9 +164,12 @@ export function usePresence(roomId: string | undefined) {
               const ownerLeft = leftPresences.some((presence: any) => presence.role === 'owner');
 
               if (ownerLeft) {
-                console.log('[usePresence] 🚨 Owner left detected');
-
                 const currentIdentity = userIdentityRef.current;
+                console.log('[usePresence] 🚨 Owner left detected, currentIdentity:', {
+                  id: currentIdentity?.id,
+                  role: currentIdentity?.role,
+                  name: currentIdentity?.name,
+                });
 
                 // If current user is a visitor, redirect immediately
                 // (Don't rely on broadcast because Supabase doesn't send broadcasts to self by default)

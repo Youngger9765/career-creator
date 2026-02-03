@@ -164,9 +164,19 @@ export function usePresence(roomId: string | undefined) {
               const ownerLeft = leftPresences.some((presence: any) => presence.role === 'owner');
 
               if (ownerLeft) {
-                console.log('[usePresence] 🚨 Owner left, broadcasting session_ended');
+                console.log('[usePresence] 🚨 Owner left detected');
 
-                // Broadcast session_ended to all participants
+                const currentIdentity = userIdentityRef.current;
+
+                // If current user is a visitor, redirect immediately
+                // (Don't rely on broadcast because Supabase doesn't send broadcasts to self by default)
+                if (currentIdentity?.role === 'visitor') {
+                  console.log('[usePresence] 🚨 Visitor detected owner left, redirecting to session-ended');
+                  router.push('/session-ended');
+                  return;
+                }
+
+                // Otherwise broadcast to other participants (for multi-visitor scenarios)
                 channel
                   .send({
                     type: 'broadcast',

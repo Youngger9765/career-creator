@@ -40,26 +40,21 @@ export function usePresence(roomId: string | undefined) {
   // Memoize user identity to prevent unnecessary re-renders
   // Use useMemo instead of useCallback to avoid dependency issues
   const userIdentity = useMemo((): PresenceUser | null => {
-    // 1. 檢查是否為登入用戶（諮詢師）
-    if (user) {
-      return {
-        id: user.id,
-        name: user.name || '諮詢師',
-        role: 'owner',
-        avatar: undefined,
-        joinedAt: new Date().toISOString(),
-      };
-    }
-
-    // 2. 檢查是否為訪客 (only access localStorage on client side)
+    // Check visitor FIRST (visitor session takes priority over auth store)
+    // This handles the case where visitor opens link in browser that has logged-in user
     if (typeof window !== 'undefined') {
+      // Check URL parameter for visitor flag
+      const urlParams = new URLSearchParams(window.location.search);
+      const isVisitorFromUrl = urlParams.get('visitor') === 'true';
+
+      // Check localStorage for visitor session
       const visitorSessionStr = localStorage.getItem('visitor_session');
       if (visitorSessionStr) {
         try {
           const visitorSession = JSON.parse(visitorSessionStr);
 
-          // 驗證 session 是否為當前房間
-          if (visitorSession.room_id === roomId) {
+          // If visitor session exists for current room OR URL indicates visitor
+          if (visitorSession.room_id === roomId || isVisitorFromUrl) {
             return {
               id: `visitor_${visitorSession.session_id || visitorSession.visitor_id}`,
               name: visitorSession.name || '訪客',
@@ -71,6 +66,17 @@ export function usePresence(roomId: string | undefined) {
           console.error('解析 visitor session 失敗:', e);
         }
       }
+    }
+
+    // If not a visitor, check for logged-in user (counselor/owner)
+    if (user) {
+      return {
+        id: user.id,
+        name: user.name || '諮詢師',
+        role: 'owner',
+        avatar: undefined,
+        joinedAt: new Date().toISOString(),
+      };
     }
 
     return null;

@@ -7,13 +7,14 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import GrowthPlanCanvas from '../game-canvases/GrowthPlanCanvas';
 import GameLayout from '../common/GameLayout';
 import { useUnifiedCardSync } from '@/hooks/use-unified-card-sync';
-import { useCardSync } from '@/hooks/use-card-sync';
+import { useCardSync, CardGameState } from '@/hooks/use-card-sync';
 import { useAuthStore } from '@/stores/auth-store';
+import { debounce } from '@/lib/throttle-debounce';
 import { GAMEPLAY_IDS } from '@/constants/game-modes';
 
 interface GrowthPlanningGameProps {
@@ -65,7 +66,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     },
   });
 
-  // 載入已儲存的狀態
+  // 載入已儲存的狀態 - 只在連線狀態變更時執行一次
   useEffect(() => {
     if (gameSync.isConnected) {
       const savedState = gameSync.loadGameState();
@@ -76,7 +77,8 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         setPlanText(savedState.settings.planText);
       }
     }
-  }, [gameSync]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameSync.isConnected]); // 只依賴 isConnected，避免 gameSync 物件變更造成無限循環
 
   // 載入牌組 - 從同一個 deck 中分離 action 和 mindset 卡
   useEffect(() => {
@@ -136,6 +138,25 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     [fullDeck?.cards]
   );
 
+  // Debounced save function for remote sync (500ms delay)
+  // This reduces broadcast frequency while maintaining smooth local typing
+  const debouncedSaveGameState = useMemo(
+    () =>
+      debounce((state: CardGameState) => {
+        if (gameSync.isConnected) {
+          gameSync.saveGameState(state);
+        }
+      }, 500),
+    [gameSync]
+  );
+
+  // Cleanup debounced function on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSaveGameState.cancel();
+    };
+  }, [debouncedSaveGameState]);
+
   // 建立卡片前綴文字
   const getCardPrefix = useCallback(() => {
     // 如果都沒有選擇卡片，不顯示前綴
@@ -186,24 +207,22 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
         text = prefix + userContent;
       }
 
-      setPlanText(text); // 立即更新本地狀態
+      setPlanText(text); // 立即更新本地狀態（打字流暢）
 
-      // 立即同步到遠端
-      if (gameSync.isConnected) {
-        const gameState = {
-          cards: {}, // 空的卡片資料
-          settings: {
-            planText: text, // 文字存在 settings 中
-          },
-          lastUpdated: Date.now(),
-          gameType: `${GAMEPLAY_IDS.GROWTH_PLANNING}_settings`,
-        };
+      // Debounced 同步到遠端（500ms 延遲，減少廣播訊息）
+      const gameState: CardGameState = {
+        cards: {}, // 空的卡片資料
+        settings: {
+          planText: text, // 文字存在 settings 中
+        },
+        lastUpdated: Date.now(),
+        gameType: `${GAMEPLAY_IDS.GROWTH_PLANNING}_settings`,
+      };
 
-        // 儲存狀態 - saveGameState 會自動廣播給所有人
-        gameSync.saveGameState(gameState);
-      }
+      // 使用 debounced 版本 - 只有停止打字 500ms 後才會廣播
+      debouncedSaveGameState(gameState);
     },
-    [gameSync, isRoomOwner, getCardPrefix]
+    [isRoomOwner, getCardPrefix, debouncedSaveGameState]
   );
 
   // 當卡片改變時，自動更新前綴

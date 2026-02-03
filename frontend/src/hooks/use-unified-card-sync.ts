@@ -183,7 +183,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
             });
             return acc;
           }, {} as any),
-          uploadedFile: state.uploadedFile,
+          uploadedFile: state.cardPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };
@@ -222,7 +222,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
             });
             return acc;
           }, {} as any),
-          uploadedFile: state.uploadedFile,
+          uploadedFile: state.cardPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };

@@ -101,7 +101,7 @@ export function useVisitorJoin() {
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('Presence check timeout')), 5000);
 
-        tempChannel!.subscribe((status) => {
+        tempChannel!.subscribe((status: string) => {
           if (status === 'SUBSCRIBED') {
             clearTimeout(timeout);
             resolve();

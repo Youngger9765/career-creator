@@ -185,7 +185,7 @@ export default function RoomPage() {
     onTimeout: () => {
       console.log('[RoomPage] Idle timeout reached, saving and exiting');
       // Save current game state
-      gameSession.saveState();
+      gameSession.saveGameState(gameSession.gameState);
       // Exit game if in gameplay
       if (exitGameRef.current) {
         exitGameRef.current();

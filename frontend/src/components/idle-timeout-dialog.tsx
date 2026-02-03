@@ -1,14 +1,14 @@
 'use client';
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Clock } from 'lucide-react';
 
 interface IdleTimeoutDialogProps {
@@ -19,19 +19,19 @@ interface IdleTimeoutDialogProps {
 
 export function IdleTimeoutDialog({ open, countdown, onContinue }: IdleTimeoutDialogProps) {
   return (
-    <AlertDialog open={open}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
+    <Dialog open={open}>
+      <DialogContent>
+        <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="rounded-full bg-yellow-100 p-2">
               <Clock className="w-6 h-6 text-yellow-600" />
             </div>
-            <AlertDialogTitle>閒置偵測</AlertDialogTitle>
+            <DialogTitle>閒置偵測</DialogTitle>
           </div>
-          <AlertDialogDescription className="text-base">
+          <DialogDescription className="text-base">
             由於長時間無操作，系統即將自動存檔並關閉連線。
-          </AlertDialogDescription>
-        </AlertDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
 
         <div className="py-6">
           <div className="text-center">
@@ -40,12 +40,12 @@ export function IdleTimeoutDialog({ open, countdown, onContinue }: IdleTimeoutDi
           </div>
         </div>
 
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={onContinue} className="w-full">
+        <DialogFooter>
+          <Button onClick={onContinue} className="w-full">
             繼續使用
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

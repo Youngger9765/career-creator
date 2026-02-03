@@ -161,7 +161,7 @@ export function usePresence(roomId: string | undefined) {
 
             // Check if owner left
             if (Array.isArray(leftPresences)) {
-              const ownerLeft = leftPresences.some((user: PresenceUser) => user.role === 'owner');
+              const ownerLeft = leftPresences.some((presence: any) => presence.role === 'owner');
 
               if (ownerLeft) {
                 console.log('[usePresence] 🚨 Owner left, broadcasting session_ended');

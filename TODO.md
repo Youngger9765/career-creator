@@ -4,7 +4,29 @@
 
 ---
 
-## 🚨 Young 負責項目（2026-01-31）
+## 🚨 Young 負責項目（2026-02-03）
+
+### 🐛 已修復 Bug（2026-02-03）
+- [x] **GCS 403 權限錯誤** ✅ FIXED
+  - Commit: `4254f12`
+  - 問題：`blob.make_public()` 需要 IAM 權限，Cloud Run SA 沒有
+  - 修復：移除 `blob.make_public()` 呼叫（bucket 已有公開存取設定）
+  - 狀態：已部署到 staging
+
+- [x] **PDF 檔案雙向同步失敗** ✅ FIXED
+  - Commit: `1f46693`
+  - 問題：上傳的 PDF 無法在所有參與者之間同步
+    - Owner 上傳 → Visitor 看到 ✓
+    - Visitor 上傳 → Owner 看不到 ❌
+    - 新加入 Visitor → 看不到之前上傳的檔案 ❌
+  - Root Cause：
+    1. `saveGameState` 缺少 `uploadedFile` 欄位
+    2. Owner 接收 visitor 上傳時不保存狀態
+  - 修復：
+    - 在 `handleCardMove` 和 `handleCardReorder` 的 `saveGameState` 中加入 `uploadedFile`
+    - 在 `onFileUpload` callback 中，owner 接收時保存狀態
+  - 檔案：`frontend/src/hooks/use-unified-card-sync.ts`
+  - 狀態：已 commit，等待 CI/CD 部署
 
 ### Production Bug 修復
 - [ ] **調整 PROD DB 參數** 🔴 URGENT

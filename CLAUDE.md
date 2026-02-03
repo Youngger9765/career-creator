@@ -29,6 +29,14 @@ Building an online card consultation system for career counselors and visitors.
 3. **Auto-fix** - Only safe errors (lint/format/imports)
 4. **User Testing First** - Ask "Have you tested? Ready to commit?"
 
+## Test Credentials
+
+| Account | Email | Password |
+|---------|-------|----------|
+| Counselor | demo.counselor@example.com | demo123 |
+| Counselor 2 | demo.counselor2@example.com | demo123 |
+| Admin | demo.admin@example.com | demo123 |
+
 ## Commands
 
 ```bash

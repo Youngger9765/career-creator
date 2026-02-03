@@ -47,8 +47,15 @@ export function useGameplayStatePersistence(options: UseGameplayStatePersistence
 
     try {
       const currentState = getGameState(roomId, gameplayId);
+
+      // Extract uploadedFile from cardPlacements for backend storage
+      // Backend expects: { cardPlacements: {...}, uploadedFile: {...}, metadata: {...} }
+      // Frontend has: { cardPlacements: { uploadedFile: {...} }, metadata: {...} }
+      const { uploadedFile, ...cardPlacementsWithoutFile } = currentState.cardPlacements;
+
       const stateToSave = {
-        cardPlacements: currentState.cardPlacements,
+        cardPlacements: cardPlacementsWithoutFile,
+        uploadedFile: uploadedFile || null,
         metadata: currentState.metadata,
       };
 
@@ -90,8 +97,16 @@ export function useGameplayStatePersistence(options: UseGameplayStatePersistence
         // Room owner: Load from backend
         const backendState = await gameplayStatesAPI.getGameplayState(roomId, gameplayId);
         if (backendState) {
+          // Backend stores: { cardPlacements: {...}, uploadedFile: {...}, metadata: {...} }
+          // Frontend needs: { cardPlacements: { uploadedFile: {...} }, metadata: {...} }
+          const cardPlacementsFromBackend = backendState.state.cardPlacements || {};
+          const uploadedFileFromBackend = backendState.state.uploadedFile;
+
           savedState = {
-            cardPlacements: backendState.state.cardPlacements || {},
+            cardPlacements: {
+              ...cardPlacementsFromBackend,
+              ...(uploadedFileFromBackend ? { uploadedFile: uploadedFileFromBackend } : {}),
+            },
             metadata: backendState.state.metadata || {
               version: 1,
               lastModified: new Date(backendState.updated_at).getTime(),
@@ -106,8 +121,17 @@ export function useGameplayStatePersistence(options: UseGameplayStatePersistence
         const localData = localStorage.getItem(key);
         if (localData) {
           const parsed = JSON.parse(localData);
+
+          // For localStorage, we might have either format (top-level or nested)
+          // Support both for backward compatibility
+          const cardPlacementsFromLocal = parsed.cardPlacements || {};
+          const uploadedFileFromLocal = parsed.uploadedFile;
+
           savedState = {
-            cardPlacements: parsed.cardPlacements || {},
+            cardPlacements: {
+              ...cardPlacementsFromLocal,
+              ...(uploadedFileFromLocal ? { uploadedFile: uploadedFileFromLocal } : {}),
+            },
             metadata: parsed.metadata || {
               version: 1,
               lastModified: Date.now(),

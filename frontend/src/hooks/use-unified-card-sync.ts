@@ -117,6 +117,43 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       console.log(`[${gameType}] Received game state:`, gameState);
       // TODO: 處理完整狀態同步
     },
+    onFileUpload: (fileData) => {
+      console.log(`[${gameType}] Received remote file upload:`, fileData.name);
+      // 更新本地狀態（不廣播，因為這是遠端事件）
+      updateCards({
+        uploadedFile: {
+          name: fileData.name,
+          type: fileData.type,
+          size: fileData.size,
+          url: fileData.url, // GCS public URL (was dataUrl)
+          uploadedAt: fileData.uploadedAt,
+        },
+      });
+
+      // Owner needs to save state when receiving visitor's upload
+      if (isRoomOwner) {
+        const gameState = {
+          cards: zones.reduce((acc, z) => {
+            const key = `${z}Cards`;
+            const cards = state.cardPlacements[key] || [];
+            cards.forEach((id: string) => {
+              acc[id] = { zone: z };
+            });
+            return acc;
+          }, {} as any),
+          uploadedFile: {
+            name: fileData.name,
+            type: fileData.type,
+            size: fileData.size,
+            url: fileData.url,
+            uploadedAt: fileData.uploadedAt,
+          },
+          lastUpdated: Date.now(),
+          gameType,
+        };
+        cardSync.saveGameState(gameState);
+      }
+    },
   });
 
   /**
@@ -146,6 +183,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
             });
             return acc;
           }, {} as any),
+          uploadedFile: state.cardPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };
@@ -184,6 +222,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
             });
             return acc;
           }, {} as any),
+          uploadedFile: state.cardPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };
@@ -193,12 +232,42 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     [state.cardPlacements, zones, updateCards, isRoomOwner, cardSync, gameType, persistence]
   );
 
+  /**
+   * 文件上傳函數
+   */
+  const handleFileUpload = useCallback(
+    (fileData: {
+      name: string;
+      type: string;
+      size: number;
+      url: string; // GCS public URL (was dataUrl)
+      uploadedAt: number;
+    }) => {
+      console.log(`[${gameType}] Local file upload:`, fileData.name);
+
+      // 1. 更新本地狀態
+      updateCards({
+        uploadedFile: fileData,
+      });
+
+      // 2. 廣播到其他用戶
+      if (cardSync.isConnected) {
+        cardSync.uploadFile(fileData);
+      }
+
+      // 3. Mark as dirty for persistence
+      persistence.markDirty();
+    },
+    [updateCards, cardSync, gameType, persistence]
+  );
+
   return {
     state,
     draggedByOthers,
     handleCardMove,
     handleCardReorder, // Export reorder function
-    updateCards, // Export for components that need it (e.g., file upload)
+    handleFileUpload, // Export file upload function
+    updateCards, // Export for components that need it (e.g., backward compatibility)
     cardSync,
     userId,
     userName,

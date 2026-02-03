@@ -2,11 +2,14 @@
  * useGameModeSync Hook
  * 遊戲模式同步 Hook - 使用 Supabase Broadcast 同步遊戲模式
  * Owner 切換模式時，所有參與者即時同步
+ *
+ * Implements exponential backoff to prevent quota exhaustion
  */
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/lib/supabase-client';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DECK_TYPES, GAMEPLAY_IDS, getDefaultGameplay } from '@/constants/game-modes';
+import { RealtimeRetryManager } from '@/lib/realtime-retry';
 
 export interface GameModeState {
   deck: string;
@@ -36,14 +39,18 @@ export interface UseGameModeSyncReturn {
   changeGameMode: (deck: string, gameRule: string, gameMode: string) => void;
   // 開始遊戲（只有 Owner 能用）
   startGame: () => void;
+  // 退出遊戲（只有 Owner 能用）
+  exitGame: () => void;
   // 遊戲是否已開始
   gameStarted: boolean;
+  // 重試是否已耗盡
+  retryExhausted: boolean;
 }
 
 const DEFAULT_STATE: GameModeState = {
   deck: DECK_TYPES.TRAVELER,
-  gameRule: '六大性格分析',
-  gameMode: GAMEPLAY_IDS.PERSONALITY_ASSESSMENT,
+  gameRule: '',
+  gameMode: '', // 空字串表示諮詢師尚未選擇遊戲模式
 };
 
 // LocalStorage key for owner state persistence
@@ -59,6 +66,21 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
   const [gameStarted, setGameStarted] = useState(false);
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
 
+  // Use ref to store latest syncedState for listeners (prevents closure stale state)
+  const syncedStateRef = useRef<GameModeState>(initialState);
+
+  // Use ref for onStateChange to prevent effect re-subscription on every render
+  const onStateChangeRef = useRef(onStateChange);
+  useEffect(() => {
+    onStateChangeRef.current = onStateChange;
+  }, [onStateChange]);
+
+  // Helper to update both state and ref
+  const updateSyncedState = useCallback((newState: GameModeState) => {
+    setSyncedState(newState);
+    syncedStateRef.current = newState;
+  }, []);
+
   // Load persisted state for owner
   useEffect(() => {
     if (isOwner && typeof window !== 'undefined') {
@@ -67,13 +89,13 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          setSyncedState(parsed);
+          updateSyncedState(parsed);
         } catch (err) {
           console.error('[GameModeSync] Failed to parse saved state:', err);
         }
       }
     }
-  }, [isOwner, roomId]);
+  }, [isOwner, roomId, updateSyncedState]);
 
   // Persist state for owner
   const persistState = useCallback(
@@ -97,9 +119,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       const newState: GameModeState = { deck, gameRule, gameMode };
 
       // Update local state immediately
-      setSyncedState(newState);
+      updateSyncedState(newState);
       persistState(newState);
-      onStateChange?.(newState);
+      onStateChangeRef.current?.(newState);
 
       // Broadcast to others
       channel
@@ -114,7 +136,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
           setError('無法同步遊戲模式');
         });
     },
-    [isOwner, channel, persistState, onStateChange]
+    [isOwner, channel, persistState, updateSyncedState]
   );
 
   // Start game (Owner only)
@@ -140,81 +162,194 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       });
   }, [isOwner, channel]);
 
+  // Exit game (Owner only) - 退出玩法，廣播給所有訪客回到等待中
+  const exitGame = useCallback(() => {
+    if (!isOwner || !channel) {
+      console.warn('[GameModeSync] Only owner can exit game');
+      return;
+    }
+
+    const resetState: GameModeState = {
+      deck: DECK_TYPES.TRAVELER,
+      gameRule: '',
+      gameMode: '', // 重置為空字串 = 等待中
+    };
+
+    // Update local state
+    updateSyncedState(resetState);
+    persistState(resetState);
+    setGameStarted(false);
+    onStateChangeRef.current?.(resetState);
+
+    // Broadcast to all participants
+    channel
+      .send({
+        type: 'broadcast',
+        event: 'game_exit',
+        payload: resetState,
+      })
+      .then(() => {
+        console.log('[GameModeSync] Successfully broadcasted game exit');
+      })
+      .catch((err) => {
+        console.error('[GameModeSync] Failed to broadcast game exit:', err);
+        setError('無法退出遊戲');
+      });
+  }, [isOwner, channel, persistState, updateSyncedState]);
+
+  // Retry manager ref
+  const retryManagerRef = useRef<RealtimeRetryManager | null>(null);
+  const [retryExhausted, setRetryExhausted] = useState(false);
+
+  // Keep isOwner in a ref to avoid dependency issues
+  const isOwnerRef = useRef(isOwner);
+  useEffect(() => {
+    isOwnerRef.current = isOwner;
+  }, [isOwner]);
+
   // Setup channel and listeners
   useEffect(() => {
-    if (!supabase || !roomId) return;
+    if (!isSupabaseConfigured() || !supabase || !roomId) return;
 
-    // Create channel (必須使用 realtime: 前綴)
-    const gameChannel = supabase.channel(`realtime:room:${roomId}:gamemode`);
+    // Initialize retry manager
+    if (!retryManagerRef.current) {
+      retryManagerRef.current = new RealtimeRetryManager({
+        maxRetries: 5,
+        initialDelayMs: 1000,
+        maxDelayMs: 30000,
+      });
+    }
 
-    // Listen for mode changes
-    gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
-      setSyncedState(payload as GameModeState);
-      onStateChange?.(payload as GameModeState);
-    });
+    const retryManager = retryManagerRef.current;
+    let isCleanedUp = false;
+    let currentChannel: RealtimeChannel | null = null;
 
-    // Listen for game start
-    gameChannel.on('broadcast', { event: 'game_started' }, ({ payload }) => {
-      setGameStarted(true);
-    });
+    const setupChannel = async () => {
+      if (isCleanedUp) return;
 
-    // Request current state (for non-owners joining)
-    gameChannel.on('broadcast', { event: 'request_state' }, ({ payload }) => {
-      if (isOwner) {
-        gameChannel.send({
-          type: 'broadcast',
-          event: 'current_state',
-          payload: syncedState,
-        });
+      // Clean up existing channel
+      if (currentChannel) {
+        await currentChannel.unsubscribe();
+        currentChannel = null;
       }
-    });
 
-    // Receive current state (for non-owners)
-    gameChannel.on('broadcast', { event: 'current_state' }, ({ payload }) => {
-      if (!isOwner) {
-        setSyncedState(payload as GameModeState);
-        onStateChange?.(payload as GameModeState);
-      }
-    });
+      // Create channel (必須使用 realtime: 前綴)
+      const gameChannel = supabase!.channel(`realtime:room:${roomId}:gamemode`);
+      currentChannel = gameChannel;
 
-    // Owner presence tracking
-    gameChannel.on('presence', { event: 'sync' }, () => {
-      const state = gameChannel.presenceState();
-      const users = Object.values(state).flat();
-      const ownerExists = users.some((u: any) => u.role === 'owner');
-      setOwnerOnline(ownerExists);
-    });
+      // Listen for mode changes
+      gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
+        updateSyncedState(payload as GameModeState);
+        onStateChangeRef.current?.(payload as GameModeState);
+      });
 
-    // Subscribe to channel
-    gameChannel.subscribe(async (status, err) => {
-      if (err) {
-        console.error('[GameModeSync] Subscribe error:', err);
-        setError('無法連接到遊戲同步服務');
-        setIsConnected(false);
-      } else if (status === 'SUBSCRIBED') {
-        setIsConnected(true);
-        setError(null);
-        setChannel(gameChannel);
+      // Listen for game start
+      gameChannel.on('broadcast', { event: 'game_started' }, ({ payload }) => {
+        setGameStarted(true);
+      });
 
-        // Track presence
-        if (isOwner) {
-          await gameChannel.track({ role: 'owner', id: `owner-${roomId}` });
-        } else {
-          await gameChannel.track({ role: 'participant', id: `user-${Date.now()}` });
-          // Request current state from owner
+      // Listen for game exit - 訪客收到後回到等待中
+      gameChannel.on('broadcast', { event: 'game_exit' }, ({ payload }) => {
+        updateSyncedState(payload as GameModeState);
+        setGameStarted(false);
+        onStateChangeRef.current?.(payload as GameModeState);
+        console.log('[GameModeSync] Received game exit, returning to waiting state');
+      });
+
+      // Request current state (for non-owners joining)
+      gameChannel.on('broadcast', { event: 'request_state' }, ({ payload }) => {
+        if (isOwnerRef.current) {
+          // Use ref to get latest state (prevents closure stale state bug)
           gameChannel.send({
             type: 'broadcast',
-            event: 'request_state',
-            payload: { timestamp: new Date().toISOString() },
+            event: 'current_state',
+            payload: syncedStateRef.current,
           });
         }
-      }
-    });
+      });
+
+      // Receive current state (for non-owners)
+      gameChannel.on('broadcast', { event: 'current_state' }, ({ payload }) => {
+        if (!isOwnerRef.current) {
+          updateSyncedState(payload as GameModeState);
+          onStateChangeRef.current?.(payload as GameModeState);
+        }
+      });
+
+      // Owner presence tracking
+      gameChannel.on('presence', { event: 'sync' }, () => {
+        const state = gameChannel.presenceState();
+        const users = Object.values(state).flat();
+        const ownerExists = users.some((u: any) => u.role === 'owner');
+        setOwnerOnline(ownerExists);
+      });
+
+      // Subscribe to channel
+      gameChannel.subscribe(async (status, err) => {
+        if (isCleanedUp) return;
+
+        if (status === 'SUBSCRIBED') {
+          // Success! Reset retry counter
+          retryManager.reset();
+          setRetryExhausted(false);
+          setIsConnected(true);
+          setError(null);
+          setChannel(gameChannel);
+
+          // Track presence
+          if (isOwnerRef.current) {
+            await gameChannel.track({ role: 'owner', id: `owner-${roomId}` });
+          } else {
+            await gameChannel.track({ role: 'participant', id: `user-${Date.now()}` });
+            // Request current state from owner
+            gameChannel.send({
+              type: 'broadcast',
+              event: 'request_state',
+              payload: { timestamp: new Date().toISOString() },
+            });
+          }
+        } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+          console.error('[GameModeSync] Subscribe error:', err || status);
+          setIsConnected(false);
+          setChannel(null);
+
+          // Check if error is quota-related
+          const errorMsg = err?.message || String(err) || '';
+          if (errorMsg.includes('quota') || errorMsg.includes('rate_limit')) {
+            setError('服務配額已達上限，請稍後再試');
+            setRetryExhausted(true);
+            return; // Don't retry on quota errors
+          }
+
+          setError('無法連接到遊戲同步服務');
+
+          // Attempt retry with exponential backoff
+          if (!isCleanedUp && retryManager.canRetry()) {
+            retryManager.scheduleRetry(() => {
+              console.log('[GameModeSync] Attempting reconnection...');
+              setupChannel();
+            });
+          } else if (!retryManager.canRetry()) {
+            setRetryExhausted(true);
+            setError('無法連接到即時服務，請重新整理頁面');
+          }
+        }
+      });
+    };
+
+    setupChannel();
 
     return () => {
-      gameChannel.unsubscribe();
+      isCleanedUp = true;
+      if (retryManagerRef.current) {
+        retryManagerRef.current.cleanup();
+      }
+      if (currentChannel) {
+        currentChannel.unsubscribe();
+      }
+      setChannel(null);
     };
-  }, [roomId, isOwner]); // Remove onStateChange and syncedState to prevent infinite loop
+  }, [roomId, updateSyncedState]); // Only essential deps - use refs for others
 
   // Determine if room can be interacted with
   const canInteract = isOwner || ownerOnline;
@@ -227,6 +362,8 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     error,
     changeGameMode,
     startGame,
+    exitGame,
     gameStarted,
+    retryExhausted, // Expose retry exhaustion state
   };
 }

@@ -2,11 +2,14 @@
  * useCardSync Hook
  * 牌卡即時同步 Hook - 使用 Supabase Broadcast 實現即時同步
  * Phase 3: 雙方都能移動，最後操作優先
+ *
+ * Implements exponential backoff to prevent quota exhaustion
  */
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { supabase } from '@/lib/supabase-client';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { throttle, debounce } from '@/lib/throttle-debounce';
+import { RealtimeRetryManager } from '@/lib/realtime-retry';
 
 // 牌卡移動事件
 export interface CardMoveEvent {
@@ -27,6 +30,18 @@ export interface DragInfo {
   performerName: string;
   performerId: string;
   startTime: number;
+}
+
+// 文件上傳事件 (使用 GCS URL，不使用 base64 dataUrl)
+export interface FileUploadEvent {
+  name: string;
+  type: string;
+  size: number;
+  url: string; // GCS public URL (was dataUrl)
+  uploadedAt: number;
+  performedBy: 'owner' | 'visitor';
+  performerName: string;
+  performerId: string;
 }
 
 // 遊戲狀態（存在 localStorage）
@@ -58,6 +73,7 @@ export interface UseCardSyncOptions {
   onDragStart?: (info: DragInfo) => void;
   onDragEnd?: (cardId: string) => void;
   onStateReceived?: (state: CardGameState) => void;
+  onFileUpload?: (fileData: FileUploadEvent) => void;
 }
 
 export interface UseCardSyncReturn {
@@ -75,6 +91,8 @@ export interface UseCardSyncReturn {
   startDrag: (cardId: string) => void;
   // 結束拖曳
   endDrag: (cardId: string) => void;
+  // 上傳文件
+  uploadFile: (fileData: Omit<FileUploadEvent, 'performedBy' | 'performerName' | 'performerId'>) => void;
   // 載入遊戲狀態
   loadGameState: () => CardGameState | null;
   // 儲存遊戲狀態（Owner only）
@@ -82,6 +100,8 @@ export interface UseCardSyncReturn {
   // 連線狀態
   isConnected: boolean;
   error: string | null;
+  // 重試是否已耗盡
+  retryExhausted: boolean;
   // Channel reference for direct access
   channelRef: React.MutableRefObject<RealtimeChannel | null>;
 }
@@ -97,12 +117,30 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     onDragStart,
     onDragEnd,
     onStateReceived,
+    onFileUpload,
   } = options;
 
   const [draggedCards, setDraggedCards] = useState<Map<string, DragInfo>>(new Map());
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryExhausted, setRetryExhausted] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
+  const retryManagerRef = useRef<RealtimeRetryManager | null>(null);
+
+  // Use refs for callbacks to avoid dependency issues in useEffect
+  const onCardMoveRef = useRef(onCardMove);
+  const onDragStartRef = useRef(onDragStart);
+  const onDragEndRef = useRef(onDragEnd);
+  const onStateReceivedRef = useRef(onStateReceived);
+  const onFileUploadRef = useRef(onFileUpload);
+
+  useEffect(() => {
+    onCardMoveRef.current = onCardMove;
+    onDragStartRef.current = onDragStart;
+    onDragEndRef.current = onDragEnd;
+    onStateReceivedRef.current = onStateReceived;
+    onFileUploadRef.current = onFileUpload;
+  }, [onCardMove, onDragStart, onDragEnd, onStateReceived, onFileUpload]);
 
   // LocalStorage key
   const storageKey = `career_creator_cards_${roomId}_${gameType}`;
@@ -265,130 +303,229 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     [debouncedBroadcastDragEnd]
   );
 
+  // 上傳文件
+  const uploadFile = useCallback(
+    (fileData: Omit<FileUploadEvent, 'performedBy' | 'performerName' | 'performerId'>) => {
+      if (!channelRef.current) {
+        console.warn('[CardSyncRT] Channel not connected');
+        return;
+      }
+
+      const event: FileUploadEvent = {
+        ...fileData,
+        performedBy: isOwner ? 'owner' : 'visitor',
+        performerName: userName,
+        performerId: userId,
+      };
+
+      // 廣播文件上傳
+      channelRef.current
+        .send({
+          type: 'broadcast',
+          event: 'file_uploaded',
+          payload: event,
+        })
+        .then(() => {
+          console.log('[CardSyncRT] File upload broadcasted:', event.name);
+        })
+        .catch((err) => {
+          console.error('[CardSyncRT] Failed to broadcast file upload:', err);
+          setError('無法同步文件上傳');
+        });
+    },
+    [isOwner, userName, userId]
+  );
+
+  // Keep refs for values used in useEffect callbacks
+  const isOwnerRef = useRef(isOwner);
+  const userIdRef = useRef(userId);
+  useEffect(() => {
+    isOwnerRef.current = isOwner;
+    userIdRef.current = userId;
+  }, [isOwner, userId]);
+
   // 設置頻道和監聽器
   useEffect(() => {
-    if (!supabase || !roomId) return;
+    if (!isSupabaseConfigured() || !supabase || !roomId) return;
 
-    // 建立頻道 (必須使用 realtime: 前綴)
-    const channel = supabase.channel(`realtime:room:${roomId}:cards:${gameType}`);
+    // Initialize retry manager
+    if (!retryManagerRef.current) {
+      retryManagerRef.current = new RealtimeRetryManager({
+        maxRetries: 5,
+        initialDelayMs: 1000,
+        maxDelayMs: 30000,
+      });
+    }
 
-    // 監聽牌卡移動
-    channel.on('broadcast', { event: 'card_moved' }, ({ payload }) => {
-      const event = payload as CardMoveEvent;
+    const retryManager = retryManagerRef.current;
+    let isCleanedUp = false;
 
-      // 如果是自己的操作，跳過（已在本地處理）
-      if (event.performerId === userId) return;
+    const setupChannel = async () => {
+      if (isCleanedUp) return;
 
-      // 處理他人的移動
-      onCardMove?.(event);
-    });
+      // Clean up existing channel
+      if (channelRef.current) {
+        await channelRef.current.unsubscribe();
+        channelRef.current = null;
+      }
 
-    // 監聽拖曳開始
-    channel.on('broadcast', { event: 'drag_start' }, ({ payload }) => {
-      const info = payload as DragInfo;
+      // 建立頻道 (必須使用 realtime: 前綴)
+      const channel = supabase!.channel(`realtime:room:${roomId}:cards:${gameType}`);
 
-      // 如果是自己，跳過
-      if (info.performerId === userId) return;
+      // 監聽牌卡移動
+      channel.on('broadcast', { event: 'card_moved' }, ({ payload }) => {
+        const event = payload as CardMoveEvent;
 
-      // 更新拖曳狀態
-      setDraggedCards((prev) => {
-        const next = new Map(prev);
-        next.set(info.cardId, info);
-        return next;
+        // 如果是自己的操作，跳過（已在本地處理）
+        if (event.performerId === userIdRef.current) return;
+
+        // 處理他人的移動
+        onCardMoveRef.current?.(event);
       });
 
-      onDragStart?.(info);
-    });
+      // 監聽拖曳開始
+      channel.on('broadcast', { event: 'drag_start' }, ({ payload }) => {
+        const info = payload as DragInfo;
 
-    // 監聽拖曳結束
-    channel.on('broadcast', { event: 'drag_end' }, ({ payload }) => {
-      const { cardId } = payload;
+        // 如果是自己，跳過
+        if (info.performerId === userIdRef.current) return;
 
-      // 移除拖曳狀態
-      setDraggedCards((prev) => {
-        const next = new Map(prev);
-        next.delete(cardId);
-        return next;
+        // 更新拖曳狀態
+        setDraggedCards((prev) => {
+          const next = new Map(prev);
+          next.set(info.cardId, info);
+          return next;
+        });
+
+        onDragStartRef.current?.(info);
       });
 
-      onDragEnd?.(cardId);
-    });
+      // 監聽拖曳結束
+      channel.on('broadcast', { event: 'drag_end' }, ({ payload }) => {
+        const { cardId } = payload;
 
-    // 新用戶請求狀態
-    channel.on('broadcast', { event: 'request_game_state' }, ({ payload }) => {
-      if (isOwner) {
-        const state = loadGameState();
-        if (state) {
-          channel.send({
-            type: 'broadcast',
-            event: 'current_game_state',
-            payload: state,
-          });
+        // 移除拖曳狀態
+        setDraggedCards((prev) => {
+          const next = new Map(prev);
+          next.delete(cardId);
+          return next;
+        });
+
+        onDragEndRef.current?.(cardId);
+      });
+
+      // 監聽文件上傳
+      channel.on('broadcast', { event: 'file_uploaded' }, ({ payload }) => {
+        const event = payload as FileUploadEvent;
+
+        // 如果是自己的操作，跳過（已在本地處理）
+        if (event.performerId === userIdRef.current) return;
+
+        // 處理他人的文件上傳
+        console.log('[CardSyncRT] Received file upload:', event.name);
+        onFileUploadRef.current?.(event);
+      });
+
+      // 新用戶請求狀態
+      channel.on('broadcast', { event: 'request_game_state' }, ({ payload }) => {
+        if (isOwnerRef.current) {
+          const state = loadGameState();
+          if (state) {
+            channel.send({
+              type: 'broadcast',
+              event: 'current_game_state',
+              payload: state,
+            });
+          }
         }
-      }
-    });
+      });
 
-    // 接收完整狀態（新用戶）
-    channel.on('broadcast', { event: 'current_game_state' }, ({ payload }) => {
-      if (!isOwner) {
-        const state = payload as CardGameState;
-        onStateReceived?.(state);
-      }
-    });
-
-    // 訂閱頻道
-    channel.subscribe(async (status, err) => {
-      if (err) {
-        console.error('[CardSyncRT] Subscribe error:', err);
-        setError('無法連接到牌卡同步服務');
-        setIsConnected(false);
-      } else if (status === 'SUBSCRIBED') {
-        setIsConnected(true);
-        setError(null);
-        channelRef.current = channel;
-
-        // 新用戶請求當前狀態
-        if (!isOwner) {
-          channel.send({
-            type: 'broadcast',
-            event: 'request_game_state',
-            payload: { userId },
-          });
+      // 接收完整狀態（新用戶）
+      channel.on('broadcast', { event: 'current_game_state' }, ({ payload }) => {
+        if (!isOwnerRef.current) {
+          const state = payload as CardGameState;
+          onStateReceivedRef.current?.(state);
         }
-      }
-    });
+      });
+
+      // 訂閱頻道
+      channel.subscribe(async (status, err) => {
+        if (isCleanedUp) return;
+
+        if (status === 'SUBSCRIBED') {
+          // Success! Reset retry counter
+          retryManager.reset();
+          setRetryExhausted(false);
+          setIsConnected(true);
+          setError(null);
+          channelRef.current = channel;
+
+          // 新用戶請求當前狀態
+          if (!isOwnerRef.current) {
+            channel.send({
+              type: 'broadcast',
+              event: 'request_game_state',
+              payload: { userId: userIdRef.current },
+            });
+          }
+        } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+          console.error('[CardSyncRT] Subscribe error:', err || status);
+          setIsConnected(false);
+          channelRef.current = null;
+
+          // Check if error is quota-related
+          const errorMsg = err?.message || String(err) || '';
+          if (errorMsg.includes('quota') || errorMsg.includes('rate_limit')) {
+            setError('服務配額已達上限，請稍後再試');
+            setRetryExhausted(true);
+            return; // Don't retry on quota errors
+          }
+
+          setError('無法連接到牌卡同步服務');
+
+          // Attempt retry with exponential backoff
+          if (!isCleanedUp && retryManager.canRetry()) {
+            retryManager.scheduleRetry(() => {
+              console.log('[CardSyncRT] Attempting reconnection...');
+              setupChannel();
+            });
+          } else if (!retryManager.canRetry()) {
+            setRetryExhausted(true);
+            setError('無法連接到即時服務，請重新整理頁面');
+          }
+        }
+      });
+    };
+
+    setupChannel();
 
     return () => {
-      channel.unsubscribe();
-      channelRef.current = null;
+      isCleanedUp = true;
+      if (retryManagerRef.current) {
+        retryManagerRef.current.cleanup();
+      }
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
+        channelRef.current = null;
+      }
 
       // Cleanup pending throttled/debounced calls to prevent memory leaks
       throttledBroadcastMove.cancel();
       debouncedBroadcastDragEnd.cancel();
     };
-  }, [
-    roomId,
-    gameType,
-    isOwner,
-    userId,
-    onCardMove,
-    onDragStart,
-    onDragEnd,
-    onStateReceived,
-    loadGameState,
-    throttledBroadcastMove,
-    debouncedBroadcastDragEnd,
-  ]);
+  }, [roomId, gameType, loadGameState, throttledBroadcastMove, debouncedBroadcastDragEnd]); // Minimal deps - use refs for others
 
   return {
     draggedCards,
     moveCard,
     startDrag,
     endDrag,
+    uploadFile,
     loadGameState,
     saveGameState,
     isConnected,
     error,
+    retryExhausted, // Expose retry exhaustion state
     channelRef, // Export for direct channel access
   };
 }

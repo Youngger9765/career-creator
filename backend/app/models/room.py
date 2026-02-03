@@ -12,10 +12,15 @@ if TYPE_CHECKING:
 
 
 def generate_share_code() -> str:
-    """Generate 6-character random share code"""
-    return "".join(
-        secrets.choice(string.ascii_uppercase + string.digits) for _ in range(6)
-    )
+    """Generate 6-character random share code
+
+    Uses a character set that excludes confusing characters:
+    - Removed: O, 0, I, 1, L (easily confused with each other)
+    - Kept: A-N, P-Z (excluding I, L, O) and 2-9 (excluding 0, 1)
+    """
+    # Safe characters: exclude O/0, I/1/L to avoid confusion
+    safe_chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"
+    return "".join(secrets.choice(safe_chars) for _ in range(6))
 
 
 class RoomBase(SQLModel):

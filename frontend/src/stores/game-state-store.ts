@@ -43,7 +43,7 @@ export interface GameState {
       name: string;
       type: string;
       size: number;
-      dataUrl: string; // Base64 data URL for persistence
+      url: string; // GCS public URL (was dataUrl)
       uploadedAt: number;
     };
 

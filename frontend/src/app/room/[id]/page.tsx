@@ -25,6 +25,8 @@ import html2canvas from 'html2canvas';
 import { Camera } from 'lucide-react';
 import { consultationRecordsAPI } from '@/lib/api/clients';
 import { ConsultationRecord } from '@/types/client';
+import { useIdleTimeout } from '@/hooks/use-idle-timeout';
+import { IdleTimeoutDialog } from '@/components/idle-timeout-dialog';
 
 export default function RoomPage() {
   const params = useParams();
@@ -50,6 +52,7 @@ export default function RoomPage() {
     useState<ConsultationRecord | null>(null);
   const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const exitGameRef = useRef<(() => void) | null>(null);
 
   // Game Session for state persistence
   const gameSession = useGameSession({
@@ -174,6 +177,25 @@ export default function RoomPage() {
     currentUser: currentUserInfo,
     updateInterval: 10000, // 10 seconds
     offlineThreshold: 60000, // 1 minute
+  });
+
+  // Idle timeout - automatically save and disconnect after 30 minutes of inactivity
+  const { showWarning: showIdleWarning, countdown: idleCountdown, resetTimer: resetIdleTimer } = useIdleTimeout({
+    timeoutMs: 30 * 60 * 1000, // 30 minutes
+    onTimeout: () => {
+      console.log('[RoomPage] Idle timeout reached, saving and exiting');
+      // Save current game state
+      gameSession.saveGameState(gameSession.gameState);
+      // Exit game if in gameplay
+      if (exitGameRef.current) {
+        exitGameRef.current();
+      }
+      // Redirect to home
+      router.push('/');
+    },
+    // Reset timer when game state changes (indicates user activity)
+    activities: [gameSession.gameState, currentGameplay],
+    enabled: isReady, // Only enable when room is ready
   });
 
   // Debug log for participants (only on significant changes)
@@ -455,7 +477,10 @@ export default function RoomPage() {
             {/* 切換遊戲模式按鈕 */}
             {isCounselor && showNewArchitecture && currentGameplay && (
               <button
-                onClick={() => setCurrentGameplay('')}
+                onClick={() => {
+                  exitGameRef.current?.();
+                  setCurrentGameplay('');
+                }}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
                 title="切換遊戲模式"
               >
@@ -565,6 +590,9 @@ export default function RoomPage() {
             console.log('[Room] Game state changed:', state);
             // 可以在這裡更新 gameSession 或其他狀態
           }}
+          onExitGame={(exitFn) => {
+            exitGameRef.current = exitFn;
+          }}
         />
       </div>
 
@@ -668,6 +696,7 @@ export default function RoomPage() {
             </button>
             <button
               onClick={() => {
+                exitGameRef.current?.();
                 setShowExitDialog(false);
                 router.push('/dashboard');
               }}
@@ -678,6 +707,13 @@ export default function RoomPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Idle Timeout Warning Dialog */}
+      <IdleTimeoutDialog
+        open={showIdleWarning}
+        countdown={idleCountdown}
+        onContinue={resetIdleTimer}
+      />
     </div>
   );
 }

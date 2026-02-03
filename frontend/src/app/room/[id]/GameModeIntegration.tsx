@@ -38,6 +38,7 @@ interface GameModeIntegrationProps {
   onGameplayChange?: (gameplay: string) => void;
   currentGameplay?: string;
   onStateChange?: (state: any) => void;
+  onExitGame?: (exitFn: () => void) => void;
 }
 
 const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
@@ -48,6 +49,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
   onGameplayChange,
   currentGameplay,
   onStateChange,
+  onExitGame,
 }) => {
   // 模式和玩法選擇 - 本地預覽狀態
   const [selectedMode, setSelectedMode] = useState<string>('');
@@ -84,6 +86,7 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     error: syncError,
     changeGameMode,
     startGame,
+    exitGame,
     gameStarted,
   } = useGameModeSync({
     roomId,
@@ -100,6 +103,13 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
 
   // 計算是否可互動（使用 room presence，不使用 game_mode channel）
   const canInteractLocal = isRoomOwner || counselorOnline;
+
+  // 將 exitGame 函數傳遞給父元件
+  useEffect(() => {
+    if (exitGame && onExitGame) {
+      onExitGame(exitGame);
+    }
+  }, [exitGame, onExitGame]);
 
   // 選擇遊戲（模式 + 玩法）- Owner 同步選擇
   const handleGameSelect = (modeId: string, gameplayId: string) => {
@@ -290,29 +300,51 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
           {!gameStarted && !selectedGameplay && (
             <div className="h-full overflow-y-auto px-3 sm:px-6 py-4 sm:py-8">
               <div className="max-w-7xl mx-auto">
-                {/* Owner 離線提示（訪客才顯示） */}
-                {isVisitor && !ownerOnline && (
-                  <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">⏸️</span>
-                      <div>
-                        <p className="font-medium text-yellow-800 dark:text-yellow-200">
-                          等待諮詢師上線
-                        </p>
-                        <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                          諮詢師離線時無法切換遊戲模式
-                        </p>
+                {/* 訪客 + 諮詢師未選擇遊戲模式 → 全螢幕等待 */}
+                {isVisitor && syncedState.gameMode === '' ? (
+                  <div className="h-full flex items-center justify-center">
+                    <div className="relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8 mx-4 max-w-md text-center">
+                      <div className="mb-4">
+                        <span className="text-6xl">⏸️</span>
                       </div>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                        等待諮詢師選擇遊戲模式
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        諮詢師正在準備遊戲，請稍候
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-500 mt-4">
+                        {ownerOnline ? '🟢 諮詢師在線' : '⏸️ 等待諮詢師上線'}
+                      </p>
                     </div>
                   </div>
-                )}
+                ) : (
+                  <>
+                    {/* Owner 離線提示（訪客才顯示） */}
+                    {isVisitor && !ownerOnline && (
+                      <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">⏸️</span>
+                          <div>
+                            <p className="font-medium text-yellow-800 dark:text-yellow-200">
+                              等待諮詢師上線
+                            </p>
+                            <p className="text-sm text-yellow-600 dark:text-yellow-400">
+                              諮詢師離線時無法切換遊戲模式
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                <CombinedGameSelector
-                  onGameSelect={handleGameSelect}
-                  currentMode={selectedMode}
-                  currentGameplay={selectedGameplay}
-                  disabled={!canInteractLocal}
-                />
+                    <CombinedGameSelector
+                      onGameSelect={handleGameSelect}
+                      currentMode={selectedMode}
+                      currentGameplay={selectedGameplay}
+                      disabled={!canInteractLocal}
+                    />
+                  </>
+                )}
               </div>
             </div>
           )}

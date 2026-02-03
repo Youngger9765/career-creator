@@ -199,28 +199,82 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Create channel (必須使用 realtime: 前綴)
     const gameChannel = supabase.channel(`realtime:room:${roomId}:gamemode`);
 
+    // Retry logic for state request (visitors only)
+    let stateReceived = false;
+    let retryTimeoutId: NodeJS.Timeout | null = null;
+    let periodicSyncIntervalId: NodeJS.Timeout | null = null;
+
+    const maxRetries = 3;
+    const retryDelay = 2000; // 2 seconds
+    const periodicSyncInterval = 10000; // 10 seconds
+
+    const requestStateWithRetry = (attempt: number) => {
+      if (stateReceived || attempt > maxRetries) {
+        if (attempt > maxRetries) {
+          console.warn('[GameModeSync] Max retries reached, will rely on periodic sync');
+        }
+        return;
+      }
+
+      console.log(`[GameModeSync] Requesting state from owner (attempt ${attempt}/${maxRetries})`);
+
+      gameChannel.send({
+        type: 'broadcast',
+        event: 'request_state',
+        payload: { timestamp: new Date().toISOString(), attempt },
+      });
+
+      // Schedule retry
+      if (attempt < maxRetries) {
+        retryTimeoutId = setTimeout(() => {
+          if (!stateReceived) {
+            requestStateWithRetry(attempt + 1);
+          }
+        }, retryDelay);
+      }
+    };
+
+    // Periodic state sync for visitors (fallback mechanism)
+    const startPeriodicSync = () => {
+      periodicSyncIntervalId = setInterval(() => {
+        // If visitor still has empty gameMode, request state again
+        if (!isOwner && !syncedStateRef.current.gameMode) {
+          console.log('[GameModeSync] Periodic sync: gameMode still empty, requesting state');
+          gameChannel.send({
+            type: 'broadcast',
+            event: 'request_state',
+            payload: { timestamp: new Date().toISOString(), periodic: true },
+          });
+        }
+      }, periodicSyncInterval);
+    };
+
     // Listen for mode changes
     gameChannel.on('broadcast', { event: 'mode_changed' }, ({ payload }) => {
+      console.log('[GameModeSync] Received mode_changed:', payload);
       updateSyncedState(payload as GameModeState);
       onStateChangeRef.current?.(payload as GameModeState);
+      stateReceived = true; // Mark as received
     });
 
     // Listen for game start
     gameChannel.on('broadcast', { event: 'game_started' }, ({ payload }) => {
+      console.log('[GameModeSync] Received game_started');
       setGameStarted(true);
     });
 
     // Listen for game exit - 訪客收到後回到等待中
     gameChannel.on('broadcast', { event: 'game_exit' }, ({ payload }) => {
+      console.log('[GameModeSync] Received game_exit');
       updateSyncedState(payload as GameModeState);
       setGameStarted(false);
       onStateChangeRef.current?.(payload as GameModeState);
-      console.log('[GameModeSync] Received game exit, returning to waiting state');
     });
 
     // Request current state (for non-owners joining)
     gameChannel.on('broadcast', { event: 'request_state' }, ({ payload }) => {
       if (isOwner) {
+        console.log('[GameModeSync] Owner received request_state, responding with current state:', syncedStateRef.current);
         // Use ref to get latest state (prevents closure stale state bug)
         gameChannel.send({
           type: 'broadcast',
@@ -233,8 +287,10 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Receive current state (for non-owners)
     gameChannel.on('broadcast', { event: 'current_state' }, ({ payload }) => {
       if (!isOwner) {
+        console.log('[GameModeSync] Visitor received current_state:', payload);
         updateSyncedState(payload as GameModeState);
         onStateChangeRef.current?.(payload as GameModeState);
+        stateReceived = true; // Mark as received
       }
     });
 
@@ -243,6 +299,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
       const state = gameChannel.presenceState();
       const users = Object.values(state).flat();
       const ownerExists = users.some((u: any) => u.role === 'owner');
+      console.log('[GameModeSync] Presence sync, owner online:', ownerExists);
       setOwnerOnline(ownerExists);
     });
 
@@ -253,6 +310,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
         setError('無法連接到遊戲同步服務');
         setIsConnected(false);
       } else if (status === 'SUBSCRIBED') {
+        console.log('[GameModeSync] Successfully subscribed, isOwner:', isOwner);
         setIsConnected(true);
         setError(null);
         setChannel(gameChannel);
@@ -262,20 +320,28 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
           await gameChannel.track({ role: 'owner', id: `owner-${roomId}` });
         } else {
           await gameChannel.track({ role: 'participant', id: `user-${Date.now()}` });
-          // Request current state from owner
-          gameChannel.send({
-            type: 'broadcast',
-            event: 'request_state',
-            payload: { timestamp: new Date().toISOString() },
-          });
+
+          // Start retry logic for initial state request
+          requestStateWithRetry(1);
+
+          // Start periodic sync as fallback
+          startPeriodicSync();
         }
       }
     });
 
     return () => {
+      // Cleanup timers
+      if (retryTimeoutId) {
+        clearTimeout(retryTimeoutId);
+      }
+      if (periodicSyncIntervalId) {
+        clearInterval(periodicSyncIntervalId);
+      }
+
       gameChannel.unsubscribe();
     };
-  }, [roomId, isOwner]); // Remove onStateChange and syncedState to prevent infinite loop
+  }, [roomId, isOwner, updateSyncedState]); // Add updateSyncedState to prevent stale closure
 
   // Determine if room can be interacted with
   const canInteract = isOwner || ownerOnline;

@@ -160,32 +160,42 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     return null;
   }, [storageKey]);
 
+  // Create debounced broadcast for game state (500ms to reduce quota usage)
+  const debouncedBroadcastGameState = useMemo(
+    () =>
+      debounce((state: CardGameState) => {
+        if (!channelRef.current) return;
+
+        channelRef.current
+          .send({
+            type: 'broadcast',
+            event: 'current_game_state',
+            payload: state,
+          })
+          .then(() => {})
+          .catch((err) => {
+            console.error('[CardSyncRT] Failed to broadcast game state:', err);
+          });
+      }, 500),
+    []
+  );
+
   // 儲存遊戲狀態（Owner only）
   const saveGameState = useCallback(
     (state: CardGameState) => {
       if (!isOwner || typeof window === 'undefined') return;
 
       try {
+        // Save to localStorage immediately (local UX)
         localStorage.setItem(storageKey, JSON.stringify(state));
 
-        // 同時廣播狀態給其他人
-        if (channelRef.current) {
-          channelRef.current
-            .send({
-              type: 'broadcast',
-              event: 'current_game_state',
-              payload: state,
-            })
-            .then(() => {})
-            .catch((err) => {
-              console.error('[CardSyncRT] Failed to broadcast game state:', err);
-            });
-        }
+        // Use debounced broadcast to prevent quota exhaustion
+        debouncedBroadcastGameState(state);
       } catch (err) {
         console.error('[CardSyncRT] Failed to save game state:', err);
       }
     },
-    [isOwner, storageKey]
+    [isOwner, storageKey, debouncedBroadcastGameState]
   );
 
   // Create throttled broadcast for card_moved (300ms throttle)
@@ -512,8 +522,9 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
       // Cleanup pending throttled/debounced calls to prevent memory leaks
       throttledBroadcastMove.cancel();
       debouncedBroadcastDragEnd.cancel();
+      debouncedBroadcastGameState.cancel();
     };
-  }, [roomId, gameType, loadGameState, throttledBroadcastMove, debouncedBroadcastDragEnd]); // Minimal deps - use refs for others
+  }, [roomId, gameType, loadGameState, throttledBroadcastMove, debouncedBroadcastDragEnd, debouncedBroadcastGameState]); // Minimal deps - use refs for others
 
   return {
     draggedCards,

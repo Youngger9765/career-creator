@@ -89,43 +89,55 @@ export function useVisitorJoin() {
   const checkOwnerOnline = useCallback(async (roomId: string): Promise<boolean> => {
     if (!isSupabaseConfigured() || !supabase) {
       console.warn('[useVisitorJoin] Supabase not configured, skipping owner check');
-      return true; // Allow join if Supabase is not configured
+      return true;
     }
 
-    let tempChannel = null;
+    let tempChannel: ReturnType<typeof supabase.channel> | null = null;
     try {
-      // Create temporary channel to query presence
       tempChannel = supabase.channel(`room:${roomId}`);
 
-      // Subscribe and wait for connection
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('Presence check timeout')), 5000);
+      // Create promise that resolves when sync happens
+      const syncPromise = new Promise<boolean>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          console.warn('[useVisitorJoin] Presence check timeout, allowing join');
+          resolve(true); // Timeout = allow join (fail open)
+        }, 5000);
 
+        // Listen for sync event - this is when presence state is ready
+        tempChannel!.on('presence', { event: 'sync' }, () => {
+          clearTimeout(timeout);
+          const state = tempChannel!.presenceState<PresenceUser>();
+          const users = Object.values(state).flat();
+          const ownerOnline = users.some((u) => u.role === 'owner');
+
+          console.log('[useVisitorJoin] Owner online check (after sync):', {
+            ownerOnline,
+            userCount: users.length,
+            users: users.map(u => ({ id: u.id, role: u.role }))
+          });
+
+          resolve(ownerOnline);
+        });
+
+        // Subscribe to channel
         tempChannel!.subscribe((status: string) => {
-          if (status === 'SUBSCRIBED') {
+          console.log('[useVisitorJoin] Channel status:', status);
+          if (status === 'CHANNEL_ERROR') {
             clearTimeout(timeout);
-            resolve();
-          } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
+            console.warn('[useVisitorJoin] Channel error, allowing join');
+            resolve(true); // Channel error = allow join (fail open)
+          } else if (status === 'CLOSED') {
             clearTimeout(timeout);
-            reject(new Error('Failed to connect to presence'));
+            reject(new Error('Channel closed'));
           }
         });
       });
 
-      // Query presence state
-      const state = tempChannel.presenceState<PresenceUser>();
-      const users = Object.values(state).flat();
-      const ownerOnline = users.some((u) => u.role === 'owner');
-
-      console.log('[useVisitorJoin] Owner online check:', { ownerOnline, userCount: users.length });
-
-      return ownerOnline;
+      return await syncPromise;
     } catch (error) {
       console.error('[useVisitorJoin] Error checking owner presence:', error);
-      // On error, allow join (fail open to not block legitimate users)
-      return true;
+      return true; // Fail open
     } finally {
-      // Clean up temporary channel
       if (tempChannel) {
         await tempChannel.unsubscribe();
       }

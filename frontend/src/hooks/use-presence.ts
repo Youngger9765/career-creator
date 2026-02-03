@@ -158,6 +158,40 @@ export function usePresence(roomId: string | undefined) {
           })
           .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
             console.log('[usePresence] 用戶離開:', key);
+
+            // Check if owner left
+            if (Array.isArray(leftPresences)) {
+              const ownerLeft = leftPresences.some((user: PresenceUser) => user.role === 'owner');
+
+              if (ownerLeft) {
+                console.log('[usePresence] 🚨 Owner left, broadcasting session_ended');
+
+                // Broadcast session_ended to all participants
+                channel
+                  .send({
+                    type: 'broadcast',
+                    event: 'session_ended',
+                    payload: {
+                      reason: 'owner_left',
+                      timestamp: new Date().toISOString(),
+                    },
+                  })
+                  .then(() => {
+                    console.log('[usePresence] ✅ session_ended broadcast sent');
+                  })
+                  .catch((err) => {
+                    console.error('[usePresence] Failed to broadcast session_ended:', err);
+                  });
+              }
+            }
+          })
+          // Listen for session_ended broadcast (visitors will receive this)
+          .on('broadcast', { event: 'session_ended' }, ({ payload }) => {
+            const currentIdentity = userIdentityRef.current;
+            if (currentIdentity?.role === 'visitor') {
+              console.log('[usePresence] 🚨 Received session_ended, redirecting visitor');
+              router.push('/session-ended');
+            }
           });
 
         // 訂閱 channel - 根據官方文檔

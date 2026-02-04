@@ -63,6 +63,9 @@ jobs:
             echo "USE_MOCK_STORAGE=${{ secrets.USE_MOCK_STORAGE_PRODUCTION }}" >> $GITHUB_ENV
             echo "TEMP_INIT_SECRET=${{ secrets.TEMP_INIT_SECRET_PRODUCTION }}" >> $GITHUB_ENV
           fi
+          # QA Feedback Google Sheets integration (shared across environments)
+          echo "QA_SHEET_ID=${{ secrets.QA_SHEET_ID }}" >> $GITHUB_ENV
+          echo "GOOGLE_SHEETS_CREDENTIALS_B64=${{ secrets.GOOGLE_SHEETS_CREDENTIALS_B64 }}" >> $GITHUB_ENV
           echo "IMAGE_TAG=gcr.io/${{ env.PROJECT_ID }}/career-creator-backend:${{ github.ref_name }}-${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Authenticate to Google Cloud
@@ -105,7 +108,7 @@ jobs:
             --concurrency 100 \
             --min-instances 0 \
             --max-instances 10 \
-            --set-env-vars DATABASE_URL="${{ env.DATABASE_URL }}",DIRECT_DATABASE_URL="${{ env.DIRECT_DATABASE_URL }}",JWT_SECRET="${{ env.JWT_SECRET }}",JWT_ALGORITHM=HS256,ACCESS_TOKEN_EXPIRE_MINUTES=240,REFRESH_TOKEN_EXPIRE_DAYS=7,ENVIRONMENT="${{ env.ENVIRONMENT }}",SUPABASE_URL="${{ env.SUPABASE_URL }}",SUPABASE_ANON_KEY="${{ env.SUPABASE_ANON_KEY }}",GCS_BUCKET_NAME="${{ env.GCS_BUCKET_NAME }}",USE_MOCK_STORAGE="${{ env.USE_MOCK_STORAGE }}",TEMP_INIT_SECRET="${{ env.TEMP_INIT_SECRET }}" \
+            --set-env-vars DATABASE_URL="${{ env.DATABASE_URL }}",DIRECT_DATABASE_URL="${{ env.DIRECT_DATABASE_URL }}",JWT_SECRET="${{ env.JWT_SECRET }}",JWT_ALGORITHM=HS256,ACCESS_TOKEN_EXPIRE_MINUTES=240,REFRESH_TOKEN_EXPIRE_DAYS=7,ENVIRONMENT="${{ env.ENVIRONMENT }}",SUPABASE_URL="${{ env.SUPABASE_URL }}",SUPABASE_ANON_KEY="${{ env.SUPABASE_ANON_KEY }}",GCS_BUCKET_NAME="${{ env.GCS_BUCKET_NAME }}",USE_MOCK_STORAGE="${{ env.USE_MOCK_STORAGE }}",TEMP_INIT_SECRET="${{ env.TEMP_INIT_SECRET }}",QA_SHEET_ID="${{ env.QA_SHEET_ID }}",GOOGLE_SHEETS_CREDENTIALS_B64="${{ env.GOOGLE_SHEETS_CREDENTIALS_B64 }}" \
             --timeout 300s \
             --project ${{ env.PROJECT_ID }}
 

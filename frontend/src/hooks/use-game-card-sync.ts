@@ -8,7 +8,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useCardSync } from './use-card-sync';
 import { useAuthStore } from '@/stores/auth-store';
-import { useGameState } from '@/stores/game-state-store';
+import { useGameState, type GameState } from '@/stores/game-state-store';
+import type { CardZoneInfo } from '@/types/game';
 
 interface UseGameCardSyncOptions {
   roomId: string;
@@ -19,12 +20,12 @@ interface UseGameCardSyncOptions {
 
 interface UseGameCardSyncReturn {
   // 狀態
-  state: any;
+  state: GameState;
   draggedByOthers: Map<string, string>;
 
   // 方法
   handleCardMove: (cardId: string, zone: string | null, broadcast?: boolean) => void;
-  updateCards: (placements: any) => void;
+  updateCards: (placements: Partial<GameState['cardPlacements']>) => void;
 
   // 同步相關
   cardSync: ReturnType<typeof useCardSync>;
@@ -159,20 +160,21 @@ export function useGameCardSync(options: UseGameCardSyncOptions): UseGameCardSyn
  */
 export function createCardMoveHandler(
   zones: string[],
-  state: any,
-  updateCards: (placements: any) => void,
+  state: GameState,
+  updateCards: (placements: Partial<GameState['cardPlacements']>) => void,
   cardSync: ReturnType<typeof useCardSync>,
   isRoomOwner: boolean,
   gameType: string
 ) {
   return (cardId: string, zone: string | null, broadcast = true) => {
-    const currentPlacements = { ...state.cardPlacements };
+    const currentPlacements: GameState['cardPlacements'] = { ...state.cardPlacements };
 
     // 找出卡片原本在哪個區域
     let fromZone: string | undefined = 'deck';
     for (const z of zones) {
       const key = `${z}Cards`;
-      if (currentPlacements[key]?.includes(cardId)) {
+      const zoneCards = currentPlacements[key];
+      if (Array.isArray(zoneCards) && zoneCards.includes(cardId)) {
         fromZone = z;
         break;
       }
@@ -181,18 +183,20 @@ export function createCardMoveHandler(
     // 從所有區域移除該卡片
     for (const z of zones) {
       const key = `${z}Cards`;
-      if (currentPlacements[key]) {
-        currentPlacements[key] = currentPlacements[key].filter((id: string) => id !== cardId);
+      const zoneCards = currentPlacements[key];
+      if (Array.isArray(zoneCards)) {
+        currentPlacements[key] = zoneCards.filter((id: string) => id !== cardId);
       }
     }
 
     // 如果有新區域，加入該卡片
     if (zone !== null) {
       const key = `${zone}Cards`;
-      if (!currentPlacements[key]) {
+      const existingCards = currentPlacements[key];
+      if (!Array.isArray(existingCards)) {
         currentPlacements[key] = [];
       }
-      currentPlacements[key].push(cardId);
+      (currentPlacements[key] as string[]).push(cardId);
     }
 
     // 更新 Store
@@ -206,15 +210,17 @@ export function createCardMoveHandler(
 
     // Owner 儲存狀態
     if (isRoomOwner) {
+      const cards: Record<string, CardZoneInfo> = {};
+      Object.entries(currentPlacements).forEach(([zoneKey, zoneCards]) => {
+        if (Array.isArray(zoneCards)) {
+          zoneCards.forEach((id: string) => {
+            cards[id] = { zone: zoneKey.replace('Cards', '') };
+          });
+        }
+      });
+
       const gameState = {
-        cards: Object.entries(currentPlacements).reduce((acc, [zoneKey, cards]) => {
-          if (Array.isArray(cards)) {
-            cards.forEach((id: string) => {
-              acc[id] = { zone: zoneKey.replace('Cards', '') };
-            });
-          }
-          return acc;
-        }, {} as any),
+        cards,
         lastUpdated: Date.now(),
         gameType,
       };

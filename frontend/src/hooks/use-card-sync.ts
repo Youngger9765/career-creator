@@ -481,13 +481,17 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
       channel.on('broadcast', { event: 'request_game_state' }, ({ payload }) => {
         if (isOwnerRef.current) {
           const state = loadGameState();
-          if (state) {
-            channel.send({
-              type: 'broadcast',
-              event: 'current_game_state',
-              payload: state,
-            });
-          }
+          // Always respond, even if state is null (send empty cards object)
+          const stateToSend = state || {
+            cards: {},
+            lastUpdated: Date.now(),
+            gameType,
+          };
+          channel.send({
+            type: 'broadcast',
+            event: 'current_game_state',
+            payload: stateToSend,
+          });
         }
       });
 

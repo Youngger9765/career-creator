@@ -215,6 +215,43 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
   });
 
   /**
+   * Owner 連線後主動廣播當前狀態
+   * 解決訪客刷新或切換遊戲模式時無法取得初始狀態的問題
+   */
+  useEffect(() => {
+    if (!isRoomOwner || !cardSync.isConnected) return;
+
+    // 延遲一小段時間確保 channel 完全就緒
+    const timer = setTimeout(() => {
+      console.log(`[${gameType}] Owner connected, broadcasting initial state`);
+
+      // 建立當前狀態
+      const cards: Record<string, CardZoneInfo> = {};
+      zones.forEach((z) => {
+        const key = `${z}Cards`;
+        const zoneCards = state.cardPlacements[key];
+        if (Array.isArray(zoneCards)) {
+          zoneCards.forEach((id: string) => {
+            cards[id] = { zone: z };
+          });
+        }
+      });
+
+      const gameState = {
+        cards,
+        uploadedFile: state.cardPlacements.uploadedFile,
+        lastUpdated: Date.now(),
+        gameType,
+      };
+
+      // 主動廣播狀態（而不是只回應請求）
+      cardSync.saveGameState(gameState);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isRoomOwner, cardSync.isConnected, gameType, zones, state.cardPlacements, cardSync]);
+
+  /**
    * 公開的卡片移動函數（給組件使用）
    */
   const handleCardMove = useCallback(

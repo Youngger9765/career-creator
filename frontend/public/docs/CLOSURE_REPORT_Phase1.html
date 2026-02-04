@@ -1,0 +1,3516 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>線上牌卡系統 - 第一階段結案報告</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css" />
+</head>
+<body class="markdown-body" style="max-width: 980px; margin: 0 auto; padding: 45px;">
+<header id="title-block-header">
+<h1 class="title">線上牌卡系統 - 第一階段結案報告</h1>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#線上牌卡系統---第一階段結案報告"
+id="toc-線上牌卡系統---第一階段結案報告">線上牌卡系統 -
+第一階段結案報告</a>
+<ul>
+<li><a href="#目錄" id="toc-目錄">目錄</a></li>
+<li><a href="#專案總覽" id="toc-專案總覽">1. 專案總覽</a>
+<ul>
+<li><a href="#基本資訊" id="toc-基本資訊">1.1 基本資訊</a></li>
+<li><a href="#專案目標" id="toc-專案目標">1.2 專案目標</a></li>
+<li><a href="#專案範圍" id="toc-專案範圍">1.3 專案範圍</a></li>
+<li><a href="#專案團隊" id="toc-專案團隊">1.4 專案團隊</a></li>
+</ul></li>
+<li><a href="#產品架構" id="toc-產品架構">2. 產品架構</a>
+<ul>
+<li><a href="#技術棧" id="toc-技術棧">2.1 技術棧</a></li>
+<li><a href="#系統架構圖" id="toc-系統架構圖">2.2 系統架構圖</a></li>
+<li><a href="#資料庫-schema核心表" id="toc-資料庫-schema核心表">2.3
+資料庫 Schema（核心表）</a></li>
+<li><a href="#api-端點設計" id="toc-api-端點設計">2.4 API
+端點設計</a></li>
+</ul></li>
+<li><a href="#開發里程碑" id="toc-開發里程碑">3. 開發里程碑</a>
+<ul>
+<li><a href="#時間軸總覽" id="toc-時間軸總覽">時間軸總覽</a></li>
+<li><a href="#第1個月mvp-核心雛形2025-09-01-09-30"
+id="toc-第1個月mvp-核心雛形2025-09-01-09-30">3.1 第1個月：MVP
+核心雛形（2025-09-01 ~ 09-30）</a></li>
+<li><a href="#第2個月功能擴充與優化2025-10-01-10-21"
+id="toc-第2個月功能擴充與優化2025-10-01-10-21">3.2
+第2個月：功能擴充與優化（2025-10-01 ~ 10-21）</a></li>
+<li><a href="#第3個月前半負載測試與基礎設施優化2025-11-01-11-04"
+id="toc-第3個月前半負載測試與基礎設施優化2025-11-01-11-04">3.3
+第3個月前半：負載測試與基礎設施優化（2025-11-01 ~ 11-04）</a></li>
+<li><a href="#第3個月中程式碼品質與-cicd-優化2025-11-04-11-21"
+id="toc-第3個月中程式碼品質與-cicd-優化2025-11-04-11-21">3.4
+第3個月中：程式碼品質與 CI/CD 優化（2025-11-04 ~ 11-21）</a></li>
+<li><a href="#第5個月牌卡內容完整上架2026-01-01-01-15"
+id="toc-第5個月牌卡內容完整上架2026-01-01-01-15">3.5
+第5個月：牌卡內容完整上架（2026-01-01 ~ 01-15）</a></li>
+</ul></li>
+<li><a href="#功能交付清單" id="toc-功能交付清單">4. 功能交付清單</a>
+<ul>
+<li><a href="#核心功能已完成" id="toc-核心功能已完成">4.1
+核心功能（已完成）</a></li>
+<li><a href="#未完成功能第二階段" id="toc-未完成功能第二階段">4.2
+未完成功能（第二階段）</a></li>
+</ul></li>
+<li><a href="#技術決策記錄" id="toc-技術決策記錄">5. 技術決策記錄</a>
+<ul>
+<li><a href="#adr-001-選擇-supabase-realtime-而非自建-websocket"
+id="toc-adr-001-選擇-supabase-realtime-而非自建-websocket">ADR-001: 選擇
+Supabase Realtime 而非自建 WebSocket</a></li>
+<li><a href="#adr-002-選擇-jsonb-localstorage-雙軌持久化"
+id="toc-adr-002-選擇-jsonb-localstorage-雙軌持久化">ADR-002: 選擇 JSONB
++ localStorage 雙軌持久化</a></li>
+<li><a href="#adr-003-選擇-dnd-kit-而非-react-dnd"
+id="toc-adr-003-選擇-dnd-kit-而非-react-dnd">ADR-003: 選擇 <span
+class="citation" data-cites="dnd-kit">@dnd-kit</span> 而非
+react-dnd</a></li>
+<li><a href="#adr-004-選擇-gcp-cloud-storage-而非-supabase-storage"
+id="toc-adr-004-選擇-gcp-cloud-storage-而非-supabase-storage">ADR-004:
+選擇 GCP Cloud Storage 而非 Supabase Storage</a></li>
+<li><a href="#adr-005-選擇-fastapi-而非-django-flask"
+id="toc-adr-005-選擇-fastapi-而非-django-flask">ADR-005: 選擇 FastAPI
+而非 Django / Flask</a></li>
+</ul></li>
+<li><a href="#問題與解決方案" id="toc-問題與解決方案">6.
+問題與解決方案</a>
+<ul>
+<li><a href="#重大問題清單教訓" id="toc-重大問題清單教訓">6.1
+重大問題清單（教訓）</a></li>
+<li><a href="#問題分類統計" id="toc-問題分類統計">6.2
+問題分類統計</a></li>
+<li><a href="#最常見問題與快速解法" id="toc-最常見問題與快速解法">6.3
+最常見問題與快速解法</a></li>
+</ul></li>
+<li><a href="#測試與品質保證" id="toc-測試與品質保證">7.
+測試與品質保證</a>
+<ul>
+<li><a href="#測試策略" id="toc-測試策略">7.1 測試策略</a></li>
+<li><a href="#e2e-測試playwright" id="toc-e2e-測試playwright">7.2 E2E
+測試（Playwright）</a></li>
+<li><a href="#負載測試locust" id="toc-負載測試locust">7.3
+負載測試（Locust）</a></li>
+<li><a href="#安全測試" id="toc-安全測試">7.4 安全測試</a></li>
+</ul></li>
+<li><a href="#部署與營運" id="toc-部署與營運">8. 部署與營運</a>
+<ul>
+<li><a href="#部署架構" id="toc-部署架構">8.1 部署架構</a></li>
+<li><a href="#docker-優化" id="toc-docker-優化">8.2 Docker 優化</a></li>
+<li><a href="#監控與日誌" id="toc-監控與日誌">8.3 監控與日誌</a></li>
+<li><a href="#成本分析月度" id="toc-成本分析月度">8.4
+成本分析（月度）</a></li>
+</ul></li>
+<li><a href="#beta-測試與使用者回饋" id="toc-beta-測試與使用者回饋">9.
+Beta 測試與使用者回饋</a>
+<ul>
+<li><a href="#beta-測試計畫" id="toc-beta-測試計畫">9.1 Beta
+測試計畫</a></li>
+<li><a href="#使用者回饋機制" id="toc-使用者回饋機制">9.2
+使用者回饋機制</a></li>
+<li><a href="#初步回饋摘要2026-01-15"
+id="toc-初步回饋摘要2026-01-15">9.3 初步回饋摘要（2026-01-15）</a></li>
+</ul></li>
+<li><a href="#第二階段規劃" id="toc-第二階段規劃">10. 第二階段規劃</a>
+<ul>
+<li><a href="#時程規劃2025-12-2026-02"
+id="toc-時程規劃2025-12-2026-02">10.1 時程規劃（2025-12 ~
+2026-02）</a></li>
+<li><a href="#優先功能p1" id="toc-優先功能p1">10.2
+優先功能（P1）</a></li>
+<li><a href="#第二階段功能p2" id="toc-第二階段功能p2">10.3
+第二階段功能（P2）</a></li>
+<li><a href="#未來展望第三階段" id="toc-未來展望第三階段">10.4
+未來展望（第三階段）</a></li>
+</ul></li>
+<li><a href="#第二階段開案建議" id="toc-第二階段開案建議">11.
+第二階段開案建議</a>
+<ul>
+<li><a href="#開案時程建議" id="toc-開案時程建議">11.1
+開案時程建議</a></li>
+<li><a href="#資源需求評估" id="toc-資源需求評估">11.2
+資源需求評估</a></li>
+<li><a href="#功能範圍與優先順序" id="toc-功能範圍與優先順序">11.3
+功能範圍與優先順序</a></li>
+<li><a href="#風險評估與緩解措施" id="toc-風險評估與緩解措施">11.4
+風險評估與緩解措施</a></li>
+<li><a href="#成功標準與驗收條件" id="toc-成功標準與驗收條件">11.5
+成功標準與驗收條件</a></li>
+<li><a href="#交付物清單" id="toc-交付物清單">11.6 交付物清單</a></li>
+<li><a href="#第二階段預算估算" id="toc-第二階段預算估算">11.7
+第二階段預算估算</a></li>
+<li><a href="#開案準備檢查清單" id="toc-開案準備檢查清單">11.8
+開案準備檢查清單</a></li>
+<li><a href="#與第一階段的延續性" id="toc-與第一階段的延續性">11.9
+與第一階段的延續性</a></li>
+</ul></li>
+<li><a href="#總結" id="toc-總結">📊 總結</a>
+<ul>
+<li><a href="#成功指標達成狀況"
+id="toc-成功指標達成狀況">成功指標達成狀況</a></li>
+<li><a href="#專案亮點" id="toc-專案亮點">專案亮點</a></li>
+<li><a href="#技術成就" id="toc-技術成就">技術成就</a></li>
+<li><a href="#教訓與經驗" id="toc-教訓與經驗">教訓與經驗</a></li>
+<li><a href="#下一步行動優先順序"
+id="toc-下一步行動優先順序">下一步行動（優先順序）</a></li>
+</ul></li>
+<li><a href="#附錄" id="toc-附錄">附錄</a>
+<ul>
+<li><a href="#a.-待辦事項追蹤todo.md" id="toc-a.-待辦事項追蹤todo.md">A.
+待辦事項追蹤（TODO.md）</a></li>
+<li><a href="#b.-技術文件清單" id="toc-b.-技術文件清單">B.
+技術文件清單</a></li>
+<li><a href="#c.-術語表" id="toc-c.-術語表">C. 術語表</a></li>
+<li><a href="#d.-聯絡資訊" id="toc-d.-聯絡資訊">D. 聯絡資訊</a></li>
+</ul></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="線上牌卡系統---第一階段結案報告">線上牌卡系統 -
+第一階段結案報告</h1>
+<p><strong>專案代號</strong>: Career Creator - Online Card Consultation
+System <strong>報告版本</strong>: v1.0 <strong>報告日期</strong>:
+2026-01-30 <strong>專案期間</strong>: 2025-09-01 ~ 2026-01-15 (4.5 個月)
+<strong>專案狀態</strong>: ✅ 第一階段完成，Beta 測試進行中</p>
+<hr />
+<h2 id="目錄">目錄</h2>
+<ol type="1">
+<li><a href="#1-專案總覽">專案總覽</a></li>
+<li><a href="#2-產品架構">產品架構</a></li>
+<li><a href="#3-開發里程碑">開發里程碑</a></li>
+<li><a href="#4-功能交付清單">功能交付清單</a></li>
+<li><a href="#5-技術決策記錄">技術決策記錄</a></li>
+<li><a href="#6-問題與解決方案">問題與解決方案</a></li>
+<li><a href="#7-測試與品質保證">測試與品質保證</a></li>
+<li><a href="#8-部署與營運">部署與營運</a></li>
+<li><a href="#9-beta-測試與使用者回饋">Beta 測試與使用者回饋</a></li>
+<li><a href="#10-第二階段規劃">第二階段規劃</a></li>
+</ol>
+<hr />
+<h2 id="專案總覽">1. 專案總覽</h2>
+<h3 id="基本資訊">1.1 基本資訊</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>專案名稱</td>
+<td>線上牌卡諮詢系統（職游產品生態系 - 第一產品）</td>
+</tr>
+<tr class="even">
+<td>專案代號</td>
+<td>Career Creator</td>
+</tr>
+<tr class="odd">
+<td>客戶名稱</td>
+<td>職涯諮詢師生態圈（To Counselor）</td>
+</tr>
+<tr class="even">
+<td>執行單位</td>
+<td>[執行團隊名稱]</td>
+</tr>
+<tr class="odd">
+<td>專案期間</td>
+<td>2025-09-01 ~ 2026-01-15 (4.5 個月)</td>
+</tr>
+<tr class="even">
+<td>專案狀態</td>
+<td>✅ 第一階段完成，Beta 測試進行中</td>
+</tr>
+<tr class="odd">
+<td>測試環境</td>
+<td>https://career-creator-frontend-staging-990202338378.asia-east1.run.app</td>
+</tr>
+<tr class="even">
+<td>正式環境</td>
+<td>[Production URL]</td>
+</tr>
+</tbody>
+</table>
+<h3 id="專案目標">1.2 專案目標</h3>
+<h4 id="主要目標">主要目標</h4>
+<p><strong>將實體牌卡數位化，打造職涯諮詢師的專業工具</strong>： - ✅
+支援遠距諮詢（消除地理限制） - ✅ 即時協作（諮詢師 + 來訪者雙向互動） -
+✅ 資料累積（建立職涯諮詢資料庫基礎）</p>
+<h4 id="次要目標">次要目標</h4>
+<ul>
+<li>✅ 提升諮詢效率（減少實體牌卡攜帶與整理時間）</li>
+<li>✅ 客戶關係管理（CRM 基礎功能）</li>
+<li>✅ 諮詢歷程記錄（筆記 + 截圖 + 狀態保存）</li>
+</ul>
+<h4 id="成功標準">成功標準</h4>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>目標</th>
+<th>達成狀況</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>核心功能完成度</td>
+<td>100%</td>
+<td>✅ 100%</td>
+</tr>
+<tr class="even">
+<td>三大牌組上架</td>
+<td>3 種牌組、7 種玩法</td>
+<td>✅ 完成</td>
+</tr>
+<tr class="odd">
+<td>多人即時同步</td>
+<td>延遲 &lt; 500ms</td>
+<td>✅ 平均 200-300ms</td>
+</tr>
+<tr class="even">
+<td>系統穩定性</td>
+<td>99% 可用率</td>
+<td>✅ 99.2%</td>
+</tr>
+<tr class="odd">
+<td>Beta 測試啟動</td>
+<td>50 位測試用戶</td>
+<td>✅ Beta 測試進行中</td>
+</tr>
+</tbody>
+</table>
+<h3 id="專案範圍">1.3 專案範圍</h3>
+<h4 id="包含已交付">✅ 包含（已交付）</h4>
+<p><strong>核心功能</strong>： - 白名單認證系統（諮詢師專用） -
+客戶管理系統（CRM 基礎版） - 三大牌組、七種玩法 - 即時同步（WebSocket /
+Supabase Realtime） - 遊戲狀態持久化（30秒自動保存） -
+諮詢師筆記功能（即時筆記 + 截圖整合） -
+響應式設計（RWD，支援桌機/平板）</p>
+<p><strong>牌卡內容</strong>： - 職游旅人卡：100 張職業卡 + 6 張 RIASEC
+說明卡 - 職能盤點卡：42 張職能卡 + 10 張行動卡 - 價值導航卡：36
+張核心價值卡</p>
+<h4 id="不包含第二階段">❌ 不包含（第二階段）</h4>
+<ul>
+<li>AI 諮詢輔助功能</li>
+<li>A+B=C Pattern 邏輯引擎</li>
+<li>用戶自定義牌卡內容</li>
+<li>班級管理系統（多人同時諮詢）</li>
+<li>完整諮詢歷史管理（匯出 CSV/PDF）</li>
+<li>公開註冊機制</li>
+</ul>
+<h3 id="專案團隊">1.4 專案團隊</h3>
+<table>
+<thead>
+<tr class="header">
+<th>角色</th>
+<th>姓名</th>
+<th>職責</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PM</td>
+<td>KM</td>
+<td>產品需求、客戶對接、測試協調</td>
+</tr>
+<tr class="even">
+<td>全端工程師</td>
+<td>Young</td>
+<td>架構設計、前後端開發、部署維運</td>
+</tr>
+<tr class="odd">
+<td>UI/UX 設計師</td>
+<td>Hannah</td>
+<td>牌卡視覺設計、素材提供</td>
+</tr>
+<tr class="even">
+<td>客戶代表</td>
+<td>[諮詢師代表]</td>
+<td>需求驗證、使用者測試</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="產品架構">2. 產品架構</h2>
+<h3 id="技術棧">2.1 技術棧</h3>
+<h4 id="frontend">Frontend</h4>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Framework</span><span class="kw">:</span><span class="at"> Next.js 14 (App Router)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Language</span><span class="kw">:</span><span class="at"> TypeScript 5.3</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Styling</span><span class="kw">:</span><span class="at"> Tailwind CSS 3.4</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">State Management</span><span class="kw">:</span><span class="at"> React Context + localStorage</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Drag &amp; Drop</span><span class="kw">:</span><span class="at"> @dnd-kit</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Real-time</span><span class="kw">:</span><span class="at"> Supabase Realtime Client</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">Charts</span><span class="kw">:</span><span class="at"> Victory (圓餅圖)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">QR Code</span><span class="kw">:</span><span class="at"> react-qr-code</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">Testing</span><span class="kw">:</span><span class="at"> Playwright E2E</span></span></code></pre></div>
+<h4 id="backend">Backend</h4>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Framework</span><span class="kw">:</span><span class="at"> FastAPI 0.104</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Language</span><span class="kw">:</span><span class="at"> Python 3.11</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ORM</span><span class="kw">:</span><span class="at"> SQLModel (基於 Pydantic + SQLAlchemy)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Validation</span><span class="kw">:</span><span class="at"> Pydantic v2</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Authentication</span><span class="kw">:</span><span class="at"> JWT (HS256)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Real-time</span><span class="kw">:</span><span class="at"> Supabase Realtime (Postgres LISTEN/NOTIFY)</span></span></code></pre></div>
+<h4 id="database-storage">Database &amp; Storage</h4>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Database</span><span class="kw">:</span><span class="at"> PostgreSQL 15 (Supabase)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Real-time</span><span class="kw">:</span><span class="at"> Supabase Realtime (WebSocket)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Storage</span><span class="kw">:</span><span class="at"> GCP Cloud Storage (牌卡圖片、截圖)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Cache</span><span class="kw">:</span><span class="at"> Browser localStorage (遊戲狀態快取)</span></span></code></pre></div>
+<h4 id="infrastructure">Infrastructure</h4>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Deployment</span><span class="kw">:</span><span class="at"> GCP Cloud Run (Serverless Container)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">CI/CD</span><span class="kw">:</span><span class="at"> GitHub Actions</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Monitoring</span><span class="kw">:</span><span class="at"> Cloud Logging + Cloud Run Metrics</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Version Control</span><span class="kw">:</span><span class="at"> GitHub</span></span></code></pre></div>
+<h3 id="系統架構圖">2.2 系統架構圖</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                        Users                                 │
+│   ┌──────────────┐                    ┌──────────────┐     │
+│   │ 諮詢師        │                    │ 來訪者        │     │
+│   │ (Counselor)  │                    │ (Visitor)    │     │
+│   └──────┬───────┘                    └──────┬───────┘     │
+│          │                                     │              │
+└──────────┼─────────────────────────────────────┼────────────┘
+           │                                     │
+           │          HTTPS / WSS                │
+           ▼                                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    GCP Cloud Run                             │
+│  ┌──────────────────────┐      ┌──────────────────────┐    │
+│  │  Frontend Container  │      │  Backend Container   │    │
+│  │  (Next.js 14)        │◄────►│  (FastAPI)           │    │
+│  │  - SSR/CSR           │      │  - REST API          │    │
+│  │  - Realtime Client   │      │  - JWT Auth          │    │
+│  └──────────┬───────────┘      └──────────┬───────────┘    │
+└─────────────┼──────────────────────────────┼────────────────┘
+              │                              │
+              │                              │
+              ▼                              ▼
+┌─────────────────────────┐    ┌─────────────────────────┐
+│   GCP Cloud Storage     │    │   Supabase (Managed)    │
+│   - 牌卡圖片             │    │   - PostgreSQL 15       │
+│   - 諮詢截圖             │    │   - Realtime (WS)       │
+│   - 公開 CDN            │    │   - Connection Pool     │
+└─────────────────────────┘    └─────────────────────────┘</code></pre>
+<h3 id="資料庫-schema核心表">2.3 資料庫 Schema（核心表）</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- 用戶表（諮詢師）</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> counselors (</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    email <span class="dt">VARCHAR</span> <span class="kw">UNIQUE</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    name <span class="dt">VARCHAR</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    hashed_password <span class="dt">VARCHAR</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    is_active <span class="dt">BOOLEAN</span> <span class="kw">DEFAULT</span> <span class="kw">true</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    must_change_password <span class="dt">BOOLEAN</span> <span class="kw">DEFAULT</span> <span class="kw">true</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    created_at <span class="dt">TIMESTAMP</span> <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co">-- 客戶表（來訪者）</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> clients (</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    counselor_id UUID <span class="kw">REFERENCES</span> counselors(<span class="kw">id</span>),</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    name <span class="dt">VARCHAR</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    email <span class="dt">VARCHAR</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    phone <span class="dt">VARCHAR</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    notes TEXT,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    created_at <span class="dt">TIMESTAMP</span> <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">-- 諮詢室表（房間）</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> consultation_rooms (</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    counselor_id UUID <span class="kw">REFERENCES</span> counselors(<span class="kw">id</span>),</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    client_id UUID <span class="kw">REFERENCES</span> clients(<span class="kw">id</span>),</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    share_link <span class="dt">VARCHAR</span> <span class="kw">UNIQUE</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    qr_code_url <span class="dt">VARCHAR</span>,</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    expires_at <span class="dt">TIMESTAMP</span>,  <span class="co">-- 7 天過期</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    created_at <span class="dt">TIMESTAMP</span> <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">-- 遊戲狀態表（持久化）</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> game_states (</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    room_id UUID <span class="kw">REFERENCES</span> consultation_rooms(<span class="kw">id</span>),</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>    deck_type <span class="dt">VARCHAR</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,  <span class="co">-- career/skill/value</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>    game_mode <span class="dt">VARCHAR</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,  <span class="co">-- personality/collector/advantage 等</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    state JSONB <span class="kw">NOT</span> <span class="kw">NULL</span>,        <span class="co">-- 完整遊戲狀態 JSON</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    updated_at <span class="dt">TIMESTAMP</span> <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">-- 諮詢筆記表</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> consultation_notes (</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    room_id UUID <span class="kw">REFERENCES</span> consultation_rooms(<span class="kw">id</span>),</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>    counselor_id UUID <span class="kw">REFERENCES</span> counselors(<span class="kw">id</span>),</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>    content TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    screenshots TEXT[],          <span class="co">-- GCS 截圖 URLs</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    created_at <span class="dt">TIMESTAMP</span> <span class="kw">DEFAULT</span> NOW()</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>);</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co">-- 牌卡定義表（靜態內容）</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> cards (</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>    <span class="kw">id</span> UUID <span class="kw">PRIMARY</span> <span class="kw">KEY</span> <span class="kw">DEFAULT</span> gen_random_uuid(),</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    deck_type <span class="dt">VARCHAR</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    card_code <span class="dt">VARCHAR</span> <span class="kw">UNIQUE</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,  <span class="co">-- e.g. &quot;career_001&quot;</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    title <span class="dt">VARCHAR</span> <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>    description TEXT,</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>    image_url <span class="dt">VARCHAR</span>,</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    metadata JSONB                       <span class="co">-- 額外屬性（RIASEC 類別等）</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>);</span></code></pre></div>
+<h3 id="api-端點設計">2.4 API 端點設計</h3>
+<h4 id="authentication">Authentication</h4>
+<pre><code>POST   /api/v1/auth/login           # 登入（JWT）
+POST   /api/v1/auth/refresh         # 刷新 Token
+POST   /api/v1/auth/change-password # 修改密碼
+POST   /api/v1/auth/forgot-password # 忘記密碼（生成 Token）
+POST   /api/v1/auth/reset-password  # 重設密碼（使用 Token）</code></pre>
+<h4 id="client-management-crm">Client Management (CRM)</h4>
+<pre><code>GET    /api/v1/clients              # 客戶列表
+POST   /api/v1/clients              # 新增客戶
+GET    /api/v1/clients/{id}         # 客戶詳情
+PATCH  /api/v1/clients/{id}         # 更新客戶資訊
+DELETE /api/v1/clients/{id}         # 刪除客戶</code></pre>
+<h4 id="consultation-rooms">Consultation Rooms</h4>
+<pre><code>POST   /api/v1/rooms                # 創建諮詢室
+GET    /api/v1/rooms/{id}           # 取得房間資訊
+GET    /api/v1/rooms/{id}/share     # 生成分享連結 + QR Code
+POST   /api/v1/rooms/{id}/join      # 訪客加入房間</code></pre>
+<h4 id="game-state">Game State</h4>
+<pre><code>GET    /api/v1/rooms/{id}/state     # 取得遊戲狀態
+POST   /api/v1/rooms/{id}/state     # 更新遊戲狀態（30秒自動保存）</code></pre>
+<h4 id="notes-screenshots">Notes &amp; Screenshots</h4>
+<pre><code>POST   /api/v1/rooms/{id}/notes     # 新增筆記
+POST   /api/v1/rooms/{id}/screenshot # 上傳截圖（返回 GCS URL）</code></pre>
+<h4 id="cards">Cards</h4>
+<pre><code>GET    /api/v1/cards?deck={type}    # 取得牌卡列表</code></pre>
+<hr />
+<h2 id="開發里程碑">3. 開發里程碑</h2>
+<h3 id="時間軸總覽">時間軸總覽</h3>
+<pre><code>2025-09 (Month 1)      2025-10 (Month 2)      2025-11 (Month 3)      2026-01 (Month 5)
+    ↓                      ↓                      ↓                      ↓
+┌─────────┐          ┌─────────┐          ┌─────────┐          ┌─────────┐
+│ MVP     │─────────►│ 優化    │─────────►│ 測試    │─────────►│ 上架    │
+│ 核心    │          │ 持久化  │          │ 負載    │          │ Beta    │
+│         │          │ 白名單  │          │ CI/CD   │          │ 測試    │
+└─────────┘          └─────────┘          └─────────┘          └─────────┘
+   7 項功能             11 項功能            9 項優化             4 項完成</code></pre>
+<h3 id="第1個月mvp-核心雛形2025-09-01-09-30">3.1 第1個月：MVP
+核心雛形（2025-09-01 ~ 09-30）</h3>
+<p><strong>目標</strong>: 完成可操作的 Prototype Demo</p>
+<h4 id="交付功能-7-項">交付功能 (7 項)</h4>
+<ol type="1">
+<li>✅ <strong>用戶認證系統</strong>
+<ul>
+<li>諮詢師註冊/登入</li>
+<li>JWT Token 管理</li>
+<li>密碼加密儲存</li>
+</ul></li>
+<li>✅ <strong>客戶管理系統（CRM 基礎版）</strong>
+<ul>
+<li>客戶列表（CRUD）</li>
+<li>基本資料記錄（姓名、Email、備註）</li>
+</ul></li>
+<li>✅ <strong>諮詢室房間系統</strong>
+<ul>
+<li>創建房間（一鍵進入）</li>
+<li>分享連結生成（QR Code）</li>
+<li>7 天過期機制</li>
+</ul></li>
+<li>✅ <strong>三大牌組、七種玩法</strong>
+<ul>
+<li><strong>職游旅人卡</strong>: 六大性格分析、職業收藏家</li>
+<li><strong>職能盤點卡</strong>: 優劣勢分析、成長計畫、職位拆解</li>
+<li><strong>價值導航卡</strong>: 價值觀排序、生活改造王</li>
+</ul></li>
+<li>✅ <strong>即時同步（Supabase Realtime）</strong>
+<ul>
+<li>游標同步顯示</li>
+<li>卡片移動同步</li>
+<li>卡片正反面同步</li>
+<li>文字輸入同步（成長計畫）</li>
+</ul></li>
+<li>✅ <strong>基礎拖曳互動</strong>
+<ul>
+<li>翻牌（正面/反面）</li>
+<li>拖曳移動（<span class="citation"
+data-cites="dnd-kit">@dnd-kit</span>）</li>
+<li>檢閱詳情（彈窗）</li>
+</ul></li>
+<li>✅ <strong>在線狀態顯示</strong>
+<ul>
+<li>Header 頭像顯示</li>
+<li>即時連線/離線偵測</li>
+</ul></li>
+</ol>
+<h4 id="技術亮點">技術亮點</h4>
+<ul>
+<li>Supabase Realtime（PostgreSQL LISTEN/NOTIFY）延遲 &lt; 300ms</li>
+<li><span class="citation" data-cites="dnd-kit">@dnd-kit</span>
+拖曳庫實現流暢拖曳體驗</li>
+<li>Next.js App Router + Server Components 架構</li>
+</ul>
+<h4 id="測試報告">測試報告</h4>
+<ul>
+<li><a href="WEEKLY_REPORT_2025-09-30.md">第一個月完整測試報告</a></li>
+<li>7 種玩法全部通過即時同步測試</li>
+<li>已知問題：極少數情況同步延遲（刷新可解決）</li>
+</ul>
+<hr />
+<h3 id="第2個月功能擴充與優化2025-10-01-10-21">3.2
+第2個月：功能擴充與優化（2025-10-01 ~ 10-21）</h3>
+<p><strong>目標</strong>: 功能完整化，Beta 測試基礎建設就緒</p>
+<h4 id="交付功能-11-項">交付功能 (11 項)</h4>
+<h5 id="原定目標3項完成">原定目標（3項完成）</h5>
+<ol type="1">
+<li>✅ <strong>牌卡視覺優化</strong>
+<ul>
+<li>疊卡模式（Stack View）</li>
+<li>雙視圖（List + Stack 切換）</li>
+<li>卡片翻轉動畫</li>
+</ul></li>
+<li>✅ <strong>遊戲狀態持久化</strong>
+<ul>
+<li>30 秒自動保存（JSONB + localStorage 雙軌）</li>
+<li>7 個遊戲模式全支援</li>
+<li>刷新頁面狀態不丟失</li>
+</ul></li>
+<li>✅ <strong>諮詢師筆記功能</strong>
+<ul>
+<li>即時筆記抽屜</li>
+<li>截圖整合（GCS Cloud Storage）</li>
+<li>自動保存機制</li>
+</ul></li>
+</ol>
+<h5 id="會議新增目標2項完成">會議新增目標（2項完成）</h5>
+<ol start="4" type="1">
+<li>✅ <strong>白名單認證系統</strong>
+<ul>
+<li>管理員後台介面</li>
+<li>CSV 批量匯入用戶</li>
+<li>單一用戶快速新增</li>
+<li>首次登入強制修改密碼</li>
+<li>忘記密碼自助重設</li>
+<li>一鍵密碼重設（管理員）</li>
+</ul></li>
+<li>✅ <strong>籌碼系統改版</strong>
+<ul>
+<li>移除 slider 滑桿</li>
+<li>+10/-10 按鈕快速調整</li>
+<li>手動數字輸入（0-100）</li>
+<li>每張牌卡獨立設定</li>
+<li>拖曳重新排序</li>
+<li>圓餅圖視覺優化</li>
+</ul></li>
+</ol>
+<h5 id="額外完成6項">額外完成（6項）</h5>
+<ol start="6" type="1">
+<li>✅ <strong>客戶諮詢室簡化</strong>
+<ul>
+<li>從「4 步驟」簡化為「2 步驟」</li>
+<li>一鍵進入諮詢室</li>
+</ul></li>
+<li>✅ <strong>截圖功能整合</strong>
+<ul>
+<li>GCS Cloud Storage 上傳</li>
+<li>自動生成公開 URL</li>
+<li>筆記抽屜一鍵儲存</li>
+</ul></li>
+<li>✅ <strong>全站 RWD 響應式設計</strong>
+<ul>
+<li>支援桌機（1920x1080）</li>
+<li>支援平板（768x1024）</li>
+<li>手機暫不支援（諮詢場景不適用）</li>
+</ul></li>
+<li>✅ <strong>CI/CD 自動化部署</strong>
+<ul>
+<li>GitHub Actions Workflow</li>
+<li>Staging 環境自動部署</li>
+<li>健康檢查與回滾機制</li>
+</ul></li>
+<li>✅ <strong>資料庫優化</strong>
+<ul>
+<li>索引優化（查詢效能 +40%）</li>
+<li>JSONB 查詢優化</li>
+</ul></li>
+<li>✅ <strong>Production 環境建置</strong>
+<ul>
+<li>GCP Cloud Run 部署</li>
+<li>Supabase Production Database</li>
+<li>環境變數隔離</li>
+</ul></li>
+</ol>
+<h4 id="技術亮點-1">技術亮點</h4>
+<ul>
+<li>GCS 整合實現截圖永久儲存</li>
+<li>JSONB + localStorage 雙軌持久化（網路斷線仍可用）</li>
+<li>CSV 批量匯入支援 50+ 用戶快速建立</li>
+</ul>
+<h4 id="測試報告-1">測試報告</h4>
+<ul>
+<li><a href="WEEKLY_REPORT_2025-10-21.md">第二個月完整測試報告</a></li>
+<li>白名單認證系統 5 項功能全部通過</li>
+<li>遊戲狀態持久化測試：刷新頁面零損失</li>
+</ul>
+<hr />
+<h3 id="第3個月前半負載測試與基礎設施優化2025-11-01-11-04">3.3
+第3個月前半：負載測試與基礎設施優化（2025-11-01 ~ 11-04）</h3>
+<p><strong>目標</strong>: 確保系統穩定性，支援 50 人並發</p>
+<h4 id="交付優化-4-項">交付優化 (4 項)</h4>
+<ol type="1">
+<li>✅ <strong>負載測試框架</strong>
+<ul>
+<li>Locust 負載測試腳本</li>
+<li>50 併發測試</li>
+<li><strong>結果</strong>: 100% 成功率、響應時間優化 97%</li>
+</ul></li>
+<li>✅ <strong>資料庫連線池優化</strong>
+<ul>
+<li>從預設 10 增加至 20</li>
+<li>連線超時優化（30s → 10s）</li>
+<li><strong>效果</strong>: 併發能力提升 100%</li>
+</ul></li>
+<li>✅ <strong>安全性強化</strong>
+<ul>
+<li>Gitleaks 規則設定</li>
+<li>移除 hardcoded secrets</li>
+<li>環境變數標準化</li>
+</ul></li>
+<li>✅ <strong>牌卡圖片整合（第一批）</strong>
+<ul>
+<li>100 張職業卡上架</li>
+<li>RIASEC 6 張說明卡</li>
+<li>GCS CDN 加速</li>
+</ul></li>
+</ol>
+<h4 id="效能指標">效能指標</h4>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>優化前</th>
+<th>優化後</th>
+<th>提升</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>併發處理能力</td>
+<td>20 RPS</td>
+<td>50 RPS</td>
+<td>+150%</td>
+</tr>
+<tr class="even">
+<td>平均響應時間</td>
+<td>1200ms</td>
+<td>300ms</td>
+<td>-75%</td>
+</tr>
+<tr class="odd">
+<td>資料庫連線成功率</td>
+<td>85%</td>
+<td>100%</td>
+<td>+15%</td>
+</tr>
+<tr class="even">
+<td>首屏載入時間</td>
+<td>2.5s</td>
+<td>1.8s</td>
+<td>-28%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="第3個月中程式碼品質與-cicd-優化2025-11-04-11-21">3.4
+第3個月中：程式碼品質與 CI/CD 優化（2025-11-04 ~ 11-21）</h3>
+<p><strong>目標</strong>: 提升開發效率與程式碼可維護性</p>
+<h4 id="交付優化-9-項">交付優化 (9 項)</h4>
+<h5 id="uiux-優化">UI/UX 優化</h5>
+<ol type="1">
+<li>✅ <strong>牌卡 UI 優化</strong>
+<ul>
+<li>圓角設計（12px）</li>
+<li>圖片顯示模式（Cover）</li>
+<li>Dark mode 支援</li>
+</ul></li>
+</ol>
+<h5 id="測試優化">測試優化</h5>
+<ol start="2" type="1">
+<li>✅ <strong>E2E 測試完善</strong>
+<ul>
+<li>移除過時測試（7 個）</li>
+<li>新增核心流程測試（5 個）</li>
+<li>CI/CD 整合（Playwright）</li>
+</ul></li>
+</ol>
+<h5 id="效能優化">效能優化</h5>
+<ol start="3" type="1">
+<li>✅ <strong>Realtime 頻寬優化</strong>
+<ul>
+<li>減少冗餘訂閱 (-60% 頻寬)</li>
+<li>Hook 清理機制</li>
+</ul></li>
+<li>✅ <strong>程式碼品質提升</strong>
+<ul>
+<li>TypeScript 型別完善（100 處）</li>
+<li>移除過時程式碼（300 行）</li>
+<li>ESLint 規則強化</li>
+</ul></li>
+</ol>
+<h5 id="cicd-優化">CI/CD 優化</h5>
+<ol start="5" type="1">
+<li>✅ <strong>Docker 優化</strong>
+<ul>
+<li>Multi-stage build</li>
+<li>Non-root user</li>
+<li>映像大小 -25%（從 1.2GB → 900MB）</li>
+</ul></li>
+<li>✅ <strong>CI/CD Pipeline 優化</strong>
+<ul>
+<li>Docker Buildx 快取</li>
+<li>依賴快取（npm/pip）</li>
+<li>智能健康檢查（3 次重試）</li>
+</ul></li>
+</ol>
+<h5 id="文件整理">文件整理</h5>
+<ol start="7" type="1">
+<li>✅ <strong>文件整理</strong>
+<ul>
+<li>移除過時文件（1314 行）</li>
+<li>PRD 重構（v6.0）</li>
+<li>測試報告標準化</li>
+</ul></li>
+<li>✅ <strong>技術債清理</strong>
+<ul>
+<li>移除未使用依賴（15 個）</li>
+<li>程式碼重複率 -20%</li>
+</ul></li>
+<li>✅ <strong>監控與日誌</strong>
+<ul>
+<li>Cloud Logging 設定</li>
+<li>錯誤追蹤機制（基礎版）</li>
+</ul></li>
+</ol>
+<h4 id="cicd-pipeline-優化成果">CI/CD Pipeline 優化成果</h4>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>優化前</th>
+<th>優化後</th>
+<th>提升</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>構建時間</td>
+<td>12 分鐘</td>
+<td>6 分鐘</td>
+<td>-50%</td>
+</tr>
+<tr class="even">
+<td>映像大小</td>
+<td>1.2GB</td>
+<td>900MB</td>
+<td>-25%</td>
+</tr>
+<tr class="odd">
+<td>部署成功率</td>
+<td>92%</td>
+<td>98%</td>
+<td>+6%</td>
+</tr>
+<tr class="even">
+<td>測試覆蓋率</td>
+<td>45%</td>
+<td>68%</td>
+<td>+23%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="第5個月牌卡內容完整上架2026-01-01-01-15">3.5
+第5個月：牌卡內容完整上架（2026-01-01 ~ 01-15）</h3>
+<p><strong>目標</strong>: P0 項目全部完成，Beta 測試正式啟動</p>
+<h4 id="交付功能-4-項">交付功能 (4 項)</h4>
+<ol type="1">
+<li>✅ <strong>職能盤點卡完整重構</strong>
+<ul>
+<li>52 張牌卡（10 張行動卡 + 42 張職能卡）</li>
+<li>卡片命名規範統一（mindset/action 取代 skill）</li>
+<li>完整文案導入</li>
+</ul></li>
+<li>✅ <strong>牌卡視覺優化</strong>
+<ul>
+<li>價值導航卡 1:1 尺寸</li>
+<li>六大性格分析區域顏色差異化
+<ul>
+<li>喜歡 = 綠色</li>
+<li>中立 = 黃色</li>
+<li>不喜歡 = 紅色</li>
+</ul></li>
+<li>DropZone 單點擊查看大圖</li>
+<li>List mode 顯示實際卡片名稱</li>
+</ul></li>
+<li>✅ <strong>資料庫搬遷至公司 Supabase</strong>
+<ul>
+<li>Staging 環境搬遷</li>
+<li>Production 環境搬遷</li>
+<li>資料完整性驗證</li>
+</ul></li>
+<li>✅ <strong>環境修復</strong>
+<ul>
+<li>Supabase 密碼更新</li>
+<li>CORS 設定優化</li>
+<li>健康檢查機制</li>
+</ul></li>
+</ol>
+<h4 id="牌卡內容統計">牌卡內容統計</h4>
+<table>
+<thead>
+<tr class="header">
+<th>牌組</th>
+<th>卡片數量</th>
+<th>內容狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>職游旅人卡</td>
+<td>106 張</td>
+<td>✅ 100 張職業卡 + 6 張 RIASEC 說明卡</td>
+</tr>
+<tr class="even">
+<td>職能盤點卡</td>
+<td>52 張</td>
+<td>✅ 42 張職能卡 + 10 張行動卡</td>
+</tr>
+<tr class="odd">
+<td>價值導航卡</td>
+<td>36 張</td>
+<td>✅ 36 張核心價值卡</td>
+</tr>
+<tr class="even">
+<td><strong>總計</strong></td>
+<td><strong>194 張</strong></td>
+<td>✅ <strong>全部上架</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="beta-測試準備">Beta 測試準備</h4>
+<ul>
+<li>✅ 50 個測試帳號建立</li>
+<li>✅ 測試環境穩定運行</li>
+<li>✅ 使用者手冊準備</li>
+<li>✅ 回饋收集機制（問卷）</li>
+</ul>
+<hr />
+<h2 id="功能交付清單">4. 功能交付清單</h2>
+<h3 id="核心功能已完成">4.1 核心功能（已完成）</h3>
+<h4 id="認證與權限">🔐 認證與權限</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>狀態</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>諮詢師登入</td>
+<td>✅</td>
+<td>JWT Token 認證</td>
+</tr>
+<tr class="even">
+<td>白名單註冊制</td>
+<td>✅</td>
+<td>管理員後台管理</td>
+</tr>
+<tr class="odd">
+<td>CSV 批量匯入</td>
+<td>✅</td>
+<td>支援 50+ 用戶快速建立</td>
+</tr>
+<tr class="even">
+<td>首次登入強制修改密碼</td>
+<td>✅</td>
+<td>安全性強化</td>
+</tr>
+<tr class="odd">
+<td>忘記密碼重設</td>
+<td>✅</td>
+<td>Token 機制</td>
+</tr>
+<tr class="even">
+<td>管理員密碼重設</td>
+<td>✅</td>
+<td>一鍵重設</td>
+</tr>
+<tr class="odd">
+<td>訪客免登入加入</td>
+<td>✅</td>
+<td>透過分享連結</td>
+</tr>
+</tbody>
+</table>
+<h4 id="客戶管理crm">👥 客戶管理（CRM）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>狀態</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>客戶列表</td>
+<td>✅</td>
+<td>CRUD 完整支援</td>
+</tr>
+<tr class="even">
+<td>客戶資訊編輯</td>
+<td>✅</td>
+<td>姓名、Email、電話、備註</td>
+</tr>
+<tr class="odd">
+<td>一鍵進入諮詢室</td>
+<td>✅</td>
+<td>簡化操作流程</td>
+</tr>
+<tr class="even">
+<td>客戶標籤（待完成）</td>
+<td>❌</td>
+<td>第二階段</td>
+</tr>
+</tbody>
+</table>
+<h4 id="諮詢室房間">🏠 諮詢室房間</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>狀態</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>創建房間</td>
+<td>✅</td>
+<td>自動生成唯一 ID</td>
+</tr>
+<tr class="even">
+<td>分享連結</td>
+<td>✅</td>
+<td>QR Code + Raw Link</td>
+</tr>
+<tr class="odd">
+<td>7 天過期機制</td>
+<td>✅</td>
+<td>自動清理</td>
+</tr>
+<tr class="even">
+<td>在線狀態顯示</td>
+<td>✅</td>
+<td>Header 頭像顯示</td>
+</tr>
+<tr class="odd">
+<td>多人並發支援</td>
+<td>✅</td>
+<td>最高測試 50 人</td>
+</tr>
+</tbody>
+</table>
+<h4 id="牌卡系統七種玩法">🃏 牌卡系統（七種玩法）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>牌組</th>
+<th>玩法</th>
+<th>狀態</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>職游旅人卡</td>
+<td>六大性格分析</td>
+<td>✅</td>
+<td>RIASEC 三欄分類</td>
+</tr>
+<tr class="even">
+<td>職游旅人卡</td>
+<td>職業收藏家</td>
+<td>✅</td>
+<td>最多 15 張</td>
+</tr>
+<tr class="odd">
+<td>職能盤點卡</td>
+<td>優劣勢分析</td>
+<td>✅</td>
+<td>雙區畫布（各 5 張）</td>
+</tr>
+<tr class="even">
+<td>職能盤點卡</td>
+<td>成長計畫</td>
+<td>✅</td>
+<td>A 職能卡 + B 行動卡</td>
+</tr>
+<tr class="odd">
+<td>職能盤點卡</td>
+<td>職位拆解</td>
+<td>✅</td>
+<td>自由排列 + JD 上傳</td>
+</tr>
+<tr class="even">
+<td>價值導航卡</td>
+<td>價值觀排序</td>
+<td>✅</td>
+<td>分層排序</td>
+</tr>
+<tr class="odd">
+<td>價值導航卡</td>
+<td>生活改造王</td>
+<td>✅</td>
+<td>籌碼分配 + 圓餅圖</td>
+</tr>
+</tbody>
+</table>
+<h4 id="即時同步">⚡ 即時同步</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>狀態</th>
+<th>延遲</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>游標同步</td>
+<td>✅</td>
+<td>&lt; 200ms</td>
+</tr>
+<tr class="even">
+<td>卡片移動</td>
+<td>✅</td>
+<td>&lt; 300ms</td>
+</tr>
+<tr class="odd">
+<td>卡片翻轉</td>
+<td>✅</td>
+<td>&lt; 300ms</td>
+</tr>
+<tr class="even">
+<td>文字輸入</td>
+<td>✅</td>
+<td>&lt; 500ms</td>
+</tr>
+<tr class="odd">
+<td>籌碼調整</td>
+<td>✅</td>
+<td>&lt; 300ms</td>
+</tr>
+<tr class="even">
+<td>圓餅圖更新</td>
+<td>✅</td>
+<td>&lt; 500ms</td>
+</tr>
+</tbody>
+</table>
+<h4 id="資料持久化">💾 資料持久化</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>狀態</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>30 秒自動保存</td>
+<td>✅</td>
+<td>JSONB + localStorage</td>
+</tr>
+<tr class="even">
+<td>刷新頁面恢復</td>
+<td>✅</td>
+<td>狀態零損失</td>
+</tr>
+<tr class="odd">
+<td>7 種玩法支援</td>
+<td>✅</td>
+<td>全部支援</td>
+</tr>
+<tr class="even">
+<td>離線快取</td>
+<td>✅</td>
+<td>localStorage fallback</td>
+</tr>
+</tbody>
+</table>
+<h4 id="諮詢筆記">📝 諮詢筆記</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>狀態</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>即時筆記</td>
+<td>✅</td>
+<td>自動保存</td>
+</tr>
+<tr class="even">
+<td>截圖整合</td>
+<td>✅</td>
+<td>GCS 永久儲存</td>
+</tr>
+<tr class="odd">
+<td>筆記抽屜</td>
+<td>✅</td>
+<td>側邊欄設計</td>
+</tr>
+<tr class="even">
+<td>歷史查看（待完成）</td>
+<td>❌</td>
+<td>第二階段</td>
+</tr>
+</tbody>
+</table>
+<h4 id="響應式設計">📱 響應式設計</h4>
+<table>
+<thead>
+<tr class="header">
+<th>裝置</th>
+<th>狀態</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>桌機（1920x1080）</td>
+<td>✅</td>
+<td>主要支援</td>
+</tr>
+<tr class="even">
+<td>平板（768x1024）</td>
+<td>✅</td>
+<td>完整支援</td>
+</tr>
+<tr class="odd">
+<td>手機（&lt; 768px）</td>
+<td>❌</td>
+<td>諮詢場景不適用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="未完成功能第二階段">4.2 未完成功能（第二階段）</h3>
+<h4 id="p1---beta-測試後必要的優化">P1 - Beta 測試後必要的優化</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>優先級</th>
+<th>預計時程</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>諮詢歷史管理完善</td>
+<td>P1</td>
+<td>2026-02</td>
+</tr>
+<tr class="even">
+<td>訪客流程優化</td>
+<td>P1</td>
+<td>2026-02</td>
+</tr>
+<tr class="odd">
+<td>監控與錯誤追蹤</td>
+<td>P1</td>
+<td>2026-02</td>
+</tr>
+</tbody>
+</table>
+<h4 id="p2---第二階段規劃2025-12-2026-02">P2 - 第二階段規劃（2025-12 ~
+2026-02）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>優先級</th>
+<th>預計時程</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A+B=C Pattern 邏輯</td>
+<td>P2</td>
+<td>2026-03</td>
+</tr>
+<tr class="even">
+<td>註冊流程優化</td>
+<td>P2</td>
+<td>2026-03</td>
+</tr>
+<tr class="odd">
+<td>AI 諮詢輔助功能</td>
+<td>P2</td>
+<td>2026-04+</td>
+</tr>
+<tr class="even">
+<td>班級管理系統</td>
+<td>P2</td>
+<td>2026-04+</td>
+</tr>
+<tr class="odd">
+<td>用戶自定義內容</td>
+<td>P2</td>
+<td>2026-05+</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="技術決策記錄">5. 技術決策記錄</h2>
+<h3 id="adr-001-選擇-supabase-realtime-而非自建-websocket">ADR-001: 選擇
+Supabase Realtime 而非自建 WebSocket</h3>
+<p><strong>日期</strong>: 2025-09-05 <strong>狀態</strong>: ✅ 已採用
+<strong>決策者</strong>: Young (全端工程師)</p>
+<h4 id="背景">背景</h4>
+<p>需要實現諮詢師與訪客之間的即時同步（游標、卡片移動、文字輸入）。</p>
+<h4 id="選項">選項</h4>
+<p><strong>A. Supabase Realtime</strong>（PostgreSQL LISTEN/NOTIFY） -
+✅ 自動管理連線 - ✅ 與資料庫深度整合 - ✅ 延遲 &lt; 300ms - ❌
+依賴第三方服務 - ❌ 成本較高（超過免費額度後）</p>
+<p><strong>B. 自建 WebSocket</strong>（Socket.io + FastAPI） - ✅
+完全控制 - ✅ 無第三方依賴 - ❌ 需自行實現斷線重連 - ❌
+需自行管理連線狀態 - ❌ 開發時間 +2 週</p>
+<p><strong>C. 短輪詢</strong>（Polling） - ✅ 實作簡單 - ❌ 延遲高（&gt;
+1s） - ❌ 伺服器負載高</p>
+<h4 id="決策">決策</h4>
+<p><strong>選擇 A: Supabase Realtime</strong></p>
+<h4 id="理由">理由</h4>
+<ol type="1">
+<li><strong>MVP 速度優先</strong>: 減少 2 週開發時間</li>
+<li><strong>穩定性</strong>: Supabase
+已處理斷線重連、心跳檢測等複雜邏輯</li>
+<li><strong>整合性</strong>: 與 PostgreSQL
+無縫整合,可直接訂閱資料表變更</li>
+<li><strong>成本可控</strong>: 預估 Beta 測試階段不會超過免費額度</li>
+</ol>
+<h4 id="後果">後果</h4>
+<p><strong>正面</strong>: - ✅ 9 月底完成 MVP（提前 1 週） - ✅
+即時同步穩定性 99.5% - ✅ 平均延遲 200-300ms（優於預期）</p>
+<p><strong>負面</strong>: - ⚠️ Supabase
+服務中斷時系統完全無法使用（依賴風險） - ⚠️ 每月成本約 $50（超過 50
+並發用戶後）</p>
+<p><strong>緩解措施</strong>: - 第二階段評估自建 WebSocket 的成本效益 -
+準備 Supabase 遷移計畫（若成本過高）</p>
+<hr />
+<h3 id="adr-002-選擇-jsonb-localstorage-雙軌持久化">ADR-002: 選擇 JSONB
++ localStorage 雙軌持久化</h3>
+<p><strong>日期</strong>: 2025-10-08 <strong>狀態</strong>: ✅ 已採用
+<strong>決策者</strong>: Young</p>
+<h4 id="背景-1">背景</h4>
+<p>需要實現遊戲狀態持久化,解決「刷新頁面後狀態丟失」問題。</p>
+<h4 id="選項-1">選項</h4>
+<p><strong>A. 僅資料庫（JSONB）</strong> - ✅ 資料集中管理 - ✅
+多人共享狀態 - ❌ 網路延遲（每次操作都要 API 請求） - ❌
+離線無法使用</p>
+<p><strong>B. 僅 localStorage</strong> - ✅ 無網路延遲 - ✅ 離線可用 -
+❌ 狀態不同步（多人協作失效） - ❌ 瀏覽器清除快取後資料丟失</p>
+<p><strong>C. JSONB + localStorage 雙軌</strong> - ✅ localStorage
+即時快取（零延遲） - ✅ JSONB 定期同步（30秒一次） - ✅
+離線優先策略（Progressive Web App 理念） - ❌ 實作複雜度較高 - ❌
+需處理衝突解決</p>
+<h4 id="決策-1">決策</h4>
+<p><strong>選擇 C: JSONB + localStorage 雙軌</strong></p>
+<h4 id="策略">策略</h4>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 讀取優先順序</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> <span class="fu">localStorage</span> (即時快取) → 無延遲</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> API 取得最新狀態 → 驗證一致性</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> 若有差異<span class="op">,</span>以伺服器為準</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">// 寫入策略</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fl">1.</span> 立即寫入 localStorage → 無延遲</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fl">2.</span> <span class="dv">30</span> 秒防抖寫入 JSONB → 減少 API 請求</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fl">3.</span> 離開頁面前強制同步 → 確保資料不丟失</span></code></pre></div>
+<h4 id="結果">結果</h4>
+<p><strong>效能提升</strong>: - 狀態讀取延遲: 從 300ms →
+<strong>0ms</strong> - API 請求減少: <strong>95%</strong>（從每次操作 →
+30秒一次） - 離線可用時間: <strong>無限</strong>（直到刷新頁面）</p>
+<p><strong>可靠性</strong>: - 刷新頁面恢復率: <strong>100%</strong> -
+網路斷線時仍可操作: ✅ - 多人協作一致性: ✅（30秒內同步）</p>
+<hr />
+<h3 id="adr-003-選擇-dnd-kit-而非-react-dnd">ADR-003: 選擇 <span
+class="citation" data-cites="dnd-kit">@dnd-kit</span> 而非
+react-dnd</h3>
+<p><strong>日期</strong>: 2025-09-03 <strong>狀態</strong>: ✅ 已採用
+<strong>決策者</strong>: Young</p>
+<h4 id="背景-2">背景</h4>
+<p>需要實現流暢的拖曳體驗（卡片拖曳到不同區域）。</p>
+<h4 id="選項-2">選項</h4>
+<p><strong>A. react-dnd</strong> - ✅ 生態成熟（使用 10+ 年） - ✅
+文件豐富 - ❌ 體積大（200KB） - ❌ 不支援觸控裝置 - ❌
+效能問題（大量元素時卡頓）</p>
+<p><strong>B. <span class="citation"
+data-cites="dnd-kit">@dnd-kit</span></strong> - ✅ 輕量（50KB） - ✅
+支援觸控裝置 - ✅ 效能優異（Virtual List 支援） - ✅ TypeScript 原生支援
+- ❌ 文件較少 - ❌ 生態較新（2021 年）</p>
+<h4 id="決策-2">決策</h4>
+<p><strong>選擇 B: <span class="citation"
+data-cites="dnd-kit">@dnd-kit</span></strong></p>
+<h4 id="理由-1">理由</h4>
+<ol type="1">
+<li><strong>效能</strong>: 支援 100+ 卡片流暢拖曳</li>
+<li><strong>觸控</strong>: 未來可能支援平板操作</li>
+<li><strong>體積</strong>: 減少 150KB Bundle Size</li>
+<li><strong>維護</strong>: 活躍開發中（react-dnd 已停止更新）</li>
+</ol>
+<h4 id="結果-1">結果</h4>
+<ul>
+<li>✅ 拖曳 FPS: 60 (無掉幀)</li>
+<li>✅ 支援 100+ 卡片同時顯示</li>
+<li>✅ 支援鍵盤無障礙操作</li>
+<li>✅ Bundle Size: -150KB</li>
+</ul>
+<hr />
+<h3 id="adr-004-選擇-gcp-cloud-storage-而非-supabase-storage">ADR-004:
+選擇 GCP Cloud Storage 而非 Supabase Storage</h3>
+<p><strong>日期</strong>: 2025-10-15 <strong>狀態</strong>: ✅ 已採用
+<strong>決策者</strong>: Young</p>
+<h4 id="背景-3">背景</h4>
+<p>需要儲存截圖與牌卡圖片（預估 10GB+ / 年）。</p>
+<h4 id="選項-3">選項</h4>
+<p><strong>A. Supabase Storage</strong> - ✅ 與資料庫同一平台 - ✅
+整合簡單 - ❌ 成本高（$0.021/GB/月 + $0.09/GB 流量） - ❌ 免費額度僅
+1GB</p>
+<p><strong>B. GCP Cloud Storage</strong> - ✅ 成本低（$0.02/GB/月 +
+$0.12/GB 流量，但有 5GB 免費） - ✅ CDN 加速 - ✅ 與 Cloud Run
+同一平台（無跨平台費用） - ❌ 需額外設定權限</p>
+<h4 id="決策-3">決策</h4>
+<p><strong>選擇 B: GCP Cloud Storage</strong></p>
+<h4 id="成本試算年度-10gb-儲存-100gb-流量">成本試算（年度 10GB 儲存 +
+100GB 流量）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>方案</th>
+<th>儲存成本</th>
+<th>流量成本</th>
+<th>年度總成本</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Supabase Storage</td>
+<td>$2.52</td>
+<td>$108</td>
+<td><strong>$110.52</strong></td>
+</tr>
+<tr class="even">
+<td>GCP Cloud Storage</td>
+<td>$2.40</td>
+<td>$12</td>
+<td><strong>$14.40</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>節省成本</strong>: <strong>$96/年（87% 降低）</strong></p>
+<h4 id="結果-2">結果</h4>
+<ul>
+<li>✅ 年度成本: $14.40（節省 87%）</li>
+<li>✅ 上傳速度: 200ms（Cloud Run 同區域）</li>
+<li>✅ CDN 加速: 首次載入 1.2s → 0.3s</li>
+</ul>
+<hr />
+<h3 id="adr-005-選擇-fastapi-而非-django-flask">ADR-005: 選擇 FastAPI
+而非 Django / Flask</h3>
+<p><strong>日期</strong>: 2025-08-25 <strong>狀態</strong>: ✅ 已採用
+<strong>決策者</strong>: Young</p>
+<h4 id="背景-4">背景</h4>
+<p>需要選擇 Python 後端框架,支援 REST API 與 JWT 認證。</p>
+<h4 id="選項-4">選項</h4>
+<p><strong>A. Django + DRF</strong> - ✅ 生態成熟 - ✅ 內建 ORM、Admin
+Panel - ❌ 重量級（學習曲線陡峭） - ❌ 效能較差</p>
+<p><strong>B. Flask</strong> - ✅ 輕量 - ✅ 靈活 - ❌ 需大量擴充套件 -
+❌ 無原生非同步支援</p>
+<p><strong>C. FastAPI</strong> - ✅ 原生非同步（ASGI） - ✅ 自動生成
+OpenAPI 文件 - ✅ Pydantic 資料驗證 - ✅ 效能優異（僅次於 Go） - ❌
+生態較新（2018 年）</p>
+<h4 id="決策-4">決策</h4>
+<p><strong>選擇 C: FastAPI</strong></p>
+<h4 id="理由-2">理由</h4>
+<ol type="1">
+<li><strong>效能</strong>: 非同步支援,適合 WebSocket 與高並發</li>
+<li><strong>開發效率</strong>: 自動生成 API 文件,減少溝通成本</li>
+<li><strong>型別安全</strong>: Pydantic 自動驗證,減少 Bug</li>
+<li><strong>現代化</strong>: 原生支援 async/await</li>
+</ol>
+<h4 id="效能基準測試">效能基準測試</h4>
+<table>
+<thead>
+<tr class="header">
+<th>Framework</th>
+<th>RPS (Request/sec)</th>
+<th>延遲 P95</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FastAPI</td>
+<td>5,200</td>
+<td>18ms</td>
+</tr>
+<tr class="even">
+<td>Flask</td>
+<td>1,800</td>
+<td>55ms</td>
+</tr>
+<tr class="odd">
+<td>Django</td>
+<td>1,200</td>
+<td>82ms</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FastAPI 效能提升</strong>: <strong>+289%（vs
+Django）</strong></p>
+<hr />
+<h2 id="問題與解決方案">6. 問題與解決方案</h2>
+<h3 id="重大問題清單教訓">6.1 重大問題清單（教訓）</h3>
+<h4 id="問題-1-supabase-realtime-連線池耗盡10月第2週">問題 #1: Supabase
+Realtime 連線池耗盡（10月第2週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-10-12</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🔴 高</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>20+ 併發用戶時系統無法連線</td>
+</tr>
+<tr class="even">
+<td>症狀</td>
+<td><code>Error: too many connections for role "postgres"</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>根本原因</strong>:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 錯誤：每個 API 請求都創建新連線</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> get_db():</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    engine <span class="op">=</span> create_async_engine(DATABASE_URL)  <span class="co"># ❌ 每次都新建</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> engine.begin() <span class="im">as</span> conn:</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> conn</span></code></pre></div>
+<p><strong>解決方案</strong>:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 正確：全域單例連線池</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>engine <span class="op">=</span> create_async_engine(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    DATABASE_URL,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    pool_size<span class="op">=</span><span class="dv">20</span>,          <span class="co"># ✅ 連線池大小</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    max_overflow<span class="op">=</span><span class="dv">10</span>,       <span class="co"># ✅ 最大溢出</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    pool_timeout<span class="op">=</span><span class="dv">30</span>,       <span class="co"># ✅ 超時時間</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    pool_recycle<span class="op">=</span><span class="dv">3600</span>      <span class="co"># ✅ 連線回收（1小時）</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> get_db():</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> engine.begin() <span class="im">as</span> conn:  <span class="co"># ✅ 重用連線</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> conn</span></code></pre></div>
+<p><strong>花費時間</strong>: 8 小時（診斷 4h + 修復 2h + 測試 2h）</p>
+<p><strong>教訓</strong>: 1. 連線池是資料庫效能的關鍵 2.
+負載測試必須在開發早期進行 3. 監控連線池使用率（後續加入 Grafana）</p>
+<p><strong>預防措施</strong>: - ✅ 加入連線池使用率監控 - ✅
+負載測試納入 CI/CD - ✅ 文件化連線池設定規範</p>
+<hr />
+<h4 id="問題-2-localstorage-與-jsonb-狀態衝突10月第3週">問題 #2:
+localStorage 與 JSONB 狀態衝突（10月第3週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-10-18</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🟡 中</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>多人協作時偶爾狀態不一致</td>
+</tr>
+<tr class="even">
+<td>症狀</td>
+<td>諮詢師看到卡片位置與訪客不同</td>
+</tr>
+</tbody>
+</table>
+<p><strong>根本原因</strong>:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 錯誤：兩個人同時修改,最後寫入者覆蓋前者</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> saveState <span class="op">=</span> <span class="kw">async</span> (state<span class="op">:</span> GameState) <span class="kw">=&gt;</span> {</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;gameState&#39;</span><span class="op">,</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(state))<span class="op">;</span>  <span class="co">// ❌ 無版本控制</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">await</span> api<span class="op">.</span><span class="fu">updateGameState</span>(roomId<span class="op">,</span> state)<span class="op">;</span>                  <span class="co">// ❌ 直接覆蓋</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+<p><strong>解決方案</strong>:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 正確：加入版本控制與衝突解決</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> GameState {</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  data<span class="op">:</span> <span class="dt">any</span><span class="op">;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  version<span class="op">:</span> <span class="dt">number</span><span class="op">;</span>       <span class="co">// ✅ 版本號</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  updatedAt<span class="op">:</span> <span class="dt">string</span><span class="op">;</span>     <span class="co">// ✅ 更新時間</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  updatedBy<span class="op">:</span> <span class="dt">string</span><span class="op">;</span>     <span class="co">// ✅ 更新者</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> saveState <span class="op">=</span> <span class="kw">async</span> (state<span class="op">:</span> GameState) <span class="kw">=&gt;</span> {</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> currentVersion <span class="op">=</span> <span class="cf">await</span> api<span class="op">.</span><span class="fu">getGameStateVersion</span>(roomId)<span class="op">;</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (state<span class="op">.</span><span class="at">version</span> <span class="op">&lt;</span> currentVersion) {</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ✅ 衝突偵測：伺服器版本較新</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> serverState <span class="op">=</span> <span class="cf">await</span> api<span class="op">.</span><span class="fu">getGameState</span>(roomId)<span class="op">;</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> merged <span class="op">=</span> <span class="fu">mergeStates</span>(state<span class="op">,</span> serverState)<span class="op">;</span>  <span class="co">// ✅ 合併策略</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;gameState&#39;</span><span class="op">,</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(merged))<span class="op">;</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> api<span class="op">.</span><span class="fu">updateGameState</span>(roomId<span class="op">,</span> merged)<span class="op">;</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">// ✅ 無衝突：正常寫入</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    state<span class="op">.</span><span class="at">version</span> <span class="op">+=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    localStorage<span class="op">.</span><span class="fu">setItem</span>(<span class="st">&#39;gameState&#39;</span><span class="op">,</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(state))<span class="op">;</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> api<span class="op">.</span><span class="fu">updateGameState</span>(roomId<span class="op">,</span> state)<span class="op">;</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+<p><strong>花費時間</strong>: 12 小時（診斷 6h + 修復 4h + 測試 2h）</p>
+<p><strong>教訓</strong>: 1. 分散式系統必須考慮併發衝突 2. localStorage
+不是萬能,需搭配伺服器版本控制 3. 測試多人同時操作的情境</p>
+<p><strong>預防措施</strong>: - ✅ 加入 E2E 測試（多瀏覽器同時操作） -
+✅ 文件化衝突解決策略 - ✅ 考慮使用 CRDT（未來優化）</p>
+<hr />
+<h4 id="問題-3-gcs-圖片-cors-錯誤11月第1週">問題 #3: GCS 圖片 CORS
+錯誤（11月第1週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-11-02</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🔴 高</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>所有牌卡圖片無法載入</td>
+</tr>
+<tr class="even">
+<td>症狀</td>
+<td><code>CORS policy: No 'Access-Control-Allow-Origin' header</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>根本原因</strong>:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 錯誤：未設定 CORS 政策</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gsutil</span> cors get gs://career-creator-cards</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 返回：[]  # ❌ 空的</span></span></code></pre></div>
+<p><strong>解決方案</strong>:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="er">//</span> <span class="er">cors-config.json</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ot">[</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">{</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;origin&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;https://career-creator-frontend-*.run.app&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;method&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;GET&quot;</span><span class="ot">,</span> <span class="st">&quot;HEAD&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;responseHeader&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Content-Type&quot;</span><span class="ot">,</span> <span class="st">&quot;Content-Length&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;maxAgeSeconds&quot;</span><span class="fu">:</span> <span class="dv">3600</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="ot">]</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 套用 CORS 政策</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gsutil</span> cors set cors-config.json gs://career-creator-cards</span></code></pre></div>
+<p><strong>花費時間</strong>: 2 小時（診斷 1h + 修復 0.5h + 測試
+0.5h）</p>
+<p><strong>教訓</strong>: 1. GCS 預設不允許跨域請求 2. 設定 CORS 需在
+GCS Bucket 層級 3. 使用萬用字元支援 Staging / Production 環境</p>
+<p><strong>預防措施</strong>: - ✅ 基礎設施配置納入版控（Terraform） -
+✅ 文件化 GCS 設定步驟 - ✅ CI/CD 加入 CORS 檢查</p>
+<hr />
+<h4 id="問題-4-playwright-e2e-測試在-ci-失敗11月第2週">問題 #4:
+Playwright E2E 測試在 CI 失敗（11月第2週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-11-08</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🟡 中</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>CI/CD Pipeline 無法通過</td>
+</tr>
+<tr class="even">
+<td>症狀</td>
+<td><code>TimeoutError: page.goto: Timeout 30000ms exceeded</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>根本原因</strong>:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 錯誤：CI 環境未安裝瀏覽器依賴</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run E2E tests</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run test:e2e</span><span class="co">  # ❌ 缺少瀏覽器安裝步驟</span></span></code></pre></div>
+<p><strong>解決方案</strong>:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 正確：安裝瀏覽器與依賴</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install Playwright Browsers</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npx playwright install --with-deps chromium</span><span class="co">  # ✅ 安裝 Chromium + 系統依賴</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run E2E tests</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">run</span><span class="kw">:</span><span class="at"> npm run test:e2e</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">CI</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">  # ✅ CI 模式（無 GUI）</span></span></code></pre></div>
+<p><strong>花費時間</strong>: 4 小時（診斷 2h + 修復 1h + 測試 1h）</p>
+<p><strong>教訓</strong>: 1. CI 環境與本地環境不同,需額外安裝系統依賴 2.
+Playwright 需要完整的瀏覽器環境 3. E2E 測試應在 PR 階段執行,而非 Merge
+後</p>
+<p><strong>預防措施</strong>: - ✅ CI/CD Pipeline 標準化（模板化） - ✅
+文件化 CI 環境設定 - ✅ 加入健康檢查（測試前驗證環境）</p>
+<hr />
+<h3 id="問題分類統計">6.2 問題分類統計</h3>
+<table>
+<thead>
+<tr class="header">
+<th>類別</th>
+<th>數量</th>
+<th>佔比</th>
+<th>平均解決時間</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>資料庫/連線池</td>
+<td>3</td>
+<td>30%</td>
+<td>6 小時</td>
+</tr>
+<tr class="even">
+<td>即時同步/狀態</td>
+<td>4</td>
+<td>40%</td>
+<td>8 小時</td>
+</tr>
+<tr class="odd">
+<td>CORS/權限</td>
+<td>2</td>
+<td>20%</td>
+<td>2 小時</td>
+</tr>
+<tr class="even">
+<td>CI/CD</td>
+<td>1</td>
+<td>10%</td>
+<td>4 小時</td>
+</tr>
+<tr class="odd">
+<td><strong>總計</strong></td>
+<td><strong>10</strong></td>
+<td><strong>100%</strong></td>
+<td><strong>平均 5.5 小時</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="最常見問題與快速解法">6.3 最常見問題與快速解法</h3>
+<h4 id="q1-supabase-realtime-斷線">Q1: Supabase Realtime 斷線</h4>
+<p><strong>症狀</strong>: <code>REALTIME_SUBSCRIPTION_ERROR</code></p>
+<p><strong>快速解法</strong>:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 加入斷線重連機制</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>supabase<span class="op">.</span><span class="fu">channel</span>(<span class="st">&#39;game_state&#39;</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;postgres_changes&#39;</span><span class="op">,</span> callback)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">.</span><span class="fu">subscribe</span>((status) <span class="kw">=&gt;</span> {</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (status <span class="op">===</span> <span class="st">&#39;CHANNEL_ERROR&#39;</span>) {</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>      <span class="pp">setTimeout</span>(() <span class="kw">=&gt;</span> {</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>        supabase<span class="op">.</span><span class="fu">channel</span>(<span class="st">&#39;game_state&#39;</span>)<span class="op">.</span><span class="fu">subscribe</span>()<span class="op">;</span>  <span class="co">// ✅ 3 秒後重試</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span> <span class="dv">3000</span>)<span class="op">;</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span></code></pre></div>
+<h4 id="q2-gcs-圖片載入緩慢">Q2: GCS 圖片載入緩慢</h4>
+<p><strong>症狀</strong>: 首次載入 &gt; 2s</p>
+<p><strong>快速解法</strong>:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 使用 CDN + 預載入</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>link rel<span class="op">=</span><span class="st">&quot;preload&quot;</span> href<span class="op">=</span><span class="st">&quot;https://storage.googleapis.com/career-creator-cards/...&quot;</span> <span class="im">as</span><span class="op">=</span><span class="st">&quot;image&quot;</span> <span class="op">/&gt;</span></span></code></pre></div>
+<h4 id="q3-localstorage-超過-5mb-限制">Q3: localStorage 超過 5MB
+限制</h4>
+<p><strong>症狀</strong>: <code>QuotaExceededError</code></p>
+<p><strong>快速解法</strong>:</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 定期清理過期資料</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> cleanupLocalStorage <span class="op">=</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> keys <span class="op">=</span> <span class="bu">Object</span><span class="op">.</span><span class="fu">keys</span>(localStorage)<span class="op">;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  keys<span class="op">.</span><span class="fu">forEach</span>(key <span class="kw">=&gt;</span> {</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (key<span class="op">.</span><span class="fu">startsWith</span>(<span class="st">&#39;gameState_&#39;</span>)) {</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> data <span class="op">=</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">parse</span>(localStorage<span class="op">.</span><span class="fu">getItem</span>(key))<span class="op">;</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="bu">Date</span><span class="op">.</span><span class="fu">now</span>() <span class="op">-</span> <span class="kw">new</span> <span class="bu">Date</span>(data<span class="op">.</span><span class="at">updatedAt</span>)<span class="op">.</span><span class="fu">getTime</span>() <span class="op">&gt;</span> <span class="dv">7</span> <span class="op">*</span> <span class="dv">24</span> <span class="op">*</span> <span class="dv">60</span> <span class="op">*</span> <span class="dv">60</span> <span class="op">*</span> <span class="dv">1000</span>) {</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>        localStorage<span class="op">.</span><span class="fu">removeItem</span>(key)<span class="op">;</span>  <span class="co">// ✅ 刪除 7 天前資料</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  })<span class="op">;</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+<hr />
+<h2 id="測試與品質保證">7. 測試與品質保證</h2>
+<h3 id="測試策略">7.1 測試策略</h3>
+<h4 id="測試金字塔">測試金字塔</h4>
+<pre><code>        ╱╲
+       ╱ E2E ╲         5% (關鍵流程)
+      ╱────────╲
+     ╱ Integration╲    20% (API + 資料庫)
+    ╱──────────────╲
+   ╱   Unit Tests   ╲  75% (邏輯層)
+  ╱──────────────────╲</code></pre>
+<h4 id="測試覆蓋率目標">測試覆蓋率目標</h4>
+<table>
+<thead>
+<tr class="header">
+<th>類型</th>
+<th>目標</th>
+<th>實際</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Unit Tests</td>
+<td>80%</td>
+<td>68%</td>
+<td>⚠️ 待提升</td>
+</tr>
+<tr class="even">
+<td>Integration Tests</td>
+<td>60%</td>
+<td>45%</td>
+<td>⚠️ 待提升</td>
+</tr>
+<tr class="odd">
+<td>E2E Tests</td>
+<td>關鍵流程 100%</td>
+<td>100%</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="e2e-測試playwright">7.2 E2E 測試（Playwright）</h3>
+<h4 id="測試場景5-個核心流程">測試場景（5 個核心流程）</h4>
+<ol type="1">
+<li>✅ <strong>諮詢師登入 → 創建房間 → 分享連結</strong>
+<ul>
+<li>測試時間：15 秒</li>
+<li>驗證：QR Code 正確生成、分享連結可用</li>
+</ul></li>
+<li>✅ <strong>訪客加入房間 → 即時同步驗證</strong>
+<ul>
+<li>測試時間：30 秒</li>
+<li>驗證：兩個瀏覽器狀態一致</li>
+</ul></li>
+<li>✅ <strong>拖曳卡片 → 跨瀏覽器同步</strong>
+<ul>
+<li>測試時間：20 秒</li>
+<li>驗證：卡片位置即時同步</li>
+</ul></li>
+<li>✅ <strong>遊戲狀態持久化 → 刷新恢復</strong>
+<ul>
+<li>測試時間：15 秒</li>
+<li>驗證：刷新後狀態完整恢復</li>
+</ul></li>
+<li>✅ <strong>諮詢師筆記 → 截圖上傳</strong>
+<ul>
+<li>測試時間：25 秒</li>
+<li>驗證：截圖成功上傳至 GCS</li>
+</ul></li>
+</ol>
+<p><strong>總執行時間</strong>: 105 秒</p>
+<h4 id="cicd-整合">CI/CD 整合</h4>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .github/workflows/staging-deploy.yml</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Run E2E Tests</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">  run</span><span class="kw">: </span><span class="ch">|</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    npm run build</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    npm run start &amp;</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    sleep 10  # 等待伺服器啟動</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    npx playwright test</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">CI</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div>
+<p><strong>通過率</strong>: 98%（50 次執行，1 次 Flaky Test）</p>
+<h3 id="負載測試locust">7.3 負載測試（Locust）</h3>
+<h4 id="測試場景設計">測試場景設計</h4>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># locust_test.py</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> CareerCreatorUser(HttpUser):</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    wait_time <span class="op">=</span> between(<span class="dv">1</span>, <span class="dv">3</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">@task</span>(<span class="dv">3</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> view_dashboard(<span class="va">self</span>):</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;模擬諮詢師查看 Dashboard&quot;&quot;&quot;</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.client.get(<span class="st">&quot;/api/v1/clients&quot;</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">@task</span>(<span class="dv">2</span>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> create_room(<span class="va">self</span>):</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;模擬創建諮詢室&quot;&quot;&quot;</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.client.post(<span class="st">&quot;/api/v1/rooms&quot;</span>, json<span class="op">=</span>{</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;client_id&quot;</span>: <span class="st">&quot;uuid-here&quot;</span></span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>        })</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">@task</span>(<span class="dv">5</span>)</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> update_game_state(<span class="va">self</span>):</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;模擬遊戲狀態更新&quot;&quot;&quot;</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.client.post(<span class="st">&quot;/api/v1/rooms/</span><span class="sc">{id}</span><span class="st">/state&quot;</span>, json<span class="op">=</span>{</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;state&quot;</span>: {...}</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>        })</span></code></pre></div>
+<h4 id="測試結果50-併發用戶">測試結果（50 併發用戶）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>結果</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>總請求數</td>
+<td>10,000</td>
+<td>持續 5 分鐘</td>
+</tr>
+<tr class="even">
+<td>成功率</td>
+<td>100%</td>
+<td>0 錯誤</td>
+</tr>
+<tr class="odd">
+<td>平均響應時間</td>
+<td>280ms</td>
+<td>P50</td>
+</tr>
+<tr class="even">
+<td>P95 響應時間</td>
+<td>450ms</td>
+<td>95% 請求 &lt; 450ms</td>
+</tr>
+<tr class="odd">
+<td>P99 響應時間</td>
+<td>720ms</td>
+<td>99% 請求 &lt; 720ms</td>
+</tr>
+<tr class="even">
+<td>RPS (Request/sec)</td>
+<td>50</td>
+<td>穩定吞吐量</td>
+</tr>
+</tbody>
+</table>
+<p><strong>結論</strong>: ✅ 系統可支援 50 人同時在線</p>
+<h4 id="效能瓶頸分析">效能瓶頸分析</h4>
+<p><strong>優化前</strong>: - 資料庫連線池耗盡（20 RPS 時失敗） -
+平均響應時間：1200ms</p>
+<p><strong>優化後</strong>: - 連線池擴大至 20 + 10 overflow -
+平均響應時間：280ms（-76%）</p>
+<h3 id="安全測試">7.4 安全測試</h3>
+<h4 id="gitleaks-掃描">Gitleaks 掃描</h4>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># .github/workflows/security.yml</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> name: Gitleaks Scan</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="ex">uses:</span> gitleaks/gitleaks-action@v2</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">env:</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">GITHUB_TOKEN:</span> <span class="va">${</span><span class="er">{ secrets.GITHUB_TOKEN </span><span class="va">}</span>}</span></code></pre></div>
+<p><strong>結果</strong>: ✅ 0 個 secrets 洩漏</p>
+<h4 id="手動滲透測試基礎">手動滲透測試（基礎）</h4>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 45%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>測試內容</th>
+<th>結果</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>SQL Injection</td>
+<td>在所有輸入欄位測試 <code>'; DROP TABLE--</code></td>
+<td>✅ Pydantic 驗證阻擋</td>
+</tr>
+<tr class="even">
+<td>XSS</td>
+<td>測試 <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></td>
+<td>✅ React 自動轉義</td>
+</tr>
+<tr class="odd">
+<td>CSRF</td>
+<td>無 JWT 情況下呼叫 API</td>
+<td>✅ 401 Unauthorized</td>
+</tr>
+<tr class="even">
+<td>弱密碼</td>
+<td>測試 <code>123456</code> 是否可註冊</td>
+<td>✅ 強制 8 字符 + 大小寫 + 數字</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="部署與營運">8. 部署與營運</h2>
+<h3 id="部署架構">8.1 部署架構</h3>
+<h4 id="環境配置">環境配置</h4>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 18%" />
+<col style="width: 22%" />
+<col style="width: 37%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>環境</th>
+<th>URL</th>
+<th>用途</th>
+<th>自動部署</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Staging</td>
+<td>https://career-creator-frontend-staging-*.run.app</td>
+<td>測試環境</td>
+<td>✅ <code>staging</code> branch push</td>
+</tr>
+<tr class="even">
+<td>Production</td>
+<td>[Production URL]</td>
+<td>正式環境</td>
+<td>✅ <code>main</code> branch push</td>
+</tr>
+</tbody>
+</table>
+<h4 id="cicd-pipeline">CI/CD Pipeline</h4>
+<pre><code>┌─────────────┐
+│ Git Push    │
+└──────┬──────┘
+       │
+       ▼
+┌──────────────────────────────────────┐
+│ GitHub Actions                       │
+│ 1. Lint (ESLint + Black)            │
+│ 2. Type Check (TypeScript + mypy)   │
+│ 3. Unit Tests                        │
+│ 4. Build Docker Images               │
+│ 5. Security Scan (Gitleaks)         │
+└──────┬───────────────────────────────┘
+       │
+       ▼
+┌──────────────────────────────────────┐
+│ GCP Cloud Run Deploy                 │
+│ 1. Push to Artifact Registry         │
+│ 2. Deploy with zero-downtime         │
+│ 3. Health Check (3 retries)         │
+│ 4. Rollback if failed                │
+└──────┬───────────────────────────────┘
+       │
+       ▼
+┌──────────────────────────────────────┐
+│ Post-Deploy Tests                    │
+│ 1. Smoke Tests                       │
+│ 2. Health Endpoint Check             │
+│ 3. Slack Notification                │
+└──────────────────────────────────────┘</code></pre>
+<p><strong>平均部署時間</strong>: 6 分鐘（優化前：12 分鐘）</p>
+<h3 id="docker-優化">8.2 Docker 優化</h3>
+<h4 id="優化前-vs-優化後">優化前 vs 優化後</h4>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>優化前</th>
+<th>優化後</th>
+<th>改善</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>映像大小</td>
+<td>1.2GB</td>
+<td>900MB</td>
+<td>-25%</td>
+</tr>
+<tr class="even">
+<td>構建時間</td>
+<td>12 分鐘</td>
+<td>6 分鐘</td>
+<td>-50%</td>
+</tr>
+<tr class="odd">
+<td>安全性</td>
+<td>root user</td>
+<td>non-root</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>快取命中率</td>
+<td>30%</td>
+<td>85%</td>
+<td>+55%</td>
+</tr>
+</tbody>
+</table>
+<h4 id="multi-stage-build">Multi-stage Build</h4>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Stage 1: Dependencies</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> node:18-alpine <span class="kw">AS</span> deps</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> package*.json ./</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> ci <span class="at">--only</span><span class="op">=</span>production</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Stage 2: Builder</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> node:18-alpine <span class="kw">AS</span> builder</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> <span class="op">--from=deps</span> /app/node_modules ./node_modules</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> . .</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">npm</span> run build</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Stage 3: Runner</span></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> node:18-alpine <span class="kw">AS</span> runner</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> NODE_ENV production</span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a><span class="co"># ✅ Non-root user</span></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">addgroup</span> <span class="at">-g</span> 1001 <span class="at">-S</span> nodejs <span class="kw">&amp;&amp;</span> <span class="ex">adduser</span> <span class="at">-S</span> nextjs <span class="at">-u</span> 1001</span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a><span class="kw">USER</span> nextjs</span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> <span class="op">--from=builder</span> <span class="op">--chown=nextjs:nodejs</span> /app/.next/standalone ./</span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> <span class="op">--from=builder</span> <span class="op">--chown=nextjs:nodejs</span> /app/.next/static ./.next/static</span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> <span class="op">--from=builder</span> <span class="op">--chown=nextjs:nodejs</span> /app/public ./public</span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a><span class="kw">EXPOSE</span> 3000</span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">&quot;node&quot;</span>, <span class="st">&quot;server.js&quot;</span>]</span></code></pre></div>
+<h3 id="監控與日誌">8.3 監控與日誌</h3>
+<h4 id="cloud-logging-設定">Cloud Logging 設定</h4>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cloud Run Service YAML</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">template</span><span class="kw">:</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">metadata</span><span class="kw">:</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">annotations</span><span class="kw">:</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">run.googleapis.com/execution-environment</span><span class="kw">:</span><span class="at"> gen2</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">spec</span><span class="kw">:</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">containers</span><span class="kw">:</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">image</span><span class="kw">:</span><span class="at"> gcr.io/career-creator/frontend</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">env</span><span class="kw">:</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> LOG_LEVEL</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">value</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;INFO&quot;</span><span class="co">  # ✅ 生產環境僅記錄 INFO 以上</span></span></code></pre></div>
+<h4 id="日誌查詢範例">日誌查詢範例</h4>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 查詢最近 1 小時錯誤</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> logging read <span class="st">&quot;resource.type=cloud_run_revision AND severity&gt;=ERROR&quot;</span> <span class="dt">\</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--limit</span> 50 <span class="at">--format</span> json <span class="at">--freshness</span><span class="op">=</span>1h</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 查詢特定用戶的請求日誌</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="ex">gcloud</span> logging read <span class="st">&quot;jsonPayload.user_id=</span><span class="dt">\&quot;</span><span class="st">uuid-here</span><span class="dt">\&quot;</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--limit</span> 100 <span class="at">--format</span> json</span></code></pre></div>
+<h4 id="監控指標cloud-run-metrics">監控指標（Cloud Run Metrics）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>目標</th>
+<th>實際</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>可用率</td>
+<td>&gt; 99%</td>
+<td>99.2%</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>P95 延遲</td>
+<td>&lt; 500ms</td>
+<td>450ms</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td>錯誤率</td>
+<td>&lt; 1%</td>
+<td>0.3%</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>容器啟動時間</td>
+<td>&lt; 5s</td>
+<td>3.2s</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="成本分析月度">8.4 成本分析（月度）</h3>
+<h4 id="gcp-費用估算50-並發用戶">GCP 費用估算（50 並發用戶）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>用量</th>
+<th>單價</th>
+<th>月費</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cloud Run (Frontend)</td>
+<td>100 GB·hours</td>
+<td>$0.00002400 / GB·hour</td>
+<td>$2.40</td>
+</tr>
+<tr class="even">
+<td>Cloud Run (Backend)</td>
+<td>50 GB·hours</td>
+<td>$0.00002400 / GB·hour</td>
+<td>$1.20</td>
+</tr>
+<tr class="odd">
+<td>Cloud Storage (牌卡圖片)</td>
+<td>10 GB</td>
+<td>$0.020 / GB</td>
+<td>$0.20</td>
+</tr>
+<tr class="even">
+<td>Cloud Storage (截圖)</td>
+<td>5 GB</td>
+<td>$0.020 / GB</td>
+<td>$0.10</td>
+</tr>
+<tr class="odd">
+<td>流量（egress）</td>
+<td>50 GB</td>
+<td>$0.12 / GB</td>
+<td>$6.00</td>
+</tr>
+<tr class="even">
+<td><strong>小計</strong></td>
+<td></td>
+<td></td>
+<td><strong>$9.90</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="supabase-費用估算">Supabase 費用估算</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>用量</th>
+<th>方案</th>
+<th>月費</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Database</td>
+<td>8GB 儲存</td>
+<td>Pro Plan</td>
+<td>$25</td>
+</tr>
+<tr class="even">
+<td>Realtime</td>
+<td>50 並發連線</td>
+<td>包含在 Pro</td>
+<td>$0</td>
+</tr>
+<tr class="odd">
+<td><strong>小計</strong></td>
+<td></td>
+<td></td>
+<td><strong>$25</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="總成本">總成本</h4>
+<p><strong>月度總成本</strong>: <strong>$34.90 / 月</strong>（50
+並發用戶）</p>
+<p><strong>單用戶成本</strong>: <strong>$0.70 / 月</strong></p>
+<hr />
+<h2 id="beta-測試與使用者回饋">9. Beta 測試與使用者回饋</h2>
+<h3 id="beta-測試計畫">9.1 Beta 測試計畫</h3>
+<h4 id="測試時程">測試時程</h4>
+<table>
+<thead>
+<tr class="header">
+<th>階段</th>
+<th>時間</th>
+<th>測試對象</th>
+<th>人數</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Alpha 測試</td>
+<td>2025-12-01 ~ 12-15</td>
+<td>內部團隊</td>
+<td>5 人</td>
+</tr>
+<tr class="even">
+<td>Beta 測試（封閉）</td>
+<td>2025-12-16 ~ 2026-01-15</td>
+<td>合作諮詢師</td>
+<td>20 人</td>
+</tr>
+<tr class="odd">
+<td>Beta 測試（開放）</td>
+<td>2026-01-16 ~ 02-15</td>
+<td>招募測試用戶</td>
+<td>50 人</td>
+</tr>
+</tbody>
+</table>
+<h4 id="測試目標">測試目標</h4>
+<ol type="1">
+<li><strong>功能驗證</strong>: 七種玩法是否符合實際諮詢場景</li>
+<li><strong>效能驗證</strong>: 多人同時使用時系統穩定性</li>
+<li><strong>UX 驗證</strong>: 操作流程是否直觀易用</li>
+<li><strong>需求收集</strong>: 第二階段功能優先順序</li>
+</ol>
+<h3 id="使用者回饋機制">9.2 使用者回饋機制</h3>
+<h4 id="收集管道">收集管道</h4>
+<ol type="1">
+<li><strong>問卷調查</strong>（Google Form）
+<ul>
+<li>每次諮詢後自動發送</li>
+<li>5 分鐘完成</li>
+<li>涵蓋功能、效能、UX 三大面向</li>
+</ul></li>
+<li><strong>一對一訪談</strong>
+<ul>
+<li>每 2 週訪談 5 位重度使用者</li>
+<li>深入了解痛點與需求</li>
+</ul></li>
+<li><strong>系統日誌分析</strong>
+<ul>
+<li>追蹤功能使用頻率</li>
+<li>識別高頻錯誤操作</li>
+</ul></li>
+<li><strong>Slack 社群</strong>
+<ul>
+<li>即時回報問題</li>
+<li>功能建議討論</li>
+</ul></li>
+</ol>
+<h4 id="問卷範例精簡版">問卷範例（精簡版）</h4>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>【線上牌卡系統 Beta 測試問卷】</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>整體滿意度（1-5 分）</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>   □ 1 □ 2 □ 3 □ 4 □ 5</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>最喜歡的功能？</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>   □ 即時同步 □ 遊戲狀態保存 □ 筆記截圖 □ 其他：______</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>最不滿意的地方？</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>   □ 卡片太小 □ 操作不直觀 □ 同步延遲 □ 其他：______</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>最希望新增的功能？</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>   （開放式回答）</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>是否願意推薦給其他諮詢師？</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>   □ 是 □ 否 □ 不確定</span></code></pre></div>
+<h3 id="初步回饋摘要2026-01-15">9.3 初步回饋摘要（2026-01-15）</h3>
+<p><strong>樣本數</strong>: 15 位諮詢師（Alpha + 部分 Beta）</p>
+<h4 id="滿意度統計">滿意度統計</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>平均分數</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>整體滿意度</td>
+<td>4.2 / 5</td>
+<td>整體正面</td>
+</tr>
+<tr class="even">
+<td>功能完整度</td>
+<td>4.5 / 5</td>
+<td>符合需求</td>
+</tr>
+<tr class="odd">
+<td>操作易用性</td>
+<td>3.8 / 5</td>
+<td><strong>待改進</strong></td>
+</tr>
+<tr class="even">
+<td>系統穩定性</td>
+<td>4.6 / 5</td>
+<td>高度穩定</td>
+</tr>
+<tr class="odd">
+<td>即時同步體驗</td>
+<td>4.3 / 5</td>
+<td>延遲可接受</td>
+</tr>
+</tbody>
+</table>
+<h4 id="正面回饋-top-3">正面回饋 Top 3</h4>
+<ol type="1">
+<li><p><strong>即時同步很流暢</strong>（13 人提及） &gt;
+“終於可以遠距諮詢了，以前都要跑到客戶公司”</p></li>
+<li><p><strong>遊戲狀態保存很實用</strong>（11 人提及） &gt;
+“不怕瀏覽器當掉了，狀態都還在”</p></li>
+<li><p><strong>筆記功能整合良好</strong>（9 人提及） &gt;
+“截圖直接存在筆記裡，超方便”</p></li>
+</ol>
+<h4 id="負面回饋-top-3">負面回饋 Top 3</h4>
+<ol type="1">
+<li><p><strong>卡片太小,難以閱讀</strong>（8 人提及）⚠️ &gt;
+“老花眼看不清楚卡片內容”</p>
+<p><strong>改善計畫</strong>: 第二階段加入字體大小調整</p></li>
+<li><p><strong>訪客操作提示不足</strong>（6 人提及）⚠️ &gt;
+“第一次使用的訪客不知道怎麼拖曳”</p>
+<p><strong>改善計畫</strong>: 加入新手引導（Onboarding Tour）</p></li>
+<li><p><strong>希望能匯出諮詢報告</strong>（5 人提及）📋 &gt; “想要有
+PDF 報告給客戶帶回家”</p>
+<p><strong>改善計畫</strong>: 第二階段納入（P1 優先）</p></li>
+</ol>
+<h4 id="功能需求優先順序使用者投票">功能需求優先順序（使用者投票）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>票數</th>
+<th>優先級</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>諮詢報告匯出（PDF）</td>
+<td>12</td>
+<td>P1</td>
+</tr>
+<tr class="even">
+<td>卡片字體大小調整</td>
+<td>10</td>
+<td>P1</td>
+</tr>
+<tr class="odd">
+<td>新手引導教學</td>
+<td>8</td>
+<td>P1</td>
+</tr>
+<tr class="even">
+<td>AI 諮詢建議</td>
+<td>7</td>
+<td>P2</td>
+</tr>
+<tr class="odd">
+<td>自訂牌卡內容</td>
+<td>5</td>
+<td>P2</td>
+</tr>
+<tr class="even">
+<td>班級管理（多人）</td>
+<td>3</td>
+<td>P2</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="第二階段規劃">10. 第二階段規劃</h2>
+<h3 id="時程規劃2025-12-2026-02">10.1 時程規劃（2025-12 ~ 2026-02）</h3>
+<h4 id="里程碑">里程碑</h4>
+<pre><code>2025-12          2026-01          2026-02
+   ↓                ↓                ↓
+┌────────┐      ┌────────┐      ┌────────┐
+│ P1     │─────►│ P1     │─────►│ P2     │
+│ 需求   │      │ 開發   │      │ 優化   │
+│ 澄清   │      │ 測試   │      │ 交付   │
+└────────┘      └────────┘      └────────┘</code></pre>
+<h3 id="優先功能p1">10.2 優先功能（P1）</h3>
+<h4 id="諮詢歷史管理完善">1. 諮詢歷史管理完善</h4>
+<p><strong>目標</strong>: 讓諮詢師能回顧與管理過往諮詢記錄</p>
+<p><strong>功能範圍</strong>: - ✅ 完整諮詢記錄查看介面（時間軸設計） -
+✅ 篩選與搜尋（日期、客戶、牌卡類型） - ✅ 歷史資料匯出（CSV） - ✅
+諮詢報告生成（PDF，基礎版）</p>
+<p><strong>技術實作</strong>:</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 時間軸組件</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Timeline<span class="op">&gt;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  {consultations<span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> (</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;</span>TimelineItem key<span class="op">=</span>{c<span class="op">.</span><span class="at">id</span>}<span class="op">&gt;</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>Avatar<span class="op">&gt;</span>{c<span class="op">.</span><span class="at">client</span><span class="op">.</span><span class="at">name</span>}<span class="op">&lt;/</span>Avatar<span class="op">&gt;</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;</span>Content<span class="op">&gt;</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>Title<span class="op">&gt;</span>{c<span class="op">.</span><span class="at">deck_type</span>} <span class="op">-</span> {c<span class="op">.</span><span class="at">game_mode</span>}<span class="op">&lt;/</span>Title<span class="op">&gt;</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span><span class="bu">Date</span><span class="op">&gt;</span>{c<span class="op">.</span><span class="at">created_at</span>}<span class="op">&lt;/</span><span class="bu">Date</span><span class="op">&gt;</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;</span>Actions<span class="op">&gt;</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>          <span class="op">&lt;</span>Button<span class="op">&gt;</span>查看詳情<span class="op">&lt;/</span>Button<span class="op">&gt;</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>          <span class="op">&lt;</span>Button<span class="op">&gt;</span>匯出 PDF<span class="op">&lt;/</span>Button<span class="op">&gt;</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>        <span class="op">&lt;/</span>Actions<span class="op">&gt;</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">&lt;/</span>Content<span class="op">&gt;</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">&lt;/</span>TimelineItem<span class="op">&gt;</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  ))}</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;/</span>Timeline<span class="op">&gt;</span></span></code></pre></div>
+<p><strong>預估工時</strong>: 3 週</p>
+<hr />
+<h4 id="訪客流程優化">2. 訪客流程優化</h4>
+<p><strong>目標</strong>: 降低訪客使用門檻，提升首次體驗</p>
+<p><strong>功能範圍</strong>: - ✅ 新手引導教學（Onboarding Tour） - ✅
+錯誤處理強化（斷線重連提示、權限錯誤說明） - ✅
+訪客端效能優化（減少不必要渲染）</p>
+<p><strong>技術實作</strong>:</p>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">// 使用 react-joyride 實現引導</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>Joyride</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  steps<span class="op">=</span>{[</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    { target<span class="op">:</span> <span class="st">&#39;.card-deck&#39;</span><span class="op">,</span> content<span class="op">:</span> <span class="st">&#39;這裡是牌卡區域，點擊翻牌&#39;</span> }<span class="op">,</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>    { target<span class="op">:</span> <span class="st">&#39;.drop-zone&#39;</span><span class="op">,</span> content<span class="op">:</span> <span class="st">&#39;拖曳卡片到這裡&#39;</span> }<span class="op">,</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>    { target<span class="op">:</span> <span class="st">&#39;.note-drawer&#39;</span><span class="op">,</span> content<span class="op">:</span> <span class="st">&#39;諮詢師可以在這裡記錄&#39;</span> }</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  ]}</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  run<span class="op">=</span>{isFirstVisit}</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="op">/&gt;</span></span></code></pre></div>
+<p><strong>預估工時</strong>: 2 週</p>
+<hr />
+<h4 id="監控與錯誤追蹤">3. 監控與錯誤追蹤</h4>
+<p><strong>目標</strong>: 快速發現與修復生產環境問題</p>
+<p><strong>功能範圍</strong>: - ✅ Cloud Logging 完整設定與 Dashboard -
+✅ 錯誤告警機制（Slack 通知） - ✅ 效能監控指標建立（P95/P99
+延遲、錯誤率）</p>
+<p><strong>技術實作</strong>:</p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alerting Policy (Cloud Monitoring)</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">conditions</span><span class="kw">:</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">displayName</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;High Error Rate&quot;</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">conditionThreshold</span><span class="kw">:</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">filter</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;resource.type=&quot;cloud_run_revision&quot; AND severity=&quot;ERROR&quot;&#39;</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">comparison</span><span class="kw">:</span><span class="at"> COMPARISON_GT</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">thresholdValue</span><span class="kw">:</span><span class="at"> </span><span class="dv">10</span><span class="co">  # 每分鐘 &gt; 10 個錯誤</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">duration</span><span class="kw">:</span><span class="at"> 60s</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="fu">notificationChannels</span><span class="kw">:</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> projects/career-creator/notificationChannels/slack-alerts</span></span></code></pre></div>
+<p><strong>預估工時</strong>: 1 週</p>
+<hr />
+<h3 id="第二階段功能p2">10.3 第二階段功能（P2）</h3>
+<h4 id="abc-pattern-邏輯引擎">1. A+B=C Pattern 邏輯引擎</h4>
+<p><strong>依賴</strong>: 等 KM 提供 Pattern 文件</p>
+<p><strong>功能說明</strong>: - 在「成長計畫」玩法中，當選擇特定 A
+職能卡 + B 行動卡時，自動生成 C 建議</p>
+<p><strong>範例</strong>:</p>
+<pre><code>A: 溝通表達 + B: 每週練習演講 → C: &quot;建議參加 Toastmasters 社團&quot;</code></pre>
+<p><strong>技術架構</strong>:</p>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Pattern 規則引擎</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> Pattern {</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  id<span class="op">:</span> <span class="dt">string</span><span class="op">;</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  mindsetCard<span class="op">:</span> <span class="dt">string</span><span class="op">;</span>  <span class="co">// 職能卡 ID</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  actionCard<span class="op">:</span> <span class="dt">string</span><span class="op">;</span>   <span class="co">// 行動卡 ID</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  suggestion<span class="op">:</span> <span class="dt">string</span><span class="op">;</span>   <span class="co">// 自動生成建議</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  resources<span class="op">?:</span> <span class="dt">string</span>[]<span class="op">;</span> <span class="co">// 外部資源連結</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> patterns<span class="op">:</span> Pattern[] <span class="op">=</span> [</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    id<span class="op">:</span> <span class="st">&quot;pattern_001&quot;</span><span class="op">,</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    mindsetCard<span class="op">:</span> <span class="st">&quot;communication&quot;</span><span class="op">,</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    actionCard<span class="op">:</span> <span class="st">&quot;weekly_practice&quot;</span><span class="op">,</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>    suggestion<span class="op">:</span> <span class="st">&quot;建議參加 Toastmasters 社團...&quot;</span><span class="op">,</span></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>    resources<span class="op">:</span> [<span class="st">&quot;https://toastmasters.org&quot;</span>]</span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>]<span class="op">;</span></span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-20"><a href="#cb41-20" aria-hidden="true" tabindex="-1"></a><span class="co">// 匹配邏輯</span></span>
+<span id="cb41-21"><a href="#cb41-21" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> findPattern <span class="op">=</span> (mindsetId<span class="op">:</span> <span class="dt">string</span><span class="op">,</span> actionId<span class="op">:</span> <span class="dt">string</span>) <span class="kw">=&gt;</span> {</span>
+<span id="cb41-22"><a href="#cb41-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> patterns<span class="op">.</span><span class="fu">find</span>(p <span class="kw">=&gt;</span></span>
+<span id="cb41-23"><a href="#cb41-23" aria-hidden="true" tabindex="-1"></a>    p<span class="op">.</span><span class="at">mindsetCard</span> <span class="op">===</span> mindsetId <span class="op">&amp;&amp;</span> p<span class="op">.</span><span class="at">actionCard</span> <span class="op">===</span> actionId</span>
+<span id="cb41-24"><a href="#cb41-24" aria-hidden="true" tabindex="-1"></a>  )<span class="op">;</span></span>
+<span id="cb41-25"><a href="#cb41-25" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span></code></pre></div>
+<p><strong>預估工時</strong>: 4 週（含規則整理）</p>
+<hr />
+<h4 id="註冊流程優化">2. 註冊流程優化</h4>
+<p><strong>目標</strong>: 從白名單制轉為公開註冊（仍需審核）</p>
+<p><strong>功能範圍</strong>: - Email 驗證機制 -
+註冊審核流程（管理員審核後啟用） - OAuth
+社群登入（Google、LinkedIn）</p>
+<p><strong>技術實作</strong>:</p>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Email 驗證流程</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="at">@router.post</span>(<span class="st">&quot;/register&quot;</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> register(email: <span class="bu">str</span>, password: <span class="bu">str</span>):</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1. 建立未啟用帳號</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    user <span class="op">=</span> <span class="cf">await</span> create_user(email, password, is_active<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2. 發送驗證信</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    token <span class="op">=</span> generate_verification_token(user.<span class="bu">id</span>)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> send_verification_email(email, token)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 3. 通知管理員審核</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> notify_admin(<span class="ss">f&quot;New user registered: </span><span class="sc">{</span>email<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;message&quot;</span>: <span class="st">&quot;請檢查信箱完成驗證&quot;</span>}</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a><span class="at">@router.get</span>(<span class="st">&quot;/verify&quot;</span>)</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> verify_email(token: <span class="bu">str</span>):</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    user_id <span class="op">=</span> decode_verification_token(token)</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 標記為「待審核」</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">await</span> update_user_status(user_id, status<span class="op">=</span><span class="st">&quot;pending_approval&quot;</span>)</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">&quot;message&quot;</span>: <span class="st">&quot;驗證成功，等待管理員審核&quot;</span>}</span></code></pre></div>
+<p><strong>預估工時</strong>: 3 週</p>
+<hr />
+<h3 id="未來展望第三階段">10.4 未來展望（第三階段）</h3>
+<h4 id="ai-諮詢輔助功能">1. AI 諮詢輔助功能</h4>
+<p><strong>時程</strong>: 2026-04 ~</p>
+<p><strong>功能構想</strong>: - <strong>智慧牌卡推薦</strong>:
+根據訪客背景，推薦適合的牌卡 - <strong>諮詢洞察分析</strong>: AI
+分析牌卡選擇模式，提供洞察 - <strong>自動生成諮詢摘要</strong>:
+根據筆記與牌卡狀態，生成摘要</p>
+<p><strong>技術預研</strong>: - 使用 OpenAI GPT-4 API - Prompt
+Engineering（Few-shot Learning） - 建立職涯諮詢領域知識庫（RAG）</p>
+<hr />
+<h4 id="班級管理系統">2. 班級管理系統</h4>
+<p><strong>時程</strong>: 2026-05 ~</p>
+<p><strong>功能構想</strong>: - 多人同時諮詢（1 位諮詢師 + 10 位訪客） -
+群組管理功能（分組討論） - 批量報告生成</p>
+<p><strong>技術挑戰</strong>: - Realtime 連線數擴展（從 2 人 → 10+ 人）
+- 狀態同步複雜度（避免衝突） - 效能優化（減少不必要的廣播）</p>
+<hr />
+<h4 id="用戶自定義內容">3. 用戶自定義內容</h4>
+<p><strong>時程</strong>: 2026-06 ~</p>
+<p><strong>功能構想</strong>: - 自訂牌卡內容（上傳圖片、編輯文案） -
+自訂玩法規則（拖曳邏輯、計分規則） - 個人化牌組管理</p>
+<p><strong>技術挑戰</strong>: - UGC 內容審查（避免不當內容） -
+圖片儲存成本控制 - 規則引擎設計（需支援彈性配置）</p>
+<hr />
+<h2 id="第二階段開案建議">11. 第二階段開案建議</h2>
+<h3 id="開案時程建議">11.1 開案時程建議</h3>
+<h4 id="建議合約期間">建議合約期間</h4>
+<p><strong>2026-02-01 ~ 2026-04-30（3 個月）</strong></p>
+<p><strong>理由</strong>: 1. Beta 測試回饋整理需時 2-4 週（2026-01-15 ~
+02-10） 2. P1 項目開發需 6-8 週（3 項功能並行開發） 3. 保留 2
+週緩衝時間（應對需求變更與測試）</p>
+<h4 id="時程規劃">時程規劃</h4>
+<pre><code>2026-02          2026-03          2026-04
+   ↓                ↓                ↓
+┌─────────┐    ┌─────────┐    ┌─────────┐
+│ Kick-off│───►│ Sprint 1│───►│ Sprint 2│
+│ Beta回饋│    │ P1 開發 │    │ P1 測試 │
+│ 需求定義│    │ 6週     │    │ 2週+交付│
+└─────────┘    └─────────┘    └─────────┘</code></pre>
+<hr />
+<h3 id="資源需求評估">11.2 資源需求評估</h3>
+<h4 id="人力需求">人力需求</h4>
+<table>
+<thead>
+<tr class="header">
+<th>角色</th>
+<th>FTE</th>
+<th>職責</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>全端工程師</td>
+<td>1.0</td>
+<td>P1 功能開發、測試、部署</td>
+<td>現有團隊延續</td>
+</tr>
+<tr class="even">
+<td>UI/UX 設計師</td>
+<td>0.3</td>
+<td>新手引導設計、報告模板設計</td>
+<td>Hannah 部分時間</td>
+</tr>
+<tr class="odd">
+<td>PM</td>
+<td>0.5</td>
+<td>需求管理、測試協調、客戶溝通</td>
+<td>KM 部分時間</td>
+</tr>
+<tr class="even">
+<td>QA 測試人員</td>
+<td>0.5</td>
+<td>P1 功能測試、回歸測試</td>
+<td><strong>建議新增</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>總人力成本</strong>: 約 2.3 FTE × 3 個月</p>
+<h4 id="技術資源需求">技術資源需求</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>成本估算</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GCP Cloud Run</td>
+<td>$30/月 × 3</td>
+<td>開發 + Staging + Production</td>
+</tr>
+<tr class="even">
+<td>Supabase Pro</td>
+<td>$25/月 × 3</td>
+<td>Database + Realtime</td>
+</tr>
+<tr class="odd">
+<td>第三方服務（Email/Slack API）</td>
+<td>$20/月 × 3</td>
+<td>告警通知機制</td>
+</tr>
+<tr class="even">
+<td><strong>總計</strong></td>
+<td><strong>$225（3個月）</strong></td>
+<td>基礎設施成本</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="功能範圍與優先順序">11.3 功能範圍與優先順序</h3>
+<h4 id="sprint-12026-02-15-03-316-週">Sprint 1（2026-02-15 ~ 03-31，6
+週）</h4>
+<p><strong>目標</strong>: 完成 P1 三大功能開發</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 27%" />
+<col style="width: 24%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>工時估算</th>
+<th>優先級</th>
+<th>交付標準</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>諮詢歷史管理完善</td>
+<td>120 小時（3 週）</td>
+<td>P1</td>
+<td>時間軸介面 + CSV 匯出 + 基礎 PDF</td>
+</tr>
+<tr class="even">
+<td>訪客流程優化</td>
+<td>80 小時（2 週）</td>
+<td>P1</td>
+<td>新手引導 + 錯誤處理 + 效能優化</td>
+</tr>
+<tr class="odd">
+<td>監控與錯誤追蹤</td>
+<td>40 小時（1 週）</td>
+<td>P1</td>
+<td>Cloud Logging + Slack 告警</td>
+</tr>
+</tbody>
+</table>
+<p><strong>並行開發策略</strong>: - Week 1-2: 諮詢歷史管理（主線）+
+監控設定（副線） - Week 3-4: 諮詢歷史管理（主線）+ 訪客流程優化（副線）
+- Week 5-6: 訪客流程優化（主線）+ 整合測試（副線）</p>
+<h4 id="sprint-22026-04-01-04-152-週">Sprint 2（2026-04-01 ~ 04-15，2
+週）</h4>
+<p><strong>目標</strong>: 測試、修復、交付</p>
+<ul>
+<li>Week 1: 整合測試 + Bug 修復</li>
+<li>Week 2: 用戶驗收測試（UAT）+ 文件交付</li>
+</ul>
+<hr />
+<h3 id="風險評估與緩解措施">11.4 風險評估與緩解措施</h3>
+<h4 id="高風險項目">高風險項目</h4>
+<table>
+<colgroup>
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>風險</th>
+<th>影響</th>
+<th>機率</th>
+<th>緩解措施</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Beta 測試回饋需求變更大</td>
+<td>高</td>
+<td>中</td>
+<td>預留 2 週緩衝時間、需求凍結機制</td>
+</tr>
+<tr class="even">
+<td>諮詢歷史管理技術複雜度高</td>
+<td>中</td>
+<td>中</td>
+<td>技術預研（POC）、降級方案（先 CSV 後 PDF）</td>
+</tr>
+<tr class="odd">
+<td>第三方告警服務整合問題</td>
+<td>低</td>
+<td>低</td>
+<td>選用成熟方案（Slack API）、備用方案（Email）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="依賴項目">依賴項目</h4>
+<table>
+<thead>
+<tr class="header">
+<th>依賴項目</th>
+<th>負責人</th>
+<th>交付時間</th>
+<th>風險</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Beta 測試回饋整理</td>
+<td>PM (KM)</td>
+<td>2026-02-10</td>
+<td>低</td>
+</tr>
+<tr class="even">
+<td>新手引導 UI 設計稿</td>
+<td>UI/UX (Hannah)</td>
+<td>2026-02-20</td>
+<td>中</td>
+</tr>
+<tr class="odd">
+<td>A+B=C Pattern 規則文件</td>
+<td>客戶 (KM)</td>
+<td>2026-03-01</td>
+<td><strong>高</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>關鍵依賴</strong>: A+B=C Pattern
+規則文件延遲風險高，<strong>建議納入 P2 或第三階段</strong>。</p>
+<hr />
+<h3 id="成功標準與驗收條件">11.5 成功標準與驗收條件</h3>
+<h4 id="功能驗收標準">功能驗收標準</h4>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 36%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>驗收標準</th>
+<th>測試方法</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>諮詢歷史管理</td>
+<td>時間軸介面正常顯示、CSV 匯出正確、PDF 格式符合需求</td>
+<td>UAT + 5 位諮詢師測試</td>
+</tr>
+<tr class="even">
+<td>訪客流程優化</td>
+<td>新手引導完成率 &gt; 80%、錯誤處理覆蓋率 100%</td>
+<td>A/B 測試 + 日誌分析</td>
+</tr>
+<tr class="odd">
+<td>監控與錯誤追蹤</td>
+<td>告警機制觸發正常、Dashboard 顯示正確</td>
+<td>模擬錯誤測試</td>
+</tr>
+</tbody>
+</table>
+<h4 id="非功能性驗收標準">非功能性驗收標準</h4>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>目標</th>
+<th>測試方法</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>系統穩定性</td>
+<td>&gt; 99%</td>
+<td>7 天連續運行測試</td>
+</tr>
+<tr class="even">
+<td>P95 響應時間</td>
+<td>&lt; 500ms</td>
+<td>負載測試（50 並發）</td>
+</tr>
+<tr class="odd">
+<td>錯誤率</td>
+<td>&lt; 1%</td>
+<td>生產環境日誌分析</td>
+</tr>
+<tr class="even">
+<td>用戶滿意度</td>
+<td>&gt; 4.0/5</td>
+<td>UAT 問卷調查</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="交付物清單">11.6 交付物清單</h3>
+<h4 id="技術交付物">技術交付物</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />P1
+三大功能原始碼（含測試）</label></li>
+<li><label><input type="checkbox" />資料庫 Migration
+Scripts</label></li>
+<li><label><input type="checkbox" />API
+文件更新（Swagger/OpenAPI）</label></li>
+<li><label><input type="checkbox" />部署腳本與 CI/CD 配置</label></li>
+<li><label><input type="checkbox" />監控 Dashboard 配置檔</label></li>
+</ul>
+<h4 id="文件交付物">文件交付物</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />第二階段功能需求文件（PRD
+v2.0）</label></li>
+<li><label><input type="checkbox" />技術架構文件更新（ADR）</label></li>
+<li><label><input
+type="checkbox" />使用者操作手冊（新手引導、歷史查看）</label></li>
+<li><label><input type="checkbox" />維運手冊（告警處理 SOP、常見問題
+FAQ）</label></li>
+<li><label><input type="checkbox" />第二階段結案報告</label></li>
+</ul>
+<h4 id="測試交付物">測試交付物</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />測試計畫與測試用例</label></li>
+<li><label><input type="checkbox" />UAT 測試報告</label></li>
+<li><label><input
+type="checkbox" />效能測試報告（負載測試）</label></li>
+<li><label><input
+type="checkbox" />安全測試報告（基礎滲透測試）</label></li>
+</ul>
+<hr />
+<h3 id="第二階段預算估算">11.7 第二階段預算估算</h3>
+<h4 id="人力成本">人力成本</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>單價</th>
+<th>數量</th>
+<th>小計</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>全端工程師</td>
+<td>$8,000/月</td>
+<td>3 個月</td>
+<td>$24,000</td>
+</tr>
+<tr class="even">
+<td>UI/UX 設計師</td>
+<td>$6,000/月 × 0.3</td>
+<td>3 個月</td>
+<td>$5,400</td>
+</tr>
+<tr class="odd">
+<td>PM</td>
+<td>$7,000/月 × 0.5</td>
+<td>3 個月</td>
+<td>$10,500</td>
+</tr>
+<tr class="even">
+<td>QA 測試人員</td>
+<td>$5,000/月 × 0.5</td>
+<td>3 個月</td>
+<td>$7,500</td>
+</tr>
+<tr class="odd">
+<td><strong>人力成本小計</strong></td>
+<td></td>
+<td></td>
+<td><strong>$47,400</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="基礎設施成本">基礎設施成本</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>月費</th>
+<th>數量</th>
+<th>小計</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>GCP Cloud Run</td>
+<td>$30</td>
+<td>3 個月</td>
+<td>$90</td>
+</tr>
+<tr class="even">
+<td>Supabase Pro</td>
+<td>$25</td>
+<td>3 個月</td>
+<td>$75</td>
+</tr>
+<tr class="odd">
+<td>第三方服務</td>
+<td>$20</td>
+<td>3 個月</td>
+<td>$60</td>
+</tr>
+<tr class="even">
+<td><strong>基礎設施成本小計</strong></td>
+<td></td>
+<td></td>
+<td><strong>$225</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="其他成本">其他成本</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>金額</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>軟體授權</td>
+<td>$500</td>
+<td>開發工具、測試工具</td>
+</tr>
+<tr class="even">
+<td>差旅費</td>
+<td>$1,000</td>
+<td>UAT 實地訪談（若需要）</td>
+</tr>
+<tr class="odd">
+<td>緩衝預算（10%）</td>
+<td>$4,900</td>
+<td>應對需求變更</td>
+</tr>
+<tr class="even">
+<td><strong>其他成本小計</strong></td>
+<td><strong>$6,400</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h4 id="總預算">總預算</h4>
+<p><strong>第二階段總預算</strong>: <strong>$54,025</strong></p>
+<p><strong>備註</strong>:
+以上為參考估算，實際費用依團隊薪資水平與合約條款調整。</p>
+<hr />
+<h3 id="開案準備檢查清單">11.8 開案準備檢查清單</h3>
+<h4 id="kick-off-前2026-02-01">Kick-off 前（2026-02-01）</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />Beta 測試回饋整理完成</label></li>
+<li><label><input type="checkbox" />第二階段 PRD
+定稿並經客戶確認</label></li>
+<li><label><input type="checkbox" />合約簽署完成</label></li>
+<li><label><input type="checkbox" />團隊成員確認（含新增 QA
+人員）</label></li>
+<li><label><input type="checkbox" />開發環境準備（GCP/Supabase
+資源申請）</label></li>
+</ul>
+<h4 id="kick-off-會議2026-02-05">Kick-off 會議（2026-02-05）</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />專案目標與範圍說明</label></li>
+<li><label><input type="checkbox" />時程與里程碑確認</label></li>
+<li><label><input type="checkbox" />角色與職責分配</label></li>
+<li><label><input type="checkbox" />溝通機制與會議節奏</label></li>
+<li><label><input type="checkbox" />風險識別與緩解計畫</label></li>
+</ul>
+<h4 id="sprint-1-開始前2026-02-15">Sprint 1 開始前（2026-02-15）</h4>
+<ul class="task-list">
+<li><label><input type="checkbox" />UI/UX
+設計稿交付（新手引導）</label></li>
+<li><label><input type="checkbox" />技術預研完成（PDF 生成、Slack
+API）</label></li>
+<li><label><input type="checkbox" />測試環境準備完成</label></li>
+<li><label><input type="checkbox" />CI/CD Pipeline 更新</label></li>
+<li><label><input type="checkbox" />第一週 Sprint Planning
+完成</label></li>
+</ul>
+<hr />
+<h3 id="與第一階段的延續性">11.9 與第一階段的延續性</h3>
+<h4 id="團隊延續">團隊延續</h4>
+<ul>
+<li>✅ 保留核心團隊（Young + KM + Hannah）</li>
+<li>✅ 第一階段累積的技術債納入 P1 優化</li>
+<li>✅ 第一階段教訓應用於第二階段（連線池、CORS、CI 環境）</li>
+</ul>
+<h4 id="技術延續">技術延續</h4>
+<ul>
+<li>✅ 技術棧不變（Next.js + FastAPI + Supabase + GCP）</li>
+<li>✅ 架構決策延續（5 個 ADR 持續有效）</li>
+<li>✅ 測試框架延續（Playwright E2E + Locust 負載測試）</li>
+</ul>
+<h4 id="流程延續">流程延續</h4>
+<ul>
+<li>✅ Git 工作流延續（Staging + Production 環境）</li>
+<li>✅ CI/CD Pipeline 延續（Self-Healing CI/CD）</li>
+<li>✅ 文件維護延續（PRD + CLAUDE.md + ADR）</li>
+</ul>
+<hr />
+<h2 id="總結">📊 總結</h2>
+<h3 id="成功指標達成狀況">成功指標達成狀況</h3>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>目標</th>
+<th>實際</th>
+<th>達成率</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>核心功能完成度</td>
+<td>100%</td>
+<td>100%</td>
+<td>✅ 100%</td>
+</tr>
+<tr class="even">
+<td>牌卡內容上架</td>
+<td>194 張</td>
+<td>194 張</td>
+<td>✅ 100%</td>
+</tr>
+<tr class="odd">
+<td>即時同步延遲</td>
+<td>&lt; 500ms</td>
+<td>200-300ms</td>
+<td>✅ 140% 超標</td>
+</tr>
+<tr class="even">
+<td>系統穩定性</td>
+<td>99%</td>
+<td>99.2%</td>
+<td>✅ 100%</td>
+</tr>
+<tr class="odd">
+<td>Beta 測試啟動</td>
+<td>50 人</td>
+<td>進行中</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>使用者滿意度</td>
+<td>4.0 / 5</td>
+<td>4.2 / 5</td>
+<td>✅ 105% 超標</td>
+</tr>
+</tbody>
+</table>
+<h3 id="專案亮點">專案亮點</h3>
+<ol type="1">
+<li>✅ <strong>4.5 個月完成 MVP → Beta 測試</strong>（原定 6 個月）</li>
+<li>✅ <strong>11 項額外功能交付</strong>（超出原定計畫）</li>
+<li>✅ <strong>99.2% 系統穩定性</strong>（優於目標）</li>
+<li>✅ <strong>成本控制良好</strong>（$34.90/月，50 用戶）</li>
+<li>✅ <strong>使用者滿意度 4.2/5</strong>（正面回饋）</li>
+</ol>
+<h3 id="技術成就">技術成就</h3>
+<ul>
+<li>✅ Supabase Realtime 即時同步（200-300ms 延遲）</li>
+<li>✅ JSONB + localStorage 雙軌持久化（100% 恢復率）</li>
+<li>✅ GCP Cloud Run 無縫部署（6 分鐘 CI/CD）</li>
+<li>✅ 負載測試 50 並發 100% 成功率</li>
+<li>✅ Docker 映像優化 -25%，構建時間 -50%</li>
+</ul>
+<h3 id="教訓與經驗">教訓與經驗</h3>
+<ol type="1">
+<li><strong>連線池是關鍵</strong>:
+資料庫效能瓶頸需在早期負載測試中發現</li>
+<li><strong>分散式狀態同步複雜</strong>: 需版本控制與衝突解決機制</li>
+<li><strong>CORS 配置易忽略</strong>: 基礎設施配置應納入版控</li>
+<li><strong>E2E 測試需 CI 環境</strong>: CI
+環境與本地環境差異需注意</li>
+<li><strong>使用者回饋優先</strong>: UX 改善需基於真實回饋,而非假設</li>
+</ol>
+<h3 id="下一步行動優先順序">下一步行動（優先順序）</h3>
+<h4 id="p0---立即執行">P0 - 立即執行</h4>
+<ul>
+<li>✅ 繼續 Beta 測試（目標 50 人）</li>
+<li>✅ 收集使用者回饋與 Bug 修復</li>
+</ul>
+<h4 id="p1---第二階段2025-12-2026-02">P1 - 第二階段（2025-12 ~
+2026-02）</h4>
+<ul>
+<li>✅ 諮詢歷史管理完善</li>
+<li>✅ 訪客流程優化</li>
+<li>✅ 監控與錯誤追蹤</li>
+</ul>
+<h4 id="p2---未來規劃2026-03">P2 - 未來規劃（2026-03+）</h4>
+<ul>
+<li>A+B=C Pattern 邏輯引擎</li>
+<li>註冊流程優化</li>
+<li>AI 諮詢輔助功能</li>
+</ul>
+<hr />
+<h2 id="附錄">附錄</h2>
+<h3 id="a.-待辦事項追蹤todo.md">A. 待辦事項追蹤（TODO.md）</h3>
+<blockquote>
+<p>最後更新：2026-01-15</p>
+</blockquote>
+<h4 id="卡牌上架總覽">📦 卡牌上架總覽</h4>
+<table>
+<thead>
+<tr class="header">
+<th>牌組</th>
+<th>總數</th>
+<th>已上傳 GCS</th>
+<th>JSON 整合</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>RIASEC 六大性格說明卡</td>
+<td>6</td>
+<td>✅ 36 files</td>
+<td>✅</td>
+<td>✅ 完成</td>
+</tr>
+<tr class="even">
+<td>職業收藏家（職游旅人卡）</td>
+<td>100</td>
+<td>✅ 100 files</td>
+<td>✅</td>
+<td>✅ 完成</td>
+</tr>
+<tr class="odd">
+<td>職能盤點卡</td>
+<td>52</td>
+<td>✅ 156 files</td>
+<td>✅</td>
+<td>✅ 完成</td>
+</tr>
+<tr class="even">
+<td>價值導航卡</td>
+<td>36</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅ 完成</td>
+</tr>
+</tbody>
+</table>
+<h4 id="第一階段完成項目2026-01-15">✅
+第一階段完成項目（2026-01-15）</h4>
+<p><strong>職能盤點卡重構</strong>: - ✅
+卡片重新命名與分類（<code>action_01~10</code>、<code>mindset_01~42</code>）
+- ✅ 所有 S/M/L 尺寸圖片重新命名並上傳 GCS（156 files） - ✅ JSON
+資料完整更新（title、category、imageUrl） - ✅ 前端邏輯調整（移除
+<code>skill_</code> 判斷，使用 <code>mindset_</code> /
+<code>action_</code>）</p>
+<p><strong>UI/UX 優化</strong>: - ✅ 價值導航卡「其他」區域 1:1 尺寸 -
+✅ 價值導航卡前三名區域 1:1 尺寸 - ✅ 六大性格分析 list mode 顏色差異化
+- ✅ DropZone 單點擊查看大圖 - ✅ 移除「查看」按鈕 - ✅ 卡片置中對齊 -
+✅ 修復卡片重疊問題 - ✅ 修復卡片邊緣被裁切問題 - ✅ Tab active
+狀態顏色更明顯 - ✅ List mode 顯示實際卡片名稱</p>
+<p><strong>環境修復</strong>: - ✅ Supabase 密碼更新 - ✅ CORS 設定更新
+- ✅ GitHub Secrets 更新</p>
+<h4 id="第二階段待辦項目">🎯 第二階段待辦項目</h4>
+<p><strong>P1 - Beta 測試後必要的優化</strong>: - ❌
+諮詢歷史管理完善（時間軸 + 篩選） - ❌ 歷史資料匯出功能（CSV/PDF） - ❌
+諮詢報告生成（基礎版，不含 AI） - ❌ 訪客引導流程優化 - ❌
+錯誤處理強化（斷線重連、權限提示） - ❌ 訪客端效能優化 - ❌ Cloud
+Logging 完整設定與 Dashboard - ❌ 錯誤告警機制（Slack/Email） - ❌
+效能監控指標建立</p>
+<p><strong>P2 - 第二階段規劃（2026-01 ~ 2026-03）</strong>: - ❌ A+B=C
+Pattern 規則分析與設計 - ❌ Pattern 固定規則實作 - ❌ 遊戲引擎整合 - ❌
+完整註冊機制（Email 驗證） - ❌ 忘記密碼功能完善 - ❌ OAuth
+社群登入（預留） - ❌ 智慧牌卡推薦（AI） - ❌ 諮詢洞察分析（AI） - ❌
+自動生成諮詢摘要（AI） - ❌ 多人同時諮詢（班級管理） - ❌ 群組管理功能 -
+❌ 批量報告生成</p>
+<hr />
+<h3 id="b.-技術文件清單">B. 技術文件清單</h3>
+<table>
+<thead>
+<tr class="header">
+<th>文件</th>
+<th>路徑</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PRD</td>
+<td>/PRD.md</td>
+<td>產品需求文件</td>
+</tr>
+<tr class="even">
+<td>TODO</td>
+<td>/TODO.md</td>
+<td>待辦事項追蹤</td>
+</tr>
+<tr class="odd">
+<td>CLAUDE.md</td>
+<td>/CLAUDE.md</td>
+<td>專案配置</td>
+</tr>
+<tr class="even">
+<td>第一個月報告</td>
+<td>/WEEKLY_REPORT_2025-09-30.md</td>
+<td>測試報告</td>
+</tr>
+<tr class="odd">
+<td>第二個月報告</td>
+<td>/WEEKLY_REPORT_2025-10-21.md</td>
+<td>測試報告</td>
+</tr>
+<tr class="even">
+<td>API 文件</td>
+<td>/docs/api.md</td>
+<td>API 規格</td>
+</tr>
+<tr class="odd">
+<td>資料庫 Schema</td>
+<td>/docs/database.md</td>
+<td>資料庫設計</td>
+</tr>
+</tbody>
+</table>
+<h3 id="c.-術語表">C. 術語表</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>術語</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>MVP</td>
+<td>Minimum Viable Product（最小可行產品）</td>
+</tr>
+<tr class="even">
+<td>CRM</td>
+<td>Customer Relationship Management（客戶關係管理）</td>
+</tr>
+<tr class="odd">
+<td>RIASEC</td>
+<td>Holland 六大性格類型（Realistic, Investigative, Artistic, Social,
+Enterprising, Conventional）</td>
+</tr>
+<tr class="even">
+<td>Realtime</td>
+<td>即時同步技術（WebSocket / Server-Sent Events）</td>
+</tr>
+<tr class="odd">
+<td>JSONB</td>
+<td>PostgreSQL 的 JSON Binary 資料型別</td>
+</tr>
+<tr class="even">
+<td>E2E</td>
+<td>End-to-End（端對端測試）</td>
+</tr>
+<tr class="odd">
+<td>RPS</td>
+<td>Request Per Second（每秒請求數）</td>
+</tr>
+<tr class="even">
+<td>P95</td>
+<td>95th Percentile（95% 請求的延遲）</td>
+</tr>
+<tr class="odd">
+<td>CORS</td>
+<td>Cross-Origin Resource Sharing（跨域資源共享）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="d.-聯絡資訊">D. 聯絡資訊</h3>
+<table>
+<thead>
+<tr class="header">
+<th>角色</th>
+<th>聯絡人</th>
+<th>Email</th>
+<th>職責</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PM</td>
+<td>KM</td>
+<td>[email]</td>
+<td>產品需求、客戶對接</td>
+</tr>
+<tr class="even">
+<td>全端工程師</td>
+<td>Young</td>
+<td>[email]</td>
+<td>技術架構、開發維運</td>
+</tr>
+<tr class="odd">
+<td>UI/UX 設計師</td>
+<td>Hannah</td>
+<td>[email]</td>
+<td>視覺設計、素材提供</td>
+</tr>
+<tr class="even">
+<td>技術支援</td>
+<td>[Support Team]</td>
+<td>support@[domain]</td>
+<td>使用者問題處理</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><strong>報告完成日期</strong>: 2026-01-30 <strong>報告版本</strong>:
+v1.0 <strong>下次更新</strong>: 第二階段結案後（2026-03）</p>
+<hr />
+<p><strong>🎉 感謝所有參與第一階段開發的團隊成員！</strong></p>
+</body>
+</html>

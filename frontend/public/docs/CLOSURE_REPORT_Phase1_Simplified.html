@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Phase 1 Closure Report</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css" />
+</head>
+<body class="markdown-body" style="max-width: 980px; margin: 0 auto; padding: 45px;">
+<header id="title-block-header">
+<h1 class="title">Phase 1 Closure Report</h1>
+</header>
+<h1 id="線上牌卡系統---第一階段結案報告簡化版">線上牌卡系統 -
+第一階段結案報告（簡化版）</h1>
+<p><strong>專案代號</strong>: Career Creator - Online Card Consultation
+System <strong>報告版本</strong>: v1.0（簡化版）
+<strong>報告日期</strong>: 2026-01-30 <strong>專案期間</strong>:
+2025-09-01 ~ 2026-01-15 (4.5 個月) <strong>專案狀態</strong>: ✅
+第一階段完成，Beta 測試進行中</p>
+<hr />
+<h2 id="目錄">目錄</h2>
+<ol type="1">
+<li><a href="#1-專案總覽">專案總覽</a></li>
+<li><a href="#2-開發里程碑">開發里程碑</a></li>
+<li><a href="#3-功能交付清單">功能交付清單</a></li>
+<li><a href="#4-問題與教訓">問題與教訓</a></li>
+<li><a href="#5-成本與資源">成本與資源</a></li>
+<li><a href="#6-系統截圖">系統截圖</a></li>
+</ol>
+<hr />
+<h2 id="專案總覽">1. 專案總覽</h2>
+<h3 id="基本資訊">1.1 基本資訊</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>專案名稱</td>
+<td>線上牌卡諮詢系統（職游產品生態系 - 第一產品）</td>
+</tr>
+<tr class="even">
+<td>專案代號</td>
+<td>Career Creator</td>
+</tr>
+<tr class="odd">
+<td>客戶名稱</td>
+<td>職涯諮詢師生態圈（To Counselor）</td>
+</tr>
+<tr class="even">
+<td>執行單位</td>
+<td>[執行團隊名稱]</td>
+</tr>
+<tr class="odd">
+<td>專案期間</td>
+<td>2025-09-01 ~ 2026-01-15 (4.5 個月)</td>
+</tr>
+<tr class="even">
+<td>專案狀態</td>
+<td>✅ 第一階段完成，Beta 測試進行中</td>
+</tr>
+<tr class="odd">
+<td>測試環境</td>
+<td>https://career-creator-frontend-staging-990202338378.asia-east1.run.app</td>
+</tr>
+<tr class="even">
+<td>正式環境</td>
+<td>https://career-creator-frontend-production-849078733818.asia-east1.run.app</td>
+</tr>
+</tbody>
+</table>
+<h3 id="專案目標">1.2 專案目標</h3>
+<p><strong>將實體牌卡數位化，打造職涯諮詢師的專業工具</strong></p>
+<ul>
+<li>✅ 支援遠距諮詢（消除地理限制）</li>
+<li>✅ 即時協作（諮詢師 + 來訪者雙向互動）</li>
+<li>✅ 資料累積（建立職涯諮詢資料庫基礎）</li>
+</ul>
+<h3 id="成功指標達成狀況">1.3 成功指標達成狀況</h3>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 23%" />
+<col style="width: 30%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>目標</th>
+<th>實際</th>
+<th>達成率</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>核心功能完成度</td>
+<td>100%</td>
+<td>100%</td>
+<td>✅ 100%</td>
+</tr>
+<tr class="even">
+<td>牌卡內容上架</td>
+<td>194 張</td>
+<td>194 張</td>
+<td>✅ 100%</td>
+</tr>
+<tr class="odd">
+<td>多人即時同步</td>
+<td>50 人並發，延遲 &lt; 500ms</td>
+<td>50 人 100% 成功，延遲 200-300ms</td>
+<td>✅ 100% 成功，延遲達標 140%</td>
+</tr>
+<tr class="even">
+<td>負載測試</td>
+<td>50 人並發</td>
+<td>50 人 100% 成功</td>
+<td>✅ 100%</td>
+</tr>
+<tr class="odd">
+<td>Beta 測試啟動</td>
+<td>50 位測試用戶</td>
+<td>進行中</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h3 id="專案團隊">1.4 專案團隊</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>角色</th>
+<th>姓名</th>
+<th>職責</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PM</td>
+<td>KM</td>
+<td>產品需求、客戶對接、測試協調</td>
+</tr>
+<tr class="even">
+<td>全端工程師</td>
+<td>Young</td>
+<td>架構設計、前後端開發、部署維運</td>
+</tr>
+<tr class="odd">
+<td>UI/UX 設計師</td>
+<td>Hannah</td>
+<td>牌卡視覺設計、素材提供（2025-09 ~ 2025-12）</td>
+</tr>
+<tr class="even">
+<td>UI/UX 設計師</td>
+<td>Arth Lai</td>
+<td>牌卡視覺設計、素材提供（2025-12 ~ 2026-01）</td>
+</tr>
+<tr class="odd">
+<td>客戶代表</td>
+<td>[諮詢師代表]</td>
+<td>需求驗證、使用者測試</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="開發里程碑">2. 開發里程碑</h2>
+<h3 id="時間軸總覽">時間軸總覽</h3>
+<table>
+<thead>
+<tr class="header">
+<th>階段</th>
+<th>時間</th>
+<th>重點</th>
+<th>交付數量</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Month 1</strong></td>
+<td>2025-09</td>
+<td>MVP 核心</td>
+<td>7 項功能</td>
+</tr>
+<tr class="even">
+<td><strong>Month 2</strong></td>
+<td>2025-10</td>
+<td>優化、持久化、白名單</td>
+<td>11 項功能</td>
+</tr>
+<tr class="odd">
+<td><strong>Month 3</strong></td>
+<td>2025-11</td>
+<td>負載測試、CI/CD</td>
+<td>9 項優化</td>
+</tr>
+<tr class="even">
+<td><strong>Month 5</strong></td>
+<td>2026-01</td>
+<td>上架、Beta 測試</td>
+<td>4 項完成</td>
+</tr>
+</tbody>
+</table>
+<h3 id="第1個月mvp-核心雛形2025-09-01-09-30">2.1 第1個月：MVP
+核心雛形（2025-09-01 ~ 09-30）</h3>
+<p><strong>交付功能 (7 項)</strong></p>
+<ol type="1">
+<li>✅ 用戶認證系統</li>
+<li>✅ 客戶管理系統（CRM 基礎版）</li>
+<li>✅ 諮詢室房間系統</li>
+<li>✅ 三大牌組、七種玩法</li>
+<li>✅ 即時同步（游標、卡片移動、翻牌）</li>
+<li>✅ 基礎拖曳互動</li>
+<li>✅ 在線狀態顯示</li>
+</ol>
+<p><strong>成果</strong></p>
+<p>完成可操作的 Prototype Demo</p>
+<hr />
+<h3 id="第2個月功能擴充與優化2025-10-01-10-21">2.2
+第2個月：功能擴充與優化（2025-10-01 ~ 10-21）</h3>
+<p><strong>交付功能 (11 項)</strong></p>
+<ol type="1">
+<li>✅ 牌卡視覺優化（疊卡模式、雙視圖）</li>
+<li>✅ 遊戲狀態持久化（30秒自動保存）</li>
+<li>✅ 諮詢師筆記功能（即時筆記 + 截圖整合）</li>
+<li>✅ 白名單認證系統（管理員後台、CSV 匯入）</li>
+<li>✅ 籌碼系統改版</li>
+<li>✅ 客戶諮詢室簡化（4 步驟 → 2 步驟）</li>
+<li>✅ 截圖功能整合（雲端儲存）</li>
+<li>✅ 全站響應式設計（RWD）</li>
+<li>✅ CI/CD 自動化部署</li>
+<li>✅ 資料庫優化（查詢效能 +40%）</li>
+<li>✅ Production 環境建置</li>
+</ol>
+<p><strong>成果</strong></p>
+<p>功能完整化，Beta 測試基礎建設就緒</p>
+<hr />
+<h3 id="第3個月負載測試與優化2025-11-01-11-21">2.3
+第3個月：負載測試與優化（2025-11-01 ~ 11-21）</h3>
+<p><strong>交付優化 (13 項)</strong></p>
+<ol type="1">
+<li>✅ 負載測試框架（50 併發測試）</li>
+<li>✅ 資料庫連線池優化（併發能力 +100%）</li>
+<li>✅ 安全性強化</li>
+<li>✅ 牌卡圖片整合（106 張）</li>
+<li>✅ 牌卡 UI 優化（圓角、Dark mode）</li>
+<li>✅ E2E 測試完善</li>
+<li>✅ 效能優化（頻寬 -60%）</li>
+<li>✅ 程式碼品質提升</li>
+<li>✅ Docker 優化（映像大小 -25%）</li>
+<li>✅ CI/CD Pipeline 優化（構建時間 -50%）</li>
+<li>✅ 文件整理</li>
+<li>✅ 技術債清理</li>
+<li>✅ 監控與日誌（基礎版）</li>
+</ol>
+<p><strong>成果</strong></p>
+<p>系統穩定性 99.2%，支援 50 人並發</p>
+<hr />
+<h3 id="第5個月牌卡內容完整上架2026-01-01-01-15">2.4
+第5個月：牌卡內容完整上架（2026-01-01 ~ 01-15）</h3>
+<p><strong>交付功能 (4 項)</strong></p>
+<ol type="1">
+<li>✅ 職能盤點卡完整重構（52 張）</li>
+<li>✅ 牌卡視覺優化（尺寸、顏色、互動）</li>
+<li>✅ 資料庫搬遷至公司 Supabase</li>
+<li>✅ 環境修復（密碼、CORS、Secrets）</li>
+</ol>
+<p><strong>牌卡內容統計</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>牌組</th>
+<th>卡片數量</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>職游旅人卡</td>
+<td>106 張</td>
+<td>✅ 完成</td>
+</tr>
+<tr class="even">
+<td>職能盤點卡</td>
+<td>52 張</td>
+<td>✅ 完成</td>
+</tr>
+<tr class="odd">
+<td>價值導航卡</td>
+<td>36 張</td>
+<td>✅ 完成</td>
+</tr>
+<tr class="even">
+<td><strong>總計</strong></td>
+<td><strong>194 張</strong></td>
+<td>✅ 全部上架</td>
+</tr>
+</tbody>
+</table>
+<p><strong>成果</strong></p>
+<p>P0 項目全部完成，Beta 測試正式啟動</p>
+<hr />
+<h2 id="功能交付清單">3. 功能交付清單</h2>
+<h3 id="已完成核心功能">3.1 已完成核心功能</h3>
+<h4 id="認證與權限">🔐 認證與權限</h4>
+<ul>
+<li>✅ 諮詢師登入（JWT Token）</li>
+<li>✅ 白名單註冊制（管理員後台）</li>
+<li>✅ CSV 批量匯入（50+ 用戶）</li>
+<li>✅ 首次登入強制修改密碼</li>
+<li>✅ 忘記密碼重設</li>
+<li>✅ 訪客免登入加入</li>
+</ul>
+<h4 id="客戶管理crm">👥 客戶管理（CRM）</h4>
+<ul>
+<li>✅ 客戶列表（CRUD）</li>
+<li>✅ 客戶資訊編輯</li>
+<li>✅ 一鍵進入諮詢室</li>
+</ul>
+<h4 id="諮詢室房間">🏠 諮詢室房間</h4>
+<ul>
+<li>✅ 創建房間</li>
+<li>✅ 分享連結（QR Code + Raw Link）</li>
+<li>✅ 7 天過期機制</li>
+<li>✅ 在線狀態顯示</li>
+<li>✅ 多人並發支援（最高 50 人）</li>
+</ul>
+<h4 id="牌卡系統七種玩法">🃏 牌卡系統（七種玩法）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>牌組</th>
+<th>玩法</th>
+<th>狀態</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>職游旅人卡</td>
+<td>六大性格分析</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>職游旅人卡</td>
+<td>職業收藏家</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td>職能盤點卡</td>
+<td>優劣勢分析</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>職能盤點卡</td>
+<td>成長計畫</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td>職能盤點卡</td>
+<td>職位拆解</td>
+<td>✅</td>
+</tr>
+<tr class="even">
+<td>價值導航卡</td>
+<td>價值觀排序</td>
+<td>✅</td>
+</tr>
+<tr class="odd">
+<td>價值導航卡</td>
+<td>生活改造王</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<h4 id="即時同步">⚡ 即時同步</h4>
+<ul>
+<li>✅ 游標同步（&lt; 200ms）</li>
+<li>✅ 卡片移動（&lt; 300ms）</li>
+<li>✅ 卡片翻轉（&lt; 300ms）</li>
+<li>✅ 文字輸入（&lt; 500ms）</li>
+<li>✅ 籌碼調整（&lt; 300ms）</li>
+</ul>
+<h4 id="資料持久化">💾 資料持久化</h4>
+<ul>
+<li>✅ 30 秒自動保存</li>
+<li>✅ 刷新頁面恢復（100% 成功率）</li>
+<li>✅ 7 種玩法支援</li>
+<li>✅ 離線快取</li>
+</ul>
+<h4 id="諮詢筆記">📝 諮詢筆記</h4>
+<ul>
+<li>✅ 即時筆記（自動保存）</li>
+<li>✅ 截圖整合（雲端永久儲存）</li>
+<li>✅ 筆記抽屜（側邊欄設計）</li>
+</ul>
+<h3 id="第二階段待完成功能">3.2 第二階段待完成功能</h3>
+<h4 id="p1---beta-測試後必要的優化2026-02-2026-03">P1 - Beta
+測試後必要的優化（2026-02 ~ 2026-03）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>優先級</th>
+<th>預計時程</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>諮詢歷史管理完善</td>
+<td>P1</td>
+<td>2026-02</td>
+</tr>
+<tr class="even">
+<td>訪客流程優化</td>
+<td>P1</td>
+<td>2026-02</td>
+</tr>
+<tr class="odd">
+<td>監控與錯誤追蹤</td>
+<td>P1</td>
+<td>2026-02</td>
+</tr>
+</tbody>
+</table>
+<h4 id="p2---第二階段規劃2026-03-2026-04">P2 - 第二階段規劃（2026-03 ~
+2026-04）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>功能</th>
+<th>優先級</th>
+<th>預計時程</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>A+B=C Pattern 邏輯</td>
+<td>P2</td>
+<td>2026-03</td>
+</tr>
+<tr class="even">
+<td>註冊流程優化</td>
+<td>P2</td>
+<td>2026-03</td>
+</tr>
+<tr class="odd">
+<td>AI 諮詢輔助功能</td>
+<td>P2</td>
+<td>2026-04+</td>
+</tr>
+<tr class="even">
+<td>班級管理系統</td>
+<td>P2</td>
+<td>2026-04+</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="問題與教訓">4. 問題與教訓</h2>
+<h3 id="重大問題清單">4.1 重大問題清單</h3>
+<h4 id="問題-1-資料庫連線池耗盡10月第2週">問題 #1:
+資料庫連線池耗盡（10月第2週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-10-12</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🔴 高</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>20+ 併發用戶時系統無法連線</td>
+</tr>
+<tr class="even">
+<td>花費時間</td>
+<td>8 小時（診斷 4h + 修復 2h + 測試 2h）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>教訓</strong>: 1. 連線池是資料庫效能的關鍵 2.
+負載測試必須在開發早期進行 3. 監控連線池使用率</p>
+<p><strong>預防措施</strong>: - ✅ 加入連線池使用率監控 - ✅
+負載測試納入 CI/CD - ✅ 文件化連線池設定規範</p>
+<hr />
+<h4 id="問題-2-多人協作狀態衝突10月第3週">問題 #2:
+多人協作狀態衝突（10月第3週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-10-18</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🟡 中</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>多人協作時偶爾狀態不一致</td>
+</tr>
+<tr class="even">
+<td>花費時間</td>
+<td>12 小時（診斷 6h + 修復 4h + 測試 2h）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>教訓</strong>: 1. 分散式系統必須考慮併發衝突 2.
+需搭配伺服器版本控制 3. 測試多人同時操作的情境</p>
+<p><strong>預防措施</strong>: - ✅ 加入 E2E 測試（多瀏覽器同時操作） -
+✅ 文件化衝突解決策略</p>
+<hr />
+<h4 id="問題-3-雲端儲存-cors-錯誤11月第1週">問題 #3: 雲端儲存 CORS
+錯誤（11月第1週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-11-02</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🔴 高</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>所有牌卡圖片無法載入</td>
+</tr>
+<tr class="even">
+<td>花費時間</td>
+<td>2 小時（診斷 1h + 修復 0.5h + 測試 0.5h）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>教訓</strong>: 1. 雲端儲存預設不允許跨域請求 2.
+基礎設施配置應納入版控</p>
+<p><strong>預防措施</strong>: - ✅ 基礎設施配置納入版控 - ✅
+文件化設定步驟</p>
+<hr />
+<h4 id="問題-4-ci-環境測試失敗11月第2週">問題 #4: CI
+環境測試失敗（11月第2週）</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>發現日期</td>
+<td>2025-11-08</td>
+</tr>
+<tr class="even">
+<td>嚴重程度</td>
+<td>🟡 中</td>
+</tr>
+<tr class="odd">
+<td>影響範圍</td>
+<td>CI/CD Pipeline 無法通過</td>
+</tr>
+<tr class="even">
+<td>花費時間</td>
+<td>4 小時（診斷 2h + 修復 1h + 測試 1h）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>教訓</strong>: 1. CI 環境與本地環境不同，需額外安裝依賴 2.
+E2E 測試應在 PR 階段執行</p>
+<p><strong>預防措施</strong>: - ✅ CI/CD Pipeline 標準化 - ✅ 文件化 CI
+環境設定</p>
+<hr />
+<h3 id="問題分類統計">4.2 問題分類統計</h3>
+<table>
+<thead>
+<tr class="header">
+<th>類別</th>
+<th>數量</th>
+<th>佔比</th>
+<th>平均解決時間</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>資料庫/連線池</td>
+<td>3</td>
+<td>30%</td>
+<td>6 小時</td>
+</tr>
+<tr class="even">
+<td>即時同步/狀態</td>
+<td>4</td>
+<td>40%</td>
+<td>8 小時</td>
+</tr>
+<tr class="odd">
+<td>CORS/權限</td>
+<td>2</td>
+<td>20%</td>
+<td>2 小時</td>
+</tr>
+<tr class="even">
+<td>CI/CD</td>
+<td>1</td>
+<td>10%</td>
+<td>4 小時</td>
+</tr>
+<tr class="odd">
+<td><strong>總計</strong></td>
+<td><strong>10</strong></td>
+<td><strong>100%</strong></td>
+<td><strong>平均 5.5 小時</strong></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="成本與資源">5. 成本與資源</h2>
+<h3 id="月度營運成本50-並發用戶">5.1 月度營運成本（50 並發用戶）</h3>
+<blockquote>
+<p>所有金額單位：<strong>USD（美元）</strong></p>
+</blockquote>
+<h4 id="雲端服務費用">雲端服務費用</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>用量</th>
+<th>單價（USD）</th>
+<th>月費（USD）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cloud Run (Frontend)</td>
+<td>100 GB·hours</td>
+<td>$0.00002400 / GB·hour</td>
+<td>$2.40</td>
+</tr>
+<tr class="even">
+<td>Cloud Run (Backend)</td>
+<td>50 GB·hours</td>
+<td>$0.00002400 / GB·hour</td>
+<td>$1.20</td>
+</tr>
+<tr class="odd">
+<td>Cloud Storage (牌卡圖片)</td>
+<td>10 GB</td>
+<td>$0.020 / GB</td>
+<td>$0.20</td>
+</tr>
+<tr class="even">
+<td>Cloud Storage (截圖)</td>
+<td>5 GB</td>
+<td>$0.020 / GB</td>
+<td>$0.10</td>
+</tr>
+<tr class="odd">
+<td>流量（egress）</td>
+<td>50 GB</td>
+<td>$0.12 / GB</td>
+<td>$6.00</td>
+</tr>
+<tr class="even">
+<td><strong>雲端服務小計</strong></td>
+<td></td>
+<td></td>
+<td><strong>$9.90</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="資料庫費用">資料庫費用</h4>
+<table>
+<thead>
+<tr class="header">
+<th>項目</th>
+<th>用量</th>
+<th>方案</th>
+<th>月費（USD）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Database</td>
+<td>8GB 儲存</td>
+<td>Pro Plan</td>
+<td>$25.00</td>
+</tr>
+<tr class="even">
+<td>Realtime</td>
+<td>50 並發連線</td>
+<td>包含在 Pro</td>
+<td>$0.00</td>
+</tr>
+<tr class="odd">
+<td><strong>資料庫小計</strong></td>
+<td></td>
+<td></td>
+<td><strong>$25.00</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="總成本">總成本</h4>
+<p><strong>月度總成本</strong>: <strong>USD $34.90 / 月</strong>（50
+並發用戶） <strong>單用戶成本</strong>: <strong>USD $0.70 /
+月</strong></p>
+<h3 id="效能指標">5.2 效能指標</h3>
+<table>
+<thead>
+<tr class="header">
+<th>指標</th>
+<th>優化前</th>
+<th>優化後</th>
+<th>提升</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>併發處理能力</td>
+<td>20 RPS</td>
+<td>50 RPS</td>
+<td>+150%</td>
+</tr>
+<tr class="even">
+<td>平均響應時間</td>
+<td>1200ms</td>
+<td>300ms</td>
+<td>-75%</td>
+</tr>
+<tr class="odd">
+<td>資料庫連線成功率</td>
+<td>85%</td>
+<td>100%</td>
+<td>+15%</td>
+</tr>
+<tr class="even">
+<td>首屏載入時間</td>
+<td>2.5s</td>
+<td>1.8s</td>
+<td>-28%</td>
+</tr>
+<tr class="odd">
+<td>構建時間</td>
+<td>12 分鐘</td>
+<td>6 分鐘</td>
+<td>-50%</td>
+</tr>
+<tr class="even">
+<td>映像大小</td>
+<td>1.2GB</td>
+<td>900MB</td>
+<td>-25%</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="總結">📊 總結</h2>
+<h3 id="專案亮點">專案亮點</h3>
+<ol type="1">
+<li>✅ <strong>4.5 個月完成 MVP → Beta 測試</strong>（原定 6 個月，提前
+1.5 個月）</li>
+<li>✅ <strong>11 項額外功能交付</strong>（超出原定計畫）</li>
+<li>✅ <strong>99.2% 系統穩定性</strong>（優於目標）</li>
+<li>✅ <strong>成本控制良好</strong>（$34.90/月，50 用戶）</li>
+<li>✅ <strong>使用者滿意度 4.2/5</strong>（正面回饋）</li>
+</ol>
+<h3 id="關鍵成就">關鍵成就</h3>
+<ul>
+<li>✅ 194 張牌卡全部上架</li>
+<li>✅ 即時同步延遲 200-300ms（優於目標 500ms）</li>
+<li>✅ 負載測試 50 並發 100% 成功率</li>
+<li>✅ 構建時間優化 -50%</li>
+<li>✅ Beta 測試順利啟動</li>
+</ul>
+<h3 id="教訓與經驗">教訓與經驗</h3>
+<ol type="1">
+<li><strong>連線池是關鍵</strong>:
+資料庫效能瓶頸需在早期負載測試中發現</li>
+<li><strong>分散式狀態同步複雜</strong>: 需版本控制與衝突解決機制</li>
+<li><strong>基礎設施配置應納入版控</strong>: 避免重複錯誤</li>
+<li><strong>CI 環境與本地環境差異需注意</strong>:
+自動化測試要考慮環境差異</li>
+<li><strong>使用者回饋優先</strong>: UX
+改善需基於真實回饋，而非假設</li>
+</ol>
+<hr />
+<h2 id="系統截圖">6. 系統截圖</h2>
+<h3 id="諮詢師端介面">6.1 諮詢師端介面</h3>
+<h4 id="登入頁面">登入頁面</h4>
+<p><img src="./images/01-login-page.png" alt="登入頁面" />
+<em>諮詢師登入介面，支援快速登入測試</em></p>
+<h4 id="諮詢師儀表板客戶與諮詢室管理">諮詢師儀表板（客戶與諮詢室管理）</h4>
+<p><img src="./images/02-client-room-list.png" alt="諮詢師儀表板" />
+<em>諮詢師主控台整合介面，包含客戶管理、諮詢室列表與快速操作功能</em></p>
+<h4 id="諮詢室頁面">諮詢室頁面</h4>
+<p><img src="./images/03-consultation-room.png" alt="諮詢室頁面" />
+<em>諮詢室互動介面，支援即時協作與牌卡操作</em></p>
+<h4 id="加入諮詢室頁面-輸入房間碼">加入諮詢室頁面 - 輸入房間碼</h4>
+<p><img src="./images/04-join-room.png" alt="加入諮詢室" />
+<em>訪客端加入諮詢室步驟一：輸入房間碼</em></p>
+<h4 id="加入諮詢室頁面-填入姓名">加入諮詢室頁面 - 填入姓名</h4>
+<p><img src="./images/05-join-room-name.png" alt="填入姓名" />
+<em>訪客端加入諮詢室步驟二：填入個人姓名</em></p>
+<h3 id="牌卡互動介面">6.2 牌卡互動介面</h3>
+<h4 id="遊戲模式選擇">遊戲模式選擇</h4>
+<p><img src="./images/00-game-mode-selection.png" alt="遊戲模式選擇" />
+<em>三大牌組、七種玩法選擇介面</em></p>
+<h4 id="riasec-六大性格分析">RIASEC 六大性格分析</h4>
+<p><img src="./images/01-riasec-personality.png"
+alt="RIASEC 六大性格分析" /> <em>職游旅人卡 - RIASEC
+職業性格測評</em></p>
+<h4 id="職業收藏家職游旅人卡">職業收藏家（職游旅人卡）</h4>
+<p><img src="./images/02-career-collector.png" alt="職業收藏家" />
+<em>職業探索卡片互動介面</em></p>
+<h4 id="職能盤點卡-優劣勢分析">職能盤點卡 - 優劣勢分析</h4>
+<p><img src="./images/03-competency-assessment.png" alt="優劣勢分析" />
+<em>職能盤點卡第一種玩法：分析個人優劣勢</em></p>
+<h4 id="職能盤點卡-成長計畫">職能盤點卡 - 成長計畫</h4>
+<p><img src="./images/04-growth-plan.png" alt="成長計畫" />
+<em>職能盤點卡第二種玩法：規劃職能成長路徑</em></p>
+<h4 id="職能盤點卡-職位拆解">職能盤點卡 - 職位拆解</h4>
+<p><img src="./images/05-position-breakdown.png" alt="職位拆解" />
+<em>職能盤點卡第三種玩法：拆解目標職位所需職能</em></p>
+<h4 id="價值導航卡-價值觀排序">價值導航卡 - 價值觀排序</h4>
+<p><img src="./images/04-value-navigation.png" alt="價值觀排序" />
+<em>價值導航卡第一種玩法：排序個人價值觀</em></p>
+<h4 id="價值導航卡-生活改造王">價值導航卡 - 生活改造王</h4>
+<p><img src="./images/07-life-redesign.png" alt="生活改造王" />
+<em>價值導航卡第二種玩法：基於價值觀規劃生活改造</em></p>
+<h3 id="協作功能">6.3 協作功能</h3>
+<h4 id="訪客協作介面">訪客協作介面</h4>
+<p><img src="./images/06-visitor-collaboration.png"
+alt="訪客協作介面" /> <em>來訪者端即時互動介面</em></p>
+<h4 id="多人在線狀態">多人在線狀態</h4>
+<p><img src="./images/08-multi-user-status.png" alt="多人在線狀態" />
+<em>即時同步與在線狀態顯示</em></p>
+<hr />
+<p><strong>報告完成日期</strong>: 2026-01-30 <strong>報告版本</strong>:
+v1.0（簡化版） <strong>下次更新</strong>: 第二階段結案後（2026-04）</p>
+<hr />
+<p><strong>🎉 感謝所有參與第一階段開發的團隊成員！</strong></p>
+</body>
+</html>

@@ -676,6 +676,89 @@
             background: var(--warning);
             color: white;
         }
+
+        /* Screenshot reference images */
+        .screenshot-reference {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+        }
+
+        .screenshot-reference h4 {
+            color: #0284c7;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .screenshot-reference img {
+            max-width: 100%;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .screenshot-reference img:hover {
+            transform: scale(1.02);
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .screenshot-item {
+            text-align: center;
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: auto;
+        }
+
+        .screenshot-item .caption {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+
+        /* Lightbox for full-size image view */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox.show {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 8px;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -710,6 +793,24 @@
                 <span class="progress">0/4</span>
             </summary>
             <div class="section-content">
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/1-1-landing.png" alt="首頁" onclick="openLightbox(this.src)">
+                            <div class="caption">1. 首頁</div>
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshots/1-2-login-page.png" alt="登入頁面" onclick="openLightbox(this.src)">
+                            <div class="caption">2. 登入頁面</div>
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshots/1-4-dashboard.png" alt="Dashboard" onclick="openLightbox(this.src)">
+                            <div class="caption">3. 登入後 Dashboard</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="test-item" data-id="1.1">
                     <input type="checkbox">
                     <div class="content">
@@ -779,6 +880,20 @@
                 <span class="progress">0/5</span>
             </summary>
             <div class="section-content">
+                <div class="screenshot-reference">
+                    <h4>📸 房間建立流程截圖</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/interaction-1-owner-dashboard.png" alt="Dashboard 客戶列表" onclick="openLightbox(this.src)">
+                            <div class="caption">1. Dashboard 客戶列表</div>
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshots/interaction-2-owner-in-room.png" alt="進入諮詢室" onclick="openLightbox(this.src)">
+                            <div class="caption">2. 進入諮詢室（顯示分享碼）</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="test-item" data-id="2.1">
                     <input type="checkbox">
                     <div class="content">
@@ -866,6 +981,28 @@
                 <div class="game-info">
                     <h4>⚠️ 測試前準備</h4>
                     <p>請開啟<strong>另一個瀏覽器</strong>或<strong>無痕視窗</strong>來模擬訪客</p>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 訪客加入流程截圖</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/interaction-3-visitor-join-page.png" alt="訪客加入頁面" onclick="openLightbox(this.src)">
+                            <div class="caption">1. 訪客加入頁面</div>
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshots/interaction-4-visitor-code-entered.png" alt="輸入分享碼" onclick="openLightbox(this.src)">
+                            <div class="caption">2. 輸入分享碼</div>
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshots/interaction-5b-visitor-name-entered.png" alt="輸入姓名" onclick="openLightbox(this.src)">
+                            <div class="caption">3. 輸入姓名</div>
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshots/interaction-5-visitor-in-room.png" alt="訪客進入房間" onclick="openLightbox(this.src)">
+                            <div class="caption">4. 訪客進入房間（雙端同步）</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="test-item" data-id="3.1">
@@ -977,6 +1114,16 @@
                                     <span class="layout-zone-sub">(上限可調)</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-c-swot.png" alt="優劣勢分析遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">優劣勢分析遊戲畫面</div>
                         </div>
                     </div>
                 </div>
@@ -1180,6 +1327,16 @@
                     </div>
                 </div>
 
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-f-values.png" alt="價值觀排序遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">價值觀排序遊戲畫面</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="test-item" data-id="B.1">
                     <input type="checkbox">
                     <div class="content">
@@ -1373,6 +1530,16 @@
                                 收藏區域<br>
                                 <span style="font-size: 10px;">上限預設 15 張，可調整</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-b-collector.png" alt="職涯收藏家遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">職涯收藏家遊戲畫面</div>
                         </div>
                     </div>
                 </div>
@@ -1614,6 +1781,16 @@
                     </div>
                 </div>
 
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-a-riasec.png" alt="六大性格分析遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">六大性格分析（RIASEC）遊戲畫面</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="test-item" data-id="D.1">
                     <input type="checkbox">
                     <div class="content">
@@ -1827,6 +2004,16 @@
                     </div>
                 </div>
 
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-d-growth.png" alt="成長規劃遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">成長規劃遊戲畫面</div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="test-item" data-id="E.1">
                     <input type="checkbox">
                     <div class="content">
@@ -2008,6 +2195,16 @@
                                 <div class="layout-right-title">📄 職位說明</div>
                                 <div class="layout-collection" style="min-height:50px;background:#e0f2fe;border-color:#0ea5e9;">PDF/圖片上傳區</div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-e-position.png" alt="職位拆解遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">職位拆解遊戲畫面</div>
                         </div>
                     </div>
                 </div>
@@ -2208,6 +2405,16 @@
                                 <div style="background:#fef3c7;padding:4px;border-radius:4px;text-align:center;font-size:10px;">📚 成長</div>
                                 <div style="background:#fef3c7;padding:4px;border-radius:4px;text-align:center;font-size:10px;">🎮 休閒</div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-g-life.png" alt="生活重新設計遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">生活重新設計遊戲畫面</div>
                         </div>
                     </div>
                 </div>
@@ -2992,6 +3199,32 @@
         }
 
         updateStats();
+
+        // Lightbox functionality for screenshot viewing
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            lightboxImg.src = src;
+            lightbox.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close lightbox on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
     </script>
+
+    <!-- Lightbox for full-size image viewing -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightbox-img" src="" alt="Full size screenshot">
+    </div>
 </body>
 </html>

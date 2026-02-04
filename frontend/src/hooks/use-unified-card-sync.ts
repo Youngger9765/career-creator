@@ -6,10 +6,11 @@
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { useCardSync } from './use-card-sync';
+import { useCardSync, type CardGameState } from './use-card-sync';
 import { useAuthStore } from '@/stores/auth-store';
-import { useGameState } from '@/stores/game-state-store';
+import { useGameState, type GameState } from '@/stores/game-state-store';
 import { useGameplayStatePersistence } from './use-gameplay-state-persistence';
+import type { CardZoneInfo, UploadedFile } from '@/types/game';
 
 interface UseUnifiedCardSyncOptions {
   roomId: string;
@@ -17,7 +18,7 @@ interface UseUnifiedCardSyncOptions {
   storeKey: string;
   isRoomOwner: boolean;
   zones: string[]; // 例如 ['like', 'neutral', 'dislike']
-  onStateReceived?: (gameState: any) => void; // Optional callback for handling settings
+  onStateReceived?: (gameState: CardGameState) => void; // Optional callback for handling settings
 }
 
 export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
@@ -45,23 +46,24 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
    */
   const moveCardInternal = useCallback(
     (cardId: string, toZone: string | null, skipBroadcast = false) => {
-      const currentPlacements = { ...state.cardPlacements };
+      const currentPlacements: GameState['cardPlacements'] = { ...state.cardPlacements };
 
       // 1. 從所有區域移除該卡片
       zones.forEach((zone) => {
         const key = `${zone}Cards`;
-        if (currentPlacements[key]) {
-          currentPlacements[key] = currentPlacements[key].filter((id: string) => id !== cardId);
+        const zoneCards = currentPlacements[key];
+        if (Array.isArray(zoneCards)) {
+          currentPlacements[key] = zoneCards.filter((id: string) => id !== cardId);
         }
       });
 
       // 2. 如果有目標區域，加入該卡片
       if (toZone && toZone !== 'deck') {
         const key = `${toZone}Cards`;
-        if (!currentPlacements[key]) {
+        if (!Array.isArray(currentPlacements[key])) {
           currentPlacements[key] = [];
         }
-        currentPlacements[key].push(cardId);
+        (currentPlacements[key] as string[]).push(cardId);
       }
 
       // 3. 更新狀態
@@ -76,7 +78,8 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       let fromZone = 'deck';
       for (const zone of zones) {
         const key = `${zone}Cards`;
-        if (state.cardPlacements[key]?.includes(cardId)) {
+        const zoneCards = state.cardPlacements[key];
+        if (Array.isArray(zoneCards) && zoneCards.includes(cardId)) {
           fromZone = zone;
           break;
         }
@@ -124,34 +127,31 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     onFileUpload: (fileData) => {
       console.log(`[${gameType}] Received remote file upload:`, fileData.name);
       // 更新本地狀態（不廣播，因為這是遠端事件）
-      updateCards({
-        uploadedFile: {
-          name: fileData.name,
-          type: fileData.type,
-          size: fileData.size,
-          url: fileData.url, // GCS public URL (was dataUrl)
-          uploadedAt: fileData.uploadedAt,
-        },
-      });
+      const uploadedFile: UploadedFile = {
+        name: fileData.name,
+        type: fileData.type,
+        size: fileData.size,
+        url: fileData.url, // GCS public URL (was dataUrl)
+        uploadedAt: fileData.uploadedAt,
+      };
+      updateCards({ uploadedFile });
 
       // Owner needs to save state when receiving visitor's upload
       if (isRoomOwner) {
-        const gameState = {
-          cards: zones.reduce((acc, z) => {
-            const key = `${z}Cards`;
-            const cards = state.cardPlacements[key] || [];
-            cards.forEach((id: string) => {
-              acc[id] = { zone: z };
+        const cards: Record<string, CardZoneInfo> = {};
+        zones.forEach((z) => {
+          const key = `${z}Cards`;
+          const zoneCards = state.cardPlacements[key];
+          if (Array.isArray(zoneCards)) {
+            zoneCards.forEach((id: string) => {
+              cards[id] = { zone: z };
             });
-            return acc;
-          }, {} as any),
-          uploadedFile: {
-            name: fileData.name,
-            type: fileData.type,
-            size: fileData.size,
-            url: fileData.url,
-            uploadedAt: fileData.uploadedAt,
-          },
+          }
+        });
+
+        const gameState = {
+          cards,
+          uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };
@@ -178,15 +178,19 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
       // Owner 儲存狀態
       if (isRoomOwner) {
-        const gameState = {
-          cards: zones.reduce((acc, z) => {
-            const key = `${z}Cards`;
-            const cards = state.cardPlacements[key] || [];
-            cards.forEach((id: string) => {
-              acc[id] = { zone: z };
+        const cards: Record<string, CardZoneInfo> = {};
+        zones.forEach((z) => {
+          const key = `${z}Cards`;
+          const zoneCards = state.cardPlacements[key];
+          if (Array.isArray(zoneCards)) {
+            zoneCards.forEach((id: string) => {
+              cards[id] = { zone: z };
             });
-            return acc;
-          }, {} as any),
+          }
+        });
+
+        const gameState = {
+          cards,
           uploadedFile: state.cardPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
@@ -205,7 +209,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       console.log(`[${gameType}] Reorder in zone ${zone}:`, newCardIds);
 
       // 更新該區域的卡片順序
-      const currentPlacements = { ...state.cardPlacements };
+      const currentPlacements: GameState['cardPlacements'] = { ...state.cardPlacements };
       const key = `${zone}Cards`;
       currentPlacements[key] = newCardIds;
 
@@ -217,15 +221,19 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
       // Owner 儲存狀態（排序也需要同步）
       if (isRoomOwner) {
-        const gameState = {
-          cards: zones.reduce((acc, z) => {
-            const zoneKey = `${z}Cards`;
-            const cards = currentPlacements[zoneKey] || [];
-            cards.forEach((id: string) => {
-              acc[id] = { zone: z };
+        const cards: Record<string, CardZoneInfo> = {};
+        zones.forEach((z) => {
+          const zoneKey = `${z}Cards`;
+          const zoneCards = currentPlacements[zoneKey];
+          if (Array.isArray(zoneCards)) {
+            zoneCards.forEach((id: string) => {
+              cards[id] = { zone: z };
             });
-            return acc;
-          }, {} as any),
+          }
+        });
+
+        const gameState = {
+          cards,
           uploadedFile: state.cardPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
@@ -240,13 +248,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
    * 文件上傳函數
    */
   const handleFileUpload = useCallback(
-    (fileData: {
-      name: string;
-      type: string;
-      size: number;
-      url: string; // GCS public URL (was dataUrl)
-      uploadedAt: number;
-    }) => {
+    (fileData: UploadedFile) => {
       console.log(`[${gameType}] Local file upload:`, fileData.name);
 
       // 1. 更新本地狀態

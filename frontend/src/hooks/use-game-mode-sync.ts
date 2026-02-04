@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DECK_TYPES, GAMEPLAY_IDS, getDefaultGameplay } from '@/constants/game-modes';
-import { RealtimeRetryManager } from '@/lib/realtime-retry';
+import { RealtimeRetryManager, classifyRealtimeError, RealtimeErrorType } from '@/lib/realtime-retry';
 
 export interface GameModeState {
   deck: string;
@@ -35,6 +35,14 @@ export interface UseGameModeSyncReturn {
   isConnected: boolean;
   // 錯誤訊息
   error: string | null;
+  // 錯誤類型（用於細粒度處理）
+  errorType: RealtimeErrorType | null;
+  // 是否正在重試
+  isRetrying: boolean;
+  // 剩餘重試次數
+  remainingRetries: number;
+  // 手動重新連線
+  reconnect: () => void;
   // 切換遊戲模式（只有 Owner 能用）
   changeGameMode: (deck: string, gameRule: string, gameMode: string) => void;
   // 開始遊戲（只有 Owner 能用）
@@ -200,6 +208,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
   // Retry manager ref
   const retryManagerRef = useRef<RealtimeRetryManager | null>(null);
   const [retryExhausted, setRetryExhausted] = useState(false);
+  const [errorType, setErrorType] = useState<RealtimeErrorType | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [remainingRetries, setRemainingRetries] = useState(0);
 
   // Keep isOwner in a ref to avoid dependency issues
   const isOwnerRef = useRef(isOwner);
@@ -287,6 +298,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
           // Success! Reset retry counter
           retryManager.reset();
           setRetryExhausted(false);
+          setIsRetrying(false);
+          setErrorType(null);
+          setRemainingRetries(0);
           setIsConnected(true);
           setError(null);
           setChannel(gameChannel);
@@ -301,29 +315,54 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
               payload: { timestamp: new Date().toISOString() },
             });
           }
+        } else if (status === 'TIMED_OUT') {
+          // Handle timeout specifically - always retryable
+          console.warn('[GameModeSync] Connection timed out');
+          setIsConnected(false);
+          setChannel(null);
+          setError('連線逾時，正在重新連線...');
+          setErrorType('TIMED_OUT');
+
+          if (!isCleanedUp && retryManager.canRetry()) {
+            setIsRetrying(true);
+            setRemainingRetries(retryManager.getRemainingRetries());
+            retryManager.scheduleRetry(() => {
+              console.log('[GameModeSync] Attempting reconnection after timeout...');
+              setupChannel();
+            });
+          } else {
+            setRetryExhausted(true);
+            setIsRetrying(false);
+            setError('無法連接到即時服務，請重新整理頁面');
+          }
         } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
           console.error('[GameModeSync] Subscribe error:', err || status);
           setIsConnected(false);
           setChannel(null);
 
-          // Check if error is quota-related
-          const errorMsg = err?.message || String(err) || '';
-          if (errorMsg.includes('quota') || errorMsg.includes('rate_limit')) {
-            setError('服務配額已達上限，請稍後再試');
+          // Classify the error for appropriate handling
+          const classifiedError = classifyRealtimeError(status, err);
+          setError(classifiedError.userMessage);
+          setErrorType(classifiedError.type);
+
+          // Handle based on error classification
+          if (!classifiedError.isRetryable) {
+            // Non-retryable errors: graceful degradation
+            console.warn(`[GameModeSync] Non-retryable error (${classifiedError.type}), degrading gracefully`);
             setRetryExhausted(true);
-            return; // Don't retry on quota errors
-          }
-
-          setError('無法連接到遊戲同步服務');
-
-          // Attempt retry with exponential backoff
-          if (!isCleanedUp && retryManager.canRetry()) {
+            setIsRetrying(false);
+          } else if (!isCleanedUp && retryManager.canRetry()) {
+            // Retryable error with attempts remaining
+            setIsRetrying(true);
+            setRemainingRetries(retryManager.getRemainingRetries());
             retryManager.scheduleRetry(() => {
               console.log('[GameModeSync] Attempting reconnection...');
               setupChannel();
             });
-          } else if (!retryManager.canRetry()) {
+          } else {
+            // Retryable but exhausted
             setRetryExhausted(true);
+            setIsRetrying(false);
             setError('無法連接到即時服務，請重新整理頁面');
           }
         }
@@ -344,6 +383,19 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     };
   }, [roomId, updateSyncedState]); // Only essential deps - use refs for others
 
+  // Manual reconnect function
+  const reconnect = useCallback(() => {
+    if (retryManagerRef.current) {
+      retryManagerRef.current.reset();
+    }
+    setRetryExhausted(false);
+    setIsRetrying(false);
+    setError(null);
+    setErrorType(null);
+    // Re-trigger connection by resetting state
+    setChannel(null);
+  }, []);
+
   // Determine if room can be interacted with
   const canInteract = isOwner || ownerOnline;
 
@@ -353,10 +405,14 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     canInteract,
     isConnected,
     error,
+    errorType,
+    isRetrying,
+    remainingRetries,
+    reconnect,
     changeGameMode,
     startGame,
     exitGame,
     gameStarted,
-    retryExhausted, // Expose retry exhaustion state
+    retryExhausted,
   };
 }

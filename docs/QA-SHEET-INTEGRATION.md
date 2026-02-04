@@ -14,8 +14,9 @@
 - [x] CORS 支援 `"null"` origin (本地 HTML 檔案)
 - [x] API 測試成功，資料可寫入 Sheet
 
-### 待修正問題
-目前 API 只寫入「摘要」，沒有寫入每個檢核點的明細，導致無法追蹤哪個步驟 Pass/Fail。
+### 已完成
+- API 同時寫入「測試」（明細）和「統計」（摘要）兩個 tab
+- 自動檢查並建立 Headers（若第一行不是正確的 headers）
 
 ---
 
@@ -151,19 +152,20 @@ document.querySelectorAll('.test-item').forEach(item => {
 ## TODO
 
 ### Phase 1: API 更新
-- [ ] 更新 `QAFeedbackItem` model 加入新欄位
-- [ ] 更新 `submit_qa_feedback` 寫入兩個 Sheet
-- [ ] 在 Sheet 建立 `明細` 和 `摘要` 兩個頁籤
+- [x] 更新 `QAFeedbackItem` model 加入新欄位
+- [x] 更新 `submit_qa_feedback` 寫入兩個 Sheet
+- [x] 在 Sheet 建立 `測試` 和 `統計` 兩個頁籤
+- [x] 自動檢查並建立 Headers（若不存在）
 
 ### Phase 2: HTML 更新
-- [ ] 更新 `submitToSheet()` 收集完整資料
+- [x] 更新 `submitToSheet()` 收集完整資料
 - [ ] 加入 Loading 狀態和成功/失敗提示
 - [ ] 優化行動裝置體驗
 
 ### Phase 3: 測試與部署
-- [ ] 本地測試 API
-- [ ] 部署到 staging
-- [ ] 用 QA HTML 實際測試
+- [x] 本地測試 API
+- [x] 部署到 staging
+- [x] 用 QA HTML 實際測試
 
 ---
 

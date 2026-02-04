@@ -238,6 +238,17 @@ export default function LoginPage() {
           </div>
         )}
 
+        {/* Visitor Join Button */}
+        <div className="pt-4 border-t border-gray-200">
+          <p className="text-center text-sm text-gray-500 mb-3">是訪客嗎？</p>
+          <a
+            href="/join"
+            className="w-full flex justify-center py-3 px-4 border-2 border-teal-500 text-sm font-medium rounded-xl text-teal-600 bg-white hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-400 transition-all"
+          >
+            🎴 輸入房間碼加入諮詢室
+          </a>
+        </div>
+
         <div className="text-center">
           <a href="/" className="text-sm text-gray-500 hover:text-amber-600 transition-colors">
             ← 回到首頁

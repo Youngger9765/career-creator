@@ -142,7 +142,7 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
         }
 
         // 建立 channel
-        const channel = supabase!.channel(`room:${roomId}`, {
+        const channel = supabase!.channel(`realtime:room:${roomId}:presence`, {
           config: {
             presence: {
               key: identity.id, // 使用用戶 ID 作為 presence key

@@ -95,7 +95,7 @@ export function useVisitorJoin() {
 
     let tempChannel: ReturnType<typeof supabase.channel> | null = null;
     try {
-      tempChannel = supabase.channel(`room:${roomId}`);
+      tempChannel = supabase.channel(`realtime:room:${roomId}:visitor-check`);
 
       // Create promise that resolves when sync happens
       const syncPromise = new Promise<boolean>((resolve, reject) => {

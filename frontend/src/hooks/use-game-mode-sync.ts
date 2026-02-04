@@ -218,6 +218,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     isOwnerRef.current = isOwner;
   }, [isOwner]);
 
+  // Track setupChannel for reconnect
+  const setupChannelRef = useRef<(() => void) | null>(null);
+
   // Setup channel and listeners
   useEffect(() => {
     if (!isSupabaseConfigured() || !supabase || !roomId) return;
@@ -237,6 +240,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
 
     const setupChannel = async () => {
       if (isCleanedUp) return;
+      setupChannelRef.current = setupChannel;
 
       // Clean up existing channel
       if (currentChannel) {
@@ -385,15 +389,24 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
 
   // Manual reconnect function
   const reconnect = useCallback(() => {
+    console.log('[GameModeSync] Manual reconnect requested');
+
+    // Reset retry manager
     if (retryManagerRef.current) {
       retryManagerRef.current.reset();
     }
+
+    // Reset state
     setRetryExhausted(false);
     setIsRetrying(false);
+    setRemainingRetries(5);
     setError(null);
     setErrorType(null);
-    // Re-trigger connection by resetting state
-    setChannel(null);
+
+    // Trigger reconnection
+    if (setupChannelRef.current) {
+      setupChannelRef.current();
+    }
   }, []);
 
   // Determine if room can be interacted with

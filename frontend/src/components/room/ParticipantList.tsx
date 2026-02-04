@@ -85,7 +85,13 @@ export function ParticipantList({
   isLoading,
   className,
 }: ParticipantListProps) {
-  if (isLoading) {
+  const maxVisible = 5;
+  const visibleParticipants = participants.slice(0, maxVisible);
+  const remainingCount = Math.max(0, participants.length - maxVisible);
+
+  // Show participants even during loading (at least show current user)
+  // Only show pure skeleton if NO participants at all
+  if (isLoading && participants.length === 0) {
     return (
       <div className={`flex items-center space-x-2 ${className}`}>
         <Users className="w-4 h-4 text-gray-400" />
@@ -98,16 +104,15 @@ export function ParticipantList({
     );
   }
 
-  const maxVisible = 5;
-  const visibleParticipants = participants.slice(0, maxVisible);
-  const remainingCount = Math.max(0, participants.length - maxVisible);
-
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
       {/* Online count */}
       <div className="flex items-center space-x-1 text-sm text-gray-600">
         <Users className="w-4 h-4" />
         <span>{onlineCount} 線上</span>
+        {isLoading && (
+          <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse ml-1" title="連線中..." />
+        )}
       </div>
 
       {/* Participant avatars */}
@@ -115,6 +120,11 @@ export function ParticipantList({
         {visibleParticipants.map((participant) => (
           <ParticipantAvatar key={participant.id} participant={participant} />
         ))}
+
+        {/* Show loading skeleton for potential additional users while connecting */}
+        {isLoading && participants.length < 3 && (
+          <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
+        )}
 
         {/* Overflow indicator */}
         {remainingCount > 0 && (

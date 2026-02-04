@@ -86,37 +86,42 @@ def ensure_headers(service, sheet_id: str):
     stats_headers = ["提交時間", "測試者", "環境", "瀏覽器", "OS", "Pass", "Fail", "Skip", "備註"]
 
     try:
-        # Check 測試 tab - read entire first row (A1:K1)
-        result = service.spreadsheets().values().get(
-            spreadsheetId=sheet_id,
-            range="測試!A1:K1"
-        ).execute()
-        values = result.get("values", [[]])
-        first_row = values[0] if values else []
-
-        # Check if first row matches expected headers
-        if first_row != test_headers:
-            # Insert a new row at position 1
-            service.spreadsheets().batchUpdate(
-                spreadsheetId=sheet_id,
-                body={"requests": [{"insertDimension": {"range": {"sheetId": 0, "dimension": "ROWS", "startIndex": 0, "endIndex": 1}}}]}
-            ).execute()
-            # Write headers
-            service.spreadsheets().values().update(
-                spreadsheetId=sheet_id,
-                range="測試!A1:K1",
-                valueInputOption="RAW",
-                body={"values": [test_headers]}
-            ).execute()
-
-        # Check 統計 tab - need to get its sheet ID first
+        # Get sheet IDs for both tabs first
         sheet_metadata = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+        test_sheet_id = None
         stats_sheet_id = None
         for sheet in sheet_metadata.get("sheets", []):
-            if sheet["properties"]["title"] == "統計":
+            title = sheet["properties"]["title"]
+            if title == "測試":
+                test_sheet_id = sheet["properties"]["sheetId"]
+            elif title == "統計":
                 stats_sheet_id = sheet["properties"]["sheetId"]
-                break
 
+        # Check 測試 tab - read entire first row (A1:K1)
+        if test_sheet_id is not None:
+            result = service.spreadsheets().values().get(
+                spreadsheetId=sheet_id,
+                range="測試!A1:K1"
+            ).execute()
+            values = result.get("values", [[]])
+            first_row = values[0] if values else []
+
+            # Check if first row matches expected headers
+            if first_row != test_headers:
+                # Insert a new row at position 1
+                service.spreadsheets().batchUpdate(
+                    spreadsheetId=sheet_id,
+                    body={"requests": [{"insertDimension": {"range": {"sheetId": test_sheet_id, "dimension": "ROWS", "startIndex": 0, "endIndex": 1}}}]}
+                ).execute()
+                # Write headers
+                service.spreadsheets().values().update(
+                    spreadsheetId=sheet_id,
+                    range="測試!A1:K1",
+                    valueInputOption="RAW",
+                    body={"values": [test_headers]}
+                ).execute()
+
+        # Check 統計 tab
         if stats_sheet_id is not None:
             # Read entire first row (A1:I1)
             result = service.spreadsheets().values().get(

@@ -51,7 +51,6 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
   const retryManagerRef = useRef<RealtimeRetryManager | null>(null);
   const onConnectionChangeRef = useRef(onConnectionChange);
   const setupPresenceRef = useRef<(() => Promise<void>) | null>(null);
-  const presenceRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Keep callback ref updated
   useEffect(() => {
@@ -238,32 +237,6 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
             }
           });
 
-        // Clear existing interval if any
-        if (presenceRefreshIntervalRef.current) {
-          clearInterval(presenceRefreshIntervalRef.current);
-        }
-
-        // Periodic presence state refresh (fallback for missed sync events)
-        presenceRefreshIntervalRef.current = setInterval(() => {
-          if (channel && !isCleanedUp) {
-            const state = channel.presenceState<PresenceUser>();
-            const users: PresenceUser[] = [];
-            Object.values(state).forEach((presences) => {
-              if (Array.isArray(presences)) {
-                users.push(...presences);
-              }
-            });
-            // Only update if count changed (avoid unnecessary re-renders)
-            setOnlineUsers((prev) => {
-              if (prev.length !== users.length) {
-                console.log('[usePresence] Periodic sync detected change:', prev.length, '->', users.length);
-                return users;
-              }
-              return prev;
-            });
-          }
-        }, 5000); // Check every 5 seconds
-
         // 訂閱 channel - 根據官方文檔
         channel.subscribe(async (status, err) => {
           if (isCleanedUp) return;
@@ -288,6 +261,22 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
               if (currentIdentity) {
                 const presenceTrackStatus = await channel.track(currentIdentity);
                 console.log('[usePresence] Presence track status:', presenceTrackStatus);
+
+                // Force a second track after 3 seconds to catch any missed visitors
+                // (Only ONE extra message, not periodic - to save quota)
+                setTimeout(async () => {
+                  if (!isCleanedUp && channel) {
+                    try {
+                      const refreshIdentity = userIdentityRef.current;
+                      if (refreshIdentity) {
+                        console.log('[usePresence] Forcing presence refresh...');
+                        await channel.track(refreshIdentity);
+                      }
+                    } catch (err) {
+                      console.debug('[usePresence] Refresh track failed:', err);
+                    }
+                  }
+                }, 3000);
               }
             } catch (trackErr) {
               console.error('[usePresence] Failed to track presence:', trackErr);
@@ -378,10 +367,6 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
     // 清理函數
     return () => {
       isCleanedUp = true;
-      if (presenceRefreshIntervalRef.current) {
-        clearInterval(presenceRefreshIntervalRef.current);
-        presenceRefreshIntervalRef.current = null;
-      }
       if (retryManagerRef.current) {
         retryManagerRef.current.cleanup();
       }

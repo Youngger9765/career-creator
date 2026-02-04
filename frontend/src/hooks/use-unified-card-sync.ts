@@ -33,11 +33,18 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
   // Auth
   const { user } = useAuthStore();
+
+  // Track client-side mounting to properly read localStorage
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => setIsMounted(true), []);
+
   // 使用 useMemo 確保 userId 穩定，避免每次 render 產生新的 ID（會造成 broadcast 迴聲）
+  // 注意：必須依賴 isMounted 來確保 SSR → Client 時重新計算
   const userId = useMemo(() => {
     if (user?.id) return user.id;
-    // 嘗試從 localStorage 取得訪客 session
-    if (typeof window !== 'undefined') {
+
+    // 只有在 client 端才能讀取 localStorage
+    if (isMounted) {
       const visitorSession = localStorage.getItem('visitor_session');
       if (visitorSession) {
         try {
@@ -48,8 +55,12 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
         }
       }
     }
-    return `visitor-${Date.now()}`;
-  }, [user?.id]);
+
+    // SSR 或找不到 session 時的 fallback
+    // 使用 roomId 作為 seed 使 SSR 結果一致
+    return isMounted ? `visitor-${Date.now()}` : `ssr-${roomId}`;
+  }, [user?.id, isMounted, roomId]);
+
   const userName = user?.name || '訪客';
 
   // State

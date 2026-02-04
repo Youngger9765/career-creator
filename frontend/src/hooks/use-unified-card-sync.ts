@@ -33,7 +33,23 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
   // Auth
   const { user } = useAuthStore();
-  const userId = user?.id || `visitor-${Date.now()}`;
+  // 使用 useMemo 確保 userId 穩定，避免每次 render 產生新的 ID（會造成 broadcast 迴聲）
+  const userId = useMemo(() => {
+    if (user?.id) return user.id;
+    // 嘗試從 localStorage 取得訪客 session
+    if (typeof window !== 'undefined') {
+      const visitorSession = localStorage.getItem('visitor_session');
+      if (visitorSession) {
+        try {
+          const parsed = JSON.parse(visitorSession);
+          return `visitor_${parsed.session_id || parsed.visitor_id}`;
+        } catch (e) {
+          // ignore
+        }
+      }
+    }
+    return `visitor-${Date.now()}`;
+  }, [user?.id]);
   const userName = user?.name || '訪客';
 
   // State

@@ -111,6 +111,8 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
         try {
           const parsed = JSON.parse(saved);
           updateSyncedState(parsed);
+          // Also notify parent component so selectedGameplay stays in sync
+          onStateChangeRef.current?.(parsed);
         } catch (err) {
           console.error('[GameModeSync] Failed to parse saved state:', err);
         }

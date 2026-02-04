@@ -805,7 +805,7 @@
                             <div class="caption">2. 登入頁面</div>
                         </div>
                         <div class="screenshot-item">
-                            <img src="screenshots/1-4-dashboard.png" alt="Dashboard" onclick="openLightbox(this.src)">
+                            <img src="screenshots/2-0-dashboard.png" alt="Dashboard" onclick="openLightbox(this.src)">
                             <div class="caption">3. 登入後 Dashboard</div>
                         </div>
                     </div>
@@ -1082,669 +1082,10 @@
             </div>
         </details>
 
-        <!-- Game A: 職能盤點卡 -->
+                <!-- Game A: 六大性格分析 -->
         <details class="section" data-section="gameA">
             <summary class="game-a">
-                <h3>🎮 遊戲 A：職能盤點卡 - 優劣勢分析</h3>
-                <span class="progress">0/11</span>
-            </summary>
-            <div class="section-content">
-                <div class="game-info">
-                    <h4>遊戲說明</h4>
-                    <p><strong>卡片數量：</strong>52 張（10 張行動卡 + 42 張職能卡）</p>
-                    <p><strong>遊戲目的：</strong>將職能分類到「優勢」或「劣勢」區域</p>
-                    <div class="layout-demo">
-                        <div class="layout-left">
-                            <div class="layout-left-title">📋 卡片清單</div>
-                            <div class="layout-card-stack">
-                                <div class="layout-card"></div>
-                                <div class="layout-card"></div>
-                                <div class="layout-card"></div>
-                            </div>
-                        </div>
-                        <div class="layout-right">
-                            <div class="layout-right-title">🎯 畫布區域</div>
-                            <div class="layout-zones">
-                                <div class="layout-zone strength">
-                                    優勢
-                                    <span class="layout-zone-sub">(上限可調)</span>
-                                </div>
-                                <div class="layout-zone weakness">
-                                    劣勢
-                                    <span class="layout-zone-sub">(上限可調)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="screenshot-reference">
-                    <h4>📸 測試截圖參考</h4>
-                    <div class="screenshot-grid">
-                        <div class="screenshot-item">
-                            <img src="screenshots/game-c-swot.png" alt="優劣勢分析遊戲畫面" onclick="openLightbox(this.src)">
-                            <div class="caption">優劣勢分析遊戲畫面</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="test-item" data-id="A.1">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.1</div>
-                        <div class="desc">選擇「職能盤點卡」遊戲模式</div>
-                        <div class="expected">預期：載入 52 張卡片，顯示在左側清單</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.2">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.2</div>
-                        <div class="desc">確認卡片分類顯示</div>
-                        <div class="expected">預期：行動卡（action_01~10）和職能卡（mindset_01~42）都有</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.3">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.3</div>
-                        <div class="desc">點擊任一張卡片</div>
-                        <div class="expected">預期：彈出大圖預覽，可看清卡片內容</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.4">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.4</div>
-                        <div class="desc">將一張卡片拖曳到「優勢」區域</div>
-                        <div class="expected">預期：卡片移動成功，左側清單數量 -1</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.5">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.5</div>
-                        <div class="desc">將一張卡片拖曳到「劣勢」區域</div>
-                        <div class="expected">預期：卡片移動成功</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.6">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.6</div>
-                        <div class="desc">調整「優勢」區域上限（如改為 3）</div>
-                        <div class="expected">預期：上限更新成功</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.7">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.7</div>
-                        <div class="desc">嘗試超過上限放入卡片</div>
-                        <div class="expected">預期：應該被阻擋或提示</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.8">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.8</div>
-                        <div class="desc">點擊卡片上的 ✕ 圖示移除已分類的卡片</div>
-                        <div class="expected">預期：卡片返回原處</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.9">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.9 <span class="sync-badge">同步測試</span></div>
-                        <div class="desc">諮詢師拖曳卡片</div>
-                        <div class="expected">預期：訪客端即時看到變化</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.10">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.10 <span class="sync-badge">同步測試</span></div>
-                        <div class="desc">訪客拖曳卡片</div>
-                        <div class="expected">預期：諮詢師端即時看到變化</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="A.11">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 A.11</div>
-                        <div class="desc">切換顯示模式（Grid / List）</div>
-                        <div class="expected">預期：切換成功，卡片顯示方式改變</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-            </div>
-        </details>
-
-        <!-- Game B: 價值導航卡 -->
-        <details class="section" data-section="gameB">
-            <summary class="game-b">
-                <h3>🎮 遊戲 B：價值導航卡 - 價值觀排序</h3>
-                <span class="progress">0/11</span>
-            </summary>
-            <div class="section-content">
-                <div class="game-info">
-                    <h4>遊戲說明</h4>
-                    <p><strong>卡片數量：</strong>36 張</p>
-                    <p><strong>遊戲目的：</strong>選出最重要的前三名價值觀並排序</p>
-                    <div class="layout-demo">
-                        <div class="layout-left">
-                            <div class="layout-left-title">📋 卡片清單</div>
-                            <div class="layout-card-stack">
-                                <div class="layout-card"></div>
-                                <div class="layout-card"></div>
-                                <div class="layout-card"></div>
-                            </div>
-                        </div>
-                        <div class="layout-right">
-                            <div class="layout-right-title">🎯 畫布區域</div>
-                            <div class="layout-rank">
-                                <div class="layout-rank-box">1</div>
-                                <div class="layout-rank-box">2</div>
-                                <div class="layout-rank-box">3</div>
-                            </div>
-                            <div class="layout-collection">其他重要價值區</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="screenshot-reference">
-                    <h4>📸 測試截圖參考</h4>
-                    <div class="screenshot-grid">
-                        <div class="screenshot-item">
-                            <img src="screenshots/game-f-values.png" alt="價值觀排序遊戲畫面" onclick="openLightbox(this.src)">
-                            <div class="caption">價值觀排序遊戲畫面</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="test-item" data-id="B.1">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.1</div>
-                        <div class="desc">選擇「價值導航卡」遊戲模式</div>
-                        <div class="expected">預期：載入 36 張卡片</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.2">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.2</div>
-                        <div class="desc">確認卡片數量</div>
-                        <div class="expected">預期：左側顯示 36 張</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.3">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.3</div>
-                        <div class="desc">點擊任一張卡片</div>
-                        <div class="expected">預期：彈出大圖預覽</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.4">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.4</div>
-                        <div class="desc">將一張卡片拖到「第 1 名」位置</div>
-                        <div class="expected">預期：卡片放入成功，尺寸為 1:1</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.5">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.5</div>
-                        <div class="desc">將卡片放到「第 2 名」和「第 3 名」</div>
-                        <div class="expected">預期：卡片放入成功</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.6">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.6</div>
-                        <div class="desc">將卡片拖到「其他」區域</div>
-                        <div class="expected">預期：卡片放入成功，尺寸 1:1</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.7">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.7</div>
-                        <div class="desc">交換「第 1 名」和「第 2 名」的卡片</div>
-                        <div class="expected">預期：順序交換成功</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.8">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.8</div>
-                        <div class="desc">點擊卡片上的 ✕ 圖示移除已排序的卡片</div>
-                        <div class="expected">預期：卡片返回原處</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.9">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.9 <span class="sync-badge">同步測試</span></div>
-                        <div class="desc">諮詢師操作排序</div>
-                        <div class="expected">預期：訪客端即時同步</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.10">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.10 <span class="sync-badge">同步測試</span></div>
-                        <div class="desc">訪客操作排序</div>
-                        <div class="expected">預期：諮詢師端即時同步</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="B.11">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 B.11</div>
-                        <div class="desc">確認前三名和其他區域都是 1:1 正方形</div>
-                        <div class="expected">預期：尺寸正確</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-            </div>
-        </details>
-
-        <!-- Game C: 職游旅人卡 -->
-        <details class="section" data-section="gameC">
-            <summary class="game-c">
-                <h3>🎮 遊戲 C：職游旅人卡 - 職涯收藏家</h3>
-                <span class="progress">0/13</span>
-            </summary>
-            <div class="section-content">
-                <div class="game-info">
-                    <h4>遊戲說明</h4>
-                    <p><strong>卡片數量：</strong>100 張職業卡</p>
-                    <p><strong>遊戲目的：</strong>收藏感興趣的職業（預設上限 15 張，可調整）</p>
-                    <div class="layout-demo">
-                        <div class="layout-left">
-                            <div class="layout-left-title">📋 職業卡清單</div>
-                            <div class="layout-card-stack">
-                                <div class="layout-card"></div>
-                                <div class="layout-card"></div>
-                                <div class="layout-card"></div>
-                            </div>
-                        </div>
-                        <div class="layout-right">
-                            <div class="layout-right-title">🎯 畫布區域</div>
-                            <div class="layout-collection" style="min-height: 70px;">
-                                收藏區域<br>
-                                <span style="font-size: 10px;">上限預設 15 張，可調整</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="screenshot-reference">
-                    <h4>📸 測試截圖參考</h4>
-                    <div class="screenshot-grid">
-                        <div class="screenshot-item">
-                            <img src="screenshots/game-b-collector.png" alt="職涯收藏家遊戲畫面" onclick="openLightbox(this.src)">
-                            <div class="caption">職涯收藏家遊戲畫面</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="test-item" data-id="C.1">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.1</div>
-                        <div class="desc">選擇「職游旅人卡」遊戲模式</div>
-                        <div class="expected">預期：載入 100 張職業卡</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.2">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.2</div>
-                        <div class="desc">確認卡片數量</div>
-                        <div class="expected">預期：左側顯示 100 張（或接近）</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.3">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.3</div>
-                        <div class="desc">滾動瀏覽所有卡片</div>
-                        <div class="expected">預期：滾動流暢，圖片載入正常</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.4">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.4</div>
-                        <div class="desc">點擊任一張職業卡</div>
-                        <div class="expected">預期：彈出大圖預覽，可看到職業描述</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.5">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.5</div>
-                        <div class="desc">將一張卡片拖到收藏區</div>
-                        <div class="expected">預期：卡片收藏成功，計數 +1</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.6">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.6</div>
-                        <div class="desc">連續收藏多張卡片</div>
-                        <div class="expected">預期：都能成功收藏</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.7">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.7</div>
-                        <div class="desc">調整收藏上限（如改為 10）</div>
-                        <div class="expected">預期：上限更新成功</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.8">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.8</div>
-                        <div class="desc">嘗試超過上限收藏</div>
-                        <div class="expected">預期：應該被阻擋或提示</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.9">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.9</div>
-                        <div class="desc">將已收藏的卡片移出收藏區</div>
-                        <div class="expected">預期：卡片返回清單，計數 -1</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.10">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.10</div>
-                        <div class="desc">在收藏區內重新排序卡片</div>
-                        <div class="expected">預期：排序成功</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.11">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.11 <span class="sync-badge">同步測試</span></div>
-                        <div class="desc">諮詢師收藏卡片</div>
-                        <div class="expected">預期：訪客端即時看到</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.12">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.12 <span class="sync-badge">同步測試</span></div>
-                        <div class="desc">訪客收藏卡片</div>
-                        <div class="expected">預期：諮詢師端即時看到</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-
-                <div class="test-item" data-id="C.13">
-                    <input type="checkbox">
-                    <div class="content">
-                        <div class="step">步驟 C.13</div>
-                        <div class="desc">切換到 List 模式</div>
-                        <div class="expected">預期：顯示卡片名稱列表</div>
-                    </div>
-                    <div class="status-buttons">
-                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
-                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
-                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
-                    </div>
-                </div>
-                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
-            </div>
-        </details>
-
-        <!-- Game D: 六大性格分析 -->
-        <details class="section" data-section="gameD">
-            <summary class="game-d">
-                <h3>🎮 遊戲 D：六大性格分析（RIASEC）</h3>
+                <h3>🎮 遊戲 A：六大性格分析（RIASEC）</h3>
                 <span class="progress">0/12</span>
             </summary>
             <div class="section-content">
@@ -1791,10 +1132,10 @@
                     </div>
                 </div>
 
-                <div class="test-item" data-id="D.1">
+                <div class="test-item" data-id="A.1">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.1</div>
+                        <div class="step">步驟 A.1</div>
                         <div class="desc">選擇「六大性格分析」遊戲模式</div>
                         <div class="expected">預期：載入 6 張 RIASEC 卡片</div>
                     </div>
@@ -1806,10 +1147,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.2">
+                <div class="test-item" data-id="A.2">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.2</div>
+                        <div class="step">步驟 A.2</div>
                         <div class="desc">確認 6 張卡片都顯示</div>
                         <div class="expected">預期：R/I/A/S/E/C 六型都有</div>
                     </div>
@@ -1821,10 +1162,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.3">
+                <div class="test-item" data-id="A.3">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.3</div>
+                        <div class="step">步驟 A.3</div>
                         <div class="desc">點擊任一張卡片</div>
                         <div class="expected">預期：彈出大圖，可看到詳細說明</div>
                     </div>
@@ -1836,10 +1177,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.4">
+                <div class="test-item" data-id="A.4">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.4</div>
+                        <div class="step">步驟 A.4</div>
                         <div class="desc">將一張卡片拖到「喜歡」欄</div>
                         <div class="expected">預期：卡片放入成功</div>
                     </div>
@@ -1851,10 +1192,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.5">
+                <div class="test-item" data-id="A.5">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.5</div>
+                        <div class="step">步驟 A.5</div>
                         <div class="desc">將一張卡片拖到「中立」欄</div>
                         <div class="expected">預期：卡片放入成功</div>
                     </div>
@@ -1866,10 +1207,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.6">
+                <div class="test-item" data-id="A.6">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.6</div>
+                        <div class="step">步驟 A.6</div>
                         <div class="desc">將一張卡片拖到「不喜歡」欄</div>
                         <div class="expected">預期：卡片放入成功</div>
                     </div>
@@ -1881,10 +1222,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.7">
+                <div class="test-item" data-id="A.7">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.7</div>
+                        <div class="step">步驟 A.7</div>
                         <div class="desc">將卡片從「喜歡」移到「不喜歡」</div>
                         <div class="expected">預期：移動成功</div>
                     </div>
@@ -1896,10 +1237,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.8">
+                <div class="test-item" data-id="A.8">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.8</div>
+                        <div class="step">步驟 A.8</div>
                         <div class="desc">點擊卡片上的 ✕ 圖示移除卡片</div>
                         <div class="expected">預期：卡片返回原處</div>
                     </div>
@@ -1911,10 +1252,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.9">
+                <div class="test-item" data-id="A.9">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.9</div>
+                        <div class="step">步驟 A.9</div>
                         <div class="desc">在同一欄內重新排序</div>
                         <div class="expected">預期：排序成功</div>
                     </div>
@@ -1926,10 +1267,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.10">
+                <div class="test-item" data-id="A.10">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.10 <span class="sync-badge">同步測試</span></div>
+                        <div class="step">步驟 A.10 <span class="sync-badge">同步測試</span></div>
                         <div class="desc">諮詢師分類卡片</div>
                         <div class="expected">預期：訪客端即時同步</div>
                     </div>
@@ -1941,10 +1282,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.11">
+                <div class="test-item" data-id="A.11">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.11 <span class="sync-badge">同步測試</span></div>
+                        <div class="step">步驟 A.11 <span class="sync-badge">同步測試</span></div>
                         <div class="desc">訪客分類卡片</div>
                         <div class="expected">預期：諮詢師端即時同步</div>
                     </div>
@@ -1956,10 +1297,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="D.12">
+                <div class="test-item" data-id="A.12">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 D.12</div>
+                        <div class="step">步驟 A.12</div>
                         <div class="desc">切換到 List 模式</div>
                         <div class="expected">預期：顯示不同顏色區分各欄</div>
                     </div>
@@ -1973,10 +1314,460 @@
             </div>
         </details>
 
-        <!-- Game E: 成長規劃 -->
-        <details class="section" data-section="gameE">
-            <summary class="game-a">
-                <h3>🎮 遊戲 E：成長規劃 - 技能發展路徑</h3>
+        <!-- Game B: 職游旅人卡 -->
+        <details class="section" data-section="gameB">
+            <summary class="game-b">
+                <h3>🎮 遊戲 B：職游旅人卡 - 職涯收藏家</h3>
+                <span class="progress">0/13</span>
+            </summary>
+            <div class="section-content">
+                <div class="game-info">
+                    <h4>遊戲說明</h4>
+                    <p><strong>卡片數量：</strong>100 張職業卡</p>
+                    <p><strong>遊戲目的：</strong>收藏感興趣的職業（預設上限 15 張，可調整）</p>
+                    <div class="layout-demo">
+                        <div class="layout-left">
+                            <div class="layout-left-title">📋 職業卡清單</div>
+                            <div class="layout-card-stack">
+                                <div class="layout-card"></div>
+                                <div class="layout-card"></div>
+                                <div class="layout-card"></div>
+                            </div>
+                        </div>
+                        <div class="layout-right">
+                            <div class="layout-right-title">🎯 畫布區域</div>
+                            <div class="layout-collection" style="min-height: 70px;">
+                                收藏區域<br>
+                                <span style="font-size: 10px;">上限預設 15 張，可調整</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-b-collector.png" alt="職涯收藏家遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">職涯收藏家遊戲畫面</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-item" data-id="B.1">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.1</div>
+                        <div class="desc">選擇「職游旅人卡」遊戲模式</div>
+                        <div class="expected">預期：載入 100 張職業卡</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.2">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.2</div>
+                        <div class="desc">確認卡片數量</div>
+                        <div class="expected">預期：左側顯示 100 張（或接近）</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.3">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.3</div>
+                        <div class="desc">滾動瀏覽所有卡片</div>
+                        <div class="expected">預期：滾動流暢，圖片載入正常</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.4">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.4</div>
+                        <div class="desc">點擊任一張職業卡</div>
+                        <div class="expected">預期：彈出大圖預覽，可看到職業描述</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.5">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.5</div>
+                        <div class="desc">將一張卡片拖到收藏區</div>
+                        <div class="expected">預期：卡片收藏成功，計數 +1</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.6">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.6</div>
+                        <div class="desc">連續收藏多張卡片</div>
+                        <div class="expected">預期：都能成功收藏</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.7">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.7</div>
+                        <div class="desc">調整收藏上限（如改為 10）</div>
+                        <div class="expected">預期：上限更新成功</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.8">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.8</div>
+                        <div class="desc">嘗試超過上限收藏</div>
+                        <div class="expected">預期：應該被阻擋或提示</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.9">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.9</div>
+                        <div class="desc">將已收藏的卡片移出收藏區</div>
+                        <div class="expected">預期：卡片返回清單，計數 -1</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.10">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.10</div>
+                        <div class="desc">在收藏區內重新排序卡片</div>
+                        <div class="expected">預期：排序成功</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.11">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.11 <span class="sync-badge">同步測試</span></div>
+                        <div class="desc">諮詢師收藏卡片</div>
+                        <div class="expected">預期：訪客端即時看到</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.12">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.12 <span class="sync-badge">同步測試</span></div>
+                        <div class="desc">訪客收藏卡片</div>
+                        <div class="expected">預期：諮詢師端即時看到</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="B.13">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 B.13</div>
+                        <div class="desc">切換到 List 模式</div>
+                        <div class="expected">預期：顯示卡片名稱列表</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+            </div>
+        </details>
+
+        <!-- Game C: 職能盤點卡 -->
+        <details class="section" data-section="gameC">
+            <summary class="game-c">
+                <h3>🎮 遊戲 C：職能盤點卡 - 優劣勢分析</h3>
+                <span class="progress">0/11</span>
+            </summary>
+            <div class="section-content">
+                <div class="game-info">
+                    <h4>遊戲說明</h4>
+                    <p><strong>卡片數量：</strong>52 張（10 張行動卡 + 42 張職能卡）</p>
+                    <p><strong>遊戲目的：</strong>將職能分類到「優勢」或「劣勢」區域</p>
+                    <div class="layout-demo">
+                        <div class="layout-left">
+                            <div class="layout-left-title">📋 卡片清單</div>
+                            <div class="layout-card-stack">
+                                <div class="layout-card"></div>
+                                <div class="layout-card"></div>
+                                <div class="layout-card"></div>
+                            </div>
+                        </div>
+                        <div class="layout-right">
+                            <div class="layout-right-title">🎯 畫布區域</div>
+                            <div class="layout-zones">
+                                <div class="layout-zone strength">
+                                    優勢
+                                    <span class="layout-zone-sub">(上限可調)</span>
+                                </div>
+                                <div class="layout-zone weakness">
+                                    劣勢
+                                    <span class="layout-zone-sub">(上限可調)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-c-swot.png" alt="優劣勢分析遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">優劣勢分析遊戲畫面</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-item" data-id="C.1">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.1</div>
+                        <div class="desc">選擇「職能盤點卡」遊戲模式</div>
+                        <div class="expected">預期：載入 52 張卡片，顯示在左側清單</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.2">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.2</div>
+                        <div class="desc">確認卡片分類顯示</div>
+                        <div class="expected">預期：行動卡（action_01~10）和職能卡（mindset_01~42）都有</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.3">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.3</div>
+                        <div class="desc">點擊任一張卡片</div>
+                        <div class="expected">預期：彈出大圖預覽，可看清卡片內容</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.4">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.4</div>
+                        <div class="desc">將一張卡片拖曳到「優勢」區域</div>
+                        <div class="expected">預期：卡片移動成功，左側清單數量 -1</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.5">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.5</div>
+                        <div class="desc">將一張卡片拖曳到「劣勢」區域</div>
+                        <div class="expected">預期：卡片移動成功</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.6">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.6</div>
+                        <div class="desc">調整「優勢」區域上限（如改為 3）</div>
+                        <div class="expected">預期：上限更新成功</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.7">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.7</div>
+                        <div class="desc">嘗試超過上限放入卡片</div>
+                        <div class="expected">預期：應該被阻擋或提示</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.8">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.8</div>
+                        <div class="desc">點擊卡片上的 ✕ 圖示移除已分類的卡片</div>
+                        <div class="expected">預期：卡片返回原處</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.9">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.9 <span class="sync-badge">同步測試</span></div>
+                        <div class="desc">諮詢師拖曳卡片</div>
+                        <div class="expected">預期：訪客端即時看到變化</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.10">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.10 <span class="sync-badge">同步測試</span></div>
+                        <div class="desc">訪客拖曳卡片</div>
+                        <div class="expected">預期：諮詢師端即時看到變化</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="C.11">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 C.11</div>
+                        <div class="desc">切換顯示模式（Grid / List）</div>
+                        <div class="expected">預期：切換成功，卡片顯示方式改變</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+            </div>
+        </details>
+
+        <!-- Game D: 成長規劃 -->
+        <details class="section" data-section="gameD">
+            <summary class="game-d">
+                <h3>🎮 遊戲 D：成長規劃 - 技能發展路徑</h3>
                 <span class="progress">0/10</span>
             </summary>
             <div class="section-content">
@@ -2014,10 +1805,10 @@
                     </div>
                 </div>
 
-                <div class="test-item" data-id="E.1">
+                <div class="test-item" data-id="D.1">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.1</div>
+                        <div class="step">步驟 D.1</div>
                         <div class="desc">選擇「成長規劃」遊戲模式</div>
                         <div class="expected">預期：載入職能盤點卡，顯示三欄畫布</div>
                     </div>
@@ -2029,10 +1820,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.2">
+                <div class="test-item" data-id="D.2">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.2</div>
+                        <div class="step">步驟 D.2</div>
                         <div class="desc">拖曳卡片到「現有技能」區</div>
                         <div class="expected">預期：卡片成功放置，從左側消失</div>
                     </div>
@@ -2044,10 +1835,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.3">
+                <div class="test-item" data-id="D.3">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.3</div>
+                        <div class="step">步驟 D.3</div>
                         <div class="desc">拖曳卡片到「學習路徑」區</div>
                         <div class="expected">預期：卡片成功放置在中間欄</div>
                     </div>
@@ -2059,10 +1850,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.4">
+                <div class="test-item" data-id="D.4">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.4</div>
+                        <div class="step">步驟 D.4</div>
                         <div class="desc">拖曳卡片到「目標技能」區</div>
                         <div class="expected">預期：卡片成功放置在右側欄</div>
                     </div>
@@ -2074,10 +1865,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.5">
+                <div class="test-item" data-id="D.5">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.5</div>
+                        <div class="step">步驟 D.5</div>
                         <div class="desc">在區域間移動卡片</div>
                         <div class="expected">預期：可以在三個區域間自由移動</div>
                     </div>
@@ -2089,10 +1880,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.6">
+                <div class="test-item" data-id="D.6">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.6</div>
+                        <div class="step">步驟 D.6</div>
                         <div class="desc">點擊卡片上的 ✕ 圖示移除卡片</div>
                         <div class="expected">預期：卡片回到左側清單</div>
                     </div>
@@ -2104,10 +1895,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.7">
+                <div class="test-item" data-id="D.7">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.7</div>
+                        <div class="step">步驟 D.7</div>
                         <div class="desc">測試每區上限（10 張）</div>
                         <div class="expected">預期：超過上限時無法再放入</div>
                     </div>
@@ -2119,10 +1910,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.8">
+                <div class="test-item" data-id="D.8">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.8 <span class="sync-badge">同步測試</span></div>
+                        <div class="step">步驟 D.8 <span class="sync-badge">同步測試</span></div>
                         <div class="desc">諮詢師拖曳卡片</div>
                         <div class="expected">預期：訪客端即時看到變化</div>
                     </div>
@@ -2134,10 +1925,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.9">
+                <div class="test-item" data-id="D.9">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.9 <span class="sync-badge">同步測試</span></div>
+                        <div class="step">步驟 D.9 <span class="sync-badge">同步測試</span></div>
                         <div class="desc">訪客拖曳卡片</div>
                         <div class="expected">預期：諮詢師端即時看到變化</div>
                     </div>
@@ -2149,10 +1940,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="E.10">
+                <div class="test-item" data-id="D.10">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 E.10</div>
+                        <div class="step">步驟 D.10</div>
                         <div class="desc">截圖功能測試</div>
                         <div class="expected">預期：可下載成長規劃截圖</div>
                     </div>
@@ -2166,10 +1957,10 @@
             </div>
         </details>
 
-        <!-- Game F: 職位拆解 -->
-        <details class="section" data-section="gameF">
-            <summary class="game-b">
-                <h3>🎮 遊戲 F：職位拆解 - 職能對照分析</h3>
+        <!-- Game E: 職位拆解 -->
+        <details class="section" data-section="gameE">
+            <summary class="game-e">
+                <h3>🎮 遊戲 E：職位拆解 - 職能對照分析</h3>
                 <span class="progress">0/11</span>
             </summary>
             <div class="section-content">
@@ -2209,10 +2000,10 @@
                     </div>
                 </div>
 
-                <div class="test-item" data-id="F.1">
+                <div class="test-item" data-id="E.1">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.1</div>
+                        <div class="step">步驟 E.1</div>
                         <div class="desc">選擇「職位拆解」遊戲模式</div>
                         <div class="expected">預期：載入職能盤點卡，顯示分割畫布</div>
                     </div>
@@ -2224,10 +2015,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.2">
+                <div class="test-item" data-id="E.2">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.2</div>
+                        <div class="step">步驟 E.2</div>
                         <div class="desc">上傳 PDF 職位說明文件</div>
                         <div class="expected">預期：PDF 顯示在右側區域</div>
                     </div>
@@ -2239,10 +2030,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.3">
+                <div class="test-item" data-id="E.3">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.3</div>
+                        <div class="step">步驟 E.3</div>
                         <div class="desc">上傳圖片職位說明</div>
                         <div class="expected">預期：圖片顯示在右側區域</div>
                     </div>
@@ -2254,10 +2045,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.4">
+                <div class="test-item" data-id="E.4">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.4</div>
+                        <div class="step">步驟 E.4</div>
                         <div class="desc">拖曳職能卡到分析區</div>
                         <div class="expected">預期：卡片成功放置</div>
                     </div>
@@ -2269,10 +2060,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.5">
+                <div class="test-item" data-id="E.5">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.5</div>
+                        <div class="step">步驟 E.5</div>
                         <div class="desc">調整卡片順序（拖曳排序）</div>
                         <div class="expected">預期：可以重新排列卡片順序</div>
                     </div>
@@ -2284,10 +2075,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.6">
+                <div class="test-item" data-id="E.6">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.6</div>
+                        <div class="step">步驟 E.6</div>
                         <div class="desc">點擊卡片上的 ✕ 圖示移除卡片</div>
                         <div class="expected">預期：卡片回到左側清單</div>
                     </div>
@@ -2299,10 +2090,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.7">
+                <div class="test-item" data-id="E.7">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.7</div>
+                        <div class="step">步驟 E.7</div>
                         <div class="desc">測試卡片上限（10 張）</div>
                         <div class="expected">預期：超過上限時顯示提示</div>
                     </div>
@@ -2314,10 +2105,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.8">
+                <div class="test-item" data-id="E.8">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.8 <span class="sync-badge">同步測試</span></div>
+                        <div class="step">步驟 E.8 <span class="sync-badge">同步測試</span></div>
                         <div class="desc">諮詢師上傳文件</div>
                         <div class="expected">預期：訪客端即時看到上傳的文件</div>
                     </div>
@@ -2329,10 +2120,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.9">
+                <div class="test-item" data-id="E.9">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.9 <span class="sync-badge">同步測試</span></div>
+                        <div class="step">步驟 E.9 <span class="sync-badge">同步測試</span></div>
                         <div class="desc">諮詢師拖曳卡片</div>
                         <div class="expected">預期：訪客端即時看到變化</div>
                     </div>
@@ -2344,10 +2135,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.10">
+                <div class="test-item" data-id="E.10">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.10 <span class="sync-badge">同步測試</span></div>
+                        <div class="step">步驟 E.10 <span class="sync-badge">同步測試</span></div>
                         <div class="desc">訪客拖曳卡片</div>
                         <div class="expected">預期：諮詢師端即時看到變化</div>
                     </div>
@@ -2359,10 +2150,10 @@
                 </div>
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
 
-                <div class="test-item" data-id="F.11">
+                <div class="test-item" data-id="E.11">
                     <input type="checkbox">
                     <div class="content">
-                        <div class="step">步驟 F.11</div>
+                        <div class="step">步驟 E.11</div>
                         <div class="desc">截圖功能測試</div>
                         <div class="expected">預期：可下載職位分析截圖</div>
                     </div>
@@ -2376,9 +2167,218 @@
             </div>
         </details>
 
+        <!-- Game F: 價值導航卡 -->
+        <details class="section" data-section="gameF">
+            <summary class="game-f">
+                <h3>🎮 遊戲 F：價值導航卡 - 價值觀排序</h3>
+                <span class="progress">0/11</span>
+            </summary>
+            <div class="section-content">
+                <div class="game-info">
+                    <h4>遊戲說明</h4>
+                    <p><strong>卡片數量：</strong>36 張</p>
+                    <p><strong>遊戲目的：</strong>選出最重要的前三名價值觀並排序</p>
+                    <div class="layout-demo">
+                        <div class="layout-left">
+                            <div class="layout-left-title">📋 卡片清單</div>
+                            <div class="layout-card-stack">
+                                <div class="layout-card"></div>
+                                <div class="layout-card"></div>
+                                <div class="layout-card"></div>
+                            </div>
+                        </div>
+                        <div class="layout-right">
+                            <div class="layout-right-title">🎯 畫布區域</div>
+                            <div class="layout-rank">
+                                <div class="layout-rank-box">1</div>
+                                <div class="layout-rank-box">2</div>
+                                <div class="layout-rank-box">3</div>
+                            </div>
+                            <div class="layout-collection">其他重要價值區</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="screenshot-reference">
+                    <h4>📸 測試截圖參考</h4>
+                    <div class="screenshot-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshots/game-f-values.png" alt="價值觀排序遊戲畫面" onclick="openLightbox(this.src)">
+                            <div class="caption">價值觀排序遊戲畫面</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="test-item" data-id="F.1">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.1</div>
+                        <div class="desc">選擇「價值導航卡」遊戲模式</div>
+                        <div class="expected">預期：載入 36 張卡片</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.2">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.2</div>
+                        <div class="desc">確認卡片數量</div>
+                        <div class="expected">預期：左側顯示 36 張</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.3">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.3</div>
+                        <div class="desc">點擊任一張卡片</div>
+                        <div class="expected">預期：彈出大圖預覽</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.4">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.4</div>
+                        <div class="desc">將一張卡片拖到「第 1 名」位置</div>
+                        <div class="expected">預期：卡片放入成功，尺寸為 1:1</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.5">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.5</div>
+                        <div class="desc">將卡片放到「第 2 名」和「第 3 名」</div>
+                        <div class="expected">預期：卡片放入成功</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.6">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.6</div>
+                        <div class="desc">將卡片拖到「其他」區域</div>
+                        <div class="expected">預期：卡片放入成功，尺寸 1:1</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.7">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.7</div>
+                        <div class="desc">交換「第 1 名」和「第 2 名」的卡片</div>
+                        <div class="expected">預期：順序交換成功</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.8">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.8</div>
+                        <div class="desc">點擊卡片上的 ✕ 圖示移除已排序的卡片</div>
+                        <div class="expected">預期：卡片返回原處</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.9">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.9 <span class="sync-badge">同步測試</span></div>
+                        <div class="desc">諮詢師操作排序</div>
+                        <div class="expected">預期：訪客端即時同步</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.10">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.10 <span class="sync-badge">同步測試</span></div>
+                        <div class="desc">訪客操作排序</div>
+                        <div class="expected">預期：諮詢師端即時同步</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+
+                <div class="test-item" data-id="F.11">
+                    <input type="checkbox">
+                    <div class="content">
+                        <div class="step">步驟 F.11</div>
+                        <div class="desc">確認前三名和其他區域都是 1:1 正方形</div>
+                        <div class="expected">預期：尺寸正確</div>
+                    </div>
+                    <div class="status-buttons">
+                        <button class="status-btn pass" onclick="setStatus(this, 'pass')">✓ 通過</button>
+                        <button class="status-btn fail" onclick="setStatus(this, 'fail')">✗ 失敗</button>
+                        <button class="status-btn skip" onclick="setStatus(this, 'skip')">- 跳過</button>
+                    </div>
+                </div>
+                <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
+            </div>
+        </details>
+
         <!-- Game G: 生活重新設計 -->
         <details class="section" data-section="gameG">
-            <summary class="game-c">
+            <summary class="game-g">
                 <h3>🎮 遊戲 G：生活重新設計 - 100點能量分配</h3>
                 <span class="progress">0/12</span>
             </summary>
@@ -2600,6 +2600,7 @@
                 <div class="bug-report"><label>Bug 描述：</label><textarea placeholder="請描述發現的問題..."></textarea></div>
             </div>
         </details>
+
 
         <!-- Section: 輔助功能 -->
         <details class="section" data-section="tools">

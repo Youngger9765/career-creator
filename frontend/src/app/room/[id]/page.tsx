@@ -420,6 +420,14 @@ export default function RoomPage() {
     setIsCapturingScreenshot(true);
     setScreenshotMessage(null);
 
+    // 1. 隱藏筆記區域，讓遊戲畫面可以拉大
+    const wasDrawerOpen = notesDrawerOpen;
+    if (wasDrawerOpen) {
+      setNotesDrawerOpen(false);
+      // 等待畫面重新排版
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    }
+
     try {
       const blob = await captureCanvasScreenshot();
       await handleMobileNotesSubmit(notes, blob);
@@ -432,6 +440,10 @@ export default function RoomPage() {
       setTimeout(() => setScreenshotMessage(null), 3000);
     } finally {
       setIsCapturingScreenshot(false);
+      // 2. 恢復筆記區域
+      if (wasDrawerOpen) {
+        setNotesDrawerOpen(true);
+      }
     }
   };
 

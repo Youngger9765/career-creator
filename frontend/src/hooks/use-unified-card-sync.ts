@@ -126,7 +126,36 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     },
     onStateReceived: (gameState) => {
       console.log(`[${gameType}] Received game state:`, gameState);
-      // Call the optional callback to handle settings (e.g., planText)
+
+      // 1. 將收到的卡牌位置轉換為 cardPlacements 格式並套用
+      if (gameState.cards) {
+        const newPlacements: Record<string, string[]> = {};
+
+        // 初始化所有區域為空陣列
+        zones.forEach((zone) => {
+          newPlacements[`${zone}Cards`] = [];
+        });
+
+        // 根據收到的狀態填入卡牌
+        Object.entries(gameState.cards).forEach(([cardId, cardInfo]) => {
+          const zone = (cardInfo as { zone: string }).zone;
+          const key = `${zone}Cards`;
+          if (newPlacements[key]) {
+            (newPlacements[key] as string[]).push(cardId);
+          }
+        });
+
+        // 保留上傳的文件（如果有）- uploadedFile 不在 CardGameState 類型中，但實際會傳遞
+        const receivedUploadedFile = (gameState as any).uploadedFile;
+        if (receivedUploadedFile || state.cardPlacements.uploadedFile) {
+          newPlacements.uploadedFile = receivedUploadedFile || state.cardPlacements.uploadedFile;
+        }
+
+        console.log(`[${gameType}] Applying received card placements:`, newPlacements);
+        updateCards(newPlacements);
+      }
+
+      // 2. Call the optional callback to handle settings (e.g., planText)
       if (onStateReceived) {
         onStateReceived(gameState);
       }

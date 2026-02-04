@@ -75,14 +75,53 @@ def get_sheets_service():
         raise HTTPException(status_code=500, detail=f"Failed to authenticate: {str(e)}")
 
 
+def ensure_headers(service, sheet_id: str):
+    """Check if headers exist, if not add them."""
+    # Headers for each tab
+    test_headers = ["提交時間", "測試者", "環境", "瀏覽器", "OS", "流程", "步驟ID", "步驟描述", "預期結果", "狀態", "Bug描述"]
+    stats_headers = ["提交時間", "測試者", "環境", "瀏覽器", "OS", "Pass", "Fail", "Skip", "備註"]
+
+    try:
+        # Check 測試 tab
+        result = service.spreadsheets().values().get(
+            spreadsheetId=sheet_id,
+            range="測試!A1:K1"
+        ).execute()
+        if not result.get("values"):
+            service.spreadsheets().values().update(
+                spreadsheetId=sheet_id,
+                range="測試!A1:K1",
+                valueInputOption="RAW",
+                body={"values": [test_headers]}
+            ).execute()
+
+        # Check 統計 tab
+        result = service.spreadsheets().values().get(
+            spreadsheetId=sheet_id,
+            range="統計!A1:I1"
+        ).execute()
+        if not result.get("values"):
+            service.spreadsheets().values().update(
+                spreadsheetId=sheet_id,
+                range="統計!A1:I1",
+                valueInputOption="RAW",
+                body={"values": [stats_headers]}
+            ).execute()
+    except Exception:
+        pass  # Ignore errors, headers are optional
+
+
 @router.post("/feedback")
 async def submit_qa_feedback(submission: QAFeedbackSubmission) -> dict[str, Any]:
-    """Submit QA feedback to Google Sheets (2 tabs: 明細 + 摘要)."""
+    """Submit QA feedback to Google Sheets (2 tabs: 測試 + 統計)."""
     sheet_id = os.getenv("QA_SHEET_ID")
     if not sheet_id:
         raise HTTPException(status_code=500, detail="QA_SHEET_ID environment variable not set")
 
     service = get_sheets_service()
+
+    # Ensure headers exist
+    ensure_headers(service, sheet_id)
 
     # Prepare data
     test_date = submission.test_date or datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -212,10 +212,10 @@ export function NotesDrawer({
                 onClick={() => onCaptureScreenshot(noteContent)}
                 disabled={isCapturingScreenshot}
                 className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2 disabled:opacity-50"
-                title="儲存諮詢畫面截圖"
+                title="儲存筆記與諮詢畫面截圖"
               >
                 <Camera className="w-4 h-4" />
-                {isCapturingScreenshot ? '處理中...' : '儲存截圖'}
+                {isCapturingScreenshot ? '處理中...' : '儲存筆記截圖'}
               </button>
             )}
             <button

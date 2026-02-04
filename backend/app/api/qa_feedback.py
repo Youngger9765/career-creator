@@ -12,24 +12,24 @@ router = APIRouter(prefix="/api/qa", tags=["qa-feedback"])
 
 
 class QAFeedbackItem(BaseModel):
-    """Single feedback item from QA checklist."""
+    """Single checkpoint from QA checklist."""
 
-    category: str
-    item: str
+    section: str  # 流程名稱 (e.g., "諮詢師登入流程")
+    step_id: str  # 步驟 ID (e.g., "1.3")
+    step_desc: str  # 步驟描述
+    expected: str  # 預期結果
     status: str  # pass, fail, skip
-    notes: str = ""
+    bug_notes: str = ""  # Bug 描述
 
 
 class QAFeedbackSubmission(BaseModel):
     """Complete QA feedback submission."""
 
     tester_name: str
-    tester_email: str = ""
-    device: str
-    browser: str
-    test_date: str = ""
     environment: str = "staging"
-    overall_score: int = 0
+    browser: str = ""
+    os: str = ""
+    test_date: str = ""
     items: list[QAFeedbackItem] = []
     general_comments: str = ""
 
@@ -77,36 +77,64 @@ def get_sheets_service():
 
 @router.post("/feedback")
 async def submit_qa_feedback(submission: QAFeedbackSubmission) -> dict[str, Any]:
-    """Submit QA feedback to Google Sheets."""
+    """Submit QA feedback to Google Sheets (2 tabs: 明細 + 摘要)."""
     sheet_id = os.getenv("QA_SHEET_ID")
     if not sheet_id:
         raise HTTPException(status_code=500, detail="QA_SHEET_ID environment variable not set")
 
     service = get_sheets_service()
 
-    # Prepare row data
+    # Prepare data
     test_date = submission.test_date or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    pass_count = len([i for i in submission.items if i.status == "pass"])
+    fail_count = len([i for i in submission.items if i.status == "fail"])
+    skip_count = len([i for i in submission.items if i.status == "skip"])
 
-    # Summary row
+    # 明細 rows (one per checkpoint)
+    detail_rows = []
+    for item in submission.items:
+        detail_rows.append([
+            test_date,
+            submission.tester_name,
+            submission.environment,
+            submission.browser,
+            submission.os,
+            item.section,
+            item.step_id,
+            item.step_desc,
+            item.expected,
+            item.status,
+            item.bug_notes,
+        ])
+
+    # 摘要 row (one per submission)
     summary_row = [
         test_date,
         submission.tester_name,
-        submission.tester_email,
-        submission.device,
-        submission.browser,
         submission.environment,
-        submission.overall_score,
-        len([i for i in submission.items if i.status == "pass"]),
-        len([i for i in submission.items if i.status == "fail"]),
-        len([i for i in submission.items if i.status == "skip"]),
+        submission.browser,
+        submission.os,
+        pass_count,
+        fail_count,
+        skip_count,
         submission.general_comments,
     ]
 
     try:
-        # Append to main sheet (工作表1)
+        # Write to 測試 tab (raw data)
+        if detail_rows:
+            service.spreadsheets().values().append(
+                spreadsheetId=sheet_id,
+                range="測試!A:K",
+                valueInputOption="RAW",
+                insertDataOption="INSERT_ROWS",
+                body={"values": detail_rows},
+            ).execute()
+
+        # Write to 統計 tab (summary)
         service.spreadsheets().values().append(
             spreadsheetId=sheet_id,
-            range="工作表1!A:K",
+            range="統計!A:I",
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
             body={"values": [summary_row]},
@@ -114,17 +142,26 @@ async def submit_qa_feedback(submission: QAFeedbackSubmission) -> dict[str, Any]
 
         return {
             "success": True,
-            "message": "Feedback submitted successfully",
+            "message": f"已提交 {len(submission.items)} 個檢核點（{pass_count} Pass / {fail_count} Fail / {skip_count} Skip）",
             "summary": {
                 "tester": submission.tester_name,
                 "date": test_date,
-                "pass": len([i for i in submission.items if i.status == "pass"]),
-                "fail": len([i for i in submission.items if i.status == "fail"]),
+                "total": len(submission.items),
+                "pass": pass_count,
+                "fail": fail_count,
+                "skip": skip_count,
             },
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to write to sheet: {str(e)}")
+        error_msg = str(e)
+        # Check if it's a "sheet not found" error
+        if "Unable to parse range" in error_msg:
+            raise HTTPException(
+                status_code=500,
+                detail="Sheet tabs not found. Please create '測試' and '統計' tabs in the Google Sheet.",
+            )
+        raise HTTPException(status_code=500, detail=f"Failed to write to sheet: {error_msg}")
 
 
 @router.get("/health")

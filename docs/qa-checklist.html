@@ -1912,35 +1912,35 @@
             submitBtn.textContent = '⏳ 送出中...';
             submitBtn.disabled = true;
 
-            // Collect all test items
+            // Collect all test items with full details
             const items = [];
             document.querySelectorAll('.test-item').forEach(item => {
-                const id = item.dataset.id;
+                const stepId = item.dataset.id || '';
                 const status = item.dataset.status || 'skip';
-                const step = item.querySelector('.step')?.textContent || '';
-                const desc = item.querySelector('.desc')?.textContent || '';
-                const bugDesc = item.nextElementSibling?.querySelector('textarea')?.value || '';
+                const stepDesc = item.querySelector('.desc')?.textContent || '';
+                const expected = item.querySelector('.expected')?.textContent?.replace('預期：', '') || '';
+                const bugNotes = item.nextElementSibling?.querySelector('textarea')?.value || '';
 
-                // Find category from parent section
+                // Find section name from parent
                 const section = item.closest('.section');
-                const category = section?.querySelector('h3')?.textContent || 'Unknown';
+                const sectionName = section?.querySelector('h3')?.textContent?.replace(/^[\d️⃣🎮\s]+/, '') || 'Unknown';
 
                 items.push({
-                    category: category,
-                    item: `${step}: ${desc}`,
+                    section: sectionName,
+                    step_id: stepId,
+                    step_desc: stepDesc,
+                    expected: expected,
                     status: status,
-                    notes: bugDesc
+                    bug_notes: bugNotes
                 });
             });
 
             const payload = {
                 tester_name: testerName,
-                tester_email: '',
-                device: document.getElementById('os').value,
-                browser: document.getElementById('browser').value,
-                test_date: testDate,
                 environment: testEnv,
-                overall_score: parseInt(document.querySelector('input[name="rating"]:checked')?.value || 0),
+                browser: document.getElementById('browser').value,
+                os: document.getElementById('os').value,
+                test_date: testDate,
                 items: items,
                 general_comments: document.getElementById('overallFeedback')?.value || ''
             };
@@ -1960,7 +1960,10 @@
                 }
 
                 const result = await response.json();
-                alert(`✅ 送出成功！\n\n通過: ${result.summary.pass}\n失敗: ${result.summary.fail}`);
+                alert(`✅ ${result.message}\n\n` +
+                      `通過: ${result.summary.pass}\n` +
+                      `失敗: ${result.summary.fail}\n` +
+                      `跳過: ${result.summary.skip}`);
             } catch (error) {
                 console.error('Submit error:', error);
                 alert(`❌ 送出失敗: ${error.message}\n\n請確認網路連線或聯繫開發團隊。`);

@@ -87,7 +87,7 @@ export const mockCardsData: MockCardsData = {
     },
     {
       id: 'career-10',
-      title: '心理諮商師',
+      title: '心理諮詢師',
       description: '提供心理健康諮詢',
       category: 'healthcare',
       tags: ['心理', '諮詢'],

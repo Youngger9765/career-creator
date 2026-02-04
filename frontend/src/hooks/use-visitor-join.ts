@@ -191,7 +191,7 @@ export function useVisitorJoin() {
         // Check if owner (counselor) is online
         const ownerOnline = await checkOwnerOnline(room.id);
         if (!ownerOnline) {
-          throw new Error('諮商師尚未開啟房間，請稍後再試');
+          throw new Error('諮詢師尚未開啟房間，請稍後再試');
         }
 
         // Create visitor using share code

@@ -77,7 +77,7 @@ async def get_my_clients(
 ) -> List[ClientResponse]:
     """
     Get all clients for the current counselor
-    獲取當前諮商師的所有客戶
+    獲取當前諮詢師的所有客戶
 
     Optimized to avoid N+1 queries using:
     - Preload all statistics with JOIN + GROUP BY
@@ -256,7 +256,7 @@ async def create_client(
     """
     Create a new client for the current counselor.
     Each counselor has independent client records.
-    創建新客戶 - 每個諮商師有獨立的客戶記錄
+    創建新客戶 - 每個諮詢師有獨立的客戶記錄
     """
     check_counselor_permission(current_user)
 

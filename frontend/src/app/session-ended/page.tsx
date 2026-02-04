@@ -28,10 +28,10 @@ export default function SessionEndedPage() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">諮商已結束</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">諮詢已結束</h1>
 
         <p className="text-gray-600 mb-8">
-          諮商師已離開房間，本次諮商已結束。感謝您的參與！
+          諮詢師已離開房間，本次諮詢已結束。感謝您的參與！
         </p>
 
         <Button onClick={handleBackToHome} className="w-full" size="lg">
@@ -39,7 +39,7 @@ export default function SessionEndedPage() {
         </Button>
 
         <p className="text-sm text-gray-500 mt-4">
-          如有任何問題，請與諮商師聯繫
+          如有任何問題，請與諮詢師聯繫
         </p>
       </div>
     </div>

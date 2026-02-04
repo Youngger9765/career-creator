@@ -232,7 +232,7 @@ def seed_career_cards():
         },
         {
             "card_key": "health_004",
-            "title": "心理諮商師",
+            "title": "心理諮詢師",
             "description": "提供心理支持，協助解決情緒問題",
             "category": "healthcare",
         },
@@ -794,7 +794,7 @@ def seed_crm_data():
         counselor1_id = UUID(DEMO_ACCOUNT_UUIDS["demo.counselor@example.com"])
         counselor2_id = UUID(DEMO_ACCOUNT_UUIDS["demo.counselor2@example.com"])
 
-        # 創建客戶資料 - 每個諮商師有獨立的客戶紀錄
+        # 創建客戶資料 - 每個諮詢師有獨立的客戶紀錄
         clients_data = [
             # Demo counselor 001's clients
             # 1. 沒有 email

@@ -235,7 +235,8 @@ export function useRoomParticipants(
   }, [participants, onlineUsers, presenceConnected, currentUser?.id]);
 
   const participantCount = mergedParticipants.length;
-  const onlineCount = mergedParticipants.filter((p) => p.isOnline).length;
+  // Use presence onlineUsers directly for accurate count (mergedParticipants may lag behind)
+  const onlineCount = onlineUsers.length > 0 ? onlineUsers.length : mergedParticipants.filter((p) => p.isOnline).length;
 
   return {
     participants: mergedParticipants,

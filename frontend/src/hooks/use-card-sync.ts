@@ -11,6 +11,28 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import { throttle, debounce } from '@/lib/throttle-debounce';
 import { RealtimeRetryManager, classifyRealtimeError, type ClassifiedError, type RealtimeErrorType } from '@/lib/realtime-retry';
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+/** Throttle delay for card move broadcasts (ms) */
+const THROTTLE_CARD_MOVE_MS = 300;
+
+/** Debounce delay for game state save broadcasts (ms) */
+const DEBOUNCE_GAME_STATE_MS = 500;
+
+/** Debounce delay for drag end broadcasts (ms) */
+const DEBOUNCE_DRAG_END_MS = 500;
+
+/** Maximum retry attempts for reconnection */
+const MAX_RETRY_ATTEMPTS = 5;
+
+/** Initial delay for exponential backoff (ms) */
+const INITIAL_RETRY_DELAY_MS = 1000;
+
+/** Maximum delay for exponential backoff (ms) */
+const MAX_RETRY_DELAY_MS = 30000;
+
 // 牌卡移動事件
 export interface CardMoveEvent {
   cardId: string;
@@ -191,7 +213,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
           .catch((err) => {
             console.error('[CardSyncRT] Failed to broadcast game state:', err);
           });
-      }, 500),
+      }, DEBOUNCE_GAME_STATE_MS),
     []
   );
 
@@ -231,7 +253,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
             console.error('[CardSyncRT] Failed to broadcast move:', err);
             setError('無法同步牌卡移動');
           });
-      }, 300),
+      }, THROTTLE_CARD_MOVE_MS),
     []
   );
 
@@ -313,7 +335,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
           .catch((err) => {
             console.error('[CardSyncRT] Failed to broadcast drag end:', err);
           });
-      }, 500),
+      }, DEBOUNCE_DRAG_END_MS),
     []
   );
 
@@ -379,9 +401,9 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     // Initialize retry manager
     if (!retryManagerRef.current) {
       retryManagerRef.current = new RealtimeRetryManager({
-        maxRetries: 5,
-        initialDelayMs: 1000,
-        maxDelayMs: 30000,
+        maxRetries: MAX_RETRY_ATTEMPTS,
+        initialDelayMs: INITIAL_RETRY_DELAY_MS,
+        maxDelayMs: MAX_RETRY_DELAY_MS,
       });
     }
 
@@ -486,7 +508,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
           retryManager.reset();
           setRetryExhausted(false);
           setIsRetrying(false);
-          setRemainingRetries(5);
+          setRemainingRetries(MAX_RETRY_ATTEMPTS);
           setIsConnected(true);
           setError(null);
           setErrorType(null);
@@ -590,7 +612,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     // Reset state
     setRetryExhausted(false);
     setIsRetrying(false);
-    setRemainingRetries(5);
+    setRemainingRetries(MAX_RETRY_ATTEMPTS);
     setError(null);
     setErrorType(null);
 

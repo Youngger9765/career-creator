@@ -11,6 +11,19 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DECK_TYPES, GAMEPLAY_IDS, getDefaultGameplay } from '@/constants/game-modes';
 import { RealtimeRetryManager, classifyRealtimeError, RealtimeErrorType } from '@/lib/realtime-retry';
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+/** Maximum retry attempts for reconnection */
+const MAX_RETRY_ATTEMPTS = 5;
+
+/** Initial delay for exponential backoff (ms) */
+const INITIAL_RETRY_DELAY_MS = 1000;
+
+/** Maximum delay for exponential backoff (ms) */
+const MAX_RETRY_DELAY_MS = 30000;
+
 export interface GameModeState {
   deck: string;
   gameRule: string;
@@ -228,9 +241,9 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Initialize retry manager
     if (!retryManagerRef.current) {
       retryManagerRef.current = new RealtimeRetryManager({
-        maxRetries: 5,
-        initialDelayMs: 1000,
-        maxDelayMs: 30000,
+        maxRetries: MAX_RETRY_ATTEMPTS,
+        initialDelayMs: INITIAL_RETRY_DELAY_MS,
+        maxDelayMs: MAX_RETRY_DELAY_MS,
       });
     }
 
@@ -399,7 +412,7 @@ export function useGameModeSync(options: UseGameModeSyncOptions): UseGameModeSyn
     // Reset state
     setRetryExhausted(false);
     setIsRetrying(false);
-    setRemainingRetries(5);
+    setRemainingRetries(MAX_RETRY_ATTEMPTS);
     setError(null);
     setErrorType(null);
 

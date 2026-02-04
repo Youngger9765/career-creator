@@ -103,37 +103,14 @@ async def submit_qa_feedback(submission: QAFeedbackSubmission) -> dict[str, Any]
     ]
 
     try:
-        # Append to Summary sheet
+        # Append to main sheet (工作表1)
         service.spreadsheets().values().append(
             spreadsheetId=sheet_id,
-            range="Summary!A:K",
+            range="工作表1!A:K",
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
             body={"values": [summary_row]},
         ).execute()
-
-        # Append individual items to Details sheet (if items provided)
-        if submission.items:
-            detail_rows = []
-            for item in submission.items:
-                detail_rows.append(
-                    [
-                        test_date,
-                        submission.tester_name,
-                        item.category,
-                        item.item,
-                        item.status,
-                        item.notes,
-                    ]
-                )
-
-            service.spreadsheets().values().append(
-                spreadsheetId=sheet_id,
-                range="Details!A:F",
-                valueInputOption="RAW",
-                insertDataOption="INSERT_ROWS",
-                body={"values": detail_rows},
-            ).execute()
 
         return {
             "success": True,

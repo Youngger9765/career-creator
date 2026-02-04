@@ -115,15 +115,18 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
       // 3. 更新狀態
       updateCards(currentPlacements);
 
-      // 4. Mark as dirty for persistence (skip if from remote)
-      if (!skipBroadcast) {
+      // 4. Mark as dirty for persistence
+      // - Local moves: always mark dirty
+      // - Remote moves (skipBroadcast=true): only mark dirty for owner
+      //   (Owner needs to persist visitor's moves to DB; visitor syncs from owner anyway)
+      if (!skipBroadcast || isRoomOwner) {
         persistence.markDirty();
       }
 
       // 5. 返回 fromZone 和更新後的 placements（避免 stale closure）
       return { fromZone, newPlacements: currentPlacements };
     },
-    [state.cardPlacements, zones, updateCards, persistence]
+    [state.cardPlacements, zones, updateCards, persistence, isRoomOwner]
   );
 
   // 同步服務

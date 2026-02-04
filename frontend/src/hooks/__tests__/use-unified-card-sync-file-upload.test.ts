@@ -38,6 +38,11 @@ describe('useUnifiedCardSync - File Upload Synchronization', () => {
     saveGameState: vi.fn(),
     isConnected: true,
     error: null,
+    errorType: null,
+    retryExhausted: false,
+    isRetrying: false,
+    remainingRetries: 5,
+    reconnect: vi.fn(),
     channelRef: { current: null },
     uploadFile: vi.fn(), // NEW: mock file upload broadcast
   };

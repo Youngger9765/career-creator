@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
-import { RealtimeRetryManager } from '@/lib/realtime-retry';
+import { RealtimeRetryManager, classifyRealtimeError, type RealtimeErrorType } from '@/lib/realtime-retry';
 
 export interface PresenceUser {
   id: string; // user-123 或 visitor-session-abc
@@ -24,15 +24,25 @@ interface PresenceState {
   [key: string]: PresenceUser[];
 }
 
-export function usePresence(roomId: string | undefined) {
+export function usePresence(roomId: string | undefined, onConnectionChange?: (isConnected: boolean, errorType?: RealtimeErrorType) => void) {
   const router = useRouter();
   const [onlineUsers, setOnlineUsers] = useState<PresenceUser[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<RealtimeErrorType | null>(null);
   const [retryExhausted, setRetryExhausted] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [remainingRetries, setRemainingRetries] = useState(5);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const prevCountRef = useRef(0);
   const retryManagerRef = useRef<RealtimeRetryManager | null>(null);
+  const onConnectionChangeRef = useRef(onConnectionChange);
+  const setupPresenceRef = useRef<(() => Promise<void>) | null>(null);
+
+  // Keep callback ref updated
+  useEffect(() => {
+    onConnectionChangeRef.current = onConnectionChange;
+  }, [onConnectionChange]);
 
   // 取得當前用戶資訊
   const { user } = useAuthStore();
@@ -122,6 +132,7 @@ export function usePresence(roomId: string | undefined) {
 
     const setupPresence = async () => {
       if (isCleanedUp) return;
+      setupPresenceRef.current = setupPresence;
 
       try {
         // Clean up existing channel if any
@@ -220,45 +231,77 @@ export function usePresence(roomId: string | undefined) {
           console.log('[usePresence] Subscription status:', status, 'Error:', err);
 
           if (status === 'SUBSCRIBED') {
-            // Success! Reset retry counter
+            // Success! Reset retry counter and state
             retryManager.reset();
             setRetryExhausted(false);
+            setIsRetrying(false);
+            setRemainingRetries(5);
             setIsConnected(true);
             setError(null);
-            console.log('[usePresence] ✅ Channel subscribed successfully');
+            setErrorType(null);
+            onConnectionChangeRef.current?.(true);
+            console.log('[usePresence] Channel subscribed successfully');
 
             // 發送自己的 presence 狀態 - use ref for latest identity
             try {
               const currentIdentity = userIdentityRef.current;
               if (currentIdentity) {
                 const presenceTrackStatus = await channel.track(currentIdentity);
-                console.log('[usePresence] ✅ Presence track status:', presenceTrackStatus);
+                console.log('[usePresence] Presence track status:', presenceTrackStatus);
               }
             } catch (trackErr) {
               console.error('[usePresence] Failed to track presence:', trackErr);
+            }
+          } else if (status === 'TIMED_OUT') {
+            // Handle timeout specifically - always retryable
+            console.warn('[usePresence] Connection timed out');
+            setIsConnected(false);
+            setError('連線逾時，正在重新連線...');
+            setErrorType('TIMED_OUT');
+            onConnectionChangeRef.current?.(false, 'TIMED_OUT');
+
+            if (!isCleanedUp && retryManager.canRetry()) {
+              setIsRetrying(true);
+              setRemainingRetries(retryManager.getRemainingRetries());
+              retryManager.scheduleRetry(() => {
+                console.log('[usePresence] Attempting reconnection after timeout...');
+                setupPresence();
+              });
+            } else {
+              setRetryExhausted(true);
+              setIsRetrying(false);
+              setError('無法連接到即時服務，請重新整理頁面');
             }
           } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
             console.error('[usePresence] Subscription error:', err || status);
             setIsConnected(false);
 
-            // Check if error is quota-related
-            const errorMsg = err?.message || String(err) || '';
-            if (errorMsg.includes('quota') || errorMsg.includes('rate_limit')) {
-              setError('服務配額已達上限，請稍後再試');
+            // Classify the error for appropriate handling
+            const classifiedError = classifyRealtimeError(status, err);
+            setError(classifiedError.userMessage);
+            setErrorType(classifiedError.type);
+            onConnectionChangeRef.current?.(false, classifiedError.type);
+
+            // Handle based on error classification
+            if (!classifiedError.isRetryable) {
+              // Non-retryable errors: graceful degradation
+              console.warn(`[usePresence] Non-retryable error (${classifiedError.type}), degrading gracefully`);
               setRetryExhausted(true);
-              return; // Don't retry on quota errors
+              setIsRetrying(false);
+              return;
             }
 
-            setError(err?.message || '連接失敗');
-
-            // Attempt retry with exponential backoff
+            // Attempt retry with exponential backoff for retryable errors
             if (!isCleanedUp && retryManager.canRetry()) {
+              setIsRetrying(true);
+              setRemainingRetries(retryManager.getRemainingRetries());
               retryManager.scheduleRetry(() => {
                 console.log('[usePresence] Attempting reconnection...');
                 setupPresence();
               });
             } else if (!retryManager.canRetry()) {
               setRetryExhausted(true);
+              setIsRetrying(false);
               setError('無法連接到即時服務，請重新整理頁面');
             }
           }
@@ -267,17 +310,25 @@ export function usePresence(roomId: string | undefined) {
         if (isCleanedUp) return;
 
         console.error('Presence 連接錯誤:', err);
-        setError(err instanceof Error ? err.message : '連接失敗');
-        setIsConnected(false);
 
-        // Attempt retry with exponential backoff
-        if (retryManager.canRetry()) {
+        // Classify the caught error
+        const classifiedError = classifyRealtimeError(undefined, err);
+        setError(classifiedError.userMessage);
+        setErrorType(classifiedError.type);
+        setIsConnected(false);
+        onConnectionChangeRef.current?.(false, classifiedError.type);
+
+        // Only retry if error is retryable
+        if (classifiedError.isRetryable && retryManager.canRetry()) {
+          setIsRetrying(true);
+          setRemainingRetries(retryManager.getRemainingRetries());
           retryManager.scheduleRetry(() => {
             console.log('[usePresence] Attempting reconnection after error...');
             setupPresence();
           });
         } else {
           setRetryExhausted(true);
+          setIsRetrying(false);
         }
       }
     };
@@ -302,27 +353,40 @@ export function usePresence(roomId: string | undefined) {
 
   // 手動重新連接
   const reconnect = useCallback(() => {
+    console.log('[usePresence] Manual reconnect requested');
+
     // Reset retry manager to allow fresh retries
     if (retryManagerRef.current) {
       retryManagerRef.current.reset();
     }
+
+    // Reset state
     setRetryExhausted(false);
+    setIsRetrying(false);
+    setRemainingRetries(5);
+    setError(null);
+    setErrorType(null);
 
     if (channelRef.current) {
       channelRef.current.unsubscribe();
       channelRef.current = null;
     }
-    // 重新觸發 useEffect
-    setIsConnected(false);
-    setError(null);
+
+    // Trigger reconnection
+    if (setupPresenceRef.current) {
+      setupPresenceRef.current();
+    }
   }, []);
 
   return {
     onlineUsers,
     isConnected,
     error,
+    errorType,
     reconnect,
-    retryExhausted, // Expose retry exhaustion state
+    retryExhausted,
+    isRetrying,
+    remainingRetries,
     // 用於除錯
     currentUser: userIdentity,
   };

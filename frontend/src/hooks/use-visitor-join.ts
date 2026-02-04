@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { visitorsAPI, VisitorCreate, Visitor } from '@/lib/api/visitors';
 import { roomsAPI, Room } from '@/lib/api/rooms';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
+import { classifyRealtimeError } from '@/lib/realtime-retry';
 import type { PresenceUser } from './use-presence';
 
 interface VisitorSession {
@@ -119,16 +120,29 @@ export function useVisitorJoin() {
           resolve(ownerOnline);
         });
 
-        // Subscribe to channel
-        tempChannel!.subscribe((status: string) => {
+        // Subscribe to channel with error classification
+        tempChannel!.subscribe((status: string, err?: Error) => {
           console.log('[useVisitorJoin] Channel status:', status);
-          if (status === 'CHANNEL_ERROR') {
+
+          if (status === 'TIMED_OUT') {
             clearTimeout(timeout);
-            console.warn('[useVisitorJoin] Channel error, allowing join');
-            resolve(true); // Channel error = allow join (fail open)
-          } else if (status === 'CLOSED') {
+            console.warn('[useVisitorJoin] Channel timed out, allowing join (fail open)');
+            resolve(true);
+          } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
             clearTimeout(timeout);
-            reject(new Error('Channel closed'));
+
+            // Classify the error for logging
+            const classifiedError = classifyRealtimeError(status, err);
+            console.warn(`[useVisitorJoin] Channel ${classifiedError.type}: ${classifiedError.message}`);
+
+            // For rate limiting, we should NOT allow join (might overwhelm the service)
+            if (classifiedError.type === 'RATE_LIMITED') {
+              reject(new Error('服務繁忙，請稍後再試'));
+              return;
+            }
+
+            // For other errors, fail open
+            resolve(true);
           }
         });
       });
@@ -136,7 +150,16 @@ export function useVisitorJoin() {
       return await syncPromise;
     } catch (error) {
       console.error('[useVisitorJoin] Error checking owner presence:', error);
-      return true; // Fail open
+
+      // Classify the error
+      const classifiedError = classifyRealtimeError(undefined, error);
+
+      // For rate limiting, propagate the error
+      if (classifiedError.type === 'RATE_LIMITED') {
+        throw new Error(classifiedError.userMessage);
+      }
+
+      return true; // Fail open for other errors
     } finally {
       if (tempChannel) {
         await tempChannel.unsubscribe();

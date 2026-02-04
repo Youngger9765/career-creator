@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { throttle, debounce } from '@/lib/throttle-debounce';
-import { RealtimeRetryManager } from '@/lib/realtime-retry';
+import { RealtimeRetryManager, classifyRealtimeError, type ClassifiedError, type RealtimeErrorType } from '@/lib/realtime-retry';
 
 // 牌卡移動事件
 export interface CardMoveEvent {
@@ -74,6 +74,7 @@ export interface UseCardSyncOptions {
   onDragEnd?: (cardId: string) => void;
   onStateReceived?: (state: CardGameState) => void;
   onFileUpload?: (fileData: FileUploadEvent) => void;
+  onConnectionChange?: (isConnected: boolean, errorType?: RealtimeErrorType) => void;
 }
 
 export interface UseCardSyncReturn {
@@ -100,8 +101,16 @@ export interface UseCardSyncReturn {
   // 連線狀態
   isConnected: boolean;
   error: string | null;
+  // 錯誤類型（用於 UI 顯示不同訊息）
+  errorType: RealtimeErrorType | null;
   // 重試是否已耗盡
   retryExhausted: boolean;
+  // 是否正在重試
+  isRetrying: boolean;
+  // 剩餘重試次數
+  remainingRetries: number;
+  // 手動重連
+  reconnect: () => void;
   // Channel reference for direct access
   channelRef: React.MutableRefObject<RealtimeChannel | null>;
 }
@@ -118,14 +127,19 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     onDragEnd,
     onStateReceived,
     onFileUpload,
+    onConnectionChange,
   } = options;
 
   const [draggedCards, setDraggedCards] = useState<Map<string, DragInfo>>(new Map());
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<RealtimeErrorType | null>(null);
   const [retryExhausted, setRetryExhausted] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [remainingRetries, setRemainingRetries] = useState(5);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const retryManagerRef = useRef<RealtimeRetryManager | null>(null);
+  const onConnectionChangeRef = useRef(onConnectionChange);
 
   // Use refs for callbacks to avoid dependency issues in useEffect
   const onCardMoveRef = useRef(onCardMove);
@@ -140,7 +154,8 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     onDragEndRef.current = onDragEnd;
     onStateReceivedRef.current = onStateReceived;
     onFileUploadRef.current = onFileUpload;
-  }, [onCardMove, onDragStart, onDragEnd, onStateReceived, onFileUpload]);
+    onConnectionChangeRef.current = onConnectionChange;
+  }, [onCardMove, onDragStart, onDragEnd, onStateReceived, onFileUpload, onConnectionChange]);
 
   // LocalStorage key
   const storageKey = `career_creator_cards_${roomId}_${gameType}`;
@@ -354,6 +369,9 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     userIdRef.current = userId;
   }, [isOwner, userId]);
 
+  // Track setupChannel for reconnect
+  const setupChannelRef = useRef<(() => Promise<void>) | null>(null);
+
   // 設置頻道和監聽器
   useEffect(() => {
     if (!isSupabaseConfigured() || !supabase || !roomId) return;
@@ -372,6 +390,7 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
 
     const setupChannel = async () => {
       if (isCleanedUp) return;
+      setupChannelRef.current = setupChannel;
 
       // Clean up existing channel
       if (channelRef.current) {
@@ -463,12 +482,16 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
         if (isCleanedUp) return;
 
         if (status === 'SUBSCRIBED') {
-          // Success! Reset retry counter
+          // Success! Reset retry counter and state
           retryManager.reset();
           setRetryExhausted(false);
+          setIsRetrying(false);
+          setRemainingRetries(5);
           setIsConnected(true);
           setError(null);
+          setErrorType(null);
           channelRef.current = channel;
+          onConnectionChangeRef.current?.(true);
 
           // 新用戶請求當前狀態
           if (!isOwnerRef.current) {
@@ -478,29 +501,58 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
               payload: { userId: userIdRef.current },
             });
           }
+        } else if (status === 'TIMED_OUT') {
+          // Handle timeout specifically - always retryable
+          console.warn('[CardSyncRT] Connection timed out');
+          setIsConnected(false);
+          channelRef.current = null;
+          setError('連線逾時，正在重新連線...');
+          setErrorType('TIMED_OUT');
+          onConnectionChangeRef.current?.(false, 'TIMED_OUT');
+
+          if (!isCleanedUp && retryManager.canRetry()) {
+            setIsRetrying(true);
+            setRemainingRetries(retryManager.getRemainingRetries());
+            retryManager.scheduleRetry(() => {
+              console.log('[CardSyncRT] Attempting reconnection after timeout...');
+              setupChannel();
+            });
+          } else {
+            setRetryExhausted(true);
+            setIsRetrying(false);
+            setError('無法連接到即時服務，請重新整理頁面');
+          }
         } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
           console.error('[CardSyncRT] Subscribe error:', err || status);
           setIsConnected(false);
           channelRef.current = null;
 
-          // Check if error is quota-related
-          const errorMsg = err?.message || String(err) || '';
-          if (errorMsg.includes('quota') || errorMsg.includes('rate_limit')) {
-            setError('服務配額已達上限，請稍後再試');
+          // Classify the error for appropriate handling
+          const classifiedError = classifyRealtimeError(status, err);
+          setError(classifiedError.userMessage);
+          setErrorType(classifiedError.type);
+          onConnectionChangeRef.current?.(false, classifiedError.type);
+
+          // Handle based on error classification
+          if (!classifiedError.isRetryable) {
+            // Non-retryable errors: graceful degradation
+            console.warn(`[CardSyncRT] Non-retryable error (${classifiedError.type}), degrading gracefully`);
             setRetryExhausted(true);
-            return; // Don't retry on quota errors
+            setIsRetrying(false);
+            return;
           }
 
-          setError('無法連接到牌卡同步服務');
-
-          // Attempt retry with exponential backoff
+          // Attempt retry with exponential backoff for retryable errors
           if (!isCleanedUp && retryManager.canRetry()) {
+            setIsRetrying(true);
+            setRemainingRetries(retryManager.getRemainingRetries());
             retryManager.scheduleRetry(() => {
               console.log('[CardSyncRT] Attempting reconnection...');
               setupChannel();
             });
           } else if (!retryManager.canRetry()) {
             setRetryExhausted(true);
+            setIsRetrying(false);
             setError('無法連接到即時服務，請重新整理頁面');
           }
         }
@@ -526,6 +578,28 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     };
   }, [roomId, gameType, loadGameState, throttledBroadcastMove, debouncedBroadcastDragEnd, debouncedBroadcastGameState]); // Minimal deps - use refs for others
 
+  // Manual reconnect function
+  const reconnect = useCallback(() => {
+    console.log('[CardSyncRT] Manual reconnect requested');
+
+    // Reset retry manager
+    if (retryManagerRef.current) {
+      retryManagerRef.current.reset();
+    }
+
+    // Reset state
+    setRetryExhausted(false);
+    setIsRetrying(false);
+    setRemainingRetries(5);
+    setError(null);
+    setErrorType(null);
+
+    // Trigger reconnection
+    if (setupChannelRef.current) {
+      setupChannelRef.current();
+    }
+  }, []);
+
   return {
     draggedCards,
     moveCard,
@@ -536,7 +610,11 @@ export function useCardSync(options: UseCardSyncOptions): UseCardSyncReturn {
     saveGameState,
     isConnected,
     error,
-    retryExhausted, // Expose retry exhaustion state
-    channelRef, // Export for direct channel access
+    errorType,
+    retryExhausted,
+    isRetrying,
+    remainingRetries,
+    reconnect,
+    channelRef,
   };
 }

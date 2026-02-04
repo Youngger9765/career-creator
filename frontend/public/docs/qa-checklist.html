@@ -412,6 +412,94 @@
                 margin-top: 10px;
             }
         }
+
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--warning);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--muted);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-body ul {
+            margin: 12px 0;
+            padding-left: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .modal-body li {
+            margin: 8px 0;
+            color: var(--text);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .modal-btn-cancel {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .modal-btn-confirm {
+            background: var(--warning);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -432,37 +520,11 @@
                     <label for="testDate">測試日期 *</label>
                     <input type="date" id="testDate">
                 </div>
-                <div class="form-group">
-                    <label for="testEnv">測試環境 *</label>
-                    <select id="testEnv">
-                        <option value="">請選擇</option>
-                        <option value="production">Production</option>
-                        <option value="staging">Staging</option>
-                    </select>
-                </div>
             </div>
-            <div class="form-row" style="margin-top: 15px;">
-                <div class="form-group">
-                    <label for="browser">瀏覽器</label>
-                    <select id="browser">
-                        <option value="chrome">Chrome</option>
-                        <option value="safari">Safari</option>
-                        <option value="firefox">Firefox</option>
-                        <option value="edge">Edge</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="os">作業系統</label>
-                    <select id="os">
-                        <option value="windows">Windows</option>
-                        <option value="mac">macOS</option>
-                        <option value="ios">iOS</option>
-                        <option value="android">Android</option>
-                        <option value="other">其他</option>
-                    </select>
-                </div>
-            </div>
+            <!-- Hidden auto-detected fields -->
+            <input type="hidden" id="testEnv" value="">
+            <input type="hidden" id="browser" value="">
+            <input type="hidden" id="os" value="">
         </div>
 
         <!-- Section 1: 諮詢師登入 -->
@@ -1698,11 +1760,11 @@
             <div class="overall-feedback">
                 <label><strong>整體使用體驗評分</strong></label>
                 <div class="rating">
-                    <label><input type="radio" name="rating" value="5"> ⭐⭐⭐⭐⭐ 非常滿意</label>
-                    <label><input type="radio" name="rating" value="4"> ⭐⭐⭐⭐ 滿意</label>
-                    <label><input type="radio" name="rating" value="3"> ⭐⭐⭐ 普通</label>
-                    <label><input type="radio" name="rating" value="2"> ⭐⭐ 不滿意</label>
                     <label><input type="radio" name="rating" value="1"> ⭐ 非常不滿意</label>
+                    <label><input type="radio" name="rating" value="2"> ⭐⭐ 不滿意</label>
+                    <label><input type="radio" name="rating" value="3"> ⭐⭐⭐ 普通</label>
+                    <label><input type="radio" name="rating" value="4"> ⭐⭐⭐⭐ 滿意</label>
+                    <label><input type="radio" name="rating" value="5"> ⭐⭐⭐⭐⭐ 非常滿意</label>
                 </div>
             </div>
 
@@ -1717,7 +1779,61 @@
         </div>
     </div>
 
+    <!-- Incomplete Items Modal -->
+    <div class="modal-overlay" id="incompleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>⚠️ 尚有未完成項目</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>以下測試項目尚未填寫：</p>
+                <ul id="incompleteList"></ul>
+                <p style="margin-top: 16px;">確定要送出嗎？未完成項目將標記為「跳過」。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">返回填寫</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmSubmit()">確認送出</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Auto-detect environment from URL
+        function detectEnvironment() {
+            const hostname = window.location.hostname;
+            if (hostname.includes('staging') || hostname.includes('localhost') || hostname.includes('127.0.0.1')) {
+                return 'staging';
+            }
+            return 'production';
+        }
+
+        // Auto-detect browser from user agent
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Edg/')) return 'edge';
+            if (ua.includes('Chrome/')) return 'chrome';
+            if (ua.includes('Firefox/')) return 'firefox';
+            if (ua.includes('Safari/') && !ua.includes('Chrome')) return 'safari';
+            return 'other';
+        }
+
+        // Auto-detect OS from user agent
+        function detectOS() {
+            const ua = navigator.userAgent;
+            const platform = navigator.platform || '';
+            if (ua.includes('iPhone') || ua.includes('iPad')) return 'ios';
+            if (ua.includes('Android')) return 'android';
+            if (platform.includes('Mac') || ua.includes('Mac OS')) return 'mac';
+            if (platform.includes('Win') || ua.includes('Windows')) return 'windows';
+            return 'other';
+        }
+
+        // Set auto-detected values
+        document.getElementById('testEnv').value = detectEnvironment();
+        document.getElementById('browser').value = detectBrowser();
+        document.getElementById('os').value = detectOS();
+
         // Initialize date
         document.getElementById('testDate').valueAsDate = new Date();
 
@@ -1921,15 +2037,54 @@
             ? 'http://localhost:8000'
             : 'https://career-creator-backend-staging-849078733818.asia-east1.run.app';
 
-        async function submitToSheet() {
+        // Modal functions
+        function closeModal() {
+            document.getElementById('incompleteModal').classList.remove('show');
+        }
+
+        function confirmSubmit() {
+            closeModal();
+            doSubmitToSheet();
+        }
+
+        function submitToSheet() {
             const testerName = document.getElementById('testerName').value;
             const testDate = document.getElementById('testDate').value;
             const testEnv = document.getElementById('testEnv').value;
 
-            if (!testerName || !testDate || !testEnv) {
-                alert('請填寫測試者資訊（姓名、日期、環境）');
+            if (!testerName || !testDate) {
+                alert('請填寫測試者資訊（姓名、日期）');
                 return;
             }
+
+            // Check for incomplete items
+            const incompleteItems = [];
+            document.querySelectorAll('.test-item').forEach(item => {
+                if (!item.dataset.status) {
+                    const stepId = item.dataset.id || '';
+                    const stepDesc = item.querySelector('.desc')?.textContent || '';
+                    const section = item.closest('.section');
+                    const sectionName = section?.querySelector('h3')?.textContent?.replace(/^[\d️⃣🎮\s]+/, '') || '';
+                    incompleteItems.push(`${stepId} - ${stepDesc} (${sectionName})`);
+                }
+            });
+
+            // Show modal if there are incomplete items
+            if (incompleteItems.length > 0) {
+                const list = document.getElementById('incompleteList');
+                list.innerHTML = incompleteItems.map(item => `<li>${item}</li>`).join('');
+                document.getElementById('incompleteModal').classList.add('show');
+                return;
+            }
+
+            // No incomplete items, submit directly
+            doSubmitToSheet();
+        }
+
+        async function doSubmitToSheet() {
+            const testerName = document.getElementById('testerName').value;
+            const testDate = document.getElementById('testDate').value;
+            const testEnv = document.getElementById('testEnv').value;
 
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.textContent;

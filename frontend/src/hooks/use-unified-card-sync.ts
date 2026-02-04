@@ -66,10 +66,22 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
   /**
    * 核心：統一的卡片移動邏輯
    * 不管是本地還是遠端，都用這個函數處理
+   * 返回 { fromZone, newPlacements } 以避免 stale closure 問題
    */
   const moveCardInternal = useCallback(
     (cardId: string, toZone: string | null, skipBroadcast = false) => {
       const currentPlacements: GameState['cardPlacements'] = { ...state.cardPlacements };
+
+      // 0. 先找出 fromZone（在移除前）
+      let fromZone = 'deck';
+      for (const zone of zones) {
+        const key = `${zone}Cards`;
+        const zoneCards = currentPlacements[key];
+        if (Array.isArray(zoneCards) && zoneCards.includes(cardId)) {
+          fromZone = zone;
+          break;
+        }
+      }
 
       // 1. 從所有區域移除該卡片
       zones.forEach((zone) => {
@@ -97,18 +109,8 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
         persistence.markDirty();
       }
 
-      // 5. 返回實際的 fromZone（用於廣播）
-      let fromZone = 'deck';
-      for (const zone of zones) {
-        const key = `${zone}Cards`;
-        const zoneCards = state.cardPlacements[key];
-        if (Array.isArray(zoneCards) && zoneCards.includes(cardId)) {
-          fromZone = zone;
-          break;
-        }
-      }
-
-      return fromZone;
+      // 5. 返回 fromZone 和更新後的 placements（避免 stale closure）
+      return { fromZone, newPlacements: currentPlacements };
     },
     [state.cardPlacements, zones, updateCards, persistence]
   );
@@ -219,8 +221,8 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
     (cardId: string, zone: string | null, broadcast = true) => {
       console.log(`[${gameType}] Local move:`, { cardId, zone, broadcast });
 
-      // 執行移動
-      const fromZone = moveCardInternal(cardId, zone, false);
+      // 執行移動（返回更新後的 placements 避免 stale closure）
+      const { fromZone, newPlacements } = moveCardInternal(cardId, zone, false);
 
       // 廣播事件（如果需要）
       if (broadcast && cardSync.isConnected) {
@@ -228,12 +230,12 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
         cardSync.moveCard(cardId, toZone, fromZone);
       }
 
-      // Owner 儲存狀態
+      // Owner 儲存狀態（使用 newPlacements 而非 state.cardPlacements）
       if (isRoomOwner) {
         const cards: Record<string, CardZoneInfo> = {};
         zones.forEach((z) => {
           const key = `${z}Cards`;
-          const zoneCards = state.cardPlacements[key];
+          const zoneCards = newPlacements[key];
           if (Array.isArray(zoneCards)) {
             zoneCards.forEach((id: string) => {
               cards[id] = { zone: z };
@@ -243,14 +245,14 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
         const gameState = {
           cards,
-          uploadedFile: state.cardPlacements.uploadedFile,
+          uploadedFile: newPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };
         cardSync.saveGameState(gameState);
       }
     },
-    [moveCardInternal, cardSync, isRoomOwner, zones, state.cardPlacements, gameType]
+    [moveCardInternal, cardSync, isRoomOwner, zones, gameType]
   );
 
   /**
@@ -286,7 +288,7 @@ export function useUnifiedCardSync(options: UseUnifiedCardSyncOptions) {
 
         const gameState = {
           cards,
-          uploadedFile: state.cardPlacements.uploadedFile,
+          uploadedFile: currentPlacements.uploadedFile,
           lastUpdated: Date.now(),
           gameType,
         };

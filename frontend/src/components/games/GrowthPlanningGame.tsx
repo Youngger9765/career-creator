@@ -44,7 +44,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
   }, [planText]);
 
   // 使用統一的卡片同步 Hook - 處理牌卡 + 設定同步（SINGLE channel）
-  const { state, draggedByOthers, handleCardMove, cardSync, updateCards } = useUnifiedCardSync({
+  const { state, draggedByOthers, handleCardMove, cardSync, updateCards, persistence } = useUnifiedCardSync({
     roomId,
     gameType: GAMEPLAY_IDS.GROWTH_PLANNING,
     storeKey: GAMEPLAY_IDS.GROWTH_PLANNING,
@@ -61,19 +61,30 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
     },
   });
 
-  // 載入已儲存的狀態 - 只在連線狀態變更時執行一次
+  // 載入已儲存的狀態 - 優先從 Zustand (DB) 載入，fallback 到 localStorage
   useEffect(() => {
+    // 1. 先檢查 Zustand state (來自 DB persistence)
+    if (state.cardPlacements.planText) {
+      console.log('[GrowthPlanning] 從 DB 載入文字:', state.cardPlacements.planText);
+      setPlanText(state.cardPlacements.planText);
+      return;
+    }
+
+    // 2. Fallback: 從 localStorage 載入 (舊資料相容)
     if (cardSync.isConnected) {
       const savedState = cardSync.loadGameState();
       console.log('[GrowthPlanning] 載入遊戲狀態:', savedState);
 
       if (savedState?.settings?.planText !== undefined) {
-        console.log('[GrowthPlanning] 載入已儲存文字:', savedState.settings.planText);
+        console.log('[GrowthPlanning] 從 localStorage 載入文字:', savedState.settings.planText);
         setPlanText(savedState.settings.planText);
+        // 同步到 Zustand store 以便未來存到 DB
+        updateCards({ planText: savedState.settings.planText });
+        persistence.markDirty();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardSync.isConnected]); // 只依賴 isConnected，避免物件變更造成無限循環
+  }, [cardSync.isConnected, state.cardPlacements.planText]); // 加入 planText 依賴
 
   // 載入牌組 - 從同一個 deck 中分離 action 和 mindset 卡
   useEffect(() => {
@@ -200,6 +211,12 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
 
       setPlanText(text); // 立即更新本地狀態（打字流暢）
 
+      // 更新 Zustand store（for DB persistence）
+      updateCards({ planText: text });
+
+      // 標記需要存到 DB（30 秒後批次存檔）
+      persistence.markDirty();
+
       // Debounced 同步到遠端（500ms 延遲，減少廣播訊息）
       // Build card state from current placements
       const cards: Record<string, { zone: string }> = {};
@@ -223,7 +240,7 @@ const GrowthPlanningGame: React.FC<GrowthPlanningGameProps> = ({
       // 使用 debounced 版本 - 只有停止打字 500ms 後才會廣播
       debouncedSaveGameState(gameState);
     },
-    [isRoomOwner, getCardPrefix, debouncedSaveGameState, state.cardPlacements]
+    [isRoomOwner, getCardPrefix, debouncedSaveGameState, state.cardPlacements, updateCards, persistence]
   );
 
   // Keep refs for functions to avoid useEffect dependency issues

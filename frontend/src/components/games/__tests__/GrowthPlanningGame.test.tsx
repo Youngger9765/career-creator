@@ -26,6 +26,7 @@ vi.mock('@/hooks/use-unified-card-sync', () => ({
       cardPlacements: {
         skillsCards: [],
         actionsCards: [],
+        planText: '',
       },
     },
     draggedByOthers: new Set(),
@@ -38,6 +39,14 @@ vi.mock('@/hooks/use-unified-card-sync', () => ({
       saveGameState: vi.fn(),
     },
     updateCards: vi.fn(),
+    persistence: {
+      markDirty: vi.fn(),
+      saveState: vi.fn(),
+      loadState: vi.fn(),
+      isLoading: false,
+      lastSavedAt: null,
+      error: null,
+    },
   })),
 }));
 
@@ -106,6 +115,7 @@ describe('GrowthPlanningGame', () => {
           cardPlacements: {
             skillsCards: ['mindset-1'],
             actionsCards: [],
+            planText: '',
           },
         },
         draggedByOthers: new Set(),
@@ -118,6 +128,14 @@ describe('GrowthPlanningGame', () => {
           saveGameState: vi.fn(),
         },
         updateCards: vi.fn(),
+        persistence: {
+          markDirty: vi.fn(),
+          saveState: vi.fn(),
+          loadState: vi.fn(),
+          isLoading: false,
+          lastSavedAt: null,
+          error: null,
+        },
       });
 
       // Trigger re-render
@@ -145,6 +163,7 @@ describe('GrowthPlanningGame', () => {
           cardPlacements: {
             skillsCards: ['mindset-1'],
             actionsCards: ['action-1'],
+            planText: '',
           },
         },
         draggedByOthers: new Set(),
@@ -157,6 +176,14 @@ describe('GrowthPlanningGame', () => {
           saveGameState: vi.fn(),
         },
         updateCards: vi.fn(),
+        persistence: {
+          markDirty: vi.fn(),
+          saveState: vi.fn(),
+          loadState: vi.fn(),
+          isLoading: false,
+          lastSavedAt: null,
+          error: null,
+        },
       });
 
       render(

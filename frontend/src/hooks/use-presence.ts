@@ -12,6 +12,19 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { RealtimeRetryManager, classifyRealtimeError, type RealtimeErrorType } from '@/lib/realtime-retry';
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+/** Maximum retry attempts for reconnection */
+const MAX_RETRY_ATTEMPTS = 5;
+
+/** Initial delay for exponential backoff (ms) */
+const INITIAL_RETRY_DELAY_MS = 1000;
+
+/** Maximum delay for exponential backoff (ms) */
+const MAX_RETRY_DELAY_MS = 30000;
+
 export interface PresenceUser {
   id: string; // user-123 或 visitor-session-abc
   name: string; // 顯示名稱
@@ -121,9 +134,9 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
     // Initialize retry manager
     if (!retryManagerRef.current) {
       retryManagerRef.current = new RealtimeRetryManager({
-        maxRetries: 5,
-        initialDelayMs: 1000,
-        maxDelayMs: 30000,
+        maxRetries: MAX_RETRY_ATTEMPTS,
+        initialDelayMs: INITIAL_RETRY_DELAY_MS,
+        maxDelayMs: MAX_RETRY_DELAY_MS,
       });
     }
 
@@ -235,7 +248,7 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
             retryManager.reset();
             setRetryExhausted(false);
             setIsRetrying(false);
-            setRemainingRetries(5);
+            setRemainingRetries(MAX_RETRY_ATTEMPTS);
             setIsConnected(true);
             setError(null);
             setErrorType(null);
@@ -363,7 +376,7 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
     // Reset state
     setRetryExhausted(false);
     setIsRetrying(false);
-    setRemainingRetries(5);
+    setRemainingRetries(MAX_RETRY_ATTEMPTS);
     setError(null);
     setErrorType(null);
 

@@ -12,6 +12,13 @@ import { useGameState, type GameState } from '@/stores/game-state-store';
 import { useGameplayStatePersistence } from './use-gameplay-state-persistence';
 import type { CardZoneInfo, UploadedFile } from '@/types/game';
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+// Note: Auto-save delay is configured in useGameplayStatePersistence hook
+// This file delegates persistence timing to that hook via markDirty()
+
 interface UseUnifiedCardSyncOptions {
   roomId: string;
   gameType: string;

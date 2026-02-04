@@ -76,18 +76,27 @@ def get_sheets_service():
 
 
 def ensure_headers(service, sheet_id: str):
-    """Check if headers exist, if not add them."""
+    """Check if headers exist, if not insert them at row 1."""
     # Headers for each tab
     test_headers = ["提交時間", "測試者", "環境", "瀏覽器", "OS", "流程", "步驟ID", "步驟描述", "預期結果", "狀態", "Bug描述"]
     stats_headers = ["提交時間", "測試者", "環境", "瀏覽器", "OS", "Pass", "Fail", "Skip", "備註"]
 
     try:
-        # Check 測試 tab
+        # Check 測試 tab - if A1 is not "提交時間", insert header row
         result = service.spreadsheets().values().get(
             spreadsheetId=sheet_id,
-            range="測試!A1:K1"
+            range="測試!A1"
         ).execute()
-        if not result.get("values"):
+        values = result.get("values", [[]])
+        first_cell = values[0][0] if values and values[0] else ""
+
+        if first_cell != "提交時間":
+            # Insert a new row at position 1
+            service.spreadsheets().batchUpdate(
+                spreadsheetId=sheet_id,
+                body={"requests": [{"insertDimension": {"range": {"sheetId": 0, "dimension": "ROWS", "startIndex": 0, "endIndex": 1}}}]}
+            ).execute()
+            # Write headers
             service.spreadsheets().values().update(
                 spreadsheetId=sheet_id,
                 range="測試!A1:K1",
@@ -95,18 +104,35 @@ def ensure_headers(service, sheet_id: str):
                 body={"values": [test_headers]}
             ).execute()
 
-        # Check 統計 tab
-        result = service.spreadsheets().values().get(
-            spreadsheetId=sheet_id,
-            range="統計!A1:I1"
-        ).execute()
-        if not result.get("values"):
-            service.spreadsheets().values().update(
+        # Check 統計 tab - need to get its sheet ID first
+        sheet_metadata = service.spreadsheets().get(spreadsheetId=sheet_id).execute()
+        stats_sheet_id = None
+        for sheet in sheet_metadata.get("sheets", []):
+            if sheet["properties"]["title"] == "統計":
+                stats_sheet_id = sheet["properties"]["sheetId"]
+                break
+
+        if stats_sheet_id is not None:
+            result = service.spreadsheets().values().get(
                 spreadsheetId=sheet_id,
-                range="統計!A1:I1",
-                valueInputOption="RAW",
-                body={"values": [stats_headers]}
+                range="統計!A1"
             ).execute()
+            values = result.get("values", [[]])
+            first_cell = values[0][0] if values and values[0] else ""
+
+            if first_cell != "提交時間":
+                # Insert a new row at position 1
+                service.spreadsheets().batchUpdate(
+                    spreadsheetId=sheet_id,
+                    body={"requests": [{"insertDimension": {"range": {"sheetId": stats_sheet_id, "dimension": "ROWS", "startIndex": 0, "endIndex": 1}}}]}
+                ).execute()
+                # Write headers
+                service.spreadsheets().values().update(
+                    spreadsheetId=sheet_id,
+                    range="統計!A1:I1",
+                    valueInputOption="RAW",
+                    body={"values": [stats_headers]}
+                ).execute()
     except Exception:
         pass  # Ignore errors, headers are optional
 

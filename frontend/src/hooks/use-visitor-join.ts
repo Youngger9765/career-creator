@@ -95,7 +95,9 @@ export function useVisitorJoin() {
 
     let tempChannel: ReturnType<typeof supabase.channel> | null = null;
     try {
-      tempChannel = supabase.channel(`realtime:room:${roomId}:visitor-check`);
+      // Reuse the presence channel name so we're checking the actual presence state
+      // that counselors are tracking on. This provides accurate owner online detection.
+      tempChannel = supabase.channel(`realtime:room:${roomId}:presence`);
 
       // Create promise that resolves when sync happens
       const syncPromise = new Promise<boolean>((resolve, reject) => {

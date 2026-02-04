@@ -76,21 +76,26 @@ def get_sheets_service():
 
 
 def ensure_headers(service, sheet_id: str):
-    """Check if headers exist, if not insert them at row 1."""
+    """Check if headers exist, if not insert them at row 1.
+
+    Checks the ENTIRE first row against expected headers.
+    If first row doesn't match, inserts a new row with headers.
+    """
     # Headers for each tab
     test_headers = ["提交時間", "測試者", "環境", "瀏覽器", "OS", "流程", "步驟ID", "步驟描述", "預期結果", "狀態", "Bug描述"]
     stats_headers = ["提交時間", "測試者", "環境", "瀏覽器", "OS", "Pass", "Fail", "Skip", "備註"]
 
     try:
-        # Check 測試 tab - if A1 is not "提交時間", insert header row
+        # Check 測試 tab - read entire first row (A1:K1)
         result = service.spreadsheets().values().get(
             spreadsheetId=sheet_id,
-            range="測試!A1"
+            range="測試!A1:K1"
         ).execute()
         values = result.get("values", [[]])
-        first_cell = values[0][0] if values and values[0] else ""
+        first_row = values[0] if values else []
 
-        if first_cell != "提交時間":
+        # Check if first row matches expected headers
+        if first_row != test_headers:
             # Insert a new row at position 1
             service.spreadsheets().batchUpdate(
                 spreadsheetId=sheet_id,
@@ -113,14 +118,16 @@ def ensure_headers(service, sheet_id: str):
                 break
 
         if stats_sheet_id is not None:
+            # Read entire first row (A1:I1)
             result = service.spreadsheets().values().get(
                 spreadsheetId=sheet_id,
-                range="統計!A1"
+                range="統計!A1:I1"
             ).execute()
             values = result.get("values", [[]])
-            first_cell = values[0][0] if values and values[0] else ""
+            first_row = values[0] if values else []
 
-            if first_cell != "提交時間":
+            # Check if first row matches expected headers
+            if first_row != stats_headers:
                 # Insert a new row at position 1
                 service.spreadsheets().batchUpdate(
                     spreadsheetId=sheet_id,
@@ -133,8 +140,10 @@ def ensure_headers(service, sheet_id: str):
                     valueInputOption="RAW",
                     body={"values": [stats_headers]}
                 ).execute()
-    except Exception:
-        pass  # Ignore errors, headers are optional
+    except Exception as e:
+        # Log but don't fail - headers are nice-to-have, not critical
+        import logging
+        logging.warning(f"Failed to ensure headers: {e}")
 
 
 @router.post("/feedback")

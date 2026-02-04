@@ -11,6 +11,7 @@ from app.api.counselor_notes import router as counselor_notes_router
 from app.api.file_uploads import router as file_uploads_router
 from app.api.game_rules import router as game_rules_router
 from app.api.gameplay_states import router as gameplay_states_router
+from app.api.qa_feedback import router as qa_feedback_router
 from app.api.rooms import router as rooms_router
 from app.api.visitors import router as visitors_router
 from app.core.config import settings
@@ -37,6 +38,7 @@ if settings.environment == "production":
     origins = [
         "https://career-creator-frontend-production-x43mdhfwsq-de.a.run.app",
         "https://career-creator-frontend-production-849078733818.asia-east1.run.app",
+        "null",  # Allow local file:// access for QA HTML
     ]
     allow_credentials = True
 elif settings.environment == "staging":
@@ -45,6 +47,7 @@ elif settings.environment == "staging":
         "https://career-creator-frontend-staging-849078733818.asia-east1.run.app",
         "http://localhost:3000",  # Allow local development
         "http://localhost:3001",  # Alternative dev port
+        "null",  # Allow local file:// access for QA HTML
     ]
     allow_credentials = True
 else:
@@ -81,6 +84,7 @@ app.include_router(clients_router)
 app.include_router(counselor_notes_router, prefix="/api")
 app.include_router(gameplay_states_router, prefix="/api")
 app.include_router(file_uploads_router)
+app.include_router(qa_feedback_router)
 
 # Mount static files for uploaded screenshots (development only)
 if os.path.exists("uploads"):

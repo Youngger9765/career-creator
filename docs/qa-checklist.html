@@ -1684,7 +1684,8 @@
             </div>
 
             <div class="actions">
-                <button class="btn-primary" onclick="exportResults()">📥 匯出測試報告</button>
+                <button class="btn-primary" onclick="submitToSheet()" id="submitBtn">📤 送出到 Google Sheet</button>
+                <button class="btn-secondary" onclick="exportResults()">📥 匯出測試報告</button>
                 <button class="btn-secondary" onclick="saveProgress()">💾 儲存進度</button>
                 <button class="btn-secondary" onclick="loadProgress()">📂 載入進度</button>
                 <button class="btn-success" onclick="copyToClipboard()">📋 複製到剪貼簿</button>
@@ -1889,6 +1890,84 @@
             navigator.clipboard.writeText(summary).then(() => {
                 alert('已複製到剪貼簿！');
             });
+        }
+
+        // API endpoint configuration
+        const API_BASE_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:8000'
+            : 'https://career-creator-backend-staging-849078733818.asia-east1.run.app';
+
+        async function submitToSheet() {
+            const testerName = document.getElementById('testerName').value;
+            const testDate = document.getElementById('testDate').value;
+            const testEnv = document.getElementById('testEnv').value;
+
+            if (!testerName || !testDate || !testEnv) {
+                alert('請填寫測試者資訊（姓名、日期、環境）');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '⏳ 送出中...';
+            submitBtn.disabled = true;
+
+            // Collect all test items
+            const items = [];
+            document.querySelectorAll('.test-item').forEach(item => {
+                const id = item.dataset.id;
+                const status = item.dataset.status || 'skip';
+                const step = item.querySelector('.step')?.textContent || '';
+                const desc = item.querySelector('.desc')?.textContent || '';
+                const bugDesc = item.nextElementSibling?.querySelector('textarea')?.value || '';
+
+                // Find category from parent section
+                const section = item.closest('.section');
+                const category = section?.querySelector('h3')?.textContent || 'Unknown';
+
+                items.push({
+                    category: category,
+                    item: `${step}: ${desc}`,
+                    status: status,
+                    notes: bugDesc
+                });
+            });
+
+            const payload = {
+                tester_name: testerName,
+                tester_email: '',
+                device: document.getElementById('os').value,
+                browser: document.getElementById('browser').value,
+                test_date: testDate,
+                environment: testEnv,
+                overall_score: parseInt(document.querySelector('input[name="rating"]:checked')?.value || 0),
+                items: items,
+                general_comments: document.getElementById('overallFeedback')?.value || ''
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/qa/feedback`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to submit');
+                }
+
+                const result = await response.json();
+                alert(`✅ 送出成功！\n\n通過: ${result.summary.pass}\n失敗: ${result.summary.fail}`);
+            } catch (error) {
+                console.error('Submit error:', error);
+                alert(`❌ 送出失敗: ${error.message}\n\n請確認網路連線或聯繫開發團隊。`);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
         }
 
         updateStats();

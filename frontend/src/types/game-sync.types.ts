@@ -160,41 +160,6 @@ export interface SyncStatus {
 }
 
 /**
- * 遊戲卡片同步選項
- */
-export interface UseGameCardSyncOptions<T extends GameState = GameState> {
-  roomId: string;
-  gameType: T['gameType'];
-  storeKey: string;
-  isRoomOwner: boolean;
-  onError?: (error: Error) => void;
-}
-
-/**
- * 遊戲卡片同步返回值
- */
-export interface UseGameCardSyncReturn<T extends GameState = GameState> {
-  state: {
-    cardPlacements: CardPlacement;
-  };
-  draggedByOthers: Map<string, string>;
-  updateCards: (placements: Partial<T>) => void;
-  cardSync: {
-    isConnected: boolean;
-    moveCard: (
-      cardId: string,
-      toZone: string | null,
-      fromZone?: string,
-      broadcast?: boolean
-    ) => void;
-    startDrag: (cardId: string) => void;
-    endDrag: (cardId: string) => void;
-    saveGameState: (state: Partial<T>) => void;
-  };
-  syncStatus: SyncStatus;
-}
-
-/**
  * 卡片移動處理器
  */
 export type CardMoveHandler = (cardId: string, zone: string | null, broadcast?: boolean) => void;

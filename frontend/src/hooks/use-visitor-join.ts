@@ -31,9 +31,6 @@ export function useVisitorJoin() {
     if (!name.trim()) {
       throw new Error('請輸入姓名');
     }
-    if (name.trim().length < 2) {
-      throw new Error('姓名至少需要2個字符');
-    }
     if (name.trim().length > 50) {
       throw new Error('姓名不能超過50個字符');
     }

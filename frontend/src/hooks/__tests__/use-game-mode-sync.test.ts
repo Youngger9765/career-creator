@@ -187,8 +187,8 @@ describe('useGameModeSync', () => {
 
   describe('Presence tracking independence', () => {
     it('ownerOnline should remain false when internal presence tracking is removed', async () => {
-      // This test documents expected behavior after removing duplicate Presence tracking
-      // ownerOnline from useGameModeSync is already overwritten by usePresence in GameModeIntegration.tsx
+      // This test documents expected behavior: useGameModeSync doesn't track presence internally
+      // Owner online status is handled by usePresence hook in GameModeIntegration.tsx
       const { result } = renderHook(() =>
         useGameModeSync({
           roomId: 'test-room',
@@ -198,8 +198,8 @@ describe('useGameModeSync', () => {
 
       await waitFor(() => expect(mockChannel.subscribe).toHaveBeenCalled());
 
-      // ownerOnline should be false (default) since we're removing internal presence tracking
-      // The actual owner online status comes from usePresence hook
+      // ownerOnline should be false (default) - useGameModeSync doesn't track presence
+      // Owner online status is provided by usePresence hook separately
       expect(result.current.ownerOnline).toBe(false);
     });
 

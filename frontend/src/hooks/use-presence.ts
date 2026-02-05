@@ -261,22 +261,6 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
               if (currentIdentity) {
                 const presenceTrackStatus = await channel.track(currentIdentity);
                 console.log('[usePresence] Presence track status:', presenceTrackStatus);
-
-                // Force a second track after 3 seconds to catch any missed visitors
-                // (Only ONE extra message, not periodic - to save quota)
-                setTimeout(async () => {
-                  if (!isCleanedUp && channel) {
-                    try {
-                      const refreshIdentity = userIdentityRef.current;
-                      if (refreshIdentity) {
-                        console.log('[usePresence] Forcing presence refresh...');
-                        await channel.track(refreshIdentity);
-                      }
-                    } catch (err) {
-                      console.debug('[usePresence] Refresh track failed:', err);
-                    }
-                  }
-                }, 3000);
               }
             } catch (trackErr) {
               console.error('[usePresence] Failed to track presence:', trackErr);

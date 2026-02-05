@@ -1,15 +1,13 @@
 'use client';
 
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/auth-store';
 import { useRoomStore } from '@/stores/room-store';
 import { useGameSession } from '@/hooks/use-game-session';
-import { useRoomParticipants } from '@/hooks/use-room-participants';
 import { VisitorWelcome } from '@/components/visitor/VisitorWelcome';
-import { ParticipantList } from '@/components/room/ParticipantList';
 import { NotesDrawer } from '@/components/room/NotesDrawer';
 import { MobileNotesModal } from '@/components/room/MobileNotesModal';
 import GameModeIntegration from './GameModeIntegration';
@@ -22,7 +20,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import html2canvas from 'html2canvas';
-import { Camera } from 'lucide-react';
 import { consultationRecordsAPI } from '@/lib/api/clients';
 import { ConsultationRecord } from '@/types/client';
 import { useIdleTimeout } from '@/hooks/use-idle-timeout';
@@ -126,59 +123,6 @@ export default function RoomPage() {
   // 檢查是否為諮詢師
   const isCounselor = user?.roles?.includes('counselor') || user?.roles?.includes('admin');
 
-  // 使用 useRoomParticipants hook 追蹤參與者
-  // IMPORTANT: Use useMemo to prevent re-creating object on every render
-  const currentUserInfo = useMemo(() => {
-    if (!isReady) return undefined;
-
-    // For visitors, use same ID format as Presence (matches use-presence.ts)
-    if (isVisitor) {
-      let visitorId: string | undefined = undefined;
-
-      if (typeof window !== 'undefined') {
-        const visitorSessionStr = localStorage.getItem('visitor_session');
-        if (visitorSessionStr) {
-          try {
-            const visitorSession = JSON.parse(visitorSessionStr);
-            const sessionId = visitorSession.session_id || visitorSession.visitor_id;
-            if (sessionId && visitorSession.room_id === roomId) {
-              visitorId = `visitor_${sessionId}`;
-            }
-          } catch (e) {
-            console.error(`Failed to parse visitor_session for room ${roomId}:`, e);
-          }
-        }
-      }
-
-      return {
-        id: visitorId || `visitor-${visitorName || urlVisitorName}`,
-        name: visitorName || urlVisitorName,
-        type: 'visitor' as const,
-      };
-    }
-
-    // For authenticated users
-    return {
-      id: user?.id || 'current-user',
-      name: user?.name || 'User',
-      type: (isCounselor ? 'counselor' : 'user') as 'counselor' | 'user',
-    };
-  }, [isReady, user?.id, user?.name, isVisitor, visitorName, urlVisitorName, isCounselor, roomId]);
-
-  const {
-    participants,
-    participantCount,
-    onlineCount,
-    isLoading: participantsLoading,
-    error: participantsError,
-    refreshParticipants,
-  } = useRoomParticipants({
-    roomId,
-    currentUser: currentUserInfo,
-    updateInterval: 10000, // 10 seconds
-    offlineThreshold: 60000, // 1 minute
-  });
-
   // Idle timeout - automatically save and disconnect after 30 minutes of inactivity
   const { showWarning: showIdleWarning, countdown: idleCountdown, resetTimer: resetIdleTimer } = useIdleTimeout({
     timeoutMs: 30 * 60 * 1000, // 30 minutes
@@ -197,17 +141,6 @@ export default function RoomPage() {
     activities: [gameSession.gameState, currentGameplay],
     enabled: isReady, // Only enable when room is ready
   });
-
-  // Debug log for participants (only on significant changes)
-  useEffect(() => {
-    if (participantCount > 0) {
-      console.log('[RoomPage] Participants updated:', {
-        count: participantCount,
-        online: onlineCount,
-        loading: participantsLoading,
-      });
-    }
-  }, [participantCount, onlineCount, participantsLoading]);
 
   // 簡單的認證檢查
   useEffect(() => {
@@ -520,16 +453,6 @@ export default function RoomPage() {
                 )}
               </div>
             )}
-          </div>
-
-          {/* 中間：線上人數 */}
-          <div className="hidden md:flex items-center">
-            <ParticipantList
-              participants={participants as any}
-              onlineCount={onlineCount}
-              isLoading={participantsLoading}
-              className=""
-            />
           </div>
 
           {/* 右側：用戶資訊 + 分享碼 + 狀態 */}

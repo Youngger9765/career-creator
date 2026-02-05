@@ -169,13 +169,18 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
         channel
           .on('presence', { event: 'sync' }, () => {
             const state = channel.presenceState<PresenceUser>();
-            // 將 presence state 轉換為用戶陣列
-            const users: PresenceUser[] = [];
+            // 將 presence state 轉換為用戶陣列，並去重複
+            const userMap = new Map<string, PresenceUser>();
             Object.values(state).forEach((presences) => {
               if (Array.isArray(presences)) {
-                users.push(...presences);
+                presences.forEach((presence) => {
+                  // 使用 user ID 作為 key，確保每個用戶只出現一次
+                  // 如果已存在，保留較新的（後面的會覆蓋前面的）
+                  userMap.set(presence.id, presence);
+                });
               }
             });
+            const users = Array.from(userMap.values());
             // Only log when user count changes
             if (users.length !== prevCountRef.current) {
               console.log('[usePresence] 在線用戶更新:', users.length, '人');

@@ -92,12 +92,9 @@ export function useVisitorJoin() {
 
     let tempChannel: ReturnType<typeof supabase.channel> | null = null;
     try {
-      // IMPORTANT: Use a UNIQUE channel name for this temporary check!
-      // Using the same name as the main presence channel causes conflicts -
-      // when we unsubscribe, it disrupts the main channel and causes
-      // visitors to appear to leave immediately after joining.
-      const checkId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      tempChannel = supabase.channel(`realtime:room:${roomId}:presence:owner-check:${checkId}`);
+      // Reuse the presence channel name so we're checking the actual presence state
+      // that counselors are tracking on. This provides accurate owner online detection.
+      tempChannel = supabase.channel(`realtime:room:${roomId}:presence`);
 
       // Create promise that resolves when sync happens
       const syncPromise = new Promise<boolean>((resolve, reject) => {

@@ -286,7 +286,19 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
               setError('無法連接到即時服務，請重新整理頁面');
             }
           } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
-            console.error('[usePresence] Subscription error:', err || status);
+            console.warn('[usePresence] Subscription error:', err || status);
+
+            // Check if presence is still working (has online users)
+            // If so, just log the error and don't retry - this avoids infinite retry loops
+            const currentOnlineUsers = channel.presenceState();
+            const hasUsers = Object.keys(currentOnlineUsers).length > 0;
+
+            if (hasUsers && status === 'CHANNEL_ERROR') {
+              console.log('[usePresence] Got CHANNEL_ERROR but presence is working, ignoring');
+              // Don't disconnect or retry - presence is still functional
+              return;
+            }
+
             setIsConnected(false);
 
             // Classify the error for appropriate handling

@@ -195,36 +195,62 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
 
               if (ownerLeft) {
                 const currentIdentity = userIdentityRef.current;
-                console.log('[usePresence] 🚨 Owner left detected, currentIdentity:', {
-                  id: currentIdentity?.id,
-                  role: currentIdentity?.role,
-                  name: currentIdentity?.name,
-                });
+                console.log('[usePresence] 🚨 Owner leave detected, will verify in 3 seconds...');
 
-                // If current user is a visitor, redirect immediately
-                // (Don't rely on broadcast because Supabase doesn't send broadcasts to self by default)
+                // Don't redirect immediately - owner might just be reconnecting
+                // Wait 3 seconds and check if owner is still gone
                 if (currentIdentity?.role === 'visitor') {
-                  console.log('[usePresence] 🚨 Visitor detected owner left, redirecting to session-ended');
-                  router.push('/session-ended');
+                  setTimeout(() => {
+                    // Check current presence state to see if owner came back
+                    const currentState = channel.presenceState<PresenceUser>();
+                    const users: PresenceUser[] = [];
+                    Object.values(currentState).forEach((presences) => {
+                      if (Array.isArray(presences)) {
+                        users.push(...presences);
+                      }
+                    });
+                    const ownerStillOnline = users.some(u => u.role === 'owner');
+
+                    if (!ownerStillOnline) {
+                      console.log('[usePresence] 🚨 Owner confirmed gone after 3s, redirecting to session-ended');
+                      router.push('/session-ended');
+                    } else {
+                      console.log('[usePresence] ✅ Owner came back, not redirecting');
+                    }
+                  }, 3000);
                   return;
                 }
 
-                // Otherwise broadcast to other participants (for multi-visitor scenarios)
-                channel
-                  .send({
-                    type: 'broadcast',
-                    event: 'session_ended',
-                    payload: {
-                      reason: 'owner_left',
-                      timestamp: new Date().toISOString(),
-                    },
-                  })
-                  .then(() => {
-                    console.log('[usePresence] ✅ session_ended broadcast sent');
-                  })
-                  .catch((err) => {
-                    console.error('[usePresence] Failed to broadcast session_ended:', err);
+                // For non-visitors (other owners?), broadcast session_ended
+                // Also wait to confirm owner is gone
+                setTimeout(() => {
+                  const currentState = channel.presenceState<PresenceUser>();
+                  const users: PresenceUser[] = [];
+                  Object.values(currentState).forEach((presences) => {
+                    if (Array.isArray(presences)) {
+                      users.push(...presences);
+                    }
                   });
+                  const ownerStillOnline = users.some(u => u.role === 'owner');
+
+                  if (!ownerStillOnline) {
+                    channel
+                      .send({
+                        type: 'broadcast',
+                        event: 'session_ended',
+                        payload: {
+                          reason: 'owner_left',
+                          timestamp: new Date().toISOString(),
+                        },
+                      })
+                      .then(() => {
+                        console.log('[usePresence] ✅ session_ended broadcast sent');
+                      })
+                      .catch((err) => {
+                        console.error('[usePresence] Failed to broadcast session_ended:', err);
+                      });
+                  }
+                }, 3000);
               }
             }
           })
@@ -287,18 +313,6 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
             }
           } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
             console.warn('[usePresence] Subscription error:', err || status);
-
-            // Check if presence is still working (has online users)
-            // If so, just log the error and don't retry - this avoids infinite retry loops
-            const currentOnlineUsers = channel.presenceState();
-            const hasUsers = Object.keys(currentOnlineUsers).length > 0;
-
-            if (hasUsers && status === 'CHANNEL_ERROR') {
-              console.log('[usePresence] Got CHANNEL_ERROR but presence is working, ignoring');
-              // Don't disconnect or retry - presence is still functional
-              return;
-            }
-
             setIsConnected(false);
 
             // Classify the error for appropriate handling

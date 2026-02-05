@@ -81,20 +81,43 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     console.log('[GameMode] counselorOnline:', counselorOnline, 'presenceConnected:', presenceConnected);
   }, [onlineUsers, counselorOnline, presenceConnected]);
 
-  // 訪客檢查 owner 是否在線（連接後 3 秒檢查）
+  // Track if we've ever seen counselor online (prevents false kicks during reconnects)
+  const everSeenCounselorRef = useRef(false);
+
+  // Update everSeenCounselor when counselor comes online
+  useEffect(() => {
+    if (counselorOnline) {
+      everSeenCounselorRef.current = true;
+    }
+  }, [counselorOnline]);
+
+  // 訪客檢查 owner 是否在線（連接後檢查，但要更寬容）
   useEffect(() => {
     if (!isVisitor || ownerCheckDoneRef.current) return;
     if (!presenceConnected) return;
 
-    // 等待 3 秒讓 presence 同步完成，再檢查 owner 是否在線
+    // 如果已經看過 counselor 在線，就不要再檢查了
+    if (everSeenCounselorRef.current) {
+      ownerCheckDoneRef.current = true;
+      return;
+    }
+
+    // 等待 5 秒讓 presence 同步完成，再檢查 owner 是否在線
+    // 增加到 5 秒因為 Supabase Realtime 可能不穩定
     const timer = setTimeout(() => {
+      // 再次檢查是否已經看過 counselor
+      if (everSeenCounselorRef.current) {
+        ownerCheckDoneRef.current = true;
+        return;
+      }
+
       ownerCheckDoneRef.current = true;
 
       if (!counselorOnline) {
-        console.log('[GameMode] Owner not online after 3s, redirecting visitor to join page');
+        console.log('[GameMode] Owner not online after 5s, redirecting visitor to join page');
         router.push('/join?error=owner_offline');
       }
-    }, 3000);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, [isVisitor, presenceConnected, counselorOnline, router]);

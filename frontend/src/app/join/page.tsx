@@ -1,16 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { roomsAPI } from '../../lib/api/rooms';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function JoinRoomPage() {
+// 內部組件，使用 useSearchParams
+function JoinRoomContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [shareCode, setShareCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 處理 URL 參數中的錯誤
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam === 'owner_offline') {
+      setError('諮詢師尚未開啟房間，請稍後再試');
+      // 清除 URL 參數
+      router.replace('/join');
+    }
+  }, [searchParams, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,5 +161,18 @@ export default function JoinRoomPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+// 主組件，包裝 Suspense boundary
+export default function JoinRoomPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-teal-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+      </div>
+    }>
+      <JoinRoomContent />
+    </Suspense>
   );
 }

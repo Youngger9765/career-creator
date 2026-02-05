@@ -6,9 +6,8 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { visitorsAPI, VisitorCreate, Visitor } from '@/lib/api/visitors';
 import { roomsAPI, Room } from '@/lib/api/rooms';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
-import { classifyRealtimeError } from '@/lib/realtime-retry';
-import type { PresenceUser } from './use-presence';
+// NOTE: checkOwnerOnline has been removed to avoid Supabase channel conflicts
+// Owner online check is now done in GameModeIntegration after Presence connects
 
 interface VisitorSession {
   visitor_id: string;
@@ -80,92 +79,6 @@ export function useVisitorJoin() {
     [generateSessionId, validateVisitorName]
   );
 
-  /**
-   * Check if room owner (counselor) is online via Presence
-   * Prevents visitors from joining when owner is offline to save Realtime quota
-   */
-  const checkOwnerOnline = useCallback(async (roomId: string): Promise<boolean> => {
-    if (!isSupabaseConfigured() || !supabase) {
-      console.warn('[useVisitorJoin] Supabase not configured, skipping owner check');
-      return true;
-    }
-
-    let tempChannel: ReturnType<typeof supabase.channel> | null = null;
-    try {
-      // Reuse the presence channel name so we're checking the actual presence state
-      // that counselors are tracking on. This provides accurate owner online detection.
-      tempChannel = supabase.channel(`realtime:room:${roomId}:presence`);
-
-      // Create promise that resolves when sync happens
-      const syncPromise = new Promise<boolean>((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          console.warn('[useVisitorJoin] Presence check timeout, allowing join');
-          resolve(true); // Timeout = allow join (fail open)
-        }, 5000);
-
-        // Listen for sync event - this is when presence state is ready
-        tempChannel!.on('presence', { event: 'sync' }, () => {
-          clearTimeout(timeout);
-          const state = tempChannel!.presenceState<PresenceUser>();
-          const users = Object.values(state).flat();
-          const ownerOnline = users.some((u) => u.role === 'owner');
-
-          console.log('[useVisitorJoin] Owner online check (after sync):', {
-            ownerOnline,
-            userCount: users.length,
-            users: users.map(u => ({ id: u.id, role: u.role }))
-          });
-
-          resolve(ownerOnline);
-        });
-
-        // Subscribe to channel with error classification
-        tempChannel!.subscribe((status: string, err?: Error) => {
-          console.log('[useVisitorJoin] Channel status:', status);
-
-          if (status === 'TIMED_OUT') {
-            clearTimeout(timeout);
-            console.warn('[useVisitorJoin] Channel timed out, allowing join (fail open)');
-            resolve(true);
-          } else if (status === 'CHANNEL_ERROR' || status === 'CLOSED') {
-            clearTimeout(timeout);
-
-            // Classify the error for logging
-            const classifiedError = classifyRealtimeError(status, err);
-            console.warn(`[useVisitorJoin] Channel ${classifiedError.type}: ${classifiedError.message}`);
-
-            // For rate limiting, we should NOT allow join (might overwhelm the service)
-            if (classifiedError.type === 'RATE_LIMITED') {
-              reject(new Error('服務繁忙，請稍後再試'));
-              return;
-            }
-
-            // For other errors, fail open
-            resolve(true);
-          }
-        });
-      });
-
-      return await syncPromise;
-    } catch (error) {
-      console.error('[useVisitorJoin] Error checking owner presence:', error);
-
-      // Classify the error
-      const classifiedError = classifyRealtimeError(undefined, error);
-
-      // For rate limiting, propagate the error
-      if (classifiedError.type === 'RATE_LIMITED') {
-        throw new Error(classifiedError.userMessage);
-      }
-
-      return true; // Fail open for other errors
-    } finally {
-      if (tempChannel) {
-        await tempChannel.unsubscribe();
-      }
-    }
-  }, []);
-
   const validateAndJoinRoom = useCallback(
     async (shareCode: string, visitorName: string): Promise<Visitor> => {
       setIsLoading(true);
@@ -185,11 +98,8 @@ export function useVisitorJoin() {
           throw new Error('諮詢室已過期，無法加入');
         }
 
-        // Check if owner (counselor) is online
-        const ownerOnline = await checkOwnerOnline(room.id);
-        if (!ownerOnline) {
-          throw new Error('諮詢師尚未開啟房間，請稍後再試');
-        }
+        // NOTE: Owner online check moved to room page (after Presence connects)
+        // This avoids channel conflicts with the main Presence channel
 
         // Create visitor using share code
         const visitor = await createVisitorByShareCode(shareCode.toUpperCase(), visitorName.trim());
@@ -203,7 +113,7 @@ export function useVisitorJoin() {
         setIsLoading(false);
       }
     },
-    [createVisitorByShareCode, checkOwnerOnline]
+    [createVisitorByShareCode]
   );
 
   const joinRoomAndRedirect = useCallback(

@@ -8,8 +8,9 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { GameModeService } from '@/game-modes/services/mode.service';
 import { CardLoaderService } from '@/game-modes/services/card-loader.service';
 import CombinedGameSelector from '@/game-modes/components/CombinedGameSelector';
@@ -67,15 +68,36 @@ const GameModeIntegration: React.FC<GameModeIntegrationProps> = ({
     setPortalContainer(container);
   }, []);
 
+  const router = useRouter();
+  const ownerCheckDoneRef = useRef(false);
+
   // 使用 room presence 檢測 counselor 在線狀態
-  const { onlineUsers } = usePresence(roomId);
+  const { onlineUsers, isConnected: presenceConnected } = usePresence(roomId);
   const counselorOnline = onlineUsers.some(u => u.role === 'owner');
 
   // Debug: log online users
   useEffect(() => {
     console.log('[GameMode] onlineUsers:', onlineUsers.map(u => ({ id: u.id, role: u.role })));
-    console.log('[GameMode] counselorOnline:', counselorOnline);
-  }, [onlineUsers, counselorOnline]);
+    console.log('[GameMode] counselorOnline:', counselorOnline, 'presenceConnected:', presenceConnected);
+  }, [onlineUsers, counselorOnline, presenceConnected]);
+
+  // 訪客檢查 owner 是否在線（連接後 3 秒檢查）
+  useEffect(() => {
+    if (!isVisitor || ownerCheckDoneRef.current) return;
+    if (!presenceConnected) return;
+
+    // 等待 3 秒讓 presence 同步完成，再檢查 owner 是否在線
+    const timer = setTimeout(() => {
+      ownerCheckDoneRef.current = true;
+
+      if (!counselorOnline) {
+        console.log('[GameMode] Owner not online after 3s, redirecting visitor to join page');
+        router.push('/join?error=owner_offline');
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [isVisitor, presenceConnected, counselorOnline, router]);
 
   // 使用遊戲模式同步 Hook
   const {

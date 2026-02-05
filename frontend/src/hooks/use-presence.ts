@@ -1,8 +1,10 @@
 /**
- * usePresence Hook
- * 管理房間內的在線狀態（使用 Supabase Presence）
+ * usePresence Hook (Simplified)
  *
- * Implements exponential backoff to prevent quota exhaustion
+ * 只做一件事：追蹤 owner 是否在線
+ * - 不做複雜的 retry（讓 Supabase 自動處理）
+ * - 不追蹤所有用戶列表
+ * - 只關心 owner 在不在
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
@@ -10,73 +12,34 @@ import { useRouter } from 'next/navigation';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
-import { RealtimeRetryManager, classifyRealtimeError, type RealtimeErrorType } from '@/lib/realtime-retry';
-
-// ============================================================================
-// Constants
-// ============================================================================
-
-/** Maximum retry attempts for reconnection */
-const MAX_RETRY_ATTEMPTS = 5;
-
-/** Initial delay for exponential backoff (ms) */
-const INITIAL_RETRY_DELAY_MS = 1000;
-
-/** Maximum delay for exponential backoff (ms) */
-const MAX_RETRY_DELAY_MS = 30000;
 
 export interface PresenceUser {
-  id: string; // user-123 或 visitor-session-abc
-  name: string; // 顯示名稱
-  role: 'owner' | 'visitor'; // 角色
-  avatar?: string; // 頭像（可選）
-  joinedAt: string; // 加入時間
+  id: string;
+  name: string;
+  role: 'owner' | 'visitor';
+  avatar?: string;
+  joinedAt: string;
 }
 
-interface PresenceState {
-  [key: string]: PresenceUser[];
-}
-
-export function usePresence(roomId: string | undefined, onConnectionChange?: (isConnected: boolean, errorType?: RealtimeErrorType) => void) {
+export function usePresence(roomId: string | undefined) {
   const router = useRouter();
   const [onlineUsers, setOnlineUsers] = useState<PresenceUser[]>([]);
   const [isConnected, setIsConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [errorType, setErrorType] = useState<RealtimeErrorType | null>(null);
-  const [retryExhausted, setRetryExhausted] = useState(false);
-  const [isRetrying, setIsRetrying] = useState(false);
-  const [remainingRetries, setRemainingRetries] = useState(5);
+  const [ownerOnline, setOwnerOnline] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
-  const prevCountRef = useRef(0);
-  const retryManagerRef = useRef<RealtimeRetryManager | null>(null);
-  const onConnectionChangeRef = useRef(onConnectionChange);
-  const setupPresenceRef = useRef<(() => Promise<void>) | null>(null);
 
-  // Keep callback ref updated
-  useEffect(() => {
-    onConnectionChangeRef.current = onConnectionChange;
-  }, [onConnectionChange]);
-
-  // 取得當前用戶資訊
   const { user } = useAuthStore();
 
-  // Memoize user identity to prevent unnecessary re-renders
-  // Use useMemo instead of useCallback to avoid dependency issues
+  // Determine current user identity
   const userIdentity = useMemo((): PresenceUser | null => {
-    // Check visitor FIRST (visitor session takes priority over auth store)
-    // This handles the case where visitor opens link in browser that has logged-in user
     if (typeof window !== 'undefined') {
-      // Check URL parameter for visitor flag
       const urlParams = new URLSearchParams(window.location.search);
       const isVisitorFromUrl = urlParams.get('visitor') === 'true';
-
-      // Check localStorage for visitor session
       const visitorSessionStr = localStorage.getItem('visitor_session');
+
       if (visitorSessionStr) {
         try {
           const visitorSession = JSON.parse(visitorSessionStr);
-
-          // If visitor session exists for current room OR URL indicates visitor
           if (visitorSession.room_id === roomId || isVisitorFromUrl) {
             return {
               id: `visitor_${visitorSession.session_id || visitorSession.visitor_id}`,
@@ -86,12 +49,11 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
             };
           }
         } catch (e) {
-          console.error('解析 visitor session 失敗:', e);
+          console.error('[usePresence] Parse visitor session failed:', e);
         }
       }
     }
 
-    // If not a visitor, check for logged-in user (counselor/owner)
     if (user) {
       return {
         id: user.id,
@@ -103,335 +65,162 @@ export function usePresence(roomId: string | undefined, onConnectionChange?: (is
     }
 
     return null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, user?.name, roomId]); // Intentionally using user?.id and user?.name instead of user to avoid unnecessary updates
+  }, [user?.id, user?.name, roomId]);
 
-  // Keep a ref for the identity to use in callbacks without causing re-subscriptions
   const userIdentityRef = useRef(userIdentity);
   useEffect(() => {
     userIdentityRef.current = userIdentity;
   }, [userIdentity]);
 
-  // 連接 Presence channel
+  // Single channel setup - NO RETRY LOGIC
   useEffect(() => {
-    // 檢查 Supabase 是否已配置
-    if (!isSupabaseConfigured()) {
-      console.warn('Supabase 未配置，Presence 功能無法使用');
-      setError('即時同步功能未啟用');
+    if (!isSupabaseConfigured() || !supabase || !roomId) {
       return;
     }
 
-    if (!supabase || !roomId) {
-      return;
-    }
-
-    // Use ref to get current identity (avoids dependency on userIdentity)
     const identity = userIdentityRef.current;
     if (!identity) {
       return;
     }
 
-    // Initialize retry manager
-    if (!retryManagerRef.current) {
-      retryManagerRef.current = new RealtimeRetryManager({
-        maxRetries: MAX_RETRY_ATTEMPTS,
-        initialDelayMs: INITIAL_RETRY_DELAY_MS,
-        maxDelayMs: MAX_RETRY_DELAY_MS,
-      });
+    // Clean up any existing channel first
+    if (channelRef.current) {
+      channelRef.current.untrack();
+      channelRef.current.unsubscribe();
+      channelRef.current = null;
     }
 
-    const retryManager = retryManagerRef.current;
     let isCleanedUp = false;
 
-    const setupPresence = async () => {
-      if (isCleanedUp) return;
-      setupPresenceRef.current = setupPresence;
+    // Use consistent channel name (same as before)
+    const channel = supabase.channel(`realtime:room:${roomId}:presence`, {
+      config: {
+        presence: {
+          key: identity.id,
+        },
+      },
+    });
 
-      try {
-        // Clean up existing channel if any
-        if (channelRef.current) {
-          await channelRef.current.unsubscribe();
-          channelRef.current = null;
+    channelRef.current = channel;
+
+    // Helper to extract unique users from presence state
+    const extractUsers = (state: Record<string, PresenceUser[]>): PresenceUser[] => {
+      const userMap = new Map<string, PresenceUser>();
+      Object.values(state).forEach((presences) => {
+        if (Array.isArray(presences)) {
+          presences.forEach((p) => userMap.set(p.id, p));
         }
-
-        // 建立 channel
-        const channel = supabase!.channel(`realtime:room:${roomId}:presence`, {
-          config: {
-            presence: {
-              key: identity.id, // 使用用戶 ID 作為 presence key
-            },
-          },
-        });
-
-        channelRef.current = channel;
-
-        // 監聽 Presence 同步事件
-        channel
-          .on('presence', { event: 'sync' }, () => {
-            const state = channel.presenceState<PresenceUser>();
-            // 將 presence state 轉換為用戶陣列，並去重複
-            const userMap = new Map<string, PresenceUser>();
-            Object.values(state).forEach((presences) => {
-              if (Array.isArray(presences)) {
-                presences.forEach((presence) => {
-                  // 使用 user ID 作為 key，確保每個用戶只出現一次
-                  // 如果已存在，保留較新的（後面的會覆蓋前面的）
-                  userMap.set(presence.id, presence);
-                });
-              }
-            });
-            const users = Array.from(userMap.values());
-            // Only log when user count changes
-            if (users.length !== prevCountRef.current) {
-              console.log('[usePresence] 在線用戶更新:', users.length, '人');
-              prevCountRef.current = users.length;
-            }
-            setOnlineUsers(users);
-          })
-          .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-            console.log('[usePresence] 用戶加入:', key);
-          })
-          .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-            console.log('[usePresence] 用戶離開:', key);
-
-            // Check if owner left
-            if (Array.isArray(leftPresences)) {
-              const ownerLeft = leftPresences.some((presence: any) => presence.role === 'owner');
-
-              if (ownerLeft) {
-                const currentIdentity = userIdentityRef.current;
-                console.log('[usePresence] 🚨 Owner leave detected, will verify in 3 seconds...');
-
-                // Don't redirect immediately - owner might just be reconnecting
-                // Wait 3 seconds and check if owner is still gone
-                if (currentIdentity?.role === 'visitor') {
-                  setTimeout(() => {
-                    // Check current presence state to see if owner came back
-                    const currentState = channel.presenceState<PresenceUser>();
-                    const users: PresenceUser[] = [];
-                    Object.values(currentState).forEach((presences) => {
-                      if (Array.isArray(presences)) {
-                        users.push(...presences);
-                      }
-                    });
-                    const ownerStillOnline = users.some(u => u.role === 'owner');
-
-                    if (!ownerStillOnline) {
-                      console.log('[usePresence] 🚨 Owner confirmed gone after 3s, redirecting to session-ended');
-                      router.push('/session-ended');
-                    } else {
-                      console.log('[usePresence] ✅ Owner came back, not redirecting');
-                    }
-                  }, 3000);
-                  return;
-                }
-
-                // For non-visitors (other owners?), broadcast session_ended
-                // Also wait to confirm owner is gone
-                setTimeout(() => {
-                  const currentState = channel.presenceState<PresenceUser>();
-                  const users: PresenceUser[] = [];
-                  Object.values(currentState).forEach((presences) => {
-                    if (Array.isArray(presences)) {
-                      users.push(...presences);
-                    }
-                  });
-                  const ownerStillOnline = users.some(u => u.role === 'owner');
-
-                  if (!ownerStillOnline) {
-                    channel
-                      .send({
-                        type: 'broadcast',
-                        event: 'session_ended',
-                        payload: {
-                          reason: 'owner_left',
-                          timestamp: new Date().toISOString(),
-                        },
-                      })
-                      .then(() => {
-                        console.log('[usePresence] ✅ session_ended broadcast sent');
-                      })
-                      .catch((err) => {
-                        console.error('[usePresence] Failed to broadcast session_ended:', err);
-                      });
-                  }
-                }, 3000);
-              }
-            }
-          })
-          // Listen for session_ended broadcast (visitors will receive this)
-          .on('broadcast', { event: 'session_ended' }, ({ payload }) => {
-            const currentIdentity = userIdentityRef.current;
-            if (currentIdentity?.role === 'visitor') {
-              console.log('[usePresence] 🚨 Received session_ended, redirecting visitor');
-              router.push('/session-ended');
-            }
-          });
-
-        // 訂閱 channel - 根據官方文檔
-        channel.subscribe(async (status, err) => {
-          if (isCleanedUp) return;
-
-          console.log('[usePresence] Subscription status:', status, 'Error:', err);
-
-          if (status === 'SUBSCRIBED') {
-            // Success! Reset retry counter and state
-            retryManager.reset();
-            setRetryExhausted(false);
-            setIsRetrying(false);
-            setRemainingRetries(MAX_RETRY_ATTEMPTS);
-            setIsConnected(true);
-            setError(null);
-            setErrorType(null);
-            onConnectionChangeRef.current?.(true);
-            console.log('[usePresence] Channel subscribed successfully');
-
-            // 發送自己的 presence 狀態 - use ref for latest identity
-            try {
-              const currentIdentity = userIdentityRef.current;
-              if (currentIdentity) {
-                const presenceTrackStatus = await channel.track(currentIdentity);
-                console.log('[usePresence] Presence track status:', presenceTrackStatus);
-              }
-            } catch (trackErr) {
-              console.error('[usePresence] Failed to track presence:', trackErr);
-            }
-          } else if (status === 'TIMED_OUT') {
-            // Handle timeout specifically - always retryable
-            console.warn('[usePresence] Connection timed out');
-            setIsConnected(false);
-            setError('連線逾時，正在重新連線...');
-            setErrorType('TIMED_OUT');
-            onConnectionChangeRef.current?.(false, 'TIMED_OUT');
-
-            if (!isCleanedUp && retryManager.canRetry()) {
-              setIsRetrying(true);
-              setRemainingRetries(retryManager.getRemainingRetries());
-              retryManager.scheduleRetry(() => {
-                console.log('[usePresence] Attempting reconnection after timeout...');
-                setupPresence();
-              });
-            } else {
-              setRetryExhausted(true);
-              setIsRetrying(false);
-              setError('無法連接到即時服務，請重新整理頁面');
-            }
-          } else if (err || status === 'CHANNEL_ERROR' || status === 'CLOSED') {
-            console.warn('[usePresence] Subscription error:', err || status);
-            setIsConnected(false);
-
-            // Classify the error for appropriate handling
-            const classifiedError = classifyRealtimeError(status, err);
-            setError(classifiedError.userMessage);
-            setErrorType(classifiedError.type);
-            onConnectionChangeRef.current?.(false, classifiedError.type);
-
-            // Handle based on error classification
-            if (!classifiedError.isRetryable) {
-              // Non-retryable errors: graceful degradation
-              console.warn(`[usePresence] Non-retryable error (${classifiedError.type}), degrading gracefully`);
-              setRetryExhausted(true);
-              setIsRetrying(false);
-              return;
-            }
-
-            // Attempt retry with exponential backoff for retryable errors
-            if (!isCleanedUp && retryManager.canRetry()) {
-              setIsRetrying(true);
-              setRemainingRetries(retryManager.getRemainingRetries());
-              retryManager.scheduleRetry(() => {
-                console.log('[usePresence] Attempting reconnection...');
-                setupPresence();
-              });
-            } else if (!retryManager.canRetry()) {
-              setRetryExhausted(true);
-              setIsRetrying(false);
-              setError('無法連接到即時服務，請重新整理頁面');
-            }
-          }
-        });
-      } catch (err) {
-        if (isCleanedUp) return;
-
-        console.error('Presence 連接錯誤:', err);
-
-        // Classify the caught error
-        const classifiedError = classifyRealtimeError(undefined, err);
-        setError(classifiedError.userMessage);
-        setErrorType(classifiedError.type);
-        setIsConnected(false);
-        onConnectionChangeRef.current?.(false, classifiedError.type);
-
-        // Only retry if error is retryable
-        if (classifiedError.isRetryable && retryManager.canRetry()) {
-          setIsRetrying(true);
-          setRemainingRetries(retryManager.getRemainingRetries());
-          retryManager.scheduleRetry(() => {
-            console.log('[usePresence] Attempting reconnection after error...');
-            setupPresence();
-          });
-        } else {
-          setRetryExhausted(true);
-          setIsRetrying(false);
-        }
-      }
+      });
+      return Array.from(userMap.values());
     };
 
-    setupPresence();
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        if (isCleanedUp) return;
 
-    // 清理函數
+        const state = channel.presenceState<PresenceUser>();
+        const users = extractUsers(state);
+        const hasOwner = users.some((u) => u.role === 'owner');
+
+        console.log('[usePresence] sync - users:', users.length, 'ownerOnline:', hasOwner);
+        setOnlineUsers(users);
+        setOwnerOnline(hasOwner);
+      })
+      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+        if (isCleanedUp) return;
+
+        // Check if owner left
+        const ownerLeft = Array.isArray(leftPresences) &&
+          leftPresences.some((p: any) => p.role === 'owner');
+
+        if (ownerLeft && userIdentityRef.current?.role === 'visitor') {
+          console.log('[usePresence] Owner left, checking in 3s...');
+
+          // Wait 3 seconds to confirm owner really left
+          setTimeout(() => {
+            if (isCleanedUp) return;
+
+            const currentState = channel.presenceState<PresenceUser>();
+            const users = extractUsers(currentState);
+            const ownerStillHere = users.some((u) => u.role === 'owner');
+
+            if (!ownerStillHere) {
+              console.log('[usePresence] Owner confirmed gone, redirecting...');
+              router.push('/session-ended');
+            } else {
+              console.log('[usePresence] Owner came back');
+            }
+          }, 3000);
+        }
+      });
+
+    // Subscribe once - let Supabase handle reconnection
+    channel.subscribe(async (status) => {
+      if (isCleanedUp) return;
+
+      console.log('[usePresence] Status:', status);
+
+      if (status === 'SUBSCRIBED') {
+        setIsConnected(true);
+
+        // Track presence ONCE
+        const currentIdentity = userIdentityRef.current;
+        if (currentIdentity) {
+          try {
+            await channel.track(currentIdentity);
+            console.log('[usePresence] Tracked successfully');
+          } catch (err) {
+            console.error('[usePresence] Track failed:', err);
+          }
+        }
+      } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+        // Don't retry manually - Supabase reconnects automatically
+        // Just update state
+        console.log('[usePresence] Channel issue, Supabase will auto-reconnect');
+        setIsConnected(false);
+      }
+    });
+
     return () => {
       isCleanedUp = true;
-      if (retryManagerRef.current) {
-        retryManagerRef.current.cleanup();
-      }
+
       if (channelRef.current) {
         channelRef.current.untrack();
         channelRef.current.unsubscribe();
         channelRef.current = null;
       }
+
       setIsConnected(false);
       setOnlineUsers([]);
+      setOwnerOnline(false);
     };
-  }, [roomId]); // Only depend on roomId - use refs for other values
+  }, [roomId, router]);
 
-  // 手動重新連接
+  // Manual reconnect (for user-triggered refresh)
   const reconnect = useCallback(() => {
-    console.log('[usePresence] Manual reconnect requested');
+    if (!channelRef.current || !supabase || !roomId) return;
 
-    // Reset retry manager to allow fresh retries
-    if (retryManagerRef.current) {
-      retryManagerRef.current.reset();
-    }
+    console.log('[usePresence] Manual reconnect');
 
-    // Reset state
-    setRetryExhausted(false);
-    setIsRetrying(false);
-    setRemainingRetries(MAX_RETRY_ATTEMPTS);
-    setError(null);
-    setErrorType(null);
+    channelRef.current.untrack();
+    channelRef.current.unsubscribe();
+    channelRef.current = null;
 
-    if (channelRef.current) {
-      channelRef.current.unsubscribe();
-      channelRef.current = null;
-    }
-
-    // Trigger reconnection
-    if (setupPresenceRef.current) {
-      setupPresenceRef.current();
-    }
-  }, []);
+    // Re-trigger effect by updating state
+    setIsConnected(false);
+  }, [roomId]);
 
   return {
     onlineUsers,
     isConnected,
-    error,
-    errorType,
+    ownerOnline,
     reconnect,
-    retryExhausted,
-    isRetrying,
-    remainingRetries,
-    // 用於除錯
     currentUser: userIdentity,
+    // Legacy compatibility (for existing code)
+    error: null,
+    errorType: null,
+    retryExhausted: false,
+    isRetrying: false,
+    remainingRetries: 0,
   };
 }
